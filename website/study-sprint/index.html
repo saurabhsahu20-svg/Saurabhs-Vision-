@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071B49"><meta name="description" content="Vision Daily Study Sprint: Five original Maths and Science practice questions with instant explanations.">
+<title>Vision Daily Study Sprint | SAURABH'S VISION</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#12234c;background:#edf3ff;color-scheme:light}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 85% -10%,#b5d5ff,transparent 46%),#edf3ff;min-height:100vh}
+button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid #00b5dd;outline-offset:3px}
+header{background:linear-gradient(115deg,#071b49,#173d92);color:white;padding:16px 0;box-shadow:0 6px 24px #071b4933}
+.wrap{width:min(100% - 32px,1040px);margin:auto}.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff}
+.brand img{width:56px;height:56px;object-fit:cover;border-radius:13px;background:#111f42}.brand strong{display:block;font-size:19px;letter-spacing:.025em}.brand span{font-size:11px;color:#ffdc74;font-weight:800;letter-spacing:.12em}
+.head{padding:54px 0 32px;color:#fff;background:linear-gradient(125deg,#071b49,#1746d2)}
+.kicker{color:#ffe375;letter-spacing:.16em;text-transform:uppercase;font-size:12px;font-weight:800}h1{font-size:clamp(32px,6vw,56px);margin:14px 0 12px;line-height:1.1;letter-spacing:-.04em}.lead{max-width:710px;font-size:18px;color:#dce8ff;line-height:1.6}
+.head small{display:inline-block;background:#ffffff1b;border:1px solid #ffffff4a;border-radius:100px;padding:10px 14px;color:#e4edff}
+main{margin:30px auto 65px}.panel{background:#fff;border:1px solid #cfdcf3;border-radius:22px;box-shadow:0 15px 40px #183e8b12;padding:clamp(18px,4vw,34px);margin:20px 0}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.track{border-radius:18px;border:2px solid #d6e2fa;background:#f7faff;padding:22px;text-align:left;min-height:145px;color:#092452}
+.track b{display:block;font-size:20px;margin:12px 0 6px}.track small{color:#4b628a;line-height:1.5;display:block}
+.track[aria-pressed=true]{background:#e6efff;border-color:#1746d2;box-shadow:inset 0 0 0 1px #1746d2}.track .emoji{font-size:26px}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}.primary,.secondary{border-radius:12px;border:0;padding:13px 22px;font-weight:800;min-height:48px}
+.primary{background:#ffd700;color:#071b49}.primary:hover{background:#ffeb63}.secondary{background:#e8efff;color:#133575}
+.note{font-size:13px;color:#536588;line-height:1.65}.muted{color:#52648a}.eyebrow{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.13em;color:#1746d2}
+#challenge[hidden],#setup[hidden],#finish[hidden]{display:none}
+.progressbar{height:9px;border-radius:20px;background:#dde6f9;overflow:hidden;margin:16px 0 24px}.progressbar>span{height:100%;display:block;background:linear-gradient(90deg,#1746d2,#00bde9);transition:width .15s}
+.options{display:grid;gap:11px;margin:24px 0}.option{width:100%;border-radius:13px;background:#f7f9ff;border:2px solid #d9e3f6;color:#152d59;padding:15px 18px;min-height:50px;text-align:left}
+.option:hover{background:#eef5ff}.option[aria-pressed=true]{border-color:#1746d2;background:#e6efff}
+.option:disabled{cursor:default;opacity:1}.option.correct{background:#e7f8eb;border-color:#3ca469;color:#185b34}.option.wrong{background:#fff0ed;border-color:#cf6f6c;color:#8d3030}
+.explain{background:#f2f7ff;border-left:4px solid #1746d2;padding:18px;border-radius:8px;line-height:1.65}
+.explain.good{border-color:#19865e}.explain.retry{border-color:#d37b30}
+footer{padding:28px 0;text-align:center;color:#627090;font-size:13px}.stat{background:#f0f5ff;border-radius:14px;padding:18px;flex:1;min-width:140px}
+.stat b{font-size:27px;display:block;color:#1746d2}.mini-result{border:1px solid #d8e3fa;border-radius:12px;padding:14px;margin:9px 0;line-height:1.55}
+.mini-result b{color:#142e63}.pill{display:inline-block;background:#e8f0ff;border-radius:99px;padding:7px 12px;font-size:12px;color:#123e90;font-weight:800}
+select{padding:12px;border-radius:12px;border:1px solid #bdcdec;background:white;color:#102754;min-height:44px}
+.visually-hidden{position:absolute!important;clip:rect(0,0,0,0);height:1px;width:1px;overflow:hidden}
+@media(max-width:720px){.cards{grid-template-columns:1fr}.head{padding:32px 0}.track{min-height:0}.brand strong{font-size:16px}.brand img{width:48px;height:48px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
+</style></head><body>
+<header><div class="wrap"><a class="brand" href="../index.html" aria-label="Saurabh's Vision home">
+<img src="../assets/vision-icon-192.png" alt="Saurabh's Vision logo" onerror="this.hidden=true">
+<div><strong>SAURABH'S VISION™</strong><span>LEARN TODAY, LEAD TOMORROW!</span></div></a></div></header>
+<div class="head"><div class="wrap"><div class="kicker">✦ FREE • NO LOGIN REQUIRED</div>
+<h1>Vision Daily<br>Study Sprint</h1><p class="lead">Five questions. Clear explanations. A small, useful step toward stronger concepts.</p>
+<small>🎯 Original foundation practice • Not official board exam questions</small></div></div>
+<main class="wrap">
+<section id="setup" class="panel" aria-labelledby="setup-title"><span class="eyebrow">Choose your practice</span><h2 id="setup-title">What would you like to revise?</h2>
+<div class="cards" id="tracks" role="group" aria-label="Practice subject">
+<button class="track" data-track="junior" aria-pressed="true"><span class="emoji">🌈</span><b>Junior Explorer</b><small>Classes 1–5 · Numbers, shapes and basic science</small></button>
+<button class="track" data-track="maths" aria-pressed="false"><span class="emoji">📐</span><b>Maths Galaxy</b><small>Classes 6–10 · Maths concepts and quick problems</small></button>
+<button class="track" data-track="science" aria-pressed="false"><span class="emoji">⚛️</span><b>Science Lab</b><small>Classes 6–10 · Physics, chemistry and biology</small></button>
+</div><p class="note">Each track offers a rotating five-question revision set. Answer at your own pace; there is no countdown or leaderboard.</p>
+<div class="row"><button id="start" class="primary">Start 5 Questions →</button><span class="pill" id="history-line">Your study history stays on this device.</span></div>
+</section>
+<section id="challenge" class="panel" hidden aria-labelledby="question"><div class="row" style="justify-content:space-between">
+<span class="eyebrow" id="subject">STUDY SPRINT</span><button class="secondary" id="leave" type="button">← Change topic</button></div>
+<p class="muted" id="position" aria-live="polite"></p><div class="progressbar" role="progressbar" aria-label="Questions completed" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" id="progress"><span id="progressfill" style="width:0%"></span></div>
+<h2 id="question" tabindex="-1"></h2><div class="options" id="options" role="group" aria-labelledby="question"></div>
+<div id="feedback" aria-live="polite"></div><div class="row" style="margin-top:20px">
+<button class="primary" id="next" hidden type="button">Next Question →</button></div>
+</section>
+<section id="finish" class="panel" hidden aria-labelledby="finish-title"><span class="eyebrow">SESSION COMPLETE</span><h2 id="finish-title">Nice work reviewing your concepts!</h2>
+<div class="row"><div class="stat"><b id="score">0/5</b><span>Correct answers</span></div><div class="stat"><b id="reviewcount">0</b><span>Topics to review</span></div></div>
+<h3>Review your explanations</h3><div id="summary"></div><div class="row" style="margin-top:22px"><button class="primary" id="again">Practice Another Set</button><button class="secondary" id="restart">Choose another track</button></div>
+<p class="note">Your score is practice feedback, not an official examination result. No account data is collected or uploaded.</p></section>
+<section class="panel" aria-labelledby="privacy-title"><h2 id="privacy-title">💡 How it works</h2>
+<p class="muted">Choose a topic, answer five original questions, and read the explanation after each answer. You can return for another set whenever you want. Only a small anonymous session summary is stored in this browser/app storage when available.</p>
+<div class="row"><button id="clear" class="secondary" type="button">Clear local Study Sprint history</button><span class="note" id="clear-note" role="status"></span></div></section>
+</main><footer><div class="wrap">SAURABH’S VISION™ • Strong Concepts. Bright Results. • Bhanpuri, Raipur<br>Learning is a process, not a race.</div></footer>
+<script>
+(()=>{'use strict';
+const BANK={
+junior:[
+['What is 8 + 7?',['14','15','16','17'],1,'8 + 7 = 15.'],
+['Which shape has three sides?',['Circle','Triangle','Square','Rectangle'],1,'A triangle has exactly three sides.'],
+['Which plant part generally absorbs water from soil?',['Flower','Fruit','Root','Leaf'],2,'Roots absorb water and dissolved minerals from soil.'],
+['What is 24 − 9?',['13','14','15','16'],2,'24 − 9 = 15.'],
+['What comes just before 100?',['90','99','101','110'],1,'The number immediately before 100 is 99.'],
+['One half of 12 is…',['4','5','6','8'],2,'12 divided into two equal parts gives 6.'],
+['Which sense organ helps us hear?',['Eye','Ear','Nose','Tongue'],1,'Our ears detect sounds.'],
+['How many sides does a square have?',['3','4','5','6'],1,'A square has four equal sides.'],
+['What is 6 × 3?',['12','15','18','21'],2,'6 groups of 3 make 18.'],
+['Which of these is a source of light?',['Stone','Sun','Chair','Notebook'],1,'The Sun emits light.']
+],
+maths:[
+['What is 3²?',['6','9','12','27'],1,'3 squared is 3 × 3 = 9.'],
+['Solve: x + 5 = 12',['5','6','7','8'],2,'Subtract 5 from both sides: x = 7.'],
+['A right angle measures…',['45°','60°','90°','180°'],2,'A right angle measures 90 degrees.'],
+['Which number is prime?',['15','21','23','27'],2,'23 has only two positive factors: 1 and 23.'],
+['What is 25% of 80?',['10','15','20','25'],2,'25% is one quarter; 80 ÷ 4 = 20.'],
+['The perimeter of a square with side 5 cm is…',['10 cm','15 cm','20 cm','25 cm'],2,'Four sides × 5 cm = 20 cm.'],
+['What is 0.6 as a fraction in simplest form?',['6/100','3/5','2/3','5/6'],1,'0.6 = 6/10 = 3/5.'],
+['What is the mean of 3, 5 and 7?',['4','5','6','7'],1,'(3+5+7) ÷ 3 = 5.'],
+['If 2x = 18, x is…',['7','8','9','10'],2,'Divide both sides by 2: x = 9.'],
+['The area of a rectangle 8 cm by 3 cm is…',['11 cm²','22 cm²','24 cm²','48 cm²'],2,'Area = length × width = 8 × 3 = 24 cm².']
+],
+science:[
+['The SI unit of force is…',['Joule','Newton','Watt','Metre'],1,'Force is measured in newtons (N).'],
+['An electron carries a…',['Positive charge','Negative charge','No charge','Double positive charge'],1,'An electron has negative electric charge.'],
+['Which gas do green plants use in photosynthesis?',['Oxygen','Nitrogen','Carbon dioxide','Helium'],2,'Plants use carbon dioxide and water to make sugars using light.'],
+['Which organ pumps blood around the human body?',['Liver','Lung','Heart','Stomach'],2,'The heart pumps blood through blood vessels.'],
+['The atomic number equals the number of…',['Neutrons','Protons','Molecules','Shells'],1,'Atomic number is the number of protons in the nucleus.'],
+['Which is a physical change?',['Burning paper','Rusting iron','Melting ice','Cooking an egg'],2,'Melting changes the state of water without creating a different substance.'],
+['Light travels fastest in…',['Glass','Water','Air','Vacuum'],3,'Light has its maximum speed in a vacuum.'],
+['Which cell structure contains DNA in most human cells?',['Nucleus','Cell wall','Vacuole','Chloroplast'],0,'The nucleus contains most genetic material in human cells.'],
+['Plants release which gas during photosynthesis?',['Carbon monoxide','Oxygen','Hydrogen','Methane'],1,'Oxygen is released during photosynthesis.'],
+['Which is a renewable energy source?',['Coal','Petrol','Natural gas','Sunlight'],3,'Sunlight is continuously replenished by the Sun.']
+]};
+const $=id=>document.getElementById(id);
+const localKey='sv-study-sprint-v1';let track='junior',questions=[],answers=[],i=0,locked=false;
+const labels={junior:'Junior Explorer',maths:'Maths Galaxy',science:'Science Lab'};
+function history(){try{return JSON.parse(localStorage.getItem(localKey)||'[]')}catch{return []}}
+function updateHistory(){const a=history();$('history-line').textContent=a.length?('You completed '+a.length+' session'+(a.length===1?'':'s')+' on this device.'):'Your study history stays on this device.'}
+function saveSession(){try{const a=history();a.unshift({date:new Date().toISOString().slice(0,10),track,score:answers.filter((v,j)=>v===questions[j][2]).length,total:questions.length});localStorage.setItem(localKey,JSON.stringify(a.slice(0,40)))}catch{}}
+function seed(){const d=new Date(),start=new Date(d.getFullYear(),0,0);return Math.floor((d-start)/86400000)}
+function choose(){let src=BANK[track],day=seed(),offset=(day*3)%src.length;questions=Array.from({length:5},(_,j)=>src[(offset+j*3)%src.length]);if(new Set(questions).size<5)questions=src.slice(offset).concat(src.slice(0,offset)).slice(0,5);answers=[];i=0;locked=false}
+function showSetup(){$('setup').hidden=false;$('challenge').hidden=true;$('finish').hidden=true;updateHistory()}
+function start(){choose();$('setup').hidden=true;$('finish').hidden=true;$('challenge').hidden=false;render()}
+function render(){locked=false;const q=questions[i];$('position').textContent='Question '+(i+1)+' of '+questions.length;$('subject').textContent=labels[track];$('question').textContent=q[0];$('progress').setAttribute('aria-valuenow',String(i));$('progressfill').style.width=(i/questions.length*100)+'%';$('feedback').replaceChildren();$('next').hidden=true;$('options').replaceChildren();q[1].forEach((v,n)=>{const b=document.createElement('button');b.className='option';b.type='button';b.textContent=String.fromCharCode(65+n)+'. '+v;b.setAttribute('aria-pressed','false');b.addEventListener('click',()=>select(n));$('options').append(b)});$('question').focus({preventScroll:true})}
+function select(n){if(locked)return;locked=true;answers.push(n);const q=questions[i],correct=n===q[2];$('options').querySelectorAll('button').forEach((b,j)=>{b.disabled=true;b.setAttribute('aria-pressed',String(j===n));if(j===q[2])b.classList.add('correct');else if(j===n)b.classList.add('wrong')});const p=document.createElement('div');p.className='explain '+(correct?'good':'retry');const strong=document.createElement('strong');strong.textContent=correct?'✓ Correct — well done.':'Review this concept';const reason=document.createElement('p');reason.textContent=q[3];p.append(strong,reason);$('feedback').replaceChildren(p);$('next').hidden=false;$('next').textContent=i===questions.length-1?'View Results →':'Next Question →';$('next').focus()}
+function finish(){$('challenge').hidden=true;$('finish').hidden=false;const correct=answers.filter((v,j)=>v===questions[j][2]).length;$('score').textContent=correct+'/'+questions.length;$('reviewcount').textContent=questions.length-correct;$('summary').replaceChildren();questions.forEach((q,j)=>{const a=document.createElement('div');a.className='mini-result';const b=document.createElement('b');b.textContent=(j+1)+'. '+q[0]+' — '+(answers[j]===q[2]?'Correct':'Review');const p=document.createElement('p');p.textContent='Answer: '+q[1][q[2]]+'. '+q[3];a.append(b,p);$('summary').append(a)});saveSession();$('finish-title').focus({preventScroll:true})}
+$('tracks').addEventListener('click',e=>{const button=e.target.closest('button[data-track]');if(!button)return;track=button.dataset.track;$('tracks').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===button)))});
+$('start').addEventListener('click',start);$('again').addEventListener('click',start);$('next').addEventListener('click',()=>{i++;if(i===questions.length)finish();else render()});$('leave').addEventListener('click',showSetup);$('restart').addEventListener('click',showSetup);
+$('clear').addEventListener('click',()=>{try{localStorage.removeItem(localKey);$('clear-note').textContent='Local Study Sprint history cleared.'}catch{$('clear-note').textContent='Storage is unavailable.'}updateHistory()});updateHistory();
+})();
+</script></body></html>
