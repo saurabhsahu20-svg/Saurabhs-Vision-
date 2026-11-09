@@ -1,5 +1,4 @@
 User-agent: *
-Disallow: /#/dashboard
-Disallow: /#/portal/
-Disallow: /#/admin
-# Configure your real canonical domain and sitemap before production launch.
+Allow: /
+
+Sitemap: https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/sitemap.xml
