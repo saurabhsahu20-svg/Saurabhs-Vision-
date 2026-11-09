@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /#/dashboard
+Disallow: /#/portal/
+Disallow: /#/admin
+# Configure your real canonical domain and sitemap before production launch.
