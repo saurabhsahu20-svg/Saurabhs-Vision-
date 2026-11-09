@@ -1,0 +1,23 @@
+{
+  "name": "SAURABH’S VISION™",
+  "short_name": "Vision",
+  "description": "Learning and coaching institute in Raipur",
+  "start_url": "./#/",
+  "display": "standalone",
+  "background_color": "#071B49",
+  "theme_color": "#071B49",
+  "icons": [
+    {
+      "src": "./assets/vision-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/vision-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

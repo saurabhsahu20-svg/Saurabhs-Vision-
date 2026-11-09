@@ -1,0 +1,13 @@
+rules_version = '2';
+service firebase.storage {
+ match /b/{bucket}/o {
+  function isStudent(){return request.auth!=null && firestore.exists(/databases/(default)/documents/roles/$(request.auth.uid)) && firestore.get(/databases/(default)/documents/roles/$(request.auth.uid)).data.role=='student';}
+  function isAdmin(){return request.auth!=null && firestore.exists(/databases/(default)/documents/roles/$(request.auth.uid)) && firestore.get(/databases/(default)/documents/roles/$(request.auth.uid)).data.role=='admin';}
+  match /doubts/{uid}/{file} {
+   allow write: if isStudent() && request.auth.uid==uid && request.resource.size < 5 * 1024 * 1024
+     && request.resource.contentType.matches('image/(jpeg|png|webp)');
+   allow read: if (request.auth!=null && request.auth.uid==uid) || isAdmin();
+  }
+  match /{path=**} {allow read,write: if false;}
+ }
+}

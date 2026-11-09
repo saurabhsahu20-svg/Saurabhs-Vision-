@@ -1,0 +1,79 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function logged(){return request.auth != null;}
+  function roleIs(r){return logged() && exists(/databases/$(database)/documents/roles/$(request.auth.uid)) && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role==r;}
+  function admin(){return roleIs('admin');}
+  function teacher(){return roleIs('teacher');}
+  function student(){return roleIs('student');}
+  function parent(){return roleIs('parent');}
+  function myself(id){return logged() && request.auth.uid==id;}
+  function linkTo(child){return parent() && exists(/databases/$(database)/documents/parentLinks/$(request.auth.uid+'_'+child));}
+  function assigned(subject){return teacher() && exists(/databases/$(database)/documents/teacherAssignments/$(request.auth.uid)) && subject in get(/databases/$(database)/documents/teacherAssignments/$(request.auth.uid)).data.subjectKeys;}
+  function textLen(v,max){return v is string && v.size()<=max;}
+  function gradeOK(v){return v is string && v in ['1','2','3','4','5','6','7','8','9','10'];}
+  function validContact(v){return v is string && v.size()>=8 && v.size()<=18 && v.matches('^[0-9+() \\-]+$');}
+  function approved(){return resource.data.published==true;}
+  function immutableCreate(){return request.resource.data.createdAt==request.time;}
+  match /roles/{uid} {allow get: if myself(uid)||admin(); allow list: if admin(); allow create,update,delete: if admin();}
+  match /studentProfiles/{uid} {allow get: if myself(uid)||admin()||linkTo(uid); allow list: if admin(); allow create,update,delete: if admin();}
+  match /parentLinks/{id} {allow read: if admin() || (parent() && resource.data.guardianId==request.auth.uid); allow write: if admin();}
+  match /teacherAssignments/{uid} {allow read: if myself(uid)||admin(); allow write: if admin();}
+  match /siteSettings/{id} {allow read: if id=='public'||admin(); allow write: if admin() && id=='public';}
+  match /admissions/{id} {
+   allow create: if request.resource.data.keys().hasOnly(['studentName','grade','course','school','preferredBatch','guardianName','contact','message','consent','status','createdAt'])
+     && textLen(request.resource.data.studentName,80) && request.resource.data.studentName.size()>=2
+     && gradeOK(request.resource.data.grade) && request.resource.data.course in ['primary','secondary','board']
+     && textLen(request.resource.data.school,100) && textLen(request.resource.data.preferredBatch,80)
+     && textLen(request.resource.data.guardianName,80) && request.resource.data.guardianName.size()>=2
+     && validContact(request.resource.data.contact) && textLen(request.resource.data.message,700)
+     && request.resource.data.consent==true && request.resource.data.status=='new' && immutableCreate();
+   allow read,update,delete: if admin();
+  }
+  match /demoSlots/{id} {allow read: if resource.data.active==true||admin(); allow write: if admin();}
+  match /demoBookings/{id} {
+   allow create: if request.resource.data.keys().hasOnly(['slotId','grade','subject','guardianName','contact','message','status','consent','createdAt'])
+     && request.resource.data.slotId is string && request.resource.data.slotId.size()<=150
+     && exists(/databases/$(database)/documents/demoSlots/$(request.resource.data.slotId))
+     && get(/databases/$(database)/documents/demoSlots/$(request.resource.data.slotId)).data.active==true
+     && gradeOK(request.resource.data.grade) && request.resource.data.subject in ['Mathematics','Science','All Subjects']
+     && textLen(request.resource.data.guardianName,80) && request.resource.data.guardianName.size()>=2
+     && validContact(request.resource.data.contact) && textLen(request.resource.data.message,700)
+     && request.resource.data.status=='requested' && request.resource.data.consent==true && immutableCreate();
+   allow read,delete: if admin();
+   allow update: if admin() && (request.resource.data.status!='confirmed' || resource.data.status=='confirmed');
+  }
+  match /quizQuestions/{id} {allow read: if approved()||admin()||teacher(); allow create: if admin()||(teacher() && assigned(request.resource.data.subject)); allow update: if admin()||(teacher() && assigned(resource.data.subject) && assigned(request.resource.data.subject)); allow delete: if admin();}
+  match /practiceAttempts/{id} {
+   allow create: if student() && request.resource.data.studentId==request.auth.uid
+     && request.resource.data.kind=='unverified-practice' && request.resource.data.correct is int && request.resource.data.correct>=0
+     && request.resource.data.total is int && request.resource.data.total>0 && request.resource.data.total<=50
+     && request.resource.data.correct<=request.resource.data.total && textLen(request.resource.data.subject,60)
+     && request.resource.data.tags is list && request.resource.data.tags.size()<=50 && immutableCreate();
+   allow read: if admin() || (logged() && (resource.data.studentId==request.auth.uid || linkTo(resource.data.studentId)));
+   allow update,delete: if false;
+  }
+  match /doubts/{id} {
+   allow create: if student() && request.resource.data.studentId==request.auth.uid
+    && request.resource.data.subjectKey in ['Mathematics','Science']
+    && request.resource.data.keys().hasOnly(['studentId','subjectKey','chapter','question','imagePath','status','answer','createdAt'])
+    && textLen(request.resource.data.chapter,90) && textLen(request.resource.data.question,2000)
+    && request.resource.data.question.size()>=4 && textLen(request.resource.data.imagePath,250)
+    && (request.resource.data.imagePath=='' || request.resource.data.imagePath.matches('^doubts/'+request.auth.uid+'/[^/]+$'))
+    && request.resource.data.status=='pending' && request.resource.data.answer=='' && immutableCreate();
+   allow read: if admin() || (logged() && resource.data.studentId==request.auth.uid) || assigned(resource.data.subjectKey);
+   allow update: if admin() || (assigned(resource.data.subjectKey)
+     && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['answer','status','answeredAt'])
+     && request.resource.data.status=='answered' && textLen(request.resource.data.answer,4000))
+     || (student() && resource.data.studentId==request.auth.uid && resource.data.status=='answered'
+     && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) && request.resource.data.status=='resolved');
+   allow delete: if admin();
+  }
+  match /homework/{id} {allow read: if admin()||teacher()|| (student() && get(/databases/$(database)/documents/studentProfiles/$(request.auth.uid)).data.grade==resource.data.grade);allow create: if admin() || (teacher() && assigned(request.resource.data.subject));allow update: if admin() || (teacher() && assigned(resource.data.subject) && assigned(request.resource.data.subject));allow delete: if admin();}
+  match /studyMaterials/{id} {allow read: if approved() || admin()||teacher();allow create: if admin() || (teacher() && assigned(request.resource.data.subject));allow update: if admin() || (teacher() && assigned(resource.data.subject) && assigned(request.resource.data.subject));allow delete: if admin();}
+  match /announcements/{id} {allow read: if approved()||admin()||teacher();allow create,update,delete: if admin();}
+  match /gallery/{id} {allow read: if approved()||admin();allow create,update: if admin() && (!request.resource.data.published || request.resource.data.consentVerified==true);allow delete: if admin();}
+  match /results/{id} {allow read: if approved()||admin();allow create,update: if admin() && (!request.resource.data.published || request.resource.data.consentVerified==true);allow delete: if admin();}
+  match /{document=**} {allow read,write: if false;}
+ }
+}
