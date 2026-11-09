@@ -85,7 +85,17 @@ jobs:
                   mobile.write_text(old.replace(marker, '<div class="more-list">'+card+'<a class="chapter-entry" href="platform/index.html">'),encoding='utf-8')
                   print('Added Study Sprint to web app learning menu')
               else:
-                  print('Study Sprint: app menu variant differs; website header still links to Sprint')
+                  # Older APKs use a different menu layout; provide an always-visible
+                  # link without changing their existing quiz/learning JavaScript.
+                  page = root / 'index.html'
+                  if page.exists():
+                      body = page.read_text(encoding='utf-8')
+                      if '../study-sprint/index.html' not in body and '</body>' in body:
+                          badge = '<a href="../study-sprint/index.html" aria-label="Daily Study Sprint" style="position:fixed;bottom:88px;right:12px;z-index:990;background:#ffd700;color:#071b49;text-decoration:none;padding:10px 14px;border-radius:24px;box-shadow:0 5px 18px #071b4955;font:800 13px system-ui">🎯 Daily Sprint</a>'
+                          page.write_text(body.replace('</body>',badge+'</body>'),encoding='utf-8')
+                          print('Added Study Sprint shortcut to hosted learning app')
+                      else:
+                          print('Study Sprint shortcut already present or incompatible HTML')
           print('Imported', count, 'public website app files including',len(samples),'JSON assets')
           PY
           touch "$RUNNER_TEMP/saurabh-site/.nojekyll"
