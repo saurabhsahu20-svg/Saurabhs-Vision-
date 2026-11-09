@@ -42,6 +42,40 @@ jobs:
                  "$RUNNER_TEMP/saurabh-site/storage.rules" \
                  "$RUNNER_TEMP/saurabh-site/firestore.indexes.json" \
                  "$RUNNER_TEMP/saurabh-site/firebase.json"
+          # Extract the publicly committed owner app's web learning material.
+          # This avoids republishing APK binaries or private Android account data.
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path, PurePosixPath
+          from zipfile import ZipFile
+          apk = Path('Saurabh_Vision_Quiz_Club_Test (4).apk')
+          if not apk.exists():
+              raise SystemExit('App content APK is missing; refusing incomplete public release.')
+          root = Path(os.environ['RUNNER_TEMP']) / 'saurabh-site' / 'vision-app'
+          allowed = {'.html','.css','.js','.json','.png','.jpg','.jpeg','.svg','.webp','.webmanifest','.txt'}
+          count = 0
+          with ZipFile(apk) as archive:
+              for member in archive.infolist():
+                  if member.is_dir() or not member.filename.startswith('assets/www/'):
+                      continue
+                  rel = member.filename[len('assets/www/'):]
+                  p = PurePosixPath(rel)
+                  if not rel or rel.startswith('/') or '..' in p.parts or '\\' in rel:
+                      raise SystemExit('Unsafe application archive path')
+                  if p.suffix.lower() not in allowed or 'fonts' in p.parts:
+                      continue
+                  dest = root.joinpath(*p.parts)
+                  dest.parent.mkdir(parents=True,exist_ok=True)
+                  with archive.open(member) as inp, dest.open('wb') as out:
+                      out.write(inp.read())
+                  count += 1
+          if not (root/'index.html').exists():
+              raise SystemExit('App did not contain web entrypoint')
+          samples=list(root.rglob('*.json'))
+          if samples:
+              json.loads(samples[0].read_text(encoding='utf-8'))
+          print('Imported', count, 'public website app files including',len(samples),'JSON assets')
+          PY
           touch "$RUNNER_TEMP/saurabh-site/.nojekyll"
           test -f "$RUNNER_TEMP/saurabh-site/index.html"
           test -f "$RUNNER_TEMP/saurabh-site/app.js"
