@@ -74,6 +74,18 @@ jobs:
           samples=list(root.rglob('*.json'))
           if samples:
               json.loads(samples[0].read_text(encoding='utf-8'))
+          # Discover the new shared Study Sprint from the imported Android app menu.
+          # The feature page is hosted at ../study-sprint/ and does not collect account data.
+          mobile = root / 'mobile.js'
+          if mobile.exists():
+              old = mobile.read_text(encoding='utf-8')
+              marker = '<div class="more-list"><a class="chapter-entry" href="platform/index.html">'
+              card = '<a class="chapter-entry" href="../study-sprint/index.html"><span aria-hidden="true">🎯</span><div><strong>Daily Study Sprint · NEW</strong><small>5 quick questions with explanations</small></div><span aria-hidden="true">→</span></a>'
+              if old.count(marker) == 1 and 'Daily Study Sprint · NEW' not in old:
+                  mobile.write_text(old.replace(marker, '<div class="more-list">'+card+'<a class="chapter-entry" href="platform/index.html">'),encoding='utf-8')
+                  print('Added Study Sprint to web app learning menu')
+              else:
+                  print('Study Sprint: app menu variant differs; website header still links to Sprint')
           print('Imported', count, 'public website app files including',len(samples),'JSON assets')
           PY
           touch "$RUNNER_TEMP/saurabh-site/.nojekyll"
