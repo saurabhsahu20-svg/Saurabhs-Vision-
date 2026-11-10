@@ -1,0 +1,75 @@
+name: Build Education Live Wallpaper APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'education-live-wallpaper/**'
+      - '.github/workflows/build-education-wallpaper.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Compile and package Vision Edu Walls
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install platform and build tools
+        run: sdkmanager --install "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Compile APK
+        run: |
+          cd education-live-wallpaper
+          gradle --no-daemon --stacktrace :app:assembleDebug
+
+      - name: Validate Android APK and publishable binary
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk="education-live-wallpaper/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$apk"
+          unzip -t "$apk" | tail -1
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | head -10
+          mkdir -p deliverables
+          cp "$apk" deliverables/Vision_Edu_Walls_v1.0.0_TEST.apk
+          sha256sum deliverables/*.apk | tee deliverables/SHA256SUMS.txt
+
+      - name: Upload downloadable APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Vision_Edu_Walls_Android_APK
+          path: deliverables/*
+          retention-days: 90
+
+      - name: Publish a direct-download GitHub test Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="vision-edu-walls-v1.0.0"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release tag already exists; uploading test APK asset."
+            gh release upload "$tag" deliverables/Vision_Edu_Walls_v1.0.0_TEST.apk deliverables/SHA256SUMS.txt --clobber
+          else
+            gh release create "$tag" deliverables/Vision_Edu_Walls_v1.0.0_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls v1.0.0 • Education Live Wallpaper" --notes "Android 6.0+ test build. Native maths/science/space/junior animated wallpaper; no login or internet. Debug signing may vary across builds: do not uninstall an older app without preserving any local settings." --latest=false
+          fi
