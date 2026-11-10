@@ -37,6 +37,9 @@ public final class V5StudioActivity extends Activity {
     private static final int SAVE_PNG=5042;
     private final StillScenePainter stillPainter=new StillScenePainter();
     private final LiveScenePainter livePainter=new LiveScenePainter();
+    private final BiologyPainter biologyPainter=new BiologyPainter();
+    private static final int STATIC_COUNT=CollectionCatalog.COUNT+BiologyCatalog.COUNT;
+    private static final int LIVE_COUNT=LiveSceneCatalog.COUNT+BiologyCatalog.COUNT;
     private SharedPreferences prefs;
     private LinearLayout gallery,actions;
     private TextView label,subtitle;
@@ -52,9 +55,9 @@ public final class V5StudioActivity extends Activity {
         getWindow().setStatusBarColor(NAVY);
         getWindow().setNavigationBarColor(NAVY);
         prefs=getSharedPreferences(EduWallpaperService.PREFS,MODE_PRIVATE);
-        selectedWallpaper=Math.max(0,Math.min(CollectionCatalog.COUNT-1,prefs.getInt(EduWallpaperService.COLLECTION,0)));
+        selectedWallpaper=Math.max(0,Math.min(STATIC_COUNT-1,prefs.getInt(EduWallpaperService.COLLECTION,0)));
         selectedWidget=getSharedPreferences(VisionWidgetProvider.PREFS,MODE_PRIVATE).getInt("pending",0);
-        selectedLive=LiveSceneCatalog.norm(prefs.getInt(EduWallpaperService.LIVE_ID,0));
+        selectedLive=Math.max(0,Math.min(LIVE_COUNT-1,prefs.getInt(EduWallpaperService.LIVE_ID,0)));
         buildUI();
     }
     private int dp(float x){return (int)(getResources().getDisplayMetrics().density*x+.5f);}
@@ -82,14 +85,14 @@ public final class V5StudioActivity extends Activity {
         LinearLayout head=new LinearLayout(this);head.setOrientation(LinearLayout.VERTICAL);
         head.setPadding(dp(18),dp(21),dp(18),dp(20));head.setBackground(round(NAVY,18));
         add(head,txt("🎓  SAURABH'S VISION",14,GOLD,true),0);
-        add(head,txt("VISION EDU WALLS 6.0",26,Color.WHITE,true),8);
-        add(head,txt("50 Static  •  50 Separate Live  •  50 Digital Widgets",14,0xffd8e8ff,true),9);
-        add(head,txt("3 separate galleries • New illustrations & animations",12,0xffa9cafa,false),7);
+        add(head,txt("VISION EDU WALLS 7.0",26,Color.WHITE,true),8);
+        add(head,txt("66 Static  •  66 Live  •  60 Digital Widgets",14,0xffd8e8ff,true),9);
+        add(head,txt("NEW: 16 Biology diagrams + 16 interactive anatomy scenes",12,0xffa9cafa,false),7);
         add(root,head,12);
 
         LinearLayout nav=new LinearLayout(this);
         nav.setOrientation(LinearLayout.HORIZONTAL);
-        String[] names={"🖼️  50 WALLS","✨  50 LIVE","⏰  50 WIDGETS"};
+        String[] names={"🖼️  66 WALLS","✨  66 LIVE","⏰  60 WIDGETS"};
         for(int k=0;k<3;k++){
             final int n=k;
             Button tab=btn(names[k],n==0?BLUE:Color.WHITE,n==0?Color.WHITE:NAVY);
@@ -115,7 +118,7 @@ public final class V5StudioActivity extends Activity {
         hd.setOnClickListener(v->{prefs.edit().putBoolean(EduWallpaperService.V6_LIVE_ENABLED,false).apply();startActivity(new Intent(this,ImagePackActivity.class));});
         Button old=btn("📚 Open Classic Wallpapers (Version 4 Collection)",0xffe1eaff,NAVY);
         add(root,old,25);old.setOnClickListener(v->{prefs.edit().putBoolean(EduWallpaperService.V6_LIVE_ENABLED,false).apply();startActivity(new Intent(this,MainActivity.class));});
-        TextView note=txt("The Static gallery contains 50 original poster compositions. The Live gallery uses a separate, newly built scene engine (not static posters with effects). The 50 Digital Widget styles read actual Android time/date/battery and optional online weather. All graphics are original.",12,0xff587091,false);
+        TextView note=txt("Static: 50 educational posters + 16 new Biology diagrams. Live: 50 animations + 16 interactive Biology studies with touch labels. Widgets: 60 working digital styles, including 10 new Biology facts. These are original educational illustrations, not clinical medical images.",12,0xff587091,false);
         add(root,note,16);
         showMode(0);
     }
@@ -135,7 +138,7 @@ public final class V5StudioActivity extends Activity {
         }else if(mode==1){
             Button apply=btn("✨ Set as LIVE Wallpaper",GOLD,NAVY);
             add(actions,apply,0);apply.setOnClickListener(v->setLive());
-            TextView help=txt("50 separate animated scene designs. Tap for sparks; double tap/swipe to switch live scenes where the Android launcher forwards touch input.",12,0xff47668f,false);
+            TextView help=txt("66 live scenes, including 16 anatomy/botany models. Tap to reveal parts, double-tap/swipe to switch scenes where your launcher supports wallpaper gestures.",12,0xff47668f,false);
             add(actions,help,8);
         }else{
             Button pin=btn("📌 Add Selected Smart Widget to Home Screen",GOLD,NAVY);
@@ -143,12 +146,20 @@ public final class V5StudioActivity extends Activity {
             Button weather=btn("☀ Set Weather City / Use Phone Location",0xffdce7ff,NAVY);
             add(actions,weather,8);
             weather.setOnClickListener(v->startActivity(new Intent(this,WeatherSettingsActivity.class)));
-            TextView hint=txt("All 50 widget styles show phone digital time, date, battery percentage and optional weather. Tap a widget's weather to change the city. Weather uses Internet; the other details come from Android.",12,0xff47668f,false);
+            TextView hint=txt("All 60 widget styles show phone digital time, date, battery percentage and optional weather. Tap a widget's weather to change the city. Weather uses Internet; the other details come from Android.",12,0xff47668f,false);
             add(actions,hint,8);
         }
-        for(int start=0;start<50;start+=2){
+        int count=mode==0?STATIC_COUNT:(mode==1?LIVE_COUNT:WidgetCatalog.COUNT);
+        for(int start=0;start<count;start+=2){
+            if(start==50 && mode!=2) {
+                TextView section=txt("🧬 NEW BIOLOGY ATLAS · 16 ORGAN & PLANT STUDIES",16,NAVY,true);
+                add(gallery,section,14);
+            }else if(start==50){
+                TextView section=txt("🧫 NEW BIOLOGY · 10 DIGITAL WIDGETS",16,NAVY,true);
+                add(gallery,section,14);
+            }
             LinearLayout row=new LinearLayout(this);row.setOrientation(LinearLayout.HORIZONTAL);
-            for(int j=start;j<start+2;j++){
+            for(int j=start;j<Math.min(start+2,count);j++){
                 final int index=j;
                 LinearLayout tile=new LinearLayout(this);tile.setOrientation(LinearLayout.VERTICAL);
                 tile.setPadding(dp(5),dp(5),dp(5),dp(10));
@@ -165,7 +176,9 @@ public final class V5StudioActivity extends Activity {
                     Miniature tiny=new Miniature(index);
                     tile.addView(tiny,new LinearLayout.LayoutParams(-1,dp(190)));
                 }
-                String name=mode==2?WidgetCatalog.name(index):mode==1?LiveSceneCatalog.name(index):CollectionCatalog.name(index);
+                String name=mode==2?WidgetCatalog.name(index):
+                    mode==1?(index>=LiveSceneCatalog.COUNT?BiologyCatalog.name(index-LiveSceneCatalog.COUNT):LiveSceneCatalog.name(index)):
+                    (index>=CollectionCatalog.COUNT?BiologyCatalog.name(index-CollectionCatalog.COUNT):CollectionCatalog.name(index));
                 TextView t=txt(String.format(Locale.US,"%02d. ",index+1)+name,12,NAVY,true);
                 t.setGravity(Gravity.CENTER);
                 t.setMaxLines(2);
@@ -184,14 +197,16 @@ public final class V5StudioActivity extends Activity {
     private void updateSelection(){
         if(mode==2){
             label.setText("⏰ "+WidgetCatalog.name(selectedWidget));
-            subtitle.setText("Widget "+(selectedWidget+1)+" of 50  ·  "+WidgetCatalog.category(selectedWidget));
+            subtitle.setText("Widget "+(selectedWidget+1)+" of "+WidgetCatalog.COUNT+"  ·  "+WidgetCatalog.category(selectedWidget));
         }else{
             if(mode==1){
-                label.setText("🌌 "+LiveSceneCatalog.name(selectedLive));
-                subtitle.setText("Live animation "+(selectedLive+1)+" of 50 · "+LiveSceneCatalog.group(selectedLive));
+                boolean biology=selectedLive>=LiveSceneCatalog.COUNT;
+                label.setText("🌌 "+(biology?BiologyCatalog.name(selectedLive-LiveSceneCatalog.COUNT):LiveSceneCatalog.name(selectedLive)));
+                subtitle.setText("Live animation "+(selectedLive+1)+" of "+LIVE_COUNT+" · "+(biology?"INTERACTIVE BIOLOGY":LiveSceneCatalog.group(selectedLive)));
             }else {
-                label.setText("🎨 "+CollectionCatalog.name(selectedWallpaper));
-                subtitle.setText("Static artwork "+(selectedWallpaper+1)+" of 50 · "+CollectionCatalog.category(selectedWallpaper));
+                boolean biology=selectedWallpaper>=CollectionCatalog.COUNT;
+                label.setText("🎨 "+(biology?BiologyCatalog.name(selectedWallpaper-CollectionCatalog.COUNT):CollectionCatalog.name(selectedWallpaper)));
+                subtitle.setText("Static artwork "+(selectedWallpaper+1)+" of "+STATIC_COUNT+" · "+(biology?"BIOLOGY ATLAS":CollectionCatalog.category(selectedWallpaper)));
             }
         }
         if(preview!=null)preview.invalidate();
@@ -199,7 +214,7 @@ public final class V5StudioActivity extends Activity {
     private Bitmap makeStill(){
         Bitmap bmp=Bitmap.createBitmap(720,1280,Bitmap.Config.ARGB_8888);
         Canvas c=new Canvas(bmp);
-        stillPainter.draw(c,720,1280,selectedWallpaper);
+        paintStill(c,720,1280,selectedWallpaper);
         return bmp;
     }
     private void setStill(){
@@ -232,6 +247,16 @@ public final class V5StudioActivity extends Activity {
             Toast.makeText(this,"Saved original wallpaper PNG.",Toast.LENGTH_LONG).show();
         }catch(Exception ex){Toast.makeText(this,"Could not save this wallpaper.",Toast.LENGTH_LONG).show();}
         finally{if(bmp!=null)bmp.recycle();}
+    }
+    private void paintStill(Canvas c,int w,int h,int n){
+        if(n>=CollectionCatalog.COUNT)
+            biologyPainter.draw(c,w,h,n-CollectionCatalog.COUNT,false,0,-1000,-1000,0);
+        else stillPainter.draw(c,w,h,n);
+    }
+    private void paintLive(Canvas c,int w,int h,int n,float sec,float x,float y,long at){
+        if(n>=LiveSceneCatalog.COUNT)
+            biologyPainter.draw(c,w,h,n-LiveSceneCatalog.COUNT,true,sec,x,y,at);
+        else livePainter.draw(c,w,h,sec,n,x,y,at);
     }
     private String phoneBattery(){
         Intent battery=registerReceiver(null,new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
@@ -272,8 +297,8 @@ public final class V5StudioActivity extends Activity {
         Miniature(int n){super(V5StudioActivity.this);index=n;setLayerType(View.LAYER_TYPE_SOFTWARE,null);}
         @Override protected void onDraw(Canvas c){
             super.onDraw(c);
-            if(mode==1)livePainter.draw(c,getWidth(),getHeight(),7.5f,index,-1000,-1000,0L);
-            else stillPainter.draw(c,getWidth(),getHeight(),index);
+            if(mode==1)paintLive(c,getWidth(),getHeight(),index,7.5f,-1000,-1000,0L);
+            else paintStill(c,getWidth(),getHeight(),index);
         }
     }
     private final class WallpaperPreview extends View{
@@ -296,11 +321,11 @@ public final class V5StudioActivity extends Activity {
                 if(playing)postInvalidateDelayed(60000);
             }else {
                 if(mode==1){
-                    livePainter.draw(c,getWidth(),getHeight(),SystemClock.uptimeMillis()/1000f,
-                        selectedLive,touchX,touchY,touchAt);
+                    paintLive(c,getWidth(),getHeight(),selectedLive,SystemClock.uptimeMillis()/1000f,
+                        touchX,touchY,touchAt);
                     if(playing)postInvalidateDelayed(52);
                 }else{
-                    stillPainter.draw(c,getWidth(),getHeight(),selectedWallpaper);
+                    paintStill(c,getWidth(),getHeight(),selectedWallpaper);
                 }
             }
         }
@@ -310,12 +335,12 @@ public final class V5StudioActivity extends Activity {
             if(e.getActionMasked()==MotionEvent.ACTION_UP){
                 float dx=e.getX()-downX;
                 if(Math.abs(dx)>dp(55)){
-                    if(mode==1)selectedLive=(selectedLive+(dx<0?1:49))%50;
-                    else selectedWallpaper=(selectedWallpaper+(dx<0?1:49))%50;
+                    if(mode==1)selectedLive=(selectedLive+(dx<0?1:LIVE_COUNT-1))%LIVE_COUNT;
+                    else selectedWallpaper=(selectedWallpaper+(dx<0?1:STATIC_COUNT-1))%STATIC_COUNT;
                     updateSelection();
                 }else if(mode==1){
                     touchX=e.getX();touchY=e.getY();touchAt=SystemClock.uptimeMillis();
-                    if(touchAt-lastTap<350){selectedLive=(selectedLive+1)%50;updateSelection();}
+                    if(touchAt-lastTap<350){selectedLive=(selectedLive+1)%LIVE_COUNT;updateSelection();}
                     lastTap=touchAt;
                 }
                 invalidate();performClick();return true;
