@@ -18,11 +18,13 @@ public final class EduWallpaperService extends WallpaperService {
     public static final String CUSTOM_ART = "custom_art";
     public static final String CUSTOM_VERSION = "custom_version";
     public static final String POSTER = "poster";
+    public static final String COLLECTION = "collection_id";
     @Override public Engine onCreateEngine() { return new EduEngine(); }
 
     private final class EduEngine extends Engine implements SharedPreferences.OnSharedPreferenceChangeListener {
         private final Handler handler = new Handler(Looper.getMainLooper());
         private final EducationPainter painter = new EducationPainter(EduWallpaperService.this);
+        private final CollectionPainter collectionPainter = new CollectionPainter();
         private final SharedPreferences prefs = getSharedPreferences(PREFS,MODE_PRIVATE);
         private volatile boolean visible = false;
         private float tapX=-1000f,tapY=-1000f;
@@ -76,7 +78,11 @@ public final class EduWallpaperService extends WallpaperService {
                 final long now=SystemClock.uptimeMillis();
                 float threshold=getResources().getDisplayMetrics().density*72f;
                 if(Math.abs(dx)>threshold && Math.abs(dx)>Math.abs(dy)*1.6f) {
-                    // Horizontal gesture changes the wallpaper design (when the launcher forwards swipes).
+                    int col=prefs.getInt(COLLECTION,-1);
+                    if(col>=0 && !prefs.getBoolean(CUSTOM_ART,false)){
+                        prefs.edit().putInt(COLLECTION,(col+(dx<0?1:CollectionCatalog.COUNT-1))%CollectionCatalog.COUNT).apply();
+                    }else{
+                    // Horizontal gesture changes the classic wallpaper design.
                     int preset=prefs.getInt(POSTER,-1);
                     if(preset>=0 && !prefs.getBoolean(CUSTOM_ART,false)){
                         int next=(preset+(dx<0?1:PosterPainter.NAMES.length-1))%PosterPainter.NAMES.length;
@@ -86,16 +92,22 @@ public final class EduWallpaperService extends WallpaperService {
                         int next=(old+(dx<0?1:3))%4;
                         prefs.edit().putInt(THEME,next).apply();
                     }
+                    }
                     tapX=x;tapY=y;tapAt=now;
                 } else if(Math.abs(dx)<threshold*.70f && Math.abs(dy)<threshold*.70f) {
                     // Double-tap changes theme; single-tap creates a subject-specific burst.
                     float distance=(float)Math.hypot(x-lastTapX,y-lastTapY);
                     if(now-lastTapAt<340 && distance<threshold) {
+                        int col=prefs.getInt(COLLECTION,-1);
+                        if(col>=0 && !prefs.getBoolean(CUSTOM_ART,false)){
+                            prefs.edit().putInt(COLLECTION,(col+1)%CollectionCatalog.COUNT).apply();
+                        }else{
                         int preset=prefs.getInt(POSTER,-1);
                         if(preset>=0 && !prefs.getBoolean(CUSTOM_ART,false)){
                             prefs.edit().putInt(POSTER,(preset+1)%PosterPainter.NAMES.length).apply();
                         }else{
                             prefs.edit().putInt(THEME,(prefs.getInt(THEME,0)+1)%4).apply();
+                        }
                         }
                         lastTapAt=0;
                     } else {
@@ -119,9 +131,19 @@ public final class EduWallpaperService extends WallpaperService {
             Canvas canvas=null;
             try {
                 canvas=holder.lockCanvas();
-                if(canvas!=null) painter.draw(canvas,canvas.getWidth(),canvas.getHeight(),
-                    SystemClock.uptimeMillis()/1000f,prefs.getInt(THEME,0),
-                    prefs.getInt(SPEED,1),tapX,tapY,tapAt,prefs.getBoolean(INTERACTIVE,true),pageOffset,prefs.getBoolean(CUSTOM_ART,false),prefs.getInt(POSTER,-1));
+                if(canvas!=null) {
+                    int collection=prefs.getInt(COLLECTION,-1);
+                    if(collection>=0 && !prefs.getBoolean(CUSTOM_ART,false)){
+                        float spd=prefs.getInt(SPEED,1)==0?.35f:(prefs.getInt(SPEED,1)==2?1.4f:.8f);
+                        collectionPainter.draw(canvas,canvas.getWidth(),canvas.getHeight(),
+                            SystemClock.uptimeMillis()/1000f*spd,
+                            collection,true,tapX,tapY,prefs.getBoolean(INTERACTIVE,true)?tapAt:0L);
+                    } else {
+                        painter.draw(canvas,canvas.getWidth(),canvas.getHeight(),
+                            SystemClock.uptimeMillis()/1000f,prefs.getInt(THEME,0),
+                            prefs.getInt(SPEED,1),tapX,tapY,tapAt,prefs.getBoolean(INTERACTIVE,true),pageOffset,prefs.getBoolean(CUSTOM_ART,false),prefs.getInt(POSTER,-1));
+                    }
+                }
             } catch(IllegalArgumentException | IllegalStateException ignored) {
                 // A temporary detached surface must not crash the wallpaper.
             } finally {
