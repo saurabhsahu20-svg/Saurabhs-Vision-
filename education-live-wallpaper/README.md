@@ -10,7 +10,7 @@ This is an expanded, original offline Android wallpapers and widget application 
 - **Offline** (no Internet permission, no accounts, no ads). Local device settings only.
 
 ## Important about the old HD image packs
-Previously generated full-resolution HD artwork packs are available as downloadable ZIP files in the ChatGPT conversation. Those photographic/AI-generated original JPG assets are **not embedded into this APK**; v5 instead ships 50 self-contained procedural poster-style compositions, and the existing Classic Gallery import can load the HD image files after extracting the ZIP. This distinction prevents claims that the 10 JPGs are included when they are not.
+Previously generated full-resolution HD artwork packs are available as downloadable ZIP files in the ChatGPT conversation. Those photographic/AI-generated original JPG assets are **not embedded into this APK**; v5 ships 50 self-contained procedural poster-style compositions instead. Users can import the separately supplied 50-HD-Wallpapers.zip archive **once from the Import HD ZIP button**, browse the HD image gallery inside the app, and apply any imported image as a static wallpaper or as an animated live wallpaper through the v4 custom-photo renderer. Image import and storage are strictly local. This distinction prevents claims that the 10 JPGs are included when they are not.
 
 ## Widgets usage
 Open app > Widgets tab > select a style > Add Selected Widget, or long-press Android Home Screen > Widgets > Vision Edu Walls > pick one of 50 designs. Clock widgets update automatically via the system `TextClock`; the other types update per WidgetProvider and by tap. Some launchers do not support programmatic pinning.

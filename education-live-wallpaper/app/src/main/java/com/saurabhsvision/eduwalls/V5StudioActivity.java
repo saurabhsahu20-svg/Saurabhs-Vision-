@@ -106,6 +106,9 @@ public final class V5StudioActivity extends Activity {
         TextView heading=txt("CHOOSE YOUR DESIGN",19,NAVY,true);add(root,heading,24);
         gallery=new LinearLayout(this);gallery.setOrientation(LinearLayout.VERTICAL);
         add(root,gallery,12);
+        Button hd=btn("📦 IMPORT ALL 50 HD WALLPAPERS FROM ZIP",0xffe1efff,NAVY);
+        add(root,hd,19);
+        hd.setOnClickListener(v->startActivity(new Intent(this,ImagePackActivity.class)));
         Button old=btn("📚 Open Classic Wallpapers (Version 4 Collection)",0xffe1eaff,NAVY);
         add(root,old,25);old.setOnClickListener(v->startActivity(new Intent(this,MainActivity.class)));
         TextView note=txt("Original poster-inspired artwork. The 50 live entries are motion variants of the 50 built-in static compositions; widgets offer 50 configurable themes from one Android widget provider. Some launchers do not forward wallpaper swipes.",12,0xff587091,false);

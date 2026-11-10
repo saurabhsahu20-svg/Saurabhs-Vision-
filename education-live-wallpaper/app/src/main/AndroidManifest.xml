@@ -18,6 +18,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" android:exported="false"/>
+        <activity android:name=".ImagePackActivity" android:exported="false"/>
         <activity android:name=".VisionWidgetSetupActivity" android:exported="true" android:label="Choose Vision Widget" />
         <receiver
             android:name=".VisionWidgetProvider"
