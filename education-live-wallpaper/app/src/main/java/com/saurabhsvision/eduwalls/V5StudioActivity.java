@@ -150,6 +150,15 @@ public final class V5StudioActivity extends Activity {
             add(actions,hint,8);
         }
         int count=mode==0?STATIC_COUNT:(mode==1?LIVE_COUNT:WidgetCatalog.COUNT);
+        if(mode!=2){
+            Button biology=btn("🧬 Jump to 16 New Biology Wallpapers",0xffd6f6e9,NAVY);
+            add(actions,biology,9);
+            biology.setOnClickListener(v->{
+                if(mode==0)selectedWallpaper=CollectionCatalog.COUNT;
+                else selectedLive=LiveSceneCatalog.COUNT;
+                updateSelection();
+            });
+        }
         for(int start=0;start<count;start+=2){
             if(start==50 && mode!=2) {
                 TextView section=txt("🧬 NEW BIOLOGY ATLAS · 16 ORGAN & PLANT STUDIES",16,NAVY,true);
