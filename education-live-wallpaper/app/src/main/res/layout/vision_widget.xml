@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/widget_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="Change Vision education widget style"
+        android:scaleType="centerCrop"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="15dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="VISION EDU WALLS"
+            android:textColor="#FFD75E"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:maxLines="1"/>
+        <TextClock
+            android:id="@+id/widget_clock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:format12Hour="h:mm a"
+            android:format24Hour="HH:mm"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="32sp"/>
+        <TextView
+            android:id="@+id/widget_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Learning is an adventure"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:maxLines="3"/>
+    </LinearLayout>
+</FrameLayout>
