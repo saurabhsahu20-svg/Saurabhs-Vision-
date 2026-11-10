@@ -1,21 +1,18 @@
-# VISION EDU WALLS 3.0 — SAURABH’S VISION™
+# SAURABH’S VISION™ — VISION EDU WALLS 4.0
 
-Native Android live wallpaper app with interactive neon Maths, Science, Space and Junior themes.
+Education-themed Android **live wallpapers**, including **eight new built-in original animated poster designs** (fully offline).
 
-## New feature: HD Art Studio
-Pick any original Maths, Science, Books or school poster image from your Android Gallery and make it a dynamic live wallpaper. A local, downsampled JPEG copy is stored in the app's private files; no cloud upload, third-party ads or internet permission.
+## NEW in Version 4.0
+- Swipeable poster-gallery selector with a real thumbnail preview of each poster, not an empty placeholder.
+- Eight animated poster presets: Magical Maths, Rainbow Numbers, Green Chalkboard, Neon Science, Success Steps, Storybook Dreams, Vintage Geometry, Space School. All original Canvas illustrations.
+- Existing four Canvas live wallpapers (Maths Galaxy, Science Lab, Cosmic Classroom, Junior Learning).
+- Original HD Maths/Science background import from Android Gallery (version 3 feature retained). The separately downloadable ZIP named Vision_Edu_Walls_4_Premium_Wallpapers.zip contains ten newly generated visuals, **not copies of Pinterest pictures**. For that high-detail art, extract ZIP and choose images through Gallery; it is not preinstalled in the APK.
+- Live particles and touch ripple, swipe/double-tap cycling (Android wallpaper gestures depend on the device launcher), animation speed and battery-aware frame scheduling.
+- No internet, analytics, user account, or ads.
 
-Touch creates sparkles and a short science/maths fact. In the app preview, horizontal swipes or double taps cycle the four themes. Some Android launchers do not forward those gestures to live wallpapers. Battery Saver mode reduces redraw frame rate and drawing stops when hidden.
+## GitHub test APK
+[Vision Edu Walls v4.0.0 Releases](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases/tag/vision-edu-walls-v4.0.0)
 
-### How to use the original wallpaper pack
-The four HD original art backgrounds were generated for the owner and supplied in the accompanying conversation as "Vision Edu Walls 3 Original Wallpapers.zip". Download the ZIP to your Android device and extract the pictures. Open Vision Edu Walls, choose **HD Image from Gallery**, choose a picture, then **Set as Live Wallpaper**. The gallery artwork is animated by the v3 particle/effect system, while the original built-in Canvas animations remain available with custom image mode off.
+Android 6.0+, package ID `com.saurabhsvision.eduwalls`, versionCode 4. This is a **test** build using a GitHub CI-generated debug signing certificate. The signer may differ from versions 1–3. If installation conflicts with an older version, uninstall only **Vision Edu Walls** (local theme settings reset); do **not** uninstall the separate Saurabh’s Vision Quiz Club app. For a stable upgrade path, supply a private production signing key via encrypted GitHub Actions secrets and verify real-device performance.
 
-## APK download
-https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases/tag/vision-edu-walls-v3.0.0
-
-### Compatibility and signing
-Android 6.0+ (minSdk 23). The app package name is com.saurabhsvision.eduwalls. This GitHub test APK has a new automatically generated debug signing certificate. If an earlier Vision Edu Walls version is installed under a different key, Android may require uninstalling that app before installing 3.0, resetting its local wallpaper settings. It does not affect the separate Saurabh’s Vision Quiz Club app.
-
-For stable upgrade-safe production releases, store a **persistent signing key in private encrypted CI secrets**, never in this public GitHub repository. Test user photo selection, performance and battery usage on devices before claiming Play Store readiness.
-
-All four downloadable art backgrounds are original generated images, not the Pinterest screenshots used as inspiration.
+Original artwork is rendered by app source and generated image pack; no Pinterest screenshot images are embedded.
