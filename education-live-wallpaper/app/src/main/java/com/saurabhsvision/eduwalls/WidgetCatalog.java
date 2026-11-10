@@ -11,25 +11,27 @@ import android.graphics.Shader;
 /** 50 selectable real home-screen widget configurations (5 content types × 10 skins). */
 public final class WidgetCatalog {
     private WidgetCatalog(){}
-    public static final int COUNT=50;
-    public static final String[] GROUPS={"LIVE CLOCK","TODAY'S DATE","MATHS FACTS","SCIENCE FACTS","STUDY MOTIVATION"};
+    public static final int COUNT=60;
+    public static final String[] GROUPS={"LIVE CLOCK","TODAY'S DATE","MATHS FACTS","SCIENCE FACTS","STUDY MOTIVATION","BIOLOGY FACTS"};
     private static final String[][] NAMES={
         {"Golden Clock","Galaxy Time","Blue Hour","Study Time","Aurora Clock","Rainbow Hours","Future Time","Star Clock","Cosmic Hour","Midnight Clock"},
         {"School Calendar","Bright Date","Galaxy Calendar","Daily Planner","Academic Date","New Day","Calendar Glow","Golden Day","Cosmic Date","Fresh Start"},
         {"Pi Facts","Algebra Bits","Geometry Facts","Prime Numbers","Fraction Facts","Maths Magic","Calculus Idea","Number Power","Maths Explorer","Quick Equations"},
         {"Atom Facts","DNA Facts","Space Science","Chemistry Facts","Life Science","Physics Fact","Periodic Table","Solar System","Energy Facts","Science Explorer"},
-        {"Stay Curious","Keep Learning","Daily Practice","Dream Big","Study Smart","Small Steps","Focus Today","Learn & Lead","Believe & Grow","Progress Daily"}
+        {"Stay Curious","Keep Learning","Daily Practice","Dream Big","Study Smart","Small Steps","Focus Today","Learn & Lead","Believe & Grow","Progress Daily"},
+        {"DNA Discovery","Heartbeat Clock","Kidney Facts","Nephron Explorer","Leaf Science","Plant Tissue Lab","Animal Tissue Lab","Neuron Signals","Chloroplast Life","Stomata Watch"}
     };
     private static final String[][] DETAILS={
         {"Your learning hour","Time to explore","A bright minute","Make today count","Minutes matter","Your colourful time","Build your future","Shine every hour","Explore the day","Keep moving forward"},
         {"Make today count","One new chance","Discover today","Plan with care","Your next chapter","Learn something new","Every day adds up","A fresh beginning","Today's knowledge","Start again"},
         {"π ≈ 3.14159","2(a + b) = 2a + 2b","Triangle angles = 180°","2, 3, 5, 7 are prime","½ = 0.5","√64 = 8","Derivative of x² is 2x","9 × 9 = 81","A square has 4 equal sides","3² + 4² = 5²"},
         {"Atoms build matter","DNA stores genetic instructions","Earth orbits the Sun","H₂O is water","Cells are units of life","Force = mass × acceleration","Atomic number = protons","Earth is a planet","Sunlight is renewable","Plants use light to make sugars"},
-        {"Stay curious","Every day, learn a little","Practice builds understanding","Your ideas matter","Ask thoughtful questions","Small steps are progress","Focus on one concept","Learn today, lead tomorrow","Keep exploring","Progress takes practice"}
+        {"Stay curious","Every day, learn a little","Practice builds understanding","Your ideas matter","Ask thoughtful questions","Small steps are progress","Focus on one concept","Learn today, lead tomorrow","Keep exploring","Progress takes practice"},
+        {"DNA stores hereditary information","Heart muscle pumps blood","Kidneys filter blood","Nephrons filter and reabsorb","Leaves use light energy","Xylem carries water","Tissues are groups of cells","Neurons transmit signals","Chloroplasts hold chlorophyll","Stomata exchange gases"}
     };
     private static final int[] PALETTE={0xffffd75e,0xff75d9ff,0xffb6aaff,0xffa0edcb,0xffff9b91,
         0xffeaa2fc,0xffbaf274,0xffffc087,0xff95dfe7,0xffffe8ad};
-    public static int norm(int n){return Math.max(0,Math.min(49,n));}
+    public static int norm(int n){return Math.max(0,Math.min(COUNT-1,n));}
     public static String name(int n){n=norm(n);return NAMES[n/10][n%10];}
     public static String category(int n){return GROUPS[norm(n)/10];}
     public static String subtitle(int n){n=norm(n);return DETAILS[n/10][n%10];}
@@ -45,7 +47,7 @@ public final class WidgetCatalog {
         final int[][] bases={
             {0xff041a39,0xff104d9c},{0xff102344,0xff25516f},
             {0xff130d44,0xff463b91},{0xff0a2b2e,0xff216f78},
-            {0xff24173c,0xff633e83}};
+            {0xff24173c,0xff633e83},{0xff092d2c,0xff246964}};
         final int hi=accent(n);
         p.setShader(new LinearGradient(0,0,width,height,
             new int[]{bases[group][0],bases[group][1],bases[group][0]},
@@ -104,7 +106,7 @@ public final class WidgetCatalog {
             }
             p.setColor(hi);p.setAlpha(150);
             c.drawCircle(width*.78f,height*.54f,width*.042f,p);
-        }else{ // Motivation: rising progress bars with flag and stars
+        }else if(group==4){ // Motivation: rising progress bars with flag and stars
             for(int j=0;j<5;j++){
                 float x=width*(.58f+j*.077f);
                 float y=height*(.83f-(j+2)*.09f);
@@ -114,6 +116,30 @@ public final class WidgetCatalog {
             }
         }
 
+        if(group==5){
+            // Ten Biology-inspired backgrounds, including helix, leaf, kidney and neuron motifs.
+            float cx=width*.79f,cy=height*.53f;
+            p.setColor(hi);p.setAlpha(138);p.setStyle(Paint.Style.STROKE);
+            p.setStrokeWidth(Math.max(2f,width*.005f));
+            if(v%3==0){
+                for(int j=0;j<13;j++){
+                    float y=height*(.20f+j*.05f);
+                    float x=cx+(float)Math.sin(j*.63f)*width*.09f;
+                    c.drawLine(x,y,2*cx-x,y,p);
+                }
+            }else if(v%3==1){
+                c.drawOval(cx-width*.14f,cy-height*.32f,cx+width*.14f,cy+height*.32f,p);
+                c.drawLine(cx,cy-height*.27f,cx,cy+height*.27f,p);
+            }else{
+                c.drawCircle(cx,cy,width*.12f,p);
+                for(int j=0;j<7;j++){
+                    float a=(float)(j*Math.PI*2/7);
+                    c.drawLine(cx,cy,cx+(float)Math.cos(a)*width*.18f,
+                        cy+(float)Math.sin(a)*height*.34f,p);
+                }
+            }
+            p.setStyle(Paint.Style.FILL);
+        }
         // Ten independent frame geometries and decorative arrangements per category.
         p.setColor(hi);p.setAlpha(176);p.setStyle(Paint.Style.STROKE);
         p.setStrokeWidth(Math.max(1.8f,width*.004f));
