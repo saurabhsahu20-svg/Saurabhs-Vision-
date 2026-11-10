@@ -132,7 +132,9 @@ public final class EducationPainter {
             else drawPlanet(c,cx,cy,size,hi,sec,time);
             drawKnowledgePulse(c,w,h,theme,time,hi,sec);
         } else {
-            drawPosterShimmer(c,w,h,time,hi,sec);
+            int effect=ctx.getSharedPreferences(EduWallpaperService.PREFS,Context.MODE_PRIVATE)
+                .getInt("premium_hd_fx",0);
+            drawPremiumArtEffects(c,w,h,time,hi,sec,effect);
         }
 
         // Elegant border arc and title/brand.
@@ -240,6 +242,68 @@ public final class EducationPainter {
         color(Color.WHITE,255);p.setFilterBitmap(true);
         c.drawBitmap(customBitmap,null,new RectF(x,y,x+wd,y+ht),p);
         return true;
+    }
+    /** Motion layers are drawn ABOVE a full-resolution imported wallpaper, with no static art duplication. */
+    private void drawPremiumArtEffects(Canvas c,int w,int h,float t,int hi,int sec,int style){
+        float z=Math.min(w,h);
+        int mode=Math.max(0,Math.min(3,style));
+        final int points=mode==3?13:(mode==2?21:37);
+        for(int j=0;j<points;j++){
+            float x=w*noise(j+702);
+            float y=h*frac(noise(j+900)+t*(.0035f+.002f*noise(j+42)));
+            float wave=(float)Math.sin(t*.62f+j*.61f);
+            float r=z*(.0015f+.0022f*noise(j+880));
+            dot(c,x+wave*z*.006f,y,r,mode==3?Color.WHITE:(j%3==0?hi:sec),
+                mode==3?85:(int)(110+90*(wave+1)/2));
+        }
+        if(mode==0){
+            // Different slow horizontal moving glimmers keep the 3D illustration visible.
+            for(int j=0;j<5;j++){
+                float x=w*frac(noise(j+241)+t*.005f*(j%2==0?1:-1));
+                float y=h*(.18f+j*.155f);
+                for(int k=0;k<5;k++){
+                    float rad=z*(.008f-k*.0015f);
+                    dot(c,x-k*z*.019f,y+k*z*.003f,rad,j%2==0?sec:hi,118-k*19);
+                }
+            }
+        }else if(mode==1){
+            // Shooting comets with separated glowing trails.
+            for(int j=0;j<4;j++){
+                float ph=frac(t*(.028f+j*.004f)+noise(j+99));
+                float x=w*(-.25f+1.5f*ph);
+                float y=h*(.19f+j*.205f)+(float)Math.sin(t*.22f+j)*z*.027f;
+                for(int k=13;k>=0;k--){
+                    float tail=k*z*.013f;
+                    dot(c,x-tail,y+tail*.32f,
+                        z*(.0012f+(13-k)*.00046f),
+                        j%2==0?sec:hi,(int)(18+(13-k)*13));
+                }
+                dot(c,x,y,z*.010f,Color.WHITE,216);
+                dot(c,x,y,z*.026f,sec,32);
+            }
+        }else if(mode==2){
+            // Slo-mo parallax orbit tracks, for the galaxy/science HD aesthetic.
+            for(int j=0;j<3;j++){
+                float cx=w*(.47f+.03f*j),cy=h*(.44f+.045f*j);
+                float rx=w*(.32f+j*.055f),ry=h*(.10f+j*.012f);
+                color(j%2==0?hi:sec,85+j*15);
+                p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(z*.0025f);
+                oval.set(cx-rx,cy-ry,cx+rx,cy+ry);
+                c.save();c.rotate(-31+j*23,cx,cy);c.drawOval(oval,p);
+                float angle=t*(.30f+j*.09f)+j*1.3f;
+                dot(c,cx+(float)Math.cos(angle)*rx,cy+(float)Math.sin(angle)*ry,
+                    z*.009f,Color.WHITE,220);
+                c.restore();p.setStyle(Paint.Style.FILL);
+            }
+        } else {
+            // Minimal GPU/CPU work: a few slow stars only.
+            for(int j=0;j<5;j++){
+                float x=w*(.12f+noise(j+301)*.77f);
+                float y=h*(.15f+noise(j+82)*.7f);
+                float pulse=.55f+.3f*(float)Math.sin(t*.30f+j);
+                dot(c,x,y,z*.004f,Color.WHITE,(int)(95*pulse));
+            }
+        }
     }
     private void drawPosterShimmer(Canvas c,int w,int h,float t,int hi,int sec){
         float z=Math.min(w,h);
