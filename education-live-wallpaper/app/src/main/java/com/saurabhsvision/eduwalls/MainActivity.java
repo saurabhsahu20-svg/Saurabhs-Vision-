@@ -241,7 +241,8 @@ public final class MainActivity extends Activity {
             if(target.exists()&&!target.delete())throw new IllegalStateException("Can't replace image");
             if(!tmp.renameTo(target))throw new IllegalStateException("Can't store image");
             customArt=true;poster=-1;
-            prefs.edit().putBoolean(EduWallpaperService.CUSTOM_ART,true)
+            prefs.edit().putBoolean(EduWallpaperService.V6_LIVE_ENABLED,false)
+                .putBoolean(EduWallpaperService.CUSTOM_ART,true)
                 .putInt(EduWallpaperService.POSTER,-1)
                 .putLong(EduWallpaperService.CUSTOM_VERSION,System.currentTimeMillis()).apply();
             if(preview!=null)preview.end();
@@ -255,7 +256,8 @@ public final class MainActivity extends Activity {
     private void selectPoster(int selected){
         poster=Math.max(0,Math.min(PosterPainter.NAMES.length-1,selected));
         customArt=false;
-        prefs.edit().putInt(EduWallpaperService.POSTER,poster)
+        prefs.edit().putBoolean(EduWallpaperService.V6_LIVE_ENABLED,false)
+            .putInt(EduWallpaperService.POSTER,poster)
             .putInt(EduWallpaperService.COLLECTION,-1)
             .putBoolean(EduWallpaperService.CUSTOM_ART,false).apply();
         if(artworkSwitch!=null && artworkSwitch.isChecked())artworkSwitch.setChecked(false);
@@ -265,7 +267,8 @@ public final class MainActivity extends Activity {
     private void selectTheme(int selected){
         theme=Math.max(0,Math.min(3,selected));
         poster=-1;customArt=false;
-        prefs.edit().putInt(EduWallpaperService.THEME,theme)
+        prefs.edit().putBoolean(EduWallpaperService.V6_LIVE_ENABLED,false)
+            .putInt(EduWallpaperService.THEME,theme)
             .putInt(EduWallpaperService.COLLECTION,-1)
             .putInt(EduWallpaperService.POSTER,-1)
             .putBoolean(EduWallpaperService.CUSTOM_ART,false).apply();
