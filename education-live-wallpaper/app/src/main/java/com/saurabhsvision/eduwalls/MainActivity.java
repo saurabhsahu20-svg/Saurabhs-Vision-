@@ -12,6 +12,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -19,6 +20,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +33,7 @@ public final class MainActivity extends Activity {
     private Preview preview;
     private TextView speedLabel;
     private int theme=0,speed=1;
+    private boolean interactive=true;
 
     @Override public void onCreate(Bundle state){
         super.onCreate(state);
@@ -38,6 +41,7 @@ public final class MainActivity extends Activity {
         prefs=getSharedPreferences(EduWallpaperService.PREFS,MODE_PRIVATE);
         theme=prefs.getInt(EduWallpaperService.THEME,0);
         speed=prefs.getInt(EduWallpaperService.SPEED,1);
+        interactive=prefs.getBoolean(EduWallpaperService.INTERACTIVE,true);
         buildUI();
     }
     private int dp(float v){return (int)(v*getResources().getDisplayMetrics().density+.5f);}
@@ -70,9 +74,9 @@ public final class MainActivity extends Activity {
         LinearLayout all=stack();scroll.addView(all);setContentView(scroll);
         LinearLayout top=stack();top.setBackgroundColor(NAVY);top.setPadding(dp(20),dp(28),dp(20),dp(26));
         add(top,text("✦ SAURABH’S VISION™",14,GOLD,true),0);
-        add(top,text("EDU LIVE WALLPAPERS",28,Color.WHITE,true),8);
+        add(top,text("VISION EDU WALLS 2.0",28,Color.WHITE,true),8);
         add(top,text("पढ़ाई की दुनिया, अब आपके फ़ोन की स्क्रीन पर!",15,0xffdbe9ff,false),8);
-        add(top,text("4 animated educational themes • No ads • Offline",12,0xffb9d7f5,false),12);
+        add(top,text("4 living worlds • Touch magic • Swipe themes • Offline",12,0xffb9d7f5,false),12);
         all.addView(top);
         LinearLayout body=stack();body.setPadding(dp(16),dp(20),dp(16),dp(34));all.addView(body);
 
@@ -80,6 +84,7 @@ public final class MainActivity extends Activity {
         preview=new Preview();frame.addView(preview,new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
         LinearLayout.LayoutParams fp=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,dp(340));
         body.addView(frame,fp);
+        add(body,text("👆 Touch the preview for knowledge sparks · Swipe horizontally to change theme.",13,MUTED,false),10);
 
         Button apply=button("✨ Set as Live Wallpaper",GOLD,NAVY);
         add(body,apply,16);
@@ -92,7 +97,7 @@ public final class MainActivity extends Activity {
             b.setGravity(Gravity.CENTER_VERTICAL|Gravity.START);
             b.setTextSize(13);
             themeButtons[i]=b;add(body,b,9);
-            b.setOnClickListener(v->{theme=n;prefs.edit().putInt(EduWallpaperService.THEME,theme).apply();refreshSelected();preview.invalidate();});
+            b.setOnClickListener(v->selectTheme(n));
         }
         refreshSelected();
         add(body,text("Animation speed",20,INK,true),22);
@@ -106,11 +111,30 @@ public final class MainActivity extends Activity {
             @Override public void onStartTrackingTouch(SeekBar b){}
             @Override public void onStopTrackingTouch(SeekBar b){}
         });
+        Switch gestures=new Switch(this);
+        gestures.setText("✨ Touch magic & gesture effects");
+        gestures.setTextSize(15);gestures.setTextColor(INK);
+        gestures.setChecked(interactive);
+        gestures.setPadding(dp(10),dp(12),dp(12),dp(12));
+        gestures.setBackground(rounded(Color.WHITE,15,0xffdbe4f4));
+        add(body,gestures,18);
+        gestures.setOnCheckedChangeListener((b,checked)->{
+            interactive=checked;
+            prefs.edit().putBoolean(EduWallpaperService.INTERACTIVE,checked).apply();
+            preview.invalidate();
+        });
+        add(body,text("Tap for particles + a fun fact. Double-tap or swipe the wallpaper to switch worlds where your launcher supports touch gestures.",12,MUTED,false),10);
         LinearLayout privacy=stack();privacy.setPadding(dp(17),dp(14),dp(17),dp(14));
         privacy.setBackground(rounded(0xffe7efff,16,0));add(privacy,text("🔒 Your privacy matters",15,INK,true),0);
         add(privacy,text("No internet permission, no account and no personal data collection. Wallpapers are drawn directly on your phone. Animation pauses when hidden.",12,MUTED,false),8);
         add(body,privacy,19);
-        add(body,text("Tip: Touch the wallpaper to create a small glow. Motion stays subtle to help conserve battery.",12,MUTED,false),13);
+        add(body,text("Battery mode: animations slow automatically when Android Battery Saver is on. Your wallpaper pauses when hidden.",12,MUTED,false),13);
+    }
+    private void selectTheme(int selected){
+        theme=Math.max(0,Math.min(3,selected));
+        prefs.edit().putInt(EduWallpaperService.THEME,theme).apply();
+        refreshSelected();
+        if(preview!=null)preview.invalidate();
     }
     private void refreshSelected(){
         for(int i=0;i<themeButtons.length;i++) {
@@ -131,18 +155,64 @@ public final class MainActivity extends Activity {
             }
         }
     }
-    @Override protected void onResume(){super.onResume();if(preview!=null)preview.begin();}
+    @Override protected void onResume(){
+        super.onResume();
+        theme=prefs.getInt(EduWallpaperService.THEME,theme);
+        refreshSelected();
+        if(preview!=null)preview.begin();
+    }
     @Override protected void onPause(){if(preview!=null)preview.end();super.onPause();}
 
     private final class Preview extends View {
         private final EducationPainter painter=new EducationPainter();
         private boolean active;
-        Preview(){super(MainActivity.this);setLayerType(View.LAYER_TYPE_SOFTWARE,null);}
+        private float downX,downY,touchX=-1000f,touchY=-1000f;
+        private long touchAt=0L,lastTapAt=0L;
+        Preview(){
+            super(MainActivity.this);
+            setLayerType(View.LAYER_TYPE_SOFTWARE,null);
+            setClickable(true);
+            setContentDescription("Interactive Education Live Wallpaper preview. Tap for sparks or swipe left and right to change themes.");
+        }
         @Override protected void onDraw(Canvas c){
             super.onDraw(c);
-            painter.draw(c,getWidth(),getHeight(),SystemClock.uptimeMillis()/1000f,theme,speed,-1000f,-1000f,0L);
-            if(active)postInvalidateDelayed(speed==0?85:45);
+            painter.draw(c,getWidth(),getHeight(),SystemClock.uptimeMillis()/1000f,
+                theme,speed,touchX,touchY,touchAt,interactive,0f);
+            if(active)postInvalidateDelayed(speed==0?90:(speed==2?38:54));
         }
+        @Override public boolean onTouchEvent(MotionEvent e){
+            if(!interactive)return super.onTouchEvent(e);
+            float x=e.getX(),y=e.getY();
+            int action=e.getActionMasked();
+            if(action==MotionEvent.ACTION_DOWN){
+                downX=x;downY=y;
+                return true;
+            }
+            if(action==MotionEvent.ACTION_MOVE){
+                if(Math.abs(x-downX)>dp(28) && Math.abs(x-downX)>Math.abs(y-downY)*1.3f){
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                }
+                return true;
+            }
+            if(action==MotionEvent.ACTION_UP){
+                float dx=x-downX,dy=y-downY;
+                if(Math.abs(dx)>dp(64)&&Math.abs(dx)>Math.abs(dy)*1.4f){
+                    selectTheme((theme+(dx<0?1:3))%4);
+                } else if(Math.abs(dx)<dp(45)&&Math.abs(dy)<dp(45)){
+                    long now=SystemClock.uptimeMillis();
+                    if(now-lastTapAt<330){
+                        selectTheme((theme+1)%4);
+                        lastTapAt=0L;
+                    }else lastTapAt=now;
+                    touchX=x;touchY=y;touchAt=now;
+                }
+                invalidate();
+                performClick();
+                return true;
+            }
+            return true;
+        }
+        @Override public boolean performClick(){super.performClick();return true;}
         void begin(){active=true;invalidate();}
         void end(){active=false;}
     }
