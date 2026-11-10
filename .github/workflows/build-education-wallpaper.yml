@@ -43,7 +43,7 @@ jobs:
         run: |
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Verify 50 distinct static, live and widget catalogs
+      - name: Validate 66 static + 66 live + 60 widget catalogs
         shell: bash
         run: |
           python3 - <<'PY'
@@ -55,9 +55,23 @@ jobs:
               start=data.find('String[][] '+token)
               assert start>=0,filename
               names=re.findall(r'"([^"]+)"',data[start:data.find(';',start)])
-              assert len(names)==50,(filename,len(names))
-              assert len(set(names))==50,(filename,'non-distinct names')
-              print(filename,': 50 named artworks/styles')
+              expected=60 if filename=='WidgetCatalog.java' else 50
+              assert len(names)==expected,(filename,len(names),expected)
+              assert len(set(names))==expected,(filename,'non-distinct names')
+              print(filename,':',expected,'unique named designs')
+          data=(base/'BiologyCatalog.java').read_text(encoding='utf8')
+          start=data.find('String[] NAMES')
+          assert start>=0
+          biology=re.findall(r'"([^"]+)"',data[start:data.find(';',start)])
+          assert len(biology)==16,(len(biology),'biology catalog must have 16 distinct topics')
+          assert len(set(biology))==16
+          assert 'class BiologyPainter' in (base/'BiologyPainter.java').read_text(encoding='utf8')
+          activity=(base/'V5StudioActivity.java').read_text(encoding='utf8')
+          engine=(base/'EduWallpaperService.java').read_text(encoding='utf8')
+          assert 'STATIC_COUNT=CollectionCatalog.COUNT+BiologyCatalog.COUNT' in activity
+          assert 'LIVE_COUNT=LiveSceneCatalog.COUNT+BiologyCatalog.COUNT' in activity
+          assert 'bioScenes.draw' in engine
+          print('Verified: 66 static, 66 live, 60 widgets; 16 biology models')
           assert 'class StillScenePainter' in (base/'StillScenePainter.java').read_text()
           assert 'class LiveScenePainter' in (base/'LiveScenePainter.java').read_text()
           xml=Path('education-live-wallpaper/app/src/main/res/layout/vision_widget.xml').read_text()
@@ -80,13 +94,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | head -10
           mkdir -p deliverables
-          cp "$apk" deliverables/Vision_Edu_Walls_v6.0.0_150_DISTINCT_TEST.apk
+          cp "$apk" deliverables/Vision_Edu_Walls_v7.0.0_BIOLOGY_ATLAS_TEST.apk
           sha256sum deliverables/*.apk | tee deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Vision_Edu_Walls_v6_150_Distinct_APK
+          name: Vision_Edu_Walls_v7_Biology_Atlas_APK
           path: deliverables/*
           retention-days: 90
 
@@ -96,10 +110,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="vision-edu-walls-v6.0.0"
+          tag="vision-edu-walls-v7.0.0"
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Release tag already exists; uploading test APK asset."
-            gh release upload "$tag" deliverables/Vision_Edu_Walls_v6.0.0_150_DISTINCT_TEST.apk deliverables/SHA256SUMS.txt --clobber
+            gh release upload "$tag" deliverables/Vision_Edu_Walls_v7.0.0_BIOLOGY_ATLAS_TEST.apk deliverables/SHA256SUMS.txt --clobber
           else
-            gh release create "$tag" deliverables/Vision_Edu_Walls_v6.0.0_150_DISTINCT_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 6.0 • 50 Different Static + 50 Live + 50 Smart Widgets" --notes "Vision Edu Walls 6.0 test: 50 individual original static school posters, 50 separately rendered animated live scenes (not repeated static backgrounds), 50 distinct Android digital widgets with system clock/date/battery and opt-in live weather, with Classic collection and HD ZIP importer preserved. Requires real-device verification. Existing debug signing keys may differ." --latest=false
+            gh release create "$tag" deliverables/Vision_Edu_Walls_v7.0.0_BIOLOGY_ATLAS_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 7.0 • Biology Atlas Interactive Wallpapers & Digital Widgets" --notes "Vision Edu Walls 7.0 Biology Atlas test APK: 66 static wallpapers and 66 live scenes, including 16 new illustrated biology models (DNA, Heart, Kidney, Nephron, Leaf, Tissues, Neuron, Lungs, Brain, Plant Cell, Flower, Chloroplast, Stomata, Roots, Blood Cells). Touch to identify anatomy, plus 60 real Android digital widgets with device clock, date, battery, and optional weather. Offline wallpapers. Build/signature checked, device testing required. Debug signing might not match prior test APKs." --latest=false
           fi

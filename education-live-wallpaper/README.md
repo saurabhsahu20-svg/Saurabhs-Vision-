@@ -1,19 +1,33 @@
-# SAURABH'S VISION — VISION EDU WALLS 6.0
+# VISION EDU WALLS 7.0 — Biology Atlas Edition
 
-A rebuilt Android education wallpaper and widget app with THREE separate catalogs:
+The Saurabh's Vision Android wallpaper collection now includes **66 static wallpapers, 66 separate live wallpaper designs, and 60 configurable Android digital widgets**.
 
-1. **50 Static Wallpapers** — 50 named original educational posters with unique graphics and layouts, generated with the new `StillScenePainter`. Each can be applied to Home screen or exported as 720×1280 PNG.
-2. **50 Live Wallpapers** — a separate `LiveScenePainter`, independent from the static poster engine. Animated Maths formulas, science atoms, DNA, rockets, planets, library scenes, motivation scenes, moving particles and reactive touch effects. Swipe/double-tap work only when the launcher forwards touches.
-3. **50 Digital Widgets** — distinct themed digital panels. All show real Android time (TextClock), system date, local device battery percentage, and weather when configured. Weather comes from Open-Meteo using a manually entered city or optional approximate Android location, and requires Internet. The clock and battery do not need weather or location permission.
+## New Biology Atlas (16 subjects × static and animated versions)
 
-### The originals are preserved
-The old 8 posters, 4 Canvas themes, user photo import, and 50-HD-ZIP importer remain under Classic Wallpapers. The original image pack is a separate ZIP in the user's ChatGPT conversation; large HD images are not all embedded in this APK.
+DNA double helix, Human Heart, Human Kidney, Nephron, Leaf Anatomy, Plant Tissues, Animal Tissues, Neuron, Lungs, Brain, Plant Cell, Flower Anatomy, Chloroplast, Stomata, Roots & Xylem, and Blood Cells.
 
-### Testing and security
-- No ads, login, trackers or account data uploads.
-- Offline drawing for wallpapers; opt-in network usage for weather only.
-- Java 17, Android SDK 35, Gradle 8.9. GitHub Actions checks catalog definitions, compiles APK, validates zip contents and verifies digital signature.
-- Android 6.0+, test APK signed with runner-generated debug key. Certificate may differ from earlier versions, causing "App not installed" when attempting to update older test builds. If necessary, uninstall **only Vision Edu Walls**, not the separate student learning app, after considering loss of local wallpaper settings.
-- Device installation, wallpaper motion, launcher widget support, battery and weather accuracy still require physical Android testing.
+- **Static Biology Posters:** original colorful, clearly titled educational diagrams.
+- **Interactive Biology Live Scenes:** gentle animation such as DNA strand movement, heart pulse, liquid tracing a nephron, leaf sparkles, lung expansion and nerve signals. Tap near the left/right part of the scene for a highlighted fact label. Swipe or double-tap to move to the next wallpaper where the device launcher forwards gestures.
+- These are **simplified educational schematics**, not clinically precise anatomy images or health advice.
 
-**Learn Today, Lead Tomorrow!**
+The original 50 Static poster designs and original separate 50 Live scenes remain available. Classic gallery, user photo import and HD ZIP pack importer are unchanged.
+
+## Digital Widgets: 60 styles
+
+- Original 50 widgets retained: Clock, Date, Maths, Science, Study Motivation.
+- **10 new Biology widgets**: DNA Discovery, Heartbeat Clock, Kidney Facts, Nephron Explorer, Leaf Science, Plant Tissue Lab, Animal Tissue Lab, Neuron Signals, Chloroplast Life, Stomata Watch.
+- Every widget displays Android device time (via system TextClock, with 12/24-hour formatting), local date, *device battery percent* and optional live weather, plus its topic-related fact.
+- For weather, choose a city (no location permission), or opt in to approximate Android location; forecast is fetched from Open-Meteo. No fabricated weather when offline, and weather may display last available cached reading.
+- Tap the weather label for setup, battery to request refresh, or the learning text to rotate between facts.
+- One configurable Android widget provider exposes the 60 styles.
+
+## Install / Build
+
+- App package: `com.saurabhsvision.eduwalls`, Android 6.0+; version 7.0.0, versionCode 8.
+- Native Java/Android Canvas; no login or advertising.
+- Wallpapers function without Internet. Only weather and city lookup need Internet.
+- CI: catalog counts, Java/Android compilation, archive integrity, digital-signature check and release binary upload.
+
+**Test build warning:** Android phone installation, OEM launchers, animations and widget behavior haven't been physically tested. GitHub CI test APKs are debug-signed using a per-run key; installing over older versions can fail with a signature conflict. If necessary, uninstall **only** old Vision Edu Walls after understanding that local wallpaper/app settings will reset. Your separately packaged Saurabh's Vision education/quiz app is not affected. Avoid publishing any signing keys.
+
+**SAURABH'S VISION — Learn Today, Lead Tomorrow!**
