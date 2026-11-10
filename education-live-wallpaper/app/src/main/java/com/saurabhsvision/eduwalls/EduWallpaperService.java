@@ -15,11 +15,13 @@ public final class EduWallpaperService extends WallpaperService {
     public static final String THEME = "theme";
     public static final String SPEED = "speed";
     public static final String INTERACTIVE = "interactive";
+    public static final String CUSTOM_ART = "custom_art";
+    public static final String CUSTOM_VERSION = "custom_version";
     @Override public Engine onCreateEngine() { return new EduEngine(); }
 
     private final class EduEngine extends Engine implements SharedPreferences.OnSharedPreferenceChangeListener {
         private final Handler handler = new Handler(Looper.getMainLooper());
-        private final EducationPainter painter = new EducationPainter();
+        private final EducationPainter painter = new EducationPainter(EduWallpaperService.this);
         private final SharedPreferences prefs = getSharedPreferences(PREFS,MODE_PRIVATE);
         private volatile boolean visible = false;
         private float tapX=-1000f,tapY=-1000f;
@@ -108,7 +110,7 @@ public final class EduWallpaperService extends WallpaperService {
                 canvas=holder.lockCanvas();
                 if(canvas!=null) painter.draw(canvas,canvas.getWidth(),canvas.getHeight(),
                     SystemClock.uptimeMillis()/1000f,prefs.getInt(THEME,0),
-                    prefs.getInt(SPEED,1),tapX,tapY,tapAt,prefs.getBoolean(INTERACTIVE,true),pageOffset);
+                    prefs.getInt(SPEED,1),tapX,tapY,tapAt,prefs.getBoolean(INTERACTIVE,true),pageOffset,prefs.getBoolean(CUSTOM_ART,false));
             } catch(IllegalArgumentException | IllegalStateException ignored) {
                 // A temporary detached surface must not crash the wallpaper.
             } finally {
