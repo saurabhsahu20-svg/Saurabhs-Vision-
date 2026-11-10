@@ -26,7 +26,7 @@ public final class VisionWidgetSetupActivity extends Activity {
         LinearLayout root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(18,18,18,30);sc.addView(root);setContentView(sc);
         TextView title=new TextView(this);
-        title.setText("🎓 VISION EDU WALLS — 50 WIDGETS");
+        title.setText("🎓 VISION EDU WALLS — 60 WIDGETS");
         title.setTextSize(23);title.setTextColor(0xff071b49);root.addView(title);
         choice=new TextView(this);choice.setTextSize(17);choice.setTextColor(0xff1746d2);
         root.addView(choice);select(style);
@@ -38,7 +38,7 @@ public final class VisionWidgetSetupActivity extends Activity {
             result.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,widgetId);
             setResult(RESULT_OK,result);finish();
         });
-        for(int n=0;n<50;n++){
+        for(int n=0;n<WidgetCatalog.COUNT;n++){
             final int index=n;
             Button b=new Button(this);b.setAllCaps(false);
             b.setText((n+1)+". "+WidgetCatalog.name(n)+" — "+WidgetCatalog.category(n));
@@ -48,5 +48,5 @@ public final class VisionWidgetSetupActivity extends Activity {
         }
     }
     private void select(int index){style=WidgetCatalog.norm(index);
-        if(choice!=null)choice.setText("Selected "+(style+1)+"/50: "+WidgetCatalog.name(style)+"\n"+WidgetCatalog.subtitle(style));}
+        if(choice!=null)choice.setText("Selected "+(style+1)+"/60: "+WidgetCatalog.name(style)+"\n"+WidgetCatalog.subtitle(style));}
 }
