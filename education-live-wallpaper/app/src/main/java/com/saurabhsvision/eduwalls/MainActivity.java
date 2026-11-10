@@ -98,7 +98,32 @@ public final class MainActivity extends Activity {
         Button apply=button("✨ Set as Live Wallpaper",GOLD,NAVY);
         add(body,apply,16);
         apply.setOnClickListener(v->applyWallpaper());
-        add(body,text("Choose a wallpaper theme",20,INK,true),24);
+        add(body,text("🎨 NEW · HD Education Wallpaper Studio",20,INK,true),24);
+        add(body,text("Turn any Maths, Science or Books image into an interactive wallpaper with moving stars, learning symbols and glowing touch effects.",13,MUTED,false),8);
+        Button pick=button("🖼 Choose HD Image from Gallery",BLUE,Color.WHITE);
+        add(body,pick,13);
+        pick.setOnClickListener(v->chooseArtwork());
+        Switch customSwitch=new Switch(this);
+        customSwitch.setText("Use My Image as Live Background");
+        customSwitch.setTextColor(INK);
+        customSwitch.setTextSize(14);
+        customSwitch.setChecked(customArt);
+        customSwitch.setPadding(dp(10),dp(12),dp(10),dp(12));
+        customSwitch.setBackground(rounded(Color.WHITE,15,0xffdbe4f4));
+        add(body,customSwitch,12);
+        customSwitch.setOnCheckedChangeListener((b2,checked)->{
+            if(checked && !new File(getFilesDir(),"vision_artwork.jpg").exists()){
+                customSwitch.setChecked(false);
+                Toast.makeText(this,"Choose a wallpaper image first.",Toast.LENGTH_SHORT).show();
+                chooseArtwork();
+                return;
+            }
+            customArt=checked;
+            prefs.edit().putBoolean(EduWallpaperService.CUSTOM_ART,checked).apply();
+            if(preview!=null)preview.invalidate();
+        });
+        add(body,text("Your picture stays on your device. To set it, use the yellow Set as Live Wallpaper button above.",12,MUTED,false),10);
+        add(body,text("Choose an animation theme",20,INK,true),25);
         add(body,text("Themes update your active wallpaper automatically.",13,MUTED,false),6);
 
         for(int i=0;i<4;i++){
