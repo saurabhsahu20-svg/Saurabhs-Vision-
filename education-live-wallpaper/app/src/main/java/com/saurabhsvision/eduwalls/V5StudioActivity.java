@@ -328,8 +328,11 @@ public final class V5StudioActivity extends Activity {
         @Override protected void onDraw(Canvas c){
             super.onDraw(c);
             if(mode==2){
-                Bitmap bmp=WidgetCatalog.background(selectedWidget,Math.max(1,getWidth()),Math.max(1,getHeight()));
-                c.drawBitmap(bmp,0,0,new Paint(Paint.ANTI_ALIAS_FLAG));bmp.recycle();
+                Bitmap bmp=PremiumWidgetArt.background(V5StudioActivity.this,Math.max(100,getWidth()),Math.max(100,getHeight()));
+                if(bmp==null)bmp=WidgetCatalog.background(selectedWidget,Math.max(1,getWidth()),Math.max(1,getHeight()));
+                c.drawBitmap(bmp,null,new android.graphics.RectF(0,0,getWidth(),getHeight()),
+                    new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG));
+                bmp.recycle();
                 Paint p=new Paint(3);p.setColor(Color.WHITE);p.setTypeface(Typeface.DEFAULT_BOLD);
                 p.setTextSize(dp(18));
                 c.drawText(WidgetCatalog.name(selectedWidget),dp(16),getHeight()*.28f,p);
