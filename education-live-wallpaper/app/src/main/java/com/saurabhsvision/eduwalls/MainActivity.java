@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
@@ -36,6 +37,9 @@ public final class MainActivity extends Activity {
     private static final String[] TITLES={"Maths Galaxy","Science Lab","Cosmic Classroom","Junior Learning"};
     private static final String[] SUBS={"Formulas • geometry • algebra","Atoms • molecules • physics","Planets • stars • exploration","Letters • numbers • happy learning"};
     private final Button[] themeButtons=new Button[4];
+    private final LinearLayout[] posterCards=new LinearLayout[PosterPainter.NAMES.length];
+    private Switch artworkSwitch;
+    private int poster=-1;
     private SharedPreferences prefs;
     private Preview preview;
     private TextView speedLabel;
@@ -51,6 +55,7 @@ public final class MainActivity extends Activity {
         speed=prefs.getInt(EduWallpaperService.SPEED,1);
         interactive=prefs.getBoolean(EduWallpaperService.INTERACTIVE,true);
         customArt=prefs.getBoolean(EduWallpaperService.CUSTOM_ART,false);
+        poster=prefs.getInt(EduWallpaperService.POSTER,-1);
         buildUI();
     }
     private int dp(float v){return (int)(v*getResources().getDisplayMetrics().density+.5f);}
@@ -83,9 +88,9 @@ public final class MainActivity extends Activity {
         LinearLayout all=stack();scroll.addView(all);setContentView(scroll);
         LinearLayout top=stack();top.setBackgroundColor(NAVY);top.setPadding(dp(20),dp(28),dp(20),dp(26));
         add(top,text("✦ SAURABH’S VISION™",14,GOLD,true),0);
-        add(top,text("VISION EDU WALLS 3.0",28,Color.WHITE,true),8);
+        add(top,text("VISION EDU WALLS 4.0",28,Color.WHITE,true),8);
         add(top,text("पढ़ाई की दुनिया, अब आपके फ़ोन की स्क्रीन पर!",15,0xffdbe9ff,false),8);
-        add(top,text("HD Art Studio • Live Particles • Touch Magic • Offline",12,0xffb9d7f5,false),12);
+        add(top,text("8 BUILT-IN POSTERS • LIVE MAGIC • OFFLINE",12,0xffb9d7f5,false),12);
         all.addView(top);
         LinearLayout body=stack();body.setPadding(dp(16),dp(20),dp(16),dp(34));all.addView(body);
 
@@ -98,12 +103,43 @@ public final class MainActivity extends Activity {
         Button apply=button("✨ Set as Live Wallpaper",GOLD,NAVY);
         add(body,apply,16);
         apply.setOnClickListener(v->applyWallpaper());
+        add(body,text("🔥 NEW • Interactive Poster Gallery",20,INK,true),22);
+        add(body,text("8 original colourful education posters, all included in the app. Tap a card to preview the animated wallpaper.",13,MUTED,false),8);
+        HorizontalScrollView gallery=new HorizontalScrollView(this);
+        gallery.setHorizontalScrollBarEnabled(false);
+        LinearLayout row=new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setPadding(dp(5),dp(5),dp(5),dp(5));
+        gallery.addView(row);
+        for(int i=0;i<PosterPainter.NAMES.length;i++){
+            final int id=i;
+            LinearLayout tile=stack();
+            tile.setPadding(dp(5),dp(5),dp(5),dp(5));
+            tile.setClickable(true);
+            tile.setFocusable(true);
+            tile.setContentDescription("Choose "+PosterPainter.NAMES[i]+" wallpaper");
+            PosterThumb art=new PosterThumb(i);
+            tile.addView(art,new LinearLayout.LayoutParams(dp(122),dp(204)));
+            TextView label=text(PosterPainter.NAMES[i],12,INK,true);
+            label.setGravity(Gravity.CENTER);
+            label.setMaxLines(2);
+            tile.addView(label,new LinearLayout.LayoutParams(dp(122),dp(38)));
+            posterCards[i]=tile;
+            LinearLayout.LayoutParams dim=new LinearLayout.LayoutParams(dp(132),ViewGroup.LayoutParams.WRAP_CONTENT);
+            dim.rightMargin=dp(10);
+            row.addView(tile,dim);
+            tile.setOnClickListener(v->selectPoster(id));
+        }
+        add(body,gallery,13);
+        add(body,text("Preview: touch for sparkles, swipe to change the poster. Animated symbols and particles are overlaid on each design.",12,MUTED,false),8);
+
         add(body,text("🎨 NEW · HD Education Wallpaper Studio",20,INK,true),24);
         add(body,text("Turn any Maths, Science or Books image into an interactive wallpaper with moving stars, learning symbols and glowing touch effects.",13,MUTED,false),8);
         Button pick=button("🖼 Choose HD Image from Gallery",BLUE,Color.WHITE);
         add(body,pick,13);
         pick.setOnClickListener(v->chooseArtwork());
-        Switch customSwitch=new Switch(this);
+        artworkSwitch=new Switch(this);
+        Switch customSwitch=artworkSwitch;
         customSwitch.setText("Use My Image as Live Background");
         customSwitch.setTextColor(INK);
         customSwitch.setTextSize(14);
@@ -119,7 +155,10 @@ public final class MainActivity extends Activity {
                 return;
             }
             customArt=checked;
-            prefs.edit().putBoolean(EduWallpaperService.CUSTOM_ART,checked).apply();
+            if(checked)poster=-1;
+            prefs.edit().putBoolean(EduWallpaperService.CUSTOM_ART,checked)
+                .putInt(EduWallpaperService.POSTER,poster).apply();
+            refreshSelected();
             if(preview!=null)preview.invalidate();
         });
         add(body,text("Your picture stays on your device. To set it, use the yellow Set as Live Wallpaper button above.",12,MUTED,false),10);
@@ -200,8 +239,9 @@ public final class MainActivity extends Activity {
             File target=new File(getFilesDir(),"vision_artwork.jpg");
             if(target.exists()&&!target.delete())throw new IllegalStateException("Can't replace image");
             if(!tmp.renameTo(target))throw new IllegalStateException("Can't store image");
-            customArt=true;
+            customArt=true;poster=-1;
             prefs.edit().putBoolean(EduWallpaperService.CUSTOM_ART,true)
+                .putInt(EduWallpaperService.POSTER,-1)
                 .putLong(EduWallpaperService.CUSTOM_VERSION,System.currentTimeMillis()).apply();
             if(preview!=null)preview.end();
             buildUI();
@@ -211,15 +251,35 @@ public final class MainActivity extends Activity {
             Toast.makeText(this,"Couldn't open this image. Choose a JPG or PNG.",Toast.LENGTH_LONG).show();
         }
     }
+    private void selectPoster(int selected){
+        poster=Math.max(0,Math.min(PosterPainter.NAMES.length-1,selected));
+        customArt=false;
+        prefs.edit().putInt(EduWallpaperService.POSTER,poster)
+            .putBoolean(EduWallpaperService.CUSTOM_ART,false).apply();
+        if(artworkSwitch!=null && artworkSwitch.isChecked())artworkSwitch.setChecked(false);
+        refreshSelected();
+        if(preview!=null)preview.invalidate();
+    }
     private void selectTheme(int selected){
         theme=Math.max(0,Math.min(3,selected));
-        prefs.edit().putInt(EduWallpaperService.THEME,theme).apply();
+        poster=-1;customArt=false;
+        prefs.edit().putInt(EduWallpaperService.THEME,theme)
+            .putInt(EduWallpaperService.POSTER,-1)
+            .putBoolean(EduWallpaperService.CUSTOM_ART,false).apply();
+        if(artworkSwitch!=null && artworkSwitch.isChecked())artworkSwitch.setChecked(false);
         refreshSelected();
         if(preview!=null)preview.invalidate();
     }
     private void refreshSelected(){
         for(int i=0;i<themeButtons.length;i++) {
-            themeButtons[i].setBackground(rounded(i==theme?0xffe3edff:Color.WHITE,14,i==theme?BLUE:0xffdbe4f4));
+            if(themeButtons[i]!=null)themeButtons[i].setBackground(rounded(
+                poster<0&&!customArt&&i==theme?0xffe3edff:Color.WHITE,14,
+                poster<0&&!customArt&&i==theme?BLUE:0xffdbe4f4));
+        }
+        for(int i=0;i<posterCards.length;i++){
+            if(posterCards[i]!=null)posterCards[i].setBackground(rounded(
+                !customArt&&poster==i?0xffffeb8f:Color.WHITE,13,
+                !customArt&&poster==i?BLUE:0xffd5e0f4));
         }
     }
     private void refreshSpeed(){
@@ -239,10 +299,25 @@ public final class MainActivity extends Activity {
     @Override protected void onResume(){
         super.onResume();
         theme=prefs.getInt(EduWallpaperService.THEME,theme);
+        poster=prefs.getInt(EduWallpaperService.POSTER,poster);
+        customArt=prefs.getBoolean(EduWallpaperService.CUSTOM_ART,customArt);
         refreshSelected();
         if(preview!=null)preview.begin();
     }
     @Override protected void onPause(){if(preview!=null)preview.end();super.onPause();}
+
+    private final class PosterThumb extends View {
+        private final int style;
+        private final PosterPainter painter=new PosterPainter();
+        PosterThumb(int index){
+            super(MainActivity.this);style=index;
+            setLayerType(View.LAYER_TYPE_SOFTWARE,null);
+        }
+        @Override protected void onDraw(Canvas canvas){
+            super.onDraw(canvas);
+            painter.draw(canvas,getWidth(),getHeight(),0f,style,0f);
+        }
+    }
 
     private final class Preview extends View {
         private final EducationPainter painter=new EducationPainter(MainActivity.this);
@@ -258,7 +333,7 @@ public final class MainActivity extends Activity {
         @Override protected void onDraw(Canvas c){
             super.onDraw(c);
             painter.draw(c,getWidth(),getHeight(),SystemClock.uptimeMillis()/1000f,
-                theme,speed,touchX,touchY,touchAt,interactive,0f,customArt);
+                theme,speed,touchX,touchY,touchAt,interactive,0f,customArt,poster);
             if(active)postInvalidateDelayed(speed==0?90:(speed==2?38:54));
         }
         @Override public boolean onTouchEvent(MotionEvent e){
@@ -278,11 +353,14 @@ public final class MainActivity extends Activity {
             if(action==MotionEvent.ACTION_UP){
                 float dx=x-downX,dy=y-downY;
                 if(Math.abs(dx)>dp(64)&&Math.abs(dx)>Math.abs(dy)*1.4f){
-                    selectTheme((theme+(dx<0?1:3))%4);
+                    if(poster>=0 && !customArt)
+                        selectPoster((poster+(dx<0?1:PosterPainter.NAMES.length-1))%PosterPainter.NAMES.length);
+                    else selectTheme((theme+(dx<0?1:3))%4);
                 } else if(Math.abs(dx)<dp(45)&&Math.abs(dy)<dp(45)){
                     long now=SystemClock.uptimeMillis();
                     if(now-lastTapAt<330){
-                        selectTheme((theme+1)%4);
+                        if(poster>=0 && !customArt)selectPoster((poster+1)%PosterPainter.NAMES.length);
+                        else selectTheme((theme+1)%4);
                         lastTapAt=0L;
                     }else lastTapAt=now;
                     touchX=x;touchY=y;touchAt=now;
