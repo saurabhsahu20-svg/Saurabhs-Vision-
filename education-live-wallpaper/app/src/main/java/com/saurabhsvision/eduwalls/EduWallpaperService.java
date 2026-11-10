@@ -19,12 +19,15 @@ public final class EduWallpaperService extends WallpaperService {
     public static final String CUSTOM_VERSION = "custom_version";
     public static final String POSTER = "poster";
     public static final String COLLECTION = "collection_id";
+    public static final String V6_LIVE_ENABLED = "v6_live_mode";
+    public static final String LIVE_ID = "v6_live_id";
     @Override public Engine onCreateEngine() { return new EduEngine(); }
 
     private final class EduEngine extends Engine implements SharedPreferences.OnSharedPreferenceChangeListener {
         private final Handler handler = new Handler(Looper.getMainLooper());
         private final EducationPainter painter = new EducationPainter(EduWallpaperService.this);
         private final CollectionPainter collectionPainter = new CollectionPainter();
+        private final LiveScenePainter liveScenes = new LiveScenePainter();
         private final SharedPreferences prefs = getSharedPreferences(PREFS,MODE_PRIVATE);
         private volatile boolean visible = false;
         private float tapX=-1000f,tapY=-1000f;
@@ -78,6 +81,10 @@ public final class EduWallpaperService extends WallpaperService {
                 final long now=SystemClock.uptimeMillis();
                 float threshold=getResources().getDisplayMetrics().density*72f;
                 if(Math.abs(dx)>threshold && Math.abs(dx)>Math.abs(dy)*1.6f) {
+                    if(prefs.getBoolean(V6_LIVE_ENABLED,false)){
+                        int n=prefs.getInt(LIVE_ID,0);
+                        prefs.edit().putInt(LIVE_ID,(n+(dx<0?1:LiveSceneCatalog.COUNT-1))%LiveSceneCatalog.COUNT).apply();
+                    }else{
                     int col=prefs.getInt(COLLECTION,-1);
                     if(col>=0 && !prefs.getBoolean(CUSTOM_ART,false)){
                         prefs.edit().putInt(COLLECTION,(col+(dx<0?1:CollectionCatalog.COUNT-1))%CollectionCatalog.COUNT).apply();
@@ -93,11 +100,16 @@ public final class EduWallpaperService extends WallpaperService {
                         prefs.edit().putInt(THEME,next).apply();
                     }
                     }
+                    }
                     tapX=x;tapY=y;tapAt=now;
                 } else if(Math.abs(dx)<threshold*.70f && Math.abs(dy)<threshold*.70f) {
                     // Double-tap changes theme; single-tap creates a subject-specific burst.
                     float distance=(float)Math.hypot(x-lastTapX,y-lastTapY);
                     if(now-lastTapAt<340 && distance<threshold) {
+                        if(prefs.getBoolean(V6_LIVE_ENABLED,false)){
+                            prefs.edit().putInt(LIVE_ID,
+                                (prefs.getInt(LIVE_ID,0)+1)%LiveSceneCatalog.COUNT).apply();
+                        }else{
                         int col=prefs.getInt(COLLECTION,-1);
                         if(col>=0 && !prefs.getBoolean(CUSTOM_ART,false)){
                             prefs.edit().putInt(COLLECTION,(col+1)%CollectionCatalog.COUNT).apply();
@@ -107,6 +119,7 @@ public final class EduWallpaperService extends WallpaperService {
                             prefs.edit().putInt(POSTER,(preset+1)%PosterPainter.NAMES.length).apply();
                         }else{
                             prefs.edit().putInt(THEME,(prefs.getInt(THEME,0)+1)%4).apply();
+                        }
                         }
                         }
                         lastTapAt=0;
@@ -132,6 +145,14 @@ public final class EduWallpaperService extends WallpaperService {
             try {
                 canvas=holder.lockCanvas();
                 if(canvas!=null) {
+                    if(prefs.getBoolean(V6_LIVE_ENABLED,false)){
+                        int speed=prefs.getInt(SPEED,1);
+                        float factor=speed==0?.33f:(speed==2?1.3f:.73f);
+                        liveScenes.draw(canvas,canvas.getWidth(),canvas.getHeight(),
+                            SystemClock.uptimeMillis()/1000f*factor,
+                            prefs.getInt(LIVE_ID,0),tapX,tapY,
+                            prefs.getBoolean(INTERACTIVE,true)?tapAt:0L);
+                    } else {
                     int collection=prefs.getInt(COLLECTION,-1);
                     if(collection>=0 && !prefs.getBoolean(CUSTOM_ART,false)){
                         float spd=prefs.getInt(SPEED,1)==0?.35f:(prefs.getInt(SPEED,1)==2?1.4f:.8f);
@@ -142,6 +163,7 @@ public final class EduWallpaperService extends WallpaperService {
                         painter.draw(canvas,canvas.getWidth(),canvas.getHeight(),
                             SystemClock.uptimeMillis()/1000f,prefs.getInt(THEME,0),
                             prefs.getInt(SPEED,1),tapX,tapY,tapAt,prefs.getBoolean(INTERACTIVE,true),pageOffset,prefs.getBoolean(CUSTOM_ART,false),prefs.getInt(POSTER,-1));
+                    }
                     }
                 }
             } catch(IllegalArgumentException | IllegalStateException ignored) {
