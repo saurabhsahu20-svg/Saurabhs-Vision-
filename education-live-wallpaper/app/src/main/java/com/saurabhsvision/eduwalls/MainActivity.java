@@ -61,7 +61,7 @@ public final class MainActivity extends Activity {
     }
     private Button button(String label,int bg,int fg){
         Button b=new Button(this);
-        b.setText(label);b.setTextAllCaps(false);b.setTextSize(15);b.setTextColor(fg);
+        b.setText(label);b.setAllCaps(false);b.setTextSize(15);b.setTextColor(fg);
         b.setTypeface(Typeface.DEFAULT,Typeface.BOLD);b.setBackground(rounded(bg,16,0));
         b.setMinHeight(dp(52));b.setPadding(dp(18),dp(10),dp(18),dp(10));return b;
     }
