@@ -95,8 +95,8 @@ public final class WidgetCatalog {
             }
         }else if(group==3) { // Science: molecule constellation
             for(int j=0;j<7;j++){
-                float a=(float)(j*Math.PI*2/7),x=width*(.78f+.13f*Math.cos(a)),
-                    y=height*(.54f+.23f*Math.sin(a));
+                float a=(float)(j*Math.PI*2/7),x=width*(.78f+.13f*(float)Math.cos(a)),
+                    y=height*(.54f+.23f*(float)Math.sin(a));
                 p.setColor(hi);p.setAlpha(100);p.setStrokeWidth(2);
                 c.drawLine(width*.78f,height*.54f,x,y,p);
                 p.setColor(j%2==0?hi:Color.WHITE);p.setAlpha(96);
