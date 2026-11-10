@@ -164,6 +164,53 @@ public final class MainActivity extends Activity {
         add(body,privacy,19);
         add(body,text("Battery mode: animations slow automatically when Android Battery Saver is on. Your wallpaper pauses when hidden.",12,MUTED,false),13);
     }
+    private void chooseArtwork(){
+        Intent intent=new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        try {startActivityForResult(Intent.createChooser(intent,"Select Education Wallpaper"),PICK_ART);}
+        catch(Exception ex){Toast.makeText(this,"Image picker not available.",Toast.LENGTH_LONG).show();}
+    }
+    @Override protected void onActivityResult(int code,int result,Intent data){
+        super.onActivityResult(code,result,data);
+        if(code!=PICK_ART||result!=RESULT_OK||data==null||data.getData()==null)return;
+        Uri uri=data.getData();
+        try{
+            BitmapFactory.Options bounds=new BitmapFactory.Options();
+            bounds.inJustDecodeBounds=true;
+            try(InputStream in=getContentResolver().openInputStream(uri)){
+                BitmapFactory.decodeStream(in,null,bounds);
+            }
+            if(bounds.outWidth<=0||bounds.outHeight<=0)throw new IllegalArgumentException("Bad image");
+            int sample=1;
+            while(bounds.outWidth/sample>1400||bounds.outHeight/sample>2400)sample*=2;
+            BitmapFactory.Options options=new BitmapFactory.Options();
+            options.inSampleSize=sample;
+            Bitmap bitmap;
+            try(InputStream in=getContentResolver().openInputStream(uri)){
+                bitmap=BitmapFactory.decodeStream(in,null,options);
+            }
+            if(bitmap==null)throw new IllegalArgumentException("Can't decode image");
+            File tmp=new File(getFilesDir(),"vision_artwork_temp.jpg");
+            try(FileOutputStream out=new FileOutputStream(tmp)){
+                if(!bitmap.compress(Bitmap.CompressFormat.JPEG,87,out)){
+                    throw new IllegalArgumentException("Can't save image");
+                }
+            } finally {bitmap.recycle();}
+            File target=new File(getFilesDir(),"vision_artwork.jpg");
+            if(target.exists()&&!target.delete())throw new IllegalStateException("Can't replace image");
+            if(!tmp.renameTo(target))throw new IllegalStateException("Can't store image");
+            customArt=true;
+            prefs.edit().putBoolean(EduWallpaperService.CUSTOM_ART,true)
+                .putLong(EduWallpaperService.CUSTOM_VERSION,System.currentTimeMillis()).apply();
+            if(preview!=null)preview.end();
+            buildUI();
+            if(preview!=null)preview.begin();
+            Toast.makeText(this,"Your HD art is ready. Tap Set as Live Wallpaper!",Toast.LENGTH_LONG).show();
+        }catch(Exception ex){
+            Toast.makeText(this,"Couldn't open this image. Choose a JPG or PNG.",Toast.LENGTH_LONG).show();
+        }
+    }
     private void selectTheme(int selected){
         theme=Math.max(0,Math.min(3,selected));
         prefs.edit().putInt(EduWallpaperService.THEME,theme).apply();
