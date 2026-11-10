@@ -71,6 +71,12 @@ jobs:
           assert 'STATIC_COUNT=CollectionCatalog.COUNT+BiologyCatalog.COUNT' in activity
           assert 'LIVE_COUNT=LiveSceneCatalog.COUNT+BiologyCatalog.COUNT' in activity
           assert 'bioScenes.draw' in engine
+          assert 'PREMIUM 3D HD ART STUDIO' in (base/'ImagePackActivity.java').read_text()
+          assert 'PremiumWidgetArt.background' in (base/'VisionWidgetProvider.java').read_text()
+          assert 'drawPremiumArtEffects' in (base/'EducationPainter.java').read_text()
+          assert 'PremiumWidgetArt.choose' in (base/'ImagePackActivity.java').read_text()
+          assert 'premium_hd_fx' in (base/'ImagePackActivity.java').read_text()
+          print('Verified Premium 3D HD Studio, real Android widget art, four live FX')
           print('Verified: 66 static, 66 live, 60 widgets; 16 biology models')
           assert 'class StillScenePainter' in (base/'StillScenePainter.java').read_text()
           assert 'class LiveScenePainter' in (base/'LiveScenePainter.java').read_text()
@@ -94,13 +100,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | head -10
           mkdir -p deliverables
-          cp "$apk" deliverables/Vision_Edu_Walls_v7.0.0_BIOLOGY_ATLAS_TEST.apk
+          cp "$apk" deliverables/Vision_Edu_Walls_v8.0.0_PREMIUM_3D_TEST.apk
           sha256sum deliverables/*.apk | tee deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Vision_Edu_Walls_v7_Biology_Atlas_APK
+          name: Vision_Edu_Walls_v8_Premium_3D_APK
           path: deliverables/*
           retention-days: 90
 
@@ -110,10 +116,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="vision-edu-walls-v7.0.0"
+          tag="vision-edu-walls-v8.0.0"
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Release tag already exists; uploading test APK asset."
-            gh release upload "$tag" deliverables/Vision_Edu_Walls_v7.0.0_BIOLOGY_ATLAS_TEST.apk deliverables/SHA256SUMS.txt --clobber
+            gh release upload "$tag" deliverables/Vision_Edu_Walls_v8.0.0_PREMIUM_3D_TEST.apk deliverables/SHA256SUMS.txt --clobber
           else
-            gh release create "$tag" deliverables/Vision_Edu_Walls_v7.0.0_BIOLOGY_ATLAS_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 7.0 • Biology Atlas Interactive Wallpapers & Digital Widgets" --notes "Vision Edu Walls 7.0 Biology Atlas test APK: 66 static wallpapers and 66 live scenes, including 16 new illustrated biology models (DNA, Heart, Kidney, Nephron, Leaf, Tissues, Neuron, Lungs, Brain, Plant Cell, Flower, Chloroplast, Stomata, Roots, Blood Cells). Touch to identify anatomy, plus 60 real Android digital widgets with device clock, date, battery, and optional weather. Offline wallpapers. Build/signature checked, device testing required. Debug signing might not match prior test APKs." --latest=false
+            gh release create "$tag" deliverables/Vision_Edu_Walls_v8.0.0_PREMIUM_3D_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 8.0 • Premium 3D HD Wallpapers, Live FX and Real Digital Widgets" --notes "Premium 3D HD Studio test APK: use separately supplied original HD ZIP art pack (not pre-embedded) to select colorful 3D wallpapers for Android static backgrounds, animated Live overlays with stardust/comets/neon orbits/minimal modes, and matching glass-style Digital Widget backgrounds. Real system clock, date, battery, optional Internet weather. Preserves 66 static, 66 live, 60 widget styles and Biology Atlas. Device testing required; debug signatures may differ from older test builds." --latest=false
           fi

@@ -1,33 +1,30 @@
-# VISION EDU WALLS 7.0 — Biology Atlas Edition
+# VISION EDU WALLS 8.0 — PREMIUM 3D HD STUDIO
 
-The Saurabh's Vision Android wallpaper collection now includes **66 static wallpapers, 66 separate live wallpaper designs, and 60 configurable Android digital widgets**.
+## What is new
+This upgrade addresses requests for vivid, richly detailed 3D neon, glossy, galaxy-themed Maths and Biology wallpapers **instead of only simple geometric Canvas illustrations.**
 
-## New Biology Atlas (16 subjects × static and animated versions)
+**Premium HD Art Pack:** A separate ZIP in the user's ChatGPT conversation has 10 high-resolution vertical images: Maths Galaxy, Neon DNA Universe, Glowing Human Heart, Kidney & Nephron, and Cosmic Biology World, each with an original HD and Aurora Neon edition. Includes the image supplied by the user and newly generated visual works. The ZIP is **not shipped inside the Android APK**; choose the "Premium 3D HD Art Studio" button on the app's home page and import the ZIP from the phone's Downloads folder. This separation allows updating the art pack without rebuilding the APK.
 
-DNA double helix, Human Heart, Human Kidney, Nephron, Leaf Anatomy, Plant Tissues, Animal Tissues, Neuron, Lungs, Brain, Plant Cell, Flower Anatomy, Chloroplast, Stomata, Roots & Xylem, and Blood Cells.
+**Actual on-device choices after importing ZIP:**
+1. Select any art as a **Static HD Wallpaper** using Android's WallpaperManager.
+2. Select as **Live Wallpaper**, then choose one of four layered animations: Floating Stardust, Shooting Comets, Neon Orbits or Minimal Glow. These overlays run on top of the imported real HD picture and respond to touch on supported launchers. Wallpaper frames pause while hidden; animation speed still controlled in Classic Wallpapers.
+3. Select as **Digital Widget Background**, giving the real Android home-screen widgets a matching image, darkened to keep text legible. Clock time uses Android TextClock, battery percentage uses Android's BatteryManager sticky broadcast, date uses system date, weather uses opt-in Open-Meteo city/approximate-location lookup. The widget is genuinely functional, not a screenshot of a clock.
 
-- **Static Biology Posters:** original colorful, clearly titled educational diagrams.
-- **Interactive Biology Live Scenes:** gentle animation such as DNA strand movement, heart pulse, liquid tracing a nephron, leaf sparkles, lung expansion and nerve signals. Tap near the left/right part of the scene for a highlighted fact label. Swipe or double-tap to move to the next wallpaper where the device launcher forwards gestures.
-- These are **simplified educational schematics**, not clinically precise anatomy images or health advice.
+## Preserved collections
+- 66 individually themed offline procedural static wallpapers (50 subject posters + 16 Biology).
+- 66 separate live Canvas scenes (50 education worlds + 16 Biology) with touch effects.
+- 60 configurable digital widget styles (clock, date, maths, science, motivation, biology) with device time/date/battery/optional Internet weather.
+- The older Classic Wallpaper features and HD ZIP collection import.
 
-The original 50 Static poster designs and original separate 50 Live scenes remain available. Classic gallery, user photo import and HD ZIP pack importer are unchanged.
+## Privacy and performance
+- Imported artwork is stored on-device only, with no cloud upload.
+- No login, advertising, or analytics.
+- Wallpaper art works offline; weather needs Internet and voluntary city or location.
+- Imported art cached as RGB565; HD widget artwork is downsampled to 480×280 and darkened for legibility. Effects use capped particle counts and stop drawing when not visible; Minimal Glow is best for reducing motion and battery usage.
 
-## Digital Widgets: 60 styles
-
-- Original 50 widgets retained: Clock, Date, Maths, Science, Study Motivation.
-- **10 new Biology widgets**: DNA Discovery, Heartbeat Clock, Kidney Facts, Nephron Explorer, Leaf Science, Plant Tissue Lab, Animal Tissue Lab, Neuron Signals, Chloroplast Life, Stomata Watch.
-- Every widget displays Android device time (via system TextClock, with 12/24-hour formatting), local date, *device battery percent* and optional live weather, plus its topic-related fact.
-- For weather, choose a city (no location permission), or opt in to approximate Android location; forecast is fetched from Open-Meteo. No fabricated weather when offline, and weather may display last available cached reading.
-- Tap the weather label for setup, battery to request refresh, or the learning text to rotate between facts.
-- One configurable Android widget provider exposes the 60 styles.
-
-## Install / Build
-
-- App package: `com.saurabhsvision.eduwalls`, Android 6.0+; version 7.0.0, versionCode 8.
-- Native Java/Android Canvas; no login or advertising.
-- Wallpapers function without Internet. Only weather and city lookup need Internet.
-- CI: catalog counts, Java/Android compilation, archive integrity, digital-signature check and release binary upload.
-
-**Test build warning:** Android phone installation, OEM launchers, animations and widget behavior haven't been physically tested. GitHub CI test APKs are debug-signed using a per-run key; installing over older versions can fail with a signature conflict. If necessary, uninstall **only** old Vision Edu Walls after understanding that local wallpaper/app settings will reset. Your separately packaged Saurabh's Vision education/quiz app is not affected. Avoid publishing any signing keys.
+## Build and installation
+- Android 6.0+, version 8.0.0, versionCode 9, Java 17, SDK 35, Gradle 8.9.
+- CI performs 66/66/60 catalog checks, Premium Studio integrations, APK compilation, ZIP integrity and digital signature verification, and publishes a GitHub Release asset.
+- This is a **debug-signed test APK**. Device installation, performance, widget support, animations and weather still need validation on a physical phone. Certificates from different GitHub runners may vary, so upgrade in place may fail; uninstall only old Vision Edu Walls if necessary, accepting local settings loss. The separate Saurabh’s Vision educational Quiz Club app is unrelated.
 
 **SAURABH'S VISION — Learn Today, Lead Tomorrow!**
