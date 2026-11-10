@@ -5,6 +5,7 @@ import android.app.WallpaperManager;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -14,6 +15,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.Gravity;
@@ -33,14 +35,15 @@ import java.util.Locale;
 public final class V5StudioActivity extends Activity {
     private static final int NAVY=0xff071b49, BLUE=0xff1746d2, GOLD=0xffffd54f;
     private static final int SAVE_PNG=5042;
-    private final CollectionPainter painter=new CollectionPainter();
+    private final StillScenePainter stillPainter=new StillScenePainter();
+    private final LiveScenePainter livePainter=new LiveScenePainter();
     private SharedPreferences prefs;
     private LinearLayout gallery,actions;
     private TextView label,subtitle;
     private WallpaperPreview preview;
     private Button[] tabs=new Button[3];
     private boolean playing;
-    private int mode=0,selectedWallpaper=0,selectedWidget=0;
+    private int mode=0,selectedWallpaper=0,selectedLive=0,selectedWidget=0;
     private long lastTap=0L;
     private float touchX=-1000f,touchY=-1000f,downX,downY;
     private long touchAt=0L;
@@ -51,6 +54,7 @@ public final class V5StudioActivity extends Activity {
         prefs=getSharedPreferences(EduWallpaperService.PREFS,MODE_PRIVATE);
         selectedWallpaper=Math.max(0,Math.min(CollectionCatalog.COUNT-1,prefs.getInt(EduWallpaperService.COLLECTION,0)));
         selectedWidget=getSharedPreferences(VisionWidgetProvider.PREFS,MODE_PRIVATE).getInt("pending",0);
+        selectedLive=LiveSceneCatalog.norm(prefs.getInt(EduWallpaperService.LIVE_ID,0));
         buildUI();
     }
     private int dp(float x){return (int)(getResources().getDisplayMetrics().density*x+.5f);}
@@ -78,9 +82,9 @@ public final class V5StudioActivity extends Activity {
         LinearLayout head=new LinearLayout(this);head.setOrientation(LinearLayout.VERTICAL);
         head.setPadding(dp(18),dp(21),dp(18),dp(20));head.setBackground(round(NAVY,18));
         add(head,txt("🎓  SAURABH'S VISION",14,GOLD,true),0);
-        add(head,txt("VISION EDU WALLS 5.1",26,Color.WHITE,true),8);
-        add(head,txt("50 Wallpapers  •  50 Live Presets  •  50 Widgets",14,0xffd8e8ff,true),9);
-        add(head,txt("Offline wallpapers • Optional live weather • Free",12,0xffa9cafa,false),7);
+        add(head,txt("VISION EDU WALLS 6.0",26,Color.WHITE,true),8);
+        add(head,txt("50 Static  •  50 Separate Live  •  50 Digital Widgets",14,0xffd8e8ff,true),9);
+        add(head,txt("3 separate galleries • New illustrations & animations",12,0xffa9cafa,false),7);
         add(root,head,12);
 
         LinearLayout nav=new LinearLayout(this);
@@ -108,10 +112,10 @@ public final class V5StudioActivity extends Activity {
         add(root,gallery,12);
         Button hd=btn("📦 IMPORT ALL 50 HD WALLPAPERS FROM ZIP",0xffe1efff,NAVY);
         add(root,hd,19);
-        hd.setOnClickListener(v->startActivity(new Intent(this,ImagePackActivity.class)));
+        hd.setOnClickListener(v->{prefs.edit().putBoolean(EduWallpaperService.V6_LIVE_ENABLED,false).apply();startActivity(new Intent(this,ImagePackActivity.class));});
         Button old=btn("📚 Open Classic Wallpapers (Version 4 Collection)",0xffe1eaff,NAVY);
-        add(root,old,25);old.setOnClickListener(v->startActivity(new Intent(this,MainActivity.class)));
-        TextView note=txt("Original poster-inspired artwork. The 50 live entries are motion variants of the 50 built-in static compositions; widgets offer 50 configurable themes from one Android widget provider. Some launchers do not forward wallpaper swipes.",12,0xff587091,false);
+        add(root,old,25);old.setOnClickListener(v->{prefs.edit().putBoolean(EduWallpaperService.V6_LIVE_ENABLED,false).apply();startActivity(new Intent(this,MainActivity.class));});
+        TextView note=txt("The Static gallery contains 50 original poster compositions. The Live gallery uses a separate, newly built scene engine (not static posters with effects). The 50 Digital Widget styles read actual Android time/date/battery and optional online weather. All graphics are original.",12,0xff587091,false);
         add(root,note,16);
         showMode(0);
     }
@@ -131,7 +135,7 @@ public final class V5StudioActivity extends Activity {
         }else if(mode==1){
             Button apply=btn("✨ Set as LIVE Wallpaper",GOLD,NAVY);
             add(actions,apply,0);apply.setOnClickListener(v->setLive());
-            TextView help=txt("Tap the wallpaper to trigger sparks; double tap or swipe in your launcher to change scenes if supported.",12,0xff47668f,false);
+            TextView help=txt("50 separate animated scene designs. Tap for sparks; double tap/swipe to switch live scenes where the Android launcher forwards touch input.",12,0xff47668f,false);
             add(actions,help,8);
         }else{
             Button pin=btn("📌 Add Selected Smart Widget to Home Screen",GOLD,NAVY);
@@ -161,7 +165,7 @@ public final class V5StudioActivity extends Activity {
                     Miniature tiny=new Miniature(index);
                     tile.addView(tiny,new LinearLayout.LayoutParams(-1,dp(190)));
                 }
-                String name=mode==2?WidgetCatalog.name(index):CollectionCatalog.name(index);
+                String name=mode==2?WidgetCatalog.name(index):mode==1?LiveSceneCatalog.name(index):CollectionCatalog.name(index);
                 TextView t=txt(String.format(Locale.US,"%02d. ",index+1)+name,12,NAVY,true);
                 t.setGravity(Gravity.CENTER);
                 t.setMaxLines(2);
@@ -169,7 +173,7 @@ public final class V5StudioActivity extends Activity {
                 LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,-2,1f);
                 lp.setMargins(dp(3),dp(3),dp(3),dp(5));row.addView(tile,lp);
                 tile.setOnClickListener(v->{
-                    if(mode==2)selectedWidget=index;else selectedWallpaper=index;
+                    if(mode==2)selectedWidget=index;else if(mode==1)selectedLive=index;else selectedWallpaper=index;
                     updateSelection();preview.invalidate();
                 });
             }
@@ -182,15 +186,20 @@ public final class V5StudioActivity extends Activity {
             label.setText("⏰ "+WidgetCatalog.name(selectedWidget));
             subtitle.setText("Widget "+(selectedWidget+1)+" of 50  ·  "+WidgetCatalog.category(selectedWidget));
         }else{
-            label.setText("✨ "+CollectionCatalog.name(selectedWallpaper));
-            subtitle.setText((mode==0?"Static wallpaper ":"Live wallpaper ")+(selectedWallpaper+1)+" of 50  ·  "+CollectionCatalog.category(selectedWallpaper));
+            if(mode==1){
+                label.setText("🌌 "+LiveSceneCatalog.name(selectedLive));
+                subtitle.setText("Live animation "+(selectedLive+1)+" of 50 · "+LiveSceneCatalog.group(selectedLive));
+            }else {
+                label.setText("🎨 "+CollectionCatalog.name(selectedWallpaper));
+                subtitle.setText("Static artwork "+(selectedWallpaper+1)+" of 50 · "+CollectionCatalog.category(selectedWallpaper));
+            }
         }
         if(preview!=null)preview.invalidate();
     }
     private Bitmap makeStill(){
         Bitmap bmp=Bitmap.createBitmap(720,1280,Bitmap.Config.ARGB_8888);
         Canvas c=new Canvas(bmp);
-        painter.draw(c,720,1280,0,selectedWallpaper,false,-1000,-1000,0L);
+        stillPainter.draw(c,720,1280,selectedWallpaper);
         return bmp;
     }
     private void setStill(){
@@ -224,8 +233,18 @@ public final class V5StudioActivity extends Activity {
         }catch(Exception ex){Toast.makeText(this,"Could not save this wallpaper.",Toast.LENGTH_LONG).show();}
         finally{if(bmp!=null)bmp.recycle();}
     }
+    private String phoneBattery(){
+        Intent battery=registerReceiver(null,new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        if(battery==null)return "Battery unavailable";
+        int level=battery.getIntExtra(BatteryManager.EXTRA_LEVEL,-1);
+        int scale=battery.getIntExtra(BatteryManager.EXTRA_SCALE,-1);
+        if(level<0||scale<=0)return "Battery unavailable";
+        return "🔋 Battery "+Math.round(level*100f/scale)+"%";
+    }
     private void setLive(){
-        prefs.edit().putInt(EduWallpaperService.COLLECTION,selectedWallpaper)
+        prefs.edit().putInt(EduWallpaperService.LIVE_ID,selectedLive)
+            .putBoolean(EduWallpaperService.V6_LIVE_ENABLED,true)
+            .putInt(EduWallpaperService.COLLECTION,-1)
             .putInt(EduWallpaperService.POSTER,-1)
             .putBoolean(EduWallpaperService.CUSTOM_ART,false).apply();
         Intent intent=new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
@@ -253,7 +272,8 @@ public final class V5StudioActivity extends Activity {
         Miniature(int n){super(V5StudioActivity.this);index=n;setLayerType(View.LAYER_TYPE_SOFTWARE,null);}
         @Override protected void onDraw(Canvas c){
             super.onDraw(c);
-            painter.draw(c,getWidth(),getHeight(),0,index,false,-1000,-1000,0);
+            if(mode==1)livePainter.draw(c,getWidth(),getHeight(),7.5f,index,-1000,-1000,0L);
+            else stillPainter.draw(c,getWidth(),getHeight(),index);
         }
     }
     private final class WallpaperPreview extends View{
@@ -271,10 +291,17 @@ public final class V5StudioActivity extends Activity {
                 p.setTextSize(dp(15));
                 c.drawText(new java.text.SimpleDateFormat("EEE, d MMM yyyy",Locale.getDefault()).format(new java.util.Date()),dp(18),getHeight()*.57f,p);
                 c.drawText(WeatherRepository.display(V5StudioActivity.this),dp(18),getHeight()*.66f,p);
-                c.drawText(WidgetCatalog.subtitle(selectedWidget),dp(18),getHeight()*.76f,p);
+                c.drawText(phoneBattery(),dp(18),getHeight()*.74f,p);
+                c.drawText(WidgetCatalog.subtitle(selectedWidget),dp(18),getHeight()*.82f,p);
+                if(playing)postInvalidateDelayed(60000);
             }else {
-                painter.draw(c,getWidth(),getHeight(),SystemClock.uptimeMillis()/1000f,selectedWallpaper,mode==1,touchX,touchY,touchAt);
-                if(playing&&mode==1)postInvalidateDelayed(52);
+                if(mode==1){
+                    livePainter.draw(c,getWidth(),getHeight(),SystemClock.uptimeMillis()/1000f,
+                        selectedLive,touchX,touchY,touchAt);
+                    if(playing)postInvalidateDelayed(52);
+                }else{
+                    stillPainter.draw(c,getWidth(),getHeight(),selectedWallpaper);
+                }
             }
         }
         @Override public boolean onTouchEvent(MotionEvent e){
@@ -283,11 +310,12 @@ public final class V5StudioActivity extends Activity {
             if(e.getActionMasked()==MotionEvent.ACTION_UP){
                 float dx=e.getX()-downX;
                 if(Math.abs(dx)>dp(55)){
-                    selectedWallpaper=(selectedWallpaper+(dx<0?1:49))%50;
+                    if(mode==1)selectedLive=(selectedLive+(dx<0?1:49))%50;
+                    else selectedWallpaper=(selectedWallpaper+(dx<0?1:49))%50;
                     updateSelection();
                 }else if(mode==1){
                     touchX=e.getX();touchY=e.getY();touchAt=SystemClock.uptimeMillis();
-                    if(touchAt-lastTap<350){selectedWallpaper=(selectedWallpaper+1)%50;updateSelection();}
+                    if(touchAt-lastTap<350){selectedLive=(selectedLive+1)%50;updateSelection();}
                     lastTap=touchAt;
                 }
                 invalidate();performClick();return true;
