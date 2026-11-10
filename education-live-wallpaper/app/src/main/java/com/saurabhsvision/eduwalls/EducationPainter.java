@@ -1,6 +1,10 @@
 package com.saurabhsvision.eduwalls;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import java.io.File;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.RadialGradient;
@@ -17,6 +21,12 @@ public final class EducationPainter {
     public static final int COSMOS = 2;
     public static final int JUNIOR = 3;
 
+    private final Context ctx;
+    private Bitmap customBitmap;
+    private long lastArtModified=Long.MIN_VALUE, lastArtSize=-1;
+    public EducationPainter(Context context) {
+        ctx=context.getApplicationContext();
+    }
     private final Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF oval = new RectF();
     private final Path path = new Path();
@@ -61,7 +71,7 @@ public final class EducationPainter {
         p.setTextAlign(Paint.Align.CENTER);
         c.drawText(value,x,y,p);
     }
-    public void draw(Canvas c, int w, int h, float seconds, int requestedTheme, int speed, float tapX, float tapY, long tapAtMillis, boolean interactive, float pageOffset) {
+    public void draw(Canvas c, int w, int h, float seconds, int requestedTheme, int speed, float tapX, float tapY, long tapAtMillis, boolean interactive, float pageOffset, boolean customArt) {
         if (w <= 0 || h <= 0) return;
         final int theme = Math.max(0,Math.min(requestedTheme,3));
         final float motion = speed == 0 ? 0.18f : (speed == 2 ? 1.2f : 0.52f);
@@ -69,20 +79,30 @@ public final class EducationPainter {
         final float size = Math.min(w,h);
         final int hi = HIGHLIGHT[theme];
         final int sec = SECONDARY[theme];
-        color(Color.WHITE,255);
-        p.setShader(new LinearGradient(0,0,w,h,BACK_A[theme],BACK_B[theme],Shader.TileMode.CLAMP));
-        c.drawRect(0,0,w,h,p);
-        p.setShader(null);
-        drawAurora(c,w,h,time,hi,sec);
+        boolean photo=customArt && drawCustom(c,w,h,pageOffset,time);
+        if(!photo) {
+            color(Color.WHITE,255);
+            p.setShader(new LinearGradient(0,0,w,h,BACK_A[theme],BACK_B[theme],Shader.TileMode.CLAMP));
+            c.drawRect(0,0,w,h,p);
+            p.setShader(null);
+            drawAurora(c,w,h,time,hi,sec);
+        } else {
+            color(Color.WHITE,255);
+            p.setShader(new LinearGradient(0,0,0,h,
+                new int[]{0xc5051029,0x10051b38,0x08051b38,0xa8081230},
+                new float[]{0f,.25f,.72f,1f},Shader.TileMode.CLAMP));
+            c.drawRect(0,0,w,h,p);
+            p.setShader(null);
+        }
 
         // Dim glowing colored orbs that drift slowly in the background.
-        for(int k=0;k<4;k++) {
+        for(int k=0;k<(photo?2:4);k++) {
             float x=w*(0.12f+0.72f*noise(k+17))+(float)Math.sin(time*.22f+k)*w*.035f;
             float y=h*(.10f+.82f*noise(k+57))+(float)Math.cos(time*.20f+k)*h*.025f;
             dot(c,x,y,size*(.13f+noise(k+23)*.15f),k%2==0?hi:sec,13);
         }
         // Starfield and small depth lights.
-        for(int k=0;k<45;k++) {
+        for(int k=0;k<(photo?38:45);k++) {
             float x=w*noise(k+190)+pageOffset*w*(.04f+.04f*noise(k+12));
             float y=h*noise(k+480);
             float pulse=.65f+.35f*(float)Math.sin(time*.8f+k*.8f);
@@ -91,27 +111,31 @@ public final class EducationPainter {
 
         // Animated floating academic notation.
         String[] symbols=SYMBOLS[theme];
-        for(int k=0;k<14;k++){
+        for(int k=0;k<(photo?8:14);k++){
             float x=w*(.09f+.82f*noise(k+37));
             float y=h*frac(noise(k+96) + time*(.008f+.006f*noise(k+20)));
             float drift=(float)Math.sin(time*.7f+k*.9f)*w*.025f;
-            text(c,symbols[k%symbols.length],x+drift,y, Math.max(12f,size*(.034f+.013f*noise(k+71))), k%3==0?hi:Color.WHITE,70+(int)(noise(k+91)*85), k%3==0);
+            text(c,symbols[k%symbols.length],x+drift,y, Math.max(12f,size*(.034f+.013f*noise(k+71))), k%3==0?hi:Color.WHITE,(photo?42:70)+(int)(noise(k+91)*(photo?54:85)), k%3==0);
         }
 
         float cx=w*.50f+pageOffset*w*.024f,cy=h*.49f;
-        if(theme==MATHS || theme==JUNIOR) drawBook(c,cx,cy,size,hi,sec,time,theme==JUNIOR);
-        else if(theme==SCIENCE) drawAtom(c,cx,cy,size,hi,sec,time);
-        else drawPlanet(c,cx,cy,size,hi,sec,time);
-        drawKnowledgePulse(c,w,h,theme,time,hi,sec);
+        if(!photo) {
+            if(theme==MATHS || theme==JUNIOR) drawBook(c,cx,cy,size,hi,sec,time,theme==JUNIOR);
+            else if(theme==SCIENCE) drawAtom(c,cx,cy,size,hi,sec,time);
+            else drawPlanet(c,cx,cy,size,hi,sec,time);
+            drawKnowledgePulse(c,w,h,theme,time,hi,sec);
+        } else {
+            drawPosterShimmer(c,w,h,time,hi,sec);
+        }
 
         // Elegant border arc and title/brand.
-        color(hi,150);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(Math.max(1.5f,size*.004f));
+        color(hi,photo?85:150);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(Math.max(1.5f,size*.004f));
         oval.set(w*.09f,h*.12f,w*.91f,h*.88f);c.drawRoundRect(oval,size*.07f,size*.07f,p);p.setStyle(Paint.Style.FILL);
         float top=h*.165f;
         text(c,"SAURABH’S VISION",cx,top,Math.min(size*.058f,28f),Color.WHITE,240,true);
         text(c,"LEARN TODAY, LEAD TOMORROW",cx,top+Math.min(size*.037f,18f)*1.7f,Math.min(size*.026f,13f),hi,215,true);
-        text(c,TITLES[theme],cx,h*.81f,Math.min(size*.052f,26f),Color.WHITE,230,true);
-        text(c,"STRONG CONCEPTS • BRIGHT RESULTS",cx,h*.85f,Math.min(size*.021f,11f),hi,210,true);
+        if(!photo)text(c,TITLES[theme],cx,h*.81f,Math.min(size*.052f,26f),Color.WHITE,230,true);
+        if(!photo)text(c,"STRONG CONCEPTS • BRIGHT RESULTS",cx,h*.85f,Math.min(size*.021f,11f),hi,210,true);
 
         if (interactive && tapAtMillis > 0) {
             drawTouchMagic(c,w,h,tapX,tapY,tapAtMillis,theme,hi,sec);
@@ -184,6 +208,50 @@ public final class EducationPainter {
     }
 
     // Soft aurora lighting is rendered as canvas gradients, never as large images.
+    private boolean drawCustom(Canvas c,int w,int h,float offset,float time) {
+        File art = new File(ctx.getFilesDir(),"vision_artwork.jpg");
+        long m=art.exists()?art.lastModified():-1;
+        long sz=art.exists()?art.length():-1;
+        if(m!=lastArtModified||sz!=lastArtSize){
+            lastArtModified=m;lastArtSize=sz;
+            if(customBitmap!=null){customBitmap.recycle();customBitmap=null;}
+            if(sz>0) {
+                try {
+                    BitmapFactory.Options opts=new BitmapFactory.Options();
+                    opts.inPreferredConfig=Bitmap.Config.RGB_565;
+                    customBitmap=BitmapFactory.decodeFile(art.getAbsolutePath(),opts);
+                }catch(Exception ignored){customBitmap=null;}
+            }
+        }
+        if(customBitmap==null||customBitmap.isRecycled())return false;
+        float bw=customBitmap.getWidth(),bh=customBitmap.getHeight();
+        if(bw<=0||bh<=0)return false;
+        float scale=Math.max(w/bw,h/bh)*1.06f;
+        float wd=bw*scale,ht=bh*scale;
+        float x=(w-wd)*.5f+offset*w*.018f+(float)Math.sin(time*.11f)*w*.007f;
+        float y=(h-ht)*.5f+(float)Math.cos(time*.12f)*h*.007f;
+        color(Color.WHITE,255);p.setFilterBitmap(true);
+        c.drawBitmap(customBitmap,null,new RectF(x,y,x+wd,y+ht),p);
+        return true;
+    }
+    private void drawPosterShimmer(Canvas c,int w,int h,float t,int hi,int sec){
+        float z=Math.min(w,h);
+        for(int k=0;k<30;k++) {
+            float x=w*noise(k+120);
+            float y=h*frac(noise(k+520)+t*(.003f+.002f*noise(k+9)));
+            float f=(float)(.45+.55*Math.abs(Math.sin(t*.85f+k)));
+            dot(c,x,y,z*(.0015f+.004f*noise(k+54)),k%3==0?hi:sec,(int)(150*f));
+            if(k%6==0) {
+                float cross=z*.012f*f;
+                line(c,x-cross,y,x+cross,y,Color.WHITE,(int)(170*f),Math.max(1f,z*.002f));
+                line(c,x,y-cross,x,y+cross,Color.WHITE,(int)(170*f),Math.max(1f,z*.002f));
+            }
+        }
+        float x=w*frac(t*.065f)-w*.14f,y=h*.64f;
+        for(int j=0;j<12;j++){
+            dot(c,x-j*z*.024f,y+j*z*.007f,z*(.001f+.0007f*(12-j)),j%2==0?hi:sec,(j+3)*10);
+        }
+    }
     private void drawAurora(Canvas c,int w,int h,float t,int hi,int sec) {
         float z=Math.min(w,h);
         for(int k=0;k<3;k++) {
