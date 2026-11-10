@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-feature android:name="android.software.live_wallpaper" android:required="false" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <application
         android:allowBackup="false"
         android:fullBackupContent="false"
@@ -19,6 +22,7 @@
         </activity>
         <activity android:name=".MainActivity" android:exported="false"/>
         <activity android:name=".ImagePackActivity" android:exported="false"/>
+        <activity android:name=".WeatherSettingsActivity" android:exported="false" android:label="Smart Widget Weather" />
         <activity android:name=".VisionWidgetSetupActivity" android:exported="true" android:label="Choose Vision Widget" />
         <receiver
             android:name=".VisionWidgetProvider"
@@ -26,6 +30,9 @@
             android:label="Vision Edu Walls - 50 Widgets">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/vision_widget_info"/>
         </receiver>

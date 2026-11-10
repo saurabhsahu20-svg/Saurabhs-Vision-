@@ -58,13 +58,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | head -10
           mkdir -p deliverables
-          cp "$apk" deliverables/Vision_Edu_Walls_v5.0.0_150_COLLECTION_TEST.apk
+          cp "$apk" deliverables/Vision_Edu_Walls_v5.1.0_SMART_WIDGETS_TEST.apk
           sha256sum deliverables/*.apk | tee deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Vision_Edu_Walls_v5_150_Collection_APK
+          name: Vision_Edu_Walls_v5_1_Smart_Widgets_APK
           path: deliverables/*
           retention-days: 90
 
@@ -74,10 +74,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="vision-edu-walls-v5.0.0"
+          tag="vision-edu-walls-v5.1.0"
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Release tag already exists; uploading test APK asset."
-            gh release upload "$tag" deliverables/Vision_Edu_Walls_v5.0.0_150_COLLECTION_TEST.apk deliverables/SHA256SUMS.txt --clobber
+            gh release upload "$tag" deliverables/Vision_Edu_Walls_v5.1.0_SMART_WIDGETS_TEST.apk deliverables/SHA256SUMS.txt --clobber
           else
-            gh release create "$tag" deliverables/Vision_Edu_Walls_v5.0.0_150_COLLECTION_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 5.0 • Interactive Poster Gallery" --notes "Vision Edu Walls 5.0 test: 50 built-in poster-style static wallpaper presets, 50 motion-reactive live presets, 50 clock/date/study widget configurations. Includes original v4 classic collection, offline rendering, local PNG export and touch/gesture effects. Widgets use Android TextClock and tap-to-cycle learning messages. Important: debug APK signing may differ between releases; test on device." --latest=false
+            gh release create "$tag" deliverables/Vision_Edu_Walls_v5.1.0_SMART_WIDGETS_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 5.1 • Smart Digital Clock Weather & Battery Widgets" --notes "Vision Edu Walls 5.1 test APK: 50 Android smart widget styles with actual phone digital clock (12h or 24h), system date, battery percentage and optionally current weather/temperature. Choose a city without location access or voluntarily grant approximate location; weather uses the Open-Meteo service and network only for weather. Weather may update around every 30 minutes, battery periodically. 50 static + 50 interactive live wallpaper presets and classic gallery retained. APK test/debug signing may differ; test on your phone." --latest=false
           fi

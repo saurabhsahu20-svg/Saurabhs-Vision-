@@ -78,9 +78,9 @@ public final class V5StudioActivity extends Activity {
         LinearLayout head=new LinearLayout(this);head.setOrientation(LinearLayout.VERTICAL);
         head.setPadding(dp(18),dp(21),dp(18),dp(20));head.setBackground(round(NAVY,18));
         add(head,txt("🎓  SAURABH'S VISION",14,GOLD,true),0);
-        add(head,txt("VISION EDU WALLS 5.0",26,Color.WHITE,true),8);
+        add(head,txt("VISION EDU WALLS 5.1",26,Color.WHITE,true),8);
         add(head,txt("50 Wallpapers  •  50 Live Presets  •  50 Widgets",14,0xffd8e8ff,true),9);
-        add(head,txt("Offline educational designs • Tap effects • Free",12,0xffa9cafa,false),7);
+        add(head,txt("Offline wallpapers • Optional live weather • Free",12,0xffa9cafa,false),7);
         add(root,head,12);
 
         LinearLayout nav=new LinearLayout(this);
@@ -134,9 +134,12 @@ public final class V5StudioActivity extends Activity {
             TextView help=txt("Tap the wallpaper to trigger sparks; double tap or swipe in your launcher to change scenes if supported.",12,0xff47668f,false);
             add(actions,help,8);
         }else{
-            Button pin=btn("📌 Add Selected Widget to Home Screen",GOLD,NAVY);
+            Button pin=btn("📌 Add Selected Smart Widget to Home Screen",GOLD,NAVY);
             add(actions,pin,0);pin.setOnClickListener(v->pinWidget());
-            TextView hint=txt("Widgets contain working time/date displays, education facts and tappable study messages. Choose a design, then use the Android launcher to add the widget.",12,0xff47668f,false);
+            Button weather=btn("☀ Set Weather City / Use Phone Location",0xffdce7ff,NAVY);
+            add(actions,weather,8);
+            weather.setOnClickListener(v->startActivity(new Intent(this,WeatherSettingsActivity.class)));
+            TextView hint=txt("All 50 widget styles show phone digital time, date, battery percentage and optional weather. Tap a widget's weather to change the city. Weather uses Internet; the other details come from Android.",12,0xff47668f,false);
             add(actions,hint,8);
         }
         for(int start=0;start<50;start+=2){
@@ -260,10 +263,15 @@ public final class V5StudioActivity extends Activity {
             if(mode==2){
                 Bitmap bmp=WidgetCatalog.background(selectedWidget,Math.max(1,getWidth()),Math.max(1,getHeight()));
                 c.drawBitmap(bmp,0,0,new Paint(Paint.ANTI_ALIAS_FLAG));bmp.recycle();
-                Paint p=new Paint(3);p.setColor(Color.WHITE);p.setTypeface(Typeface.DEFAULT_BOLD);p.setTextSize(dp(27));
-                c.drawText(WidgetCatalog.name(selectedWidget),dp(20),getHeight()*.58f,p);
+                Paint p=new Paint(3);p.setColor(Color.WHITE);p.setTypeface(Typeface.DEFAULT_BOLD);
+                p.setTextSize(dp(18));
+                c.drawText(WidgetCatalog.name(selectedWidget),dp(16),getHeight()*.28f,p);
+                p.setTextSize(dp(36));
+                c.drawText(new java.text.SimpleDateFormat("h:mm a",Locale.getDefault()).format(new java.util.Date()),dp(18),getHeight()*.48f,p);
                 p.setTextSize(dp(15));
-                c.drawText(WidgetCatalog.subtitle(selectedWidget),dp(20),getHeight()*.68f,p);
+                c.drawText(new java.text.SimpleDateFormat("EEE, d MMM yyyy",Locale.getDefault()).format(new java.util.Date()),dp(18),getHeight()*.57f,p);
+                c.drawText(WeatherRepository.display(V5StudioActivity.this),dp(18),getHeight()*.66f,p);
+                c.drawText(WidgetCatalog.subtitle(selectedWidget),dp(18),getHeight()*.76f,p);
             }else {
                 painter.draw(c,getWidth(),getHeight(),SystemClock.uptimeMillis()/1000f,selectedWallpaper,mode==1,touchX,touchY,touchAt);
                 if(playing&&mode==1)postInvalidateDelayed(52);

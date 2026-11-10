@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:minWidth="230dp"
-    android:minHeight="115dp"
-    android:minResizeWidth="170dp"
-    android:minResizeHeight="105dp"
+    android:minWidth="240dp"
+    android:minHeight="145dp"
+    android:minResizeWidth="220dp"
+    android:minResizeHeight="135dp"
     android:initialLayout="@layout/vision_widget"
     android:previewImage="@drawable/ic_launcher"
     android:updatePeriodMillis="1800000"

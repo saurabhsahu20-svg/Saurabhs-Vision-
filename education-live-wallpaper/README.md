@@ -1,13 +1,15 @@
-# VISION EDU WALLS 5.0 • 150-Design Collection
+# VISION EDU WALLS 5.1 • 150-Design Collection
 
-This is an expanded, original offline Android wallpapers and widget application by SAURABH'S VISION™.
+This is an expanded, original offline wallpapers and optional-online-weather widgets application by SAURABH'S VISION™.
 
 ## Included in this APK
 - **50 static wallpaper presets**: five educational groups × ten uniquely named, tinted and arranged poster-style compositions. Can be applied to Android Home Screen or exported as individual 720×1280 PNG images.
 - **50 live wallpaper presets**: same curated 50 artworks plus five categories of moving scenes (orbit sparks, sine waves, stardust, geometric pulses and comets). Tap to trigger particles; double-tap and swipe cycle scenes on launchers that forward touch input.
 - **50 widget styles**: ten clock faces, ten dates, ten Maths facts, ten Science facts, ten study motivation widgets. Android home screen widgets are real `AppWidgetProvider` instances with live `TextClock`, date updates and tap-to-cycle content. One widget provider exposes 50 selectable styles when adding/configuring widgets.
 - **Preserves the 8 original v4 posters**, four original Canvas animation themes, and the "Choose HD Image from Gallery" custom photo mode under "Classic Wallpapers".
-- **Offline** (no Internet permission, no accounts, no ads). Local device settings only.
+- **Wallpapers remain offline**; optional weather widgets use Internet (Open-Meteo). No login and no ads. Approximate location permission is requested only if the user explicitly selects "Use Phone Location"; city search can be used without any location permission.
+- **All 50 smart widgets show the phone's digital clock, date, and battery percentage.** Weather and city are optional: with no selected city/location the widget clearly displays "Set weather location". Widget refresh uses Android's TextClock, periodically queries device battery status, and refreshes weather roughly every 30 minutes when online. The app does not read a phone manufacturer's proprietary weather widget.
+
 
 ## Important about the old HD image packs
 Previously generated full-resolution HD artwork packs are available as downloadable ZIP files in the ChatGPT conversation. Those photographic/AI-generated original JPG assets are **not embedded into this APK**; v5 ships 50 self-contained procedural poster-style compositions instead. Users can import the separately supplied 50-HD-Wallpapers.zip archive **once from the Import HD ZIP button**, browse the HD image gallery inside the app, and apply any imported image as a static wallpaper or as an animated live wallpaper through the v4 custom-photo renderer. Image import and storage are strictly local. This distinction prevents claims that the 10 JPGs are included when they are not.
