@@ -5,7 +5,13 @@ import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.net.Uri;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -21,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.Switch;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,7 +40,8 @@ public final class MainActivity extends Activity {
     private Preview preview;
     private TextView speedLabel;
     private int theme=0,speed=1;
-    private boolean interactive=true;
+    private boolean interactive=true,customArt=false;
+    private static final int PICK_ART=8021;
 
     @Override public void onCreate(Bundle state){
         super.onCreate(state);
@@ -42,6 +50,7 @@ public final class MainActivity extends Activity {
         theme=prefs.getInt(EduWallpaperService.THEME,0);
         speed=prefs.getInt(EduWallpaperService.SPEED,1);
         interactive=prefs.getBoolean(EduWallpaperService.INTERACTIVE,true);
+        customArt=prefs.getBoolean(EduWallpaperService.CUSTOM_ART,false);
         buildUI();
     }
     private int dp(float v){return (int)(v*getResources().getDisplayMetrics().density+.5f);}
@@ -74,9 +83,9 @@ public final class MainActivity extends Activity {
         LinearLayout all=stack();scroll.addView(all);setContentView(scroll);
         LinearLayout top=stack();top.setBackgroundColor(NAVY);top.setPadding(dp(20),dp(28),dp(20),dp(26));
         add(top,text("✦ SAURABH’S VISION™",14,GOLD,true),0);
-        add(top,text("VISION EDU WALLS 2.0",28,Color.WHITE,true),8);
+        add(top,text("VISION EDU WALLS 3.0",28,Color.WHITE,true),8);
         add(top,text("पढ़ाई की दुनिया, अब आपके फ़ोन की स्क्रीन पर!",15,0xffdbe9ff,false),8);
-        add(top,text("4 living worlds • Touch magic • Swipe themes • Offline",12,0xffb9d7f5,false),12);
+        add(top,text("HD Art Studio • Live Particles • Touch Magic • Offline",12,0xffb9d7f5,false),12);
         all.addView(top);
         LinearLayout body=stack();body.setPadding(dp(16),dp(20),dp(16),dp(34));all.addView(body);
 
@@ -164,7 +173,7 @@ public final class MainActivity extends Activity {
     @Override protected void onPause(){if(preview!=null)preview.end();super.onPause();}
 
     private final class Preview extends View {
-        private final EducationPainter painter=new EducationPainter();
+        private final EducationPainter painter=new EducationPainter(MainActivity.this);
         private boolean active;
         private float downX,downY,touchX=-1000f,touchY=-1000f;
         private long touchAt=0L,lastTapAt=0L;
@@ -177,7 +186,7 @@ public final class MainActivity extends Activity {
         @Override protected void onDraw(Canvas c){
             super.onDraw(c);
             painter.draw(c,getWidth(),getHeight(),SystemClock.uptimeMillis()/1000f,
-                theme,speed,touchX,touchY,touchAt,interactive,0f);
+                theme,speed,touchX,touchY,touchAt,interactive,0f,customArt);
             if(active)postInvalidateDelayed(speed==0?90:(speed==2?38:54));
         }
         @Override public boolean onTouchEvent(MotionEvent e){
