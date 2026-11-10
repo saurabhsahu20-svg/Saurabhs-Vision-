@@ -56,7 +56,10 @@ public final class VisionWidgetProvider extends AppWidgetProvider {
         int style=WidgetCatalog.norm(pref.getInt("style_"+widgetId,pref.getInt("pending",0)));
         int category=style/10, accent=WidgetCatalog.accent(style);
         RemoteViews views=new RemoteViews(ctx.getPackageName(),R.layout.vision_widget);
-        Bitmap bg=WidgetCatalog.background(style,480,280);
+        // User-selected real HD wallpaper, darkened for readable clock/weather.
+        // Otherwise use one of the original 60 digital widget compositions.
+        Bitmap bg=PremiumWidgetArt.background(ctx,480,280);
+        if(bg==null)bg=WidgetCatalog.background(style,480,280);
         views.setImageViewBitmap(R.id.widget_background,bg);
         views.setTextViewText(R.id.widget_title,WidgetCatalog.name(style));
         views.setTextColor(R.id.widget_title,accent);
