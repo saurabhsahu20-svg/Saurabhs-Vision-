@@ -62,18 +62,42 @@ public final class ImagePackActivity extends Activity {
         root.setPadding(dp(16),dp(18),dp(16),dp(24));
         sc.addView(root);setContentView(sc);
         TextView title=new TextView(this);
-        title.setText("🖼️ HD WALLPAPER LIBRARY");
+        title.setText("✨ PREMIUM 3D HD ART STUDIO");
         title.setTextSize(24);title.setTextColor(NAVY);
         title.setTypeface(null,1);root.addView(title);
-        TextView note=new TextView(this);note.setText("Import your 50 HD JPG wallpapers from ZIP once, then choose a picture to apply as Static or interactive Live Wallpaper. Your artwork stays private on this device.");
+        TextView note=new TextView(this);note.setText("Import the Premium 3D HD wallpaper ZIP in one tap (up to 60 pictures). Choose any artwork as a Static wallpaper, interactive Live wallpaper, or Digital Widget background. Your art stays on this phone.");
         note.setTextColor(0xff48628a);note.setTextSize(14);note.setPadding(0,dp(9),0,dp(13));root.addView(note);
-        Button choose=button("📦 Import / Replace 50-HD-Wallpapers ZIP",GOLD,NAVY);
+        Button choose=button("📦 Import Premium 3D HD Wallpaper ZIP",GOLD,NAVY);
         root.addView(choose);choose.setOnClickListener(v->pickZip());
+        Button fx=button("🌟 LIVE FX: Stardust / Comets / Orbits / Minimal",BLUE,Color.WHITE);
+        LinearLayout.LayoutParams fxp=new LinearLayout.LayoutParams(-1,-2);fxp.topMargin=dp(10);
+        root.addView(fx,fxp);fx.setOnClickListener(v->selectEffect());
+        Button reset=button("↩ Restore Original Digital Widget Backgrounds",0xffdceaff,NAVY);
+        LinearLayout.LayoutParams rlp=new LinearLayout.LayoutParams(-1,-2);rlp.topMargin=dp(10);
+        root.addView(reset,rlp);
+        reset.setOnClickListener(v->{
+            PremiumWidgetArt.clear(this);
+            Toast.makeText(this,"Original educational widget backgrounds restored.",Toast.LENGTH_LONG).show();
+        });
         status=new TextView(this);status.setTextColor(BLUE);status.setTextSize(14);
         status.setPadding(0,dp(16),0,dp(10));root.addView(status);
         gallery=new LinearLayout(this);gallery.setOrientation(LinearLayout.VERTICAL);
         root.addView(gallery);
         refresh();
+    }
+    private void selectEffect(){
+        final String[] items={"🌠 Floating Stardust","☄️ Shooting Comets","🪐 Neon Orbits","🌿 Minimal Glow / Battery Friendly"};
+        int current=getSharedPreferences(EduWallpaperService.PREFS,MODE_PRIVATE).getInt("premium_hd_fx",0);
+        new android.app.AlertDialog.Builder(this)
+            .setTitle("Live 3D Wallpaper Animation")
+            .setSingleChoiceItems(items,Math.max(0,Math.min(3,current)),(dlg,which)->{
+                getSharedPreferences(EduWallpaperService.PREFS,MODE_PRIVATE).edit()
+                    .putInt("premium_hd_fx",which).apply();
+                Toast.makeText(this,"Effect selected: "+items[which],Toast.LENGTH_SHORT).show();
+                dlg.dismiss();
+            })
+            .setNegativeButton("Cancel",null)
+            .show();
     }
     private void pickZip(){
         try {
@@ -196,12 +220,26 @@ public final class ImagePackActivity extends Activity {
     }
     private void chooseImage(File file,int index){
         new android.app.AlertDialog.Builder(this)
-            .setTitle("HD Wallpaper "+String.format(Locale.US,"%02d",index+1))
-            .setMessage("How would you like to use this picture?")
-            .setPositiveButton("✨ Live Wallpaper",(dlg,which)->applyLive(file))
-            .setNeutralButton("🖼️ Static Wallpaper",(dlg,which)->applyStatic(file))
+            .setTitle("Premium HD Wallpaper "+String.format(Locale.US,"%02d",index+1))
+            .setItems(new String[]{
+                "✨ Animated LIVE Wallpaper",
+                "🖼️ Static HD Wallpaper",
+                "⏰ Digital Widget Background (real phone details)"
+            },(dlg,which)->{
+                if(which==0)applyLive(file);
+                else if(which==1)applyStatic(file);
+                else applyWidgetBackground(file);
+            })
             .setNegativeButton("Cancel",null)
             .show();
+    }
+    private void applyWidgetBackground(File image){
+        try{
+            PremiumWidgetArt.choose(this,image);
+            Toast.makeText(this,"HD Digital Widget art applied! Time, weather, date and battery remain live.",Toast.LENGTH_LONG).show();
+        }catch(IOException e){
+            Toast.makeText(this,"Couldn't apply this picture to widgets.",Toast.LENGTH_LONG).show();
+        }
     }
     private void applyStatic(File image){
         Bitmap bmp=null;
@@ -223,6 +261,7 @@ public final class ImagePackActivity extends Activity {
         if(target.exists()&&!target.delete()){tmp.delete();Toast.makeText(this,"Could not replace old image.",Toast.LENGTH_LONG).show();return;}
         if(!tmp.renameTo(target)){Toast.makeText(this,"Could not select HD art.",Toast.LENGTH_LONG).show();return;}
         getSharedPreferences(EduWallpaperService.PREFS,MODE_PRIVATE).edit()
+            .putBoolean(EduWallpaperService.V6_LIVE_ENABLED,false)
             .putBoolean(EduWallpaperService.CUSTOM_ART,true)
             .putInt(EduWallpaperService.POSTER,-1)
             .putInt(EduWallpaperService.COLLECTION,-1)
