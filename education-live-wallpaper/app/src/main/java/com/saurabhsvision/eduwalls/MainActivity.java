@@ -157,6 +157,7 @@ public final class MainActivity extends Activity {
             customArt=checked;
             if(checked)poster=-1;
             prefs.edit().putBoolean(EduWallpaperService.CUSTOM_ART,checked)
+                .putInt(EduWallpaperService.COLLECTION,-1)
                 .putInt(EduWallpaperService.POSTER,poster).apply();
             refreshSelected();
             if(preview!=null)preview.invalidate();
@@ -255,6 +256,7 @@ public final class MainActivity extends Activity {
         poster=Math.max(0,Math.min(PosterPainter.NAMES.length-1,selected));
         customArt=false;
         prefs.edit().putInt(EduWallpaperService.POSTER,poster)
+            .putInt(EduWallpaperService.COLLECTION,-1)
             .putBoolean(EduWallpaperService.CUSTOM_ART,false).apply();
         if(artworkSwitch!=null && artworkSwitch.isChecked())artworkSwitch.setChecked(false);
         refreshSelected();
@@ -264,6 +266,7 @@ public final class MainActivity extends Activity {
         theme=Math.max(0,Math.min(3,selected));
         poster=-1;customArt=false;
         prefs.edit().putInt(EduWallpaperService.THEME,theme)
+            .putInt(EduWallpaperService.COLLECTION,-1)
             .putInt(EduWallpaperService.POSTER,-1)
             .putBoolean(EduWallpaperService.CUSTOM_ART,false).apply();
         if(artworkSwitch!=null && artworkSwitch.isChecked())artworkSwitch.setChecked(false);

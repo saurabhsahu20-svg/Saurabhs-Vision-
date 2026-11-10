@@ -33,7 +33,6 @@ public final class VisionWidgetProvider extends AppWidgetProvider {
         RemoteViews views=new RemoteViews(ctx.getPackageName(),R.layout.vision_widget);
         Bitmap bg=WidgetCatalog.background(style,500,280);
         views.setImageViewBitmap(R.id.widget_background,bg);
-        bg.recycle();
         views.setTextViewText(R.id.widget_title,WidgetCatalog.name(style));
         views.setTextViewText(R.id.widget_label,WidgetCatalog.subtitle(style));
         views.setTextColor(R.id.widget_clock,0xffffffff);
@@ -60,6 +59,8 @@ public final class VisionWidgetProvider extends AppWidgetProvider {
         PendingIntent openApp=PendingIntent.getActivity(ctx,widgetId+100000,open,PENDING_FLAGS);
         views.setOnClickPendingIntent(R.id.widget_title,openApp);
         manager.updateAppWidget(widgetId,views);
+        // RemoteViews has now been serialized for the home-screen host.
+        bg.recycle();
     }
     @Override public void onUpdate(Context context,AppWidgetManager manager,int[] ids){
         for(int id:ids)updateWidget(context,manager,id);
