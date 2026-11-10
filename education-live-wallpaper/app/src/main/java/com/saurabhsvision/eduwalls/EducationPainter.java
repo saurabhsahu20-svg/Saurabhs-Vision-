@@ -3,6 +3,7 @@ package com.saurabhsvision.eduwalls;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
+import android.graphics.RadialGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
@@ -60,7 +61,7 @@ public final class EducationPainter {
         p.setTextAlign(Paint.Align.CENTER);
         c.drawText(value,x,y,p);
     }
-    public void draw(Canvas c, int w, int h, float seconds, int requestedTheme, int speed, float tapX, float tapY, long tapAtMillis) {
+    public void draw(Canvas c, int w, int h, float seconds, int requestedTheme, int speed, float tapX, float tapY, long tapAtMillis, boolean interactive, float pageOffset) {
         if (w <= 0 || h <= 0) return;
         final int theme = Math.max(0,Math.min(requestedTheme,3));
         final float motion = speed == 0 ? 0.18f : (speed == 2 ? 1.2f : 0.52f);
@@ -72,6 +73,7 @@ public final class EducationPainter {
         p.setShader(new LinearGradient(0,0,w,h,BACK_A[theme],BACK_B[theme],Shader.TileMode.CLAMP));
         c.drawRect(0,0,w,h,p);
         p.setShader(null);
+        drawAurora(c,w,h,time,hi,sec);
 
         // Dim glowing colored orbs that drift slowly in the background.
         for(int k=0;k<4;k++) {
@@ -81,7 +83,7 @@ public final class EducationPainter {
         }
         // Starfield and small depth lights.
         for(int k=0;k<45;k++) {
-            float x=w*noise(k+190);
+            float x=w*noise(k+190)+pageOffset*w*(.04f+.04f*noise(k+12));
             float y=h*noise(k+480);
             float pulse=.65f+.35f*(float)Math.sin(time*.8f+k*.8f);
             dot(c,x,y,(.55f+noise(k+440)*1.55f)*size/420f*(w/320f),Color.WHITE,Math.max(25,(int)((40+noise(k+88)*125)*pulse)));
@@ -96,10 +98,11 @@ public final class EducationPainter {
             text(c,symbols[k%symbols.length],x+drift,y, Math.max(12f,size*(.034f+.013f*noise(k+71))), k%3==0?hi:Color.WHITE,70+(int)(noise(k+91)*85), k%3==0);
         }
 
-        float cx=w*.50f,cy=h*.49f;
+        float cx=w*.50f+pageOffset*w*.024f,cy=h*.49f;
         if(theme==MATHS || theme==JUNIOR) drawBook(c,cx,cy,size,hi,sec,time,theme==JUNIOR);
         else if(theme==SCIENCE) drawAtom(c,cx,cy,size,hi,sec,time);
         else drawPlanet(c,cx,cy,size,hi,sec,time);
+        drawKnowledgePulse(c,w,h,theme,time,hi,sec);
 
         // Elegant border arc and title/brand.
         color(hi,150);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(Math.max(1.5f,size*.004f));
@@ -110,18 +113,10 @@ public final class EducationPainter {
         text(c,TITLES[theme],cx,h*.81f,Math.min(size*.052f,26f),Color.WHITE,230,true);
         text(c,"STRONG CONCEPTS • BRIGHT RESULTS",cx,h*.85f,Math.min(size*.021f,11f),hi,210,true);
 
-        if (tapAtMillis > 0 && speed > 0) {
-            float elapsed=(android.os.SystemClock.uptimeMillis()-tapAtMillis)/1000f;
-            if(elapsed>=0 && elapsed < 1.2f){
-                float radius=elapsed*size*.35f;
-                color(hi,(int)(180*(1f-elapsed/1.2f)));p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(Math.max(1.8f,size*.007f));
-                c.drawCircle(tapX,tapY,radius,p);p.setStyle(Paint.Style.FILL);
-                for(int j=0;j<8;j++) {
-                    float angle=(float)(j*Math.PI/4);
-                    dot(c,tapX+(float)Math.cos(angle)*radius*.7f,tapY+(float)Math.sin(angle)*radius*.7f,2.7f,sec,(int)(175*(1-elapsed/1.2f)));
-                }
-            }
+        if (interactive && tapAtMillis > 0) {
+            drawTouchMagic(c,w,h,tapX,tapY,tapAtMillis,theme,hi,sec);
         }
+
     }
     private void drawBook(Canvas c,float cx,float cy,float z,int gold,int blue,float t,boolean junior){
         float s=z*.45f;
@@ -186,5 +181,116 @@ public final class EducationPainter {
         float mX=cx+(float)Math.cos(t*.48f)*r*1.7f,mY=cy+(float)Math.sin(t*.48f)*r*.8f;
         dot(c,mX,mY,r*.13f,gold,230);
         text(c,"EXPLORE THE UNIVERSE",cx,cy+r*1.65f,z*.043f,Color.WHITE,220,true);
+    }
+
+    // Soft aurora lighting is rendered as canvas gradients, never as large images.
+    private void drawAurora(Canvas c,int w,int h,float t,int hi,int sec) {
+        float z=Math.min(w,h);
+        for(int k=0;k<3;k++) {
+            float cx=w*(.16f+.34f*k)+(float)Math.sin(t*.19f+k)*w*.10f;
+            float cy=h*(.32f+.20f*(k%2))+(float)Math.cos(t*.13f+k)*h*.07f;
+            float radius=z*(.40f+noise(k+44)*.22f);
+            color(Color.WHITE,27);
+            int rgb=(k%2==0?hi:sec);
+            p.setShader(new RadialGradient(cx,cy,radius,new int[]{rgb,rgb & 0x00ffffff},null,Shader.TileMode.CLAMP));
+            c.drawCircle(cx,cy,radius,p);
+            p.setShader(null);
+        }
+        // Fine glowing threads sweep below the center to create a layered scene.
+        for(int j=0;j<3;j++){
+            float top=h*(.67f+j*.018f);
+            color(j==1?hi:sec,30+j*8);
+            p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(z*(.003f+j*.001f));
+            path.reset();path.moveTo(-w*.10f,top);
+            path.cubicTo(w*.25f,top-z*.13f+(float)Math.sin(t*.3f+j)*z*.02f,w*.72f,top+z*.12f,w*1.1f,top-z*.03f);
+            c.drawPath(path,p);p.setStyle(Paint.Style.FILL);
+        }
+    }
+    private void drawKnowledgePulse(Canvas c,int w,int h,int theme,float t,int hi,int sec) {
+        float z=Math.min(w,h);
+        if(theme==MATHS) {
+            // Live sine wave: a visible link between algebra and trigonometry.
+            float base=h*.70f;
+            line(c,w*.19f,base,w*.81f,base,sec,95,1.4f);
+            line(c,w*.50f,base-z*.048f,w*.50f,base+z*.048f,sec,95,1.4f);
+            float lastX=0,lastY=0;
+            for(int j=0;j<=60;j++) {
+                float x=w*(.19f+.62f*j/60f);
+                float y=base-(float)Math.sin(j*.31f+t*.65f)*z*.029f;
+                if(j>0)line(c,lastX,lastY,x,y,hi,165,2.1f);
+                lastX=x;lastY=y;
+            }
+            dot(c,lastX,lastY,z*.007f,hi,230);
+            text(c,"f(x) = sin(x)",w*.50f,base+z*.090f,z*.030f,sec,165,true);
+        } else if(theme==SCIENCE) {
+            // Two animated complementary strands as a stylized DNA helix.
+            float top=h*.65f, bottom=h*.748f;
+            for(int j=0;j<=18;j++) {
+                float y=top+(bottom-top)*j/18f;
+                float sn=(float)Math.sin(j*.62f+t*.78f);
+                float x1=w*.50f+sn*z*.083f, x2=w*.50f-sn*z*.083f;
+                if(j%2==0)line(c,x1,y,x2,y,sec,105,2f);
+                dot(c,x1,y,z*.010f,hi,210);
+                dot(c,x2,y,z*.010f,sec,210);
+            }
+            text(c,"DNA  •  LIFE SCIENCE",w*.50f,h*.775f,z*.025f,Color.WHITE,145,true);
+        } else if(theme==COSMOS) {
+            // Repeating comet with a tapered tail, independent of network or video assets.
+            float phase=frac(t*.048f);
+            float x=w*(-.17f+1.43f*phase),y=h*(.25f+.18f*phase);
+            for(int j=9;j>=0;j--) {
+                float px=x-j*z*.029f,py=y-j*z*.011f;
+                dot(c,px,py,z*(.0025f+.0009f*(10-j)),j%3==0?hi:sec,(int)((10-j)*18));
+            }
+            dot(c,x,y,z*.012f,Color.WHITE,236);
+            // Slow orbital guide around a nearby star.
+            color(sec,92);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(1.7f);
+            oval.set(w*.23f,h*.65f,w*.77f,h*.74f);c.drawOval(oval,p);p.setStyle(Paint.Style.FILL);
+            float theta=t*.48f;
+            dot(c,w*.50f+(float)Math.cos(theta)*w*.27f,h*.695f+(float)Math.sin(theta)*h*.045f,z*.010f,hi,230);
+            text(c,"KEEP EXPLORING",w*.50f,h*.79f,z*.026f,Color.WHITE,170,true);
+        } else {
+            // Countable glowing bubbles for younger learners.
+            String[] nums={"1","2","3","4","5"};
+            for(int j=0;j<5;j++){
+                float x=w*(.24f+j*.13f);
+                float y=h*.70f+(float)Math.sin(t*.72f+j*.7f)*z*.015f;
+                dot(c,x,y,z*.040f,j%2==0?hi:sec,100);
+                text(c,nums[j],x,y+z*.012f,z*.040f,Color.WHITE,235,true);
+            }
+            text(c,"COUNT • DISCOVER • GROW",w*.50f,h*.787f,z*.025f,Color.WHITE,160,true);
+        }
+    }
+    private void drawTouchMagic(Canvas c,int w,int h,float x,float y,long time,int theme,int hi,int sec) {
+        float elapsed=(android.os.SystemClock.uptimeMillis()-time)/1000f;
+        if(elapsed<0 || elapsed>1.65f)return;
+        float z=Math.min(w,h),progress=elapsed/1.65f;
+        float opacity=(1f-progress)*(1f-progress);
+        for(int k=0;k<3;k++){
+            float f=progress-k*.16f;
+            if(f<0)continue;
+            color(k==0?hi:sec,(int)(210*opacity));
+            p.setStyle(Paint.Style.STROKE);
+            p.setStrokeWidth(z*(.008f-.0016f*k));
+            c.drawCircle(x,y,z*(.08f+f*.45f),p);
+            p.setStyle(Paint.Style.FILL);
+        }
+        for(int j=0;j<22;j++){
+            float angle=(float)(j*Math.PI*2/22+noise(j+777)*.18f);
+            float reach=z*(.025f+progress*(.28f+.12f*noise(j+321)));
+            float px=x+(float)Math.cos(angle)*reach;
+            float py=y+(float)Math.sin(angle)*reach;
+            dot(c,px,py,z*(.0045f+.006f*(1f-progress)),j%3==0?hi:sec,(int)(235*opacity));
+        }
+        if(elapsed<1.25f){
+            final String[] facts={"π  ≈  3.14159","ATOM  •  MATTER","THE UNIVERSE IS VAST","LEARN  •  PLAY  •  GROW"};
+            float tx=Math.max(w*.20f,Math.min(w*.80f,x));
+            float ty=Math.max(h*.21f,Math.min(h*.83f,y-z*.19f));
+            float half=z*.21f;
+            color(0xff061b42,(int)(183*opacity));
+            oval.set(tx-half,ty-z*.065f,tx+half,ty+z*.035f);
+            c.drawRoundRect(oval,z*.036f,z*.036f,p);
+            text(c,facts[theme],tx,ty,z*.034f,Color.WHITE,(int)(240*opacity),true);
+        }
     }
 }
