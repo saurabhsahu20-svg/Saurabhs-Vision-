@@ -1,24 +1,19 @@
-# VISION EDU WALLS 5.1 • 150-Design Collection
+# SAURABH'S VISION — VISION EDU WALLS 6.0
 
-This is an expanded, original offline wallpapers and optional-online-weather widgets application by SAURABH'S VISION™.
+A rebuilt Android education wallpaper and widget app with THREE separate catalogs:
 
-## Included in this APK
-- **50 static wallpaper presets**: five educational groups × ten uniquely named, tinted and arranged poster-style compositions. Can be applied to Android Home Screen or exported as individual 720×1280 PNG images.
-- **50 live wallpaper presets**: same curated 50 artworks plus five categories of moving scenes (orbit sparks, sine waves, stardust, geometric pulses and comets). Tap to trigger particles; double-tap and swipe cycle scenes on launchers that forward touch input.
-- **50 widget styles**: ten clock faces, ten dates, ten Maths facts, ten Science facts, ten study motivation widgets. Android home screen widgets are real `AppWidgetProvider` instances with live `TextClock`, date updates and tap-to-cycle content. One widget provider exposes 50 selectable styles when adding/configuring widgets.
-- **Preserves the 8 original v4 posters**, four original Canvas animation themes, and the "Choose HD Image from Gallery" custom photo mode under "Classic Wallpapers".
-- **Wallpapers remain offline**; optional weather widgets use Internet (Open-Meteo). No login and no ads. Approximate location permission is requested only if the user explicitly selects "Use Phone Location"; city search can be used without any location permission.
-- **All 50 smart widgets show the phone's digital clock, date, and battery percentage.** Weather and city are optional: with no selected city/location the widget clearly displays "Set weather location". Widget refresh uses Android's TextClock, periodically queries device battery status, and refreshes weather roughly every 30 minutes when online. The app does not read a phone manufacturer's proprietary weather widget.
+1. **50 Static Wallpapers** — 50 named original educational posters with unique graphics and layouts, generated with the new `StillScenePainter`. Each can be applied to Home screen or exported as 720×1280 PNG.
+2. **50 Live Wallpapers** — a separate `LiveScenePainter`, independent from the static poster engine. Animated Maths formulas, science atoms, DNA, rockets, planets, library scenes, motivation scenes, moving particles and reactive touch effects. Swipe/double-tap work only when the launcher forwards touches.
+3. **50 Digital Widgets** — distinct themed digital panels. All show real Android time (TextClock), system date, local device battery percentage, and weather when configured. Weather comes from Open-Meteo using a manually entered city or optional approximate Android location, and requires Internet. The clock and battery do not need weather or location permission.
 
+### The originals are preserved
+The old 8 posters, 4 Canvas themes, user photo import, and 50-HD-ZIP importer remain under Classic Wallpapers. The original image pack is a separate ZIP in the user's ChatGPT conversation; large HD images are not all embedded in this APK.
 
-## Important about the old HD image packs
-Previously generated full-resolution HD artwork packs are available as downloadable ZIP files in the ChatGPT conversation. Those photographic/AI-generated original JPG assets are **not embedded into this APK**; v5 ships 50 self-contained procedural poster-style compositions instead. Users can import the separately supplied 50-HD-Wallpapers.zip archive **once from the Import HD ZIP button**, browse the HD image gallery inside the app, and apply any imported image as a static wallpaper or as an animated live wallpaper through the v4 custom-photo renderer. Image import and storage are strictly local. This distinction prevents claims that the 10 JPGs are included when they are not.
+### Testing and security
+- No ads, login, trackers or account data uploads.
+- Offline drawing for wallpapers; opt-in network usage for weather only.
+- Java 17, Android SDK 35, Gradle 8.9. GitHub Actions checks catalog definitions, compiles APK, validates zip contents and verifies digital signature.
+- Android 6.0+, test APK signed with runner-generated debug key. Certificate may differ from earlier versions, causing "App not installed" when attempting to update older test builds. If necessary, uninstall **only Vision Edu Walls**, not the separate student learning app, after considering loss of local wallpaper settings.
+- Device installation, wallpaper motion, launcher widget support, battery and weather accuracy still require physical Android testing.
 
-## Widgets usage
-Open app > Widgets tab > select a style > Add Selected Widget, or long-press Android Home Screen > Widgets > Vision Edu Walls > pick one of 50 designs. Clock widgets update automatically via the system `TextClock`; the other types update per WidgetProvider and by tap. Some launchers do not support programmatic pinning.
-
-## Installation caveat
-Package: `com.saurabhsvision.eduwalls`. Android 6.0+. This is an automatically debug-signed **test** APK: the signature may not match prior v4 versions, preventing upgrade-in-place. Only uninstall the older Vision Edu Walls app if comfortable losing its app-specific wallpaper settings; the separate Saurabh Vision educational Quiz Club app is independent.
-
-## Build & quality
-Java 17, Android Gradle Plugin 8.7.3, Gradle 8.9 and SDK 35. GitHub Actions compiles, runs APK zip integrity and signing checks, then publishes the GitHub v5 test Release. Device-level installation, widget-pinning support, memory usage and battery consumption require physical-device testing.
+**Learn Today, Lead Tomorrow!**

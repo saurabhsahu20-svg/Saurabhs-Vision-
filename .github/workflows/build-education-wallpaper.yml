@@ -43,6 +43,28 @@ jobs:
         run: |
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-35" "build-tools;35.0.0"
 
+      - name: Verify 50 distinct static, live and widget catalogs
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          base=Path('education-live-wallpaper/app/src/main/java/com/saurabhsvision/eduwalls')
+          for filename,token in [('CollectionCatalog.java','NAMES'),('LiveSceneCatalog.java','TITLES'),('WidgetCatalog.java','NAMES')]:
+              data=(base/filename).read_text(encoding='utf8')
+              start=data.find('String[][] '+token)
+              assert start>=0,filename
+              names=re.findall(r'"([^"]+)"',data[start:data.find(';',start)])
+              assert len(names)==50,(filename,len(names))
+              assert len(set(names))==50,(filename,'non-distinct names')
+              print(filename,': 50 named artworks/styles')
+          assert 'class StillScenePainter' in (base/'StillScenePainter.java').read_text()
+          assert 'class LiveScenePainter' in (base/'LiveScenePainter.java').read_text()
+          xml=Path('education-live-wallpaper/app/src/main/res/layout/vision_widget.xml').read_text()
+          for name in ('widget_clock','widget_date','widget_battery','widget_weather','widget_city'):
+              assert name in xml,name
+          PY
+
       - name: Compile APK
         run: |
           cd education-live-wallpaper
@@ -58,13 +80,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | head -10
           mkdir -p deliverables
-          cp "$apk" deliverables/Vision_Edu_Walls_v5.1.0_SMART_WIDGETS_TEST.apk
+          cp "$apk" deliverables/Vision_Edu_Walls_v6.0.0_150_DISTINCT_TEST.apk
           sha256sum deliverables/*.apk | tee deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Vision_Edu_Walls_v5_1_Smart_Widgets_APK
+          name: Vision_Edu_Walls_v6_150_Distinct_APK
           path: deliverables/*
           retention-days: 90
 
@@ -74,10 +96,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="vision-edu-walls-v5.1.0"
+          tag="vision-edu-walls-v6.0.0"
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Release tag already exists; uploading test APK asset."
-            gh release upload "$tag" deliverables/Vision_Edu_Walls_v5.1.0_SMART_WIDGETS_TEST.apk deliverables/SHA256SUMS.txt --clobber
+            gh release upload "$tag" deliverables/Vision_Edu_Walls_v6.0.0_150_DISTINCT_TEST.apk deliverables/SHA256SUMS.txt --clobber
           else
-            gh release create "$tag" deliverables/Vision_Edu_Walls_v5.1.0_SMART_WIDGETS_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 5.1 • Smart Digital Clock Weather & Battery Widgets" --notes "Vision Edu Walls 5.1 test APK: 50 Android smart widget styles with actual phone digital clock (12h or 24h), system date, battery percentage and optionally current weather/temperature. Choose a city without location access or voluntarily grant approximate location; weather uses the Open-Meteo service and network only for weather. Weather may update around every 30 minutes, battery periodically. 50 static + 50 interactive live wallpaper presets and classic gallery retained. APK test/debug signing may differ; test on your phone." --latest=false
+            gh release create "$tag" deliverables/Vision_Edu_Walls_v6.0.0_150_DISTINCT_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 6.0 • 50 Different Static + 50 Live + 50 Smart Widgets" --notes "Vision Edu Walls 6.0 test: 50 individual original static school posters, 50 separately rendered animated live scenes (not repeated static backgrounds), 50 distinct Android digital widgets with system clock/date/battery and opt-in live weather, with Classic collection and HD ZIP importer preserved. Requires real-device verification. Existing debug signing keys may differ." --latest=false
           fi
