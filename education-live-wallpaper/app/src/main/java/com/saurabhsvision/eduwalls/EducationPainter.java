@@ -28,6 +28,7 @@ public final class EducationPainter {
         ctx=context.getApplicationContext();
     }
     private final Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final PosterPainter posterPainter = new PosterPainter();
     private final RectF oval = new RectF();
     private final Path path = new Path();
 
@@ -71,7 +72,7 @@ public final class EducationPainter {
         p.setTextAlign(Paint.Align.CENTER);
         c.drawText(value,x,y,p);
     }
-    public void draw(Canvas c, int w, int h, float seconds, int requestedTheme, int speed, float tapX, float tapY, long tapAtMillis, boolean interactive, float pageOffset, boolean customArt) {
+    public void draw(Canvas c, int w, int h, float seconds, int requestedTheme, int speed, float tapX, float tapY, long tapAtMillis, boolean interactive, float pageOffset, boolean customArt, int poster) {
         if (w <= 0 || h <= 0) return;
         final int theme = Math.max(0,Math.min(requestedTheme,3));
         final float motion = speed == 0 ? 0.18f : (speed == 2 ? 1.2f : 0.52f);
@@ -79,6 +80,12 @@ public final class EducationPainter {
         final float size = Math.min(w,h);
         final int hi = HIGHLIGHT[theme];
         final int sec = SECONDARY[theme];
+        if(poster>=0 && poster<PosterPainter.NAMES.length && !customArt) {
+            posterPainter.draw(c,w,h,time,poster,pageOffset);
+            drawPosterShimmer(c,w,h,time,hi,sec);
+            if(interactive && tapAtMillis>0)drawTouchMagic(c,w,h,tapX,tapY,tapAtMillis,theme,hi,sec);
+            return;
+        }
         boolean photo=customArt && drawCustom(c,w,h,pageOffset,time);
         if(!photo) {
             color(Color.WHITE,255);
