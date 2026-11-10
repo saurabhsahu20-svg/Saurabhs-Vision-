@@ -1,28 +1,29 @@
-# SAURABH'S VISION™ — Vision Edu Walls
+# VISION EDU WALLS 2.0 — SAURABH'S VISION™
 
-**Education-themed Android Live Wallpaper App v1.0.0 (test release)**
+Premium educational **Android Live Wallpaper** app, created as a separate application from the Saurabh’s Vision learning/quiz app.
 
-A fully native Android `WallpaperService` app built with Java + Android SDK. The live wallpaper draws all artwork with Android Canvas (no network, no ads, no third-party SDK). 
+## Interactive V2 features
+- **Maths Galaxy:** living open book, glowing formula particles, animated sine-wave graph.
+- **Science Lab:** moving electrons, atom orbit rings and animated DNA-style double helix.
+- **Cosmic Classroom:** planet rings, orbiting moon, aurora and a repeating comet.
+- **Junior Learning:** counting bubbles, glowing book, alphabet and numbers.
+- **Touch Magic:** touch-triggered star bursts and short educational fact labels.
+- **Gestures:** double-tap or horizontally swipe in the app preview (and system wallpaper where device launcher forwards touch events) to switch the four themes.
+- **Parallax:** depth movement with launcher page offsets.
+- **Dynamic controls:** adjustable animation speed and on/off touch effects.
+- **Power-aware:** lowers frame rate in Battery Saver and stops drawing when wallpaper is hidden.
+- No ads, internet access, login or personal data collection.
 
-## Features
-- Maths Galaxy: formulas, glowing open book, gold particles.
-- Science Lab: electrons, animated atom, floating physics/chemistry symbols.
-- Cosmic Classroom: spinning planet rings, moons, stars and educational notation.
-- Junior Learning: beginner numbers, letters, colorful book and stars.
-- Live preview in-app, apply wallpaper with Android's system preview.
-- Adjustable slow/normal/fast motion, touch glows, immediate theme updates on existing wallpaper.
-- Canvas animations pause when wallpaper isn't visible. Storage limited to anonymous local theme settings.
+## Get an APK
+GitHub Release: https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases/tag/vision-edu-walls-v2.0.0
 
-## Build
-1. Install Java 17, Android SDK (API 35), and Gradle 8.9.
-2. From this directory run `gradle :app:assembleDebug`.
-3. Debug APK: `app/build/outputs/apk/debug/app-debug.apk`.
-4. Or open GitHub Actions > **Build Education Live Wallpaper APK** for a downloadable artifact or test Release.
+### Compatibility and signing
+Android 6.0+. v2 uses the **same application ID** `com.saurabhsvision.eduwalls` with `versionCode 2`, but GitHub CI auto-creates a **new debug signing key** per runner. If Android reports **App not installed / conflicting package**, the new APK cannot be installed over v1 due to a different signing certificate. You may uninstall the old Vision Edu Walls (this will reset local wallpaper theme/speed settings) and install v2. The original **Saurabh’s Vision Quiz Club app** is a different package and is not affected. Do NOT upload signing keys to the public repo. For future upgrade-safe releases, configure persistent private release signing using GitHub Actions encrypted secrets, and verify device-level update compatibility.
 
-## Installation
-Install APK on Android 6.0+, open **Vision Edu Walls**, select your wallpaper, then tap **Set as Live Wallpaper** and confirm from Android's native wallpaper picker. Some device manufacturers show their own wallpaper chooser.
+## Build yourself
+- Java 17, Gradle 8.9, Android SDK Platform 35.
+- `cd education-live-wallpaper && gradle :app:assembleDebug`.
+- Test build signature and Android installation on actual devices before Play Store distribution.
 
-## Important
-The test APK is signed with a CI-generated debug signing identity and is for evaluation. An APK from a later CI run may use a different key and fail to update it in place. Before production publishing, configure a **private and consistent** release signing key in CI secrets, and conduct actual-device battery and performance testing. Never upload signing keys into this public repository.
-
-This is an independent educational design tool, not an official CBSE/CGBSE/ICSE app. All visual elements are drawn from code.
+## Legal
+Not affiliated with CBSE, CGBSE or ICSE. Original educational artwork is generated procedurally using Android Canvas (no copyrighted media).

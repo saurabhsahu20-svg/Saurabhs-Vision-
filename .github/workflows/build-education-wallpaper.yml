@@ -58,13 +58,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | head -10
           mkdir -p deliverables
-          cp "$apk" deliverables/Vision_Edu_Walls_v1.0.0_TEST.apk
+          cp "$apk" deliverables/Vision_Edu_Walls_v2.0.0_INTERACTIVE_TEST.apk
           sha256sum deliverables/*.apk | tee deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Vision_Edu_Walls_Android_APK
+          name: Vision_Edu_Walls_v2_Interactive_APK
           path: deliverables/*
           retention-days: 90
 
@@ -74,10 +74,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="vision-edu-walls-v1.0.0"
+          tag="vision-edu-walls-v2.0.0"
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Release tag already exists; uploading test APK asset."
-            gh release upload "$tag" deliverables/Vision_Edu_Walls_v1.0.0_TEST.apk deliverables/SHA256SUMS.txt --clobber
+            gh release upload "$tag" deliverables/Vision_Edu_Walls_v2.0.0_INTERACTIVE_TEST.apk deliverables/SHA256SUMS.txt --clobber
           else
-            gh release create "$tag" deliverables/Vision_Edu_Walls_v1.0.0_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls v1.0.0 • Education Live Wallpaper" --notes "Android 6.0+ test build. Native maths/science/space/junior animated wallpaper; no login or internet. Debug signing may vary across builds: do not uninstall an older app without preserving any local settings." --latest=false
+            gh release create "$tag" deliverables/Vision_Edu_Walls_v2.0.0_INTERACTIVE_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 2.0 • Interactive Education Live Wallpaper" --notes "Education Live Wallpaper 2.0 test APK. Four interactive learning worlds: glowing aurora, animated sine graph, DNA helix, orbital comet, touch particles and facts; swipe/double tap changes theme where supported. Offline and ad-free. Important: Android may require uninstalling v1 first because CI debug signing certificates can differ; only local theme settings would reset." --latest=false
           fi
