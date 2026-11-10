@@ -28,6 +28,7 @@ public final class EduWallpaperService extends WallpaperService {
         private final EducationPainter painter = new EducationPainter(EduWallpaperService.this);
         private final CollectionPainter collectionPainter = new CollectionPainter();
         private final LiveScenePainter liveScenes = new LiveScenePainter();
+        private final BiologyPainter bioScenes = new BiologyPainter();
         private final SharedPreferences prefs = getSharedPreferences(PREFS,MODE_PRIVATE);
         private volatile boolean visible = false;
         private float tapX=-1000f,tapY=-1000f;
@@ -83,7 +84,7 @@ public final class EduWallpaperService extends WallpaperService {
                 if(Math.abs(dx)>threshold && Math.abs(dx)>Math.abs(dy)*1.6f) {
                     if(prefs.getBoolean(V6_LIVE_ENABLED,false)){
                         int n=prefs.getInt(LIVE_ID,0);
-                        prefs.edit().putInt(LIVE_ID,(n+(dx<0?1:LiveSceneCatalog.COUNT-1))%LiveSceneCatalog.COUNT).apply();
+                        prefs.edit().putInt(LIVE_ID,(n+(dx<0?1:LiveSceneCatalog.COUNT+BiologyCatalog.COUNT-1))%(LiveSceneCatalog.COUNT+BiologyCatalog.COUNT)).apply();
                     }else{
                     int col=prefs.getInt(COLLECTION,-1);
                     if(col>=0 && !prefs.getBoolean(CUSTOM_ART,false)){
@@ -108,7 +109,7 @@ public final class EduWallpaperService extends WallpaperService {
                     if(now-lastTapAt<340 && distance<threshold) {
                         if(prefs.getBoolean(V6_LIVE_ENABLED,false)){
                             prefs.edit().putInt(LIVE_ID,
-                                (prefs.getInt(LIVE_ID,0)+1)%LiveSceneCatalog.COUNT).apply();
+                                (prefs.getInt(LIVE_ID,0)+1)%(LiveSceneCatalog.COUNT+BiologyCatalog.COUNT)).apply();
                         }else{
                         int col=prefs.getInt(COLLECTION,-1);
                         if(col>=0 && !prefs.getBoolean(CUSTOM_ART,false)){
@@ -148,10 +149,17 @@ public final class EduWallpaperService extends WallpaperService {
                     if(prefs.getBoolean(V6_LIVE_ENABLED,false)){
                         int speed=prefs.getInt(SPEED,1);
                         float factor=speed==0?.33f:(speed==2?1.3f:.73f);
-                        liveScenes.draw(canvas,canvas.getWidth(),canvas.getHeight(),
-                            SystemClock.uptimeMillis()/1000f*factor,
-                            prefs.getInt(LIVE_ID,0),tapX,tapY,
-                            prefs.getBoolean(INTERACTIVE,true)?tapAt:0L);
+                        int liveId=prefs.getInt(LIVE_ID,0);
+                        long touch=prefs.getBoolean(INTERACTIVE,true)?tapAt:0L;
+                        if(liveId>=LiveSceneCatalog.COUNT){
+                            bioScenes.draw(canvas,canvas.getWidth(),canvas.getHeight(),
+                                liveId-LiveSceneCatalog.COUNT,true,
+                                SystemClock.uptimeMillis()/1000f*factor,tapX,tapY,touch);
+                        }else{
+                            liveScenes.draw(canvas,canvas.getWidth(),canvas.getHeight(),
+                                SystemClock.uptimeMillis()/1000f*factor,
+                                liveId,tapX,tapY,touch);
+                        }
                     } else {
                     int collection=prefs.getInt(COLLECTION,-1);
                     if(collection>=0 && !prefs.getBoolean(CUSTOM_ART,false)){
