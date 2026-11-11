@@ -83,7 +83,7 @@ jobs:
           assert 'CATEGORIES' in emojis and 'Love' in emojis and 'Feelings' in emojis
           assert 'drawArtwork' in bg
           print('Verified compact IME panel + paginated emoji picker source contracts.')
-                    assert 'extends View' in bg
+          assert 'extends View' in bg
           print('Keyboard functional/input/privacy contracts checked.')
           PY
 
