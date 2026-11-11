@@ -63,7 +63,7 @@ jobs:
           assert 'android.view.InputMethod' in manifest
           assert 'android:resource="@xml/method"' in manifest
           assert 'settingsActivity' in method
-          assert 'INTERNET' not in manifest
+          assert 'android.permission.INTERNET' not in manifest
           assert 'READ_CLIPBOARD' not in manifest
           assert 'RECORD_AUDIO' not in manifest
           assert 'ACTION_INPUT_METHOD_SETTINGS' in activity
