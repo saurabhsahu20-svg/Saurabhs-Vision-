@@ -70,6 +70,7 @@ jobs:
           assert 'showInputMethodPicker' in activity
           assert 'S BOARD' in activity and 'Maths • Science' in activity
           panel=(root/'java/com/saurabhsvision/keyboard/KeyboardPanel.java').read_text()
+          policy=(root/'java/com/saurabhsvision/keyboard/KeyboardLayoutPolicy.java').read_text()
           emojis=(root/'java/com/saurabhsvision/keyboard/EmojiCatalog.java').read_text()
           assert 'extends LinearLayout' in panel
           assert 'WRAP_CONTENT' in panel
