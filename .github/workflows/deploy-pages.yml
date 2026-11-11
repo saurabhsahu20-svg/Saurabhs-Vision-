@@ -37,6 +37,19 @@ jobs:
           python3 website/tests/smoke.py
           grep -q 'wa.me/918085808586' website/app.js
           grep -q 'Parent / guardian' website/app.js
+      - name: Test mobile, admission, quiz and study tools in real Chrome
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm --prefix website/tests install --no-save --no-audit --no-fund playwright@1.56.1
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory website >/tmp/sv-website-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in {1..25}; do
+            if curl -fsS http://127.0.0.1:8765/ >/dev/null; then break; fi
+            sleep 1
+          done
+          node website/tests/browser_smoke.mjs
       - name: Create static publish directory
         shell: bash
         run: |
