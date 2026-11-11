@@ -133,9 +133,13 @@ public final class VisionKeyboardService extends InputMethodService {
         keysContent=keyboardFrame;
         suggestionChips=null;
         romanPreview=null;
-        // Keep the fourth, Space/Enter row above the device navigation inset.
-        // Bottom inset is measured by KeyboardPanel and never overlays letter keys.
-        keysContent.setPadding(dp(3),dp(5),dp(3),dp(18));
+        // OEM landscape keyboards (including ChatGPT/WhatsApp) can draw behind
+        // the Android navigation bar. Reserve an additional safe strip inside
+        // the measured input view, so ALL three alphabet rows remain unchanged
+        // and the fourth Space/Enter row moves up into the visible viewport.
+        boolean landscape=getResources().getConfiguration().orientation
+            ==android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+        keysContent.setPadding(dp(3),dp(5),dp(3),dp(landscape?58:22));
         addToolbar();
         if(mode==LANGUAGE){
             addLanguagePicker();
