@@ -6,7 +6,7 @@ const BASE = new URL(self.registration.scope);
 const publicPaths = [
   './','./index.html','./app.js','./styles.css','./firebase-config.js',
   './assets/vision-icon-64.png','./assets/vision-icon-192.png','./assets/vision-icon-512.png','./assets/brand-3d.webp',
-  './study-desk/','./study-sprint/','./admissions-guide/','./quiz-club/','./contact/'
+  './study-desk/','./study-desk/index.html','./study-sprint/','./study-sprint/index.html','./admissions-guide/','./admissions-guide/index.html','./quiz-club/','./contact/'
 ];
 const paths = new Set(publicPaths.map(p=>new URL(p,BASE).pathname));
 self.addEventListener('install',event=>{
