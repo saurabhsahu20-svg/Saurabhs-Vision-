@@ -308,7 +308,7 @@ public final class V5StudioActivity extends Activity {
         }
     }
     private void pinWidget(){
-        getSharedPreferences(VisionWidgetProvider.PREFS,MODE_PRIVATE).edit().putInt("pending",selectedWidget).apply();
+        getSharedPreferences(VisionWidgetProvider.PREFS,MODE_PRIVATE).edit().putInt("pending",selectedWidget).putInt("pending_art",-1).apply();
         AppWidgetManager manager=AppWidgetManager.getInstance(this);
         if(Build.VERSION.SDK_INT>=26 && manager.isRequestPinAppWidgetSupported()){
             boolean accepted=manager.requestPinAppWidget(new ComponentName(this,VisionWidgetProvider.class),null,null);
