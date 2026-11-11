@@ -146,7 +146,7 @@ function openMain(x){return `<main id="main">${x}</main>`}
 function render(){document.documentElement.lang=state.lang;app.innerHTML=layout(mainContent());if(state.route==='/dashboard'||state.route.startsWith('/portal/'))fetchDashboard();loadPublicPage();}
 function nav(){let path=decodeURIComponent(location.hash.slice(1)||'/').split('?')[0];if(!path.startsWith('/'))path='/';state.route=path;state.mobile=false;render();window.scrollTo({top:0,behavior:'instant'});}
 function status(id,text,cls='warn'){let el=document.querySelector(id);if(el)el.innerHTML=`<div class="notice ${cls}">${h(text)}</div>`}
-async function onSubmit(event){const form=event.target,id=form.id;const d=Object.fromEntries(new FormData(form).entries());if(d.website)return;
+async function onSubmit(event){const form=event.target,id=form.id;const d=Object.fromEntries(new FormData(form).entries());if(d.website){event.preventDefault();return;}
  if(id==='login-form'){event.preventDefault();if(!state.backend)return;status('#login-status','Signing in…');try{await state.backend.login(d.email,d.password);status('#login-status','Signed in. Opening your dashboard…','success');location.hash='#/dashboard'}catch(err){status('#login-status',err.code==='auth/invalid-credential'?'Invalid email or password.':err.message,'error')}return}
  if(id==='admissions-form'||id==='demo-form'){event.preventDefault();if(!state.backend){
       if(!form.reportValidity())return;
@@ -166,8 +166,14 @@ async function onSubmit(event){const form=event.target,id=form.id;const d=Object
         'Please share the next steps. Thank you.'
       ].filter(Boolean).join('\n');
       const link='https://wa.me/918085808586?text='+encodeURIComponent(lines);
+      // In-app browsers may block new windows. Always offer a direct user-clickable fallback.
+      const prepared=document.createElement('a');
+      prepared.href=link;prepared.target='_blank';prepared.rel='noopener noreferrer';
+      prepared.textContent='Tap here to open your WhatsApp enquiry draft ↗';
+      const field=document.querySelector('#form-status');
+      status('#form-status','Review your prepared message in WhatsApp and tap Send yourself. This site has not submitted or stored your enquiry.','success');
+      if(field){field.append(document.createElement('br'),prepared)}
       window.open(link,'_blank','noopener,noreferrer');
-      status('#form-status','WhatsApp draft opened. Review it and tap Send in WhatsApp. This site has not submitted or stored your enquiry.','success');
       return;
     }if(state.busy)return;state.busy=true;status('#form-status','Submitting securely…');try{const ref=id==='admissions-form'?await state.backend.submitAdmission(d):await state.backend.submitDemo(d);form.reset();status('#form-status',`${id==='admissions-form'?'Enquiry received':'Demo request received'}! Reference: ${ref.id}. This is not an admission or confirmed booking.`,'success')}catch(err){status('#form-status',`Submission failed: ${err.message}`,'error')}finally{state.busy=false}return}
  if(id==='doubt-form'){event.preventDefault();if(!state.backend||!state.user)return;status('#doubt-status','Submitting your question…');try{const file=form.querySelector('input[type="file"]').files[0];const doc=await state.backend.submitDoubt(d,file);form.reset();status('#doubt-status',`Question saved. Reference: ${doc.id}`,'success');await loadDoubts()}catch(err){status('#doubt-status',`Could not submit: ${err.message}`,'error')}return}
@@ -202,7 +208,21 @@ document.addEventListener('click',async event=>{const btn=event.target.closest('
  if(btn.dataset.adminStatus){const [name,id,newStatus]=btn.dataset.adminStatus.split('|');try{await state.backend.updateAdmin(name,id,{status:newStatus});await fetchDashboard()}catch(err){alert(err.message)}return}
  if(btn.dataset.confirmBooking){try{await state.backend.confirmBooking(btn.dataset.confirmBooking);alert('Booking confirmed in available slot.');await fetchDashboard()}catch(err){alert(`Cannot confirm: ${err.message}`)}return}
 });
-document.addEventListener('change',event=>{if(event.target.id==='quiz-board')syncQuizSelect('board',event.target.value);if(event.target.id==='quiz-grade')syncQuizSelect('grade',event.target.value);if(event.target.id==='quiz-subject')syncQuizSelect('subject',event.target.value);if(event.target.id==='quiz-chapter')syncQuizSelect('chapter',event.target.value);if(event.target.id==='gravity-value'){state.gravity=Number(event.target.value);const label=document.querySelector('#gravity-label');if(label)label.textContent=String(state.gravity)}});
+document.addEventListener('change',event=>{
+ if(event.target.id==='f-class'){
+   const grade=Number(event.target.value),course=document.querySelector('#f-course');
+   if(course){
+     for(const option of course.options){
+       if(!option.value)continue;
+       const allowed=(grade>=1&&grade<=5&&option.value==='primary')
+         ||(grade>=6&&grade<=10&&option.value==='secondary')
+         ||([5,8,10].includes(grade)&&option.value==='board');
+       option.hidden=!allowed;option.disabled=!allowed;
+     }
+     if(course.selectedOptions.length&&course.selectedOptions[0].disabled)course.value='';
+   }
+ }
+ if(event.target.id==='quiz-board')syncQuizSelect('board',event.target.value);if(event.target.id==='quiz-grade')syncQuizSelect('grade',event.target.value);if(event.target.id==='quiz-subject')syncQuizSelect('subject',event.target.value);if(event.target.id==='quiz-chapter')syncQuizSelect('chapter',event.target.value);if(event.target.id==='gravity-value'){state.gravity=Number(event.target.value);const label=document.querySelector('#gravity-label');if(label)label.textContent=String(state.gravity)}});
 window.addEventListener('hashchange',nav);
 async function init(){nav();if(!firebaseConfig?.projectId)return;try{const mod=await import('./firebase-service.js');state.backend=mod.service;state.backend.onAuth(async user=>{state.user=user;state.role=null;if(user){try{state.role=await state.backend.role(user.uid)}catch(err){console.warn('Cannot retrieve role',err)}}render()});await loadRemote();render();}catch(err){console.error('Firebase initialization failed',err);const info=document.createElement('div');info.className='notice warn';info.style.cssText='position:fixed;bottom:13px;left:13px;max-width:380px;z-index:120';info.textContent='Firebase could not initialize. Check configuration and network access.';document.body.append(info)}}
 init();
