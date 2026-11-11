@@ -3,6 +3,8 @@ package com.saurabhsvision.eduwalls;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.WallpaperManager;
+import android.appwidget.AppWidgetManager;
+import android.os.Build;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,7 +36,7 @@ import java.util.ArrayList;
 /**
  * 100 3D-style JPG wallpapers are PRE-INSTALLED in APK assets by the build workflow.
  * No ZIP picker, no Internet, no runtime gallery permissions or import step needed.
- * Users can apply any included artwork as a static, animated live or real widget background.
+ * Users can independently select any matching 3D artwork as Static, Live or individual Android widget backgrounds.
  */
 public final class Premium100Activity extends Activity {
     private static final int NAVY=0xff071b49,BLUE=0xff1746d2,GOLD=0xffffd54f;
@@ -96,11 +98,11 @@ public final class Premium100Activity extends Activity {
         head.setPadding(dp(18),dp(18),dp(18),dp(19));
         head.setBackground(bg(NAVY,22));
         add(head,text("🎓 SAURABH'S VISION",14,GOLD,true),0);
-        add(head,text("100 PREMIUM 3D WALLPAPERS",23,Color.WHITE,true),9);
-        add(head,text("All 100 are already inside your Android app. No download, ZIP or manual import.",13,0xffc5ddff,false),10);
+        add(head,text("100 × 3D WALLPAPER + LIVE + WIDGET",23,Color.WHITE,true),9);
+        add(head,text("100 real HD pictures • 100 matching Live presets • 100 separate 3D digital widget backgrounds. All inside the APK.",13,0xffc5ddff,false),10);
         add(root,head,0);
 
-        TextView how=text("Choose any wallpaper → Preview / Set Static / Set Animated Live / Use as Digital Widget Background / Save JPG.",14,0xff193c72,false);
+        TextView how=text("Choose artwork → Static / Interactive Live / Matching Digital Widget / Save JPG. Each Home Screen widget keeps its own chosen picture.",14,0xff193c72,false);
         add(root,how,13);
         status=text("",14,BLUE,true);add(root,status,15);
 
@@ -174,12 +176,13 @@ public final class Premium100Activity extends Activity {
                 row.addView(tile,lp);
                 tile.setClickable(true);tile.setFocusable(true);
                 tile.setContentDescription("Wallpaper "+(j+1)+": "+title);
-                tile.setOnClickListener(v->choose(file,title));
+                final int artIndex=j;
+                tile.setOnClickListener(v->choose(artIndex,file,title));
             }
             add(gallery,row,2);
         }
     }
-    private void choose(String file,String title){
+    private void choose(int index,String file,String title){
         new AlertDialog.Builder(this)
             .setTitle("3D  •  "+title)
             .setItems(new String[]{
@@ -191,8 +194,8 @@ public final class Premium100Activity extends Activity {
             },(dialog,choice)->{
                 if(choice==0)preview(file,title);
                 else if(choice==1)applyStatic(file);
-                else if(choice==2)applyLive(file);
-                else if(choice==3)applyWidget(file);
+                else if(choice==2)applyLive(file,index);
+                else if(choice==3)applyWidget(index);
                 else saveImage(file,title);
             }).show();
     }
@@ -231,7 +234,7 @@ public final class Premium100Activity extends Activity {
         if(!temp.renameTo(dest)){temp.delete();throw new IOException("Cannot finish image selection");}
         return dest;
     }
-    private void applyLive(String file){
+    private void applyLive(String file,int index){
         try{
             copyAsset(file,"vision_artwork.jpg");
             SharedPreferences prefs=getSharedPreferences(EduWallpaperService.PREFS,MODE_PRIVATE);
@@ -240,7 +243,8 @@ public final class Premium100Activity extends Activity {
                 .putBoolean(EduWallpaperService.CUSTOM_ART,true)
                 .putInt(EduWallpaperService.COLLECTION,-1)
                 .putInt(EduWallpaperService.POSTER,-1)
-                .putInt("premium_hd_fx",0)
+                .putInt("premium_hd_fx",(index/10+index%10)%3)
+                .putInt("premium_3d_index",index)
                 .putLong(EduWallpaperService.CUSTOM_VERSION,System.currentTimeMillis())
                 .apply();
             Intent i=new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
@@ -254,14 +258,32 @@ public final class Premium100Activity extends Activity {
             Toast.makeText(this,"Live wallpaper unavailable on this device.",Toast.LENGTH_LONG).show();
         }
     }
-    private void applyWidget(String file){
-        try{
-            File selected=copyAsset(file,"vision_widget_premium100_source.jpg");
-            PremiumWidgetArt.choose(this,selected);
-            Toast.makeText(this,"3D widget background saved. Add Vision Edu Walls widget from your Home Screen.",Toast.LENGTH_LONG).show();
-        }catch(Exception e){
-            Toast.makeText(this,"Could not set widget background.",Toast.LENGTH_LONG).show();
+    private void applyWidget(int index){
+        // Editing an existing widget by tapping its title must update ONLY that widget.
+        int editId=getIntent().getIntExtra("edit_widget_id",AppWidgetManager.INVALID_APPWIDGET_ID);
+        SharedPreferences w=getSharedPreferences(VisionWidgetProvider.PREFS,MODE_PRIVATE);
+        if(editId!=AppWidgetManager.INVALID_APPWIDGET_ID){
+            int style=w.getInt("style_"+editId,0);
+            VisionWidgetProvider.setWidget(this,editId,style,index);
+            Toast.makeText(this,"Updated this widget with 3D artwork "+(index+1)+".",Toast.LENGTH_LONG).show();
+            finish();return;
         }
+        // Launcher configuration binds the selected art to the newly allocated
+        // appWidgetId rather than clobbering every installed digital widget.
+        w.edit().putInt("pending_art",index).apply();
+        AppWidgetManager manager=AppWidgetManager.getInstance(this);
+        if(Build.VERSION.SDK_INT>=26 && manager.isRequestPinAppWidgetSupported()){
+            boolean offered=manager.requestPinAppWidget(
+                new ComponentName(this,VisionWidgetProvider.class),null,null);
+            if(offered) {
+                Toast.makeText(this,"Select Add on your Home Screen to place the matching 3D digital widget.",Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+        new AlertDialog.Builder(this)
+            .setTitle("3D Digital Widget selected")
+            .setMessage("Wallpaper "+(index+1)+" is selected. Long-press the Home Screen → Widgets → Vision Edu Walls → Add, and choose the 3D picture in widget setup. Your phone's time, date, battery and optional weather remain live.")
+            .setPositiveButton("OK",(d,wid)->{}).show();
     }
     private void saveImage(String file,String title){
         selectedSave=file;
