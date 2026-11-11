@@ -87,9 +87,10 @@ jobs:
           assert 'theme=(theme+1)%5' in ime
           assert 'theme==4' in ime
           assert 'scaleX(.96f)' in ime
-          assert 'setCornerRadius(dp(13))' in ime
+          assert 'setCornerRadius(dp(14))' in ime
           assert 'Pure White' in activity and 'keyPreview' in activity
           assert 'addKey(row,"Space","SPACE",4.35f' in ime
+          assert 'SBoardKeyButton b=new SBoardKeyButton(this)' in ime
           assert 'Spacebar - insert space' in ime
           assert 'setCompact(settings().getBoolean("compact_height",true))' in ime
           assert 'resizeKeyChildren' in panel
@@ -124,7 +125,15 @@ jobs:
           assert 'new Intent(this,MainActivity.class)' in splash
           assert 'animatedLogoBadge.setImageResource(R.drawable.s_board_logo)' in activity
           assert 'refreshSetupStatus()' in activity
-          assert 'index==6){press("SPACE")' in ime
+          assert 'index==6){' in ime and 'theme=(theme+1)%5' in ime
+          assert 'index==7?' in ime and 'Keyboard settings' in ime
+          assert 'String[] ids={"ABC","123","∑ Math","⚛ Sci","😊","🌐","🎨","⚙"}' in ime
+          assert 'by Saurabh' in ime
+          assert 'SBoardKeyButton b=new SBoardKeyButton(this);' in ime
+          assert 'setSpaceIndicator("SPACE".equals(output),light())' in ime
+          assert 'getBoolean("show_suggestions",false)' in ime
+          assert (root/'java/com/saurabhsvision/keyboard/SBoardKeyButton.java').is_file()
+          assert 'Toggle Smart Suggestions' in activity
           assert 'setMeasuredDimension(width,Math.min(cap' in panel
           assert 'child.layout(x,y,x+w,y+height)' in panel
           assert 'addSuggestions()' in ime and 'WordSuggestions.get' in ime
@@ -199,13 +208,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.8.0_NEON_KEYBOARD_TEST.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.0_NEON_PRO_KEYBOARD_TEST.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_8_Neon_Keyboard_APK
+          name: S_Board_v1_9_Neon_Pro_Keyboard_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -215,13 +224,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.8.0"
-          file="keyboard-deliverables/S_Board_v1.8.0_NEON_KEYBOARD_TEST.apk"
+          tag="s-board-v1.9.0"
+          file="keyboard-deliverables/S_Board_v1.9.0_NEON_PRO_KEYBOARD_TEST.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.8 • Neon Keyboard + Word Suggestions" \
-              --notes "S BOARD v1.8 TEST APK. Implements the actual glossy-neon blue S Board keyboard seen in the design reference inside Android InputMethodService—not just a picture. Adds scrollable branded toolbar with 3D S Board icon, 3-cell English/Hinglish suggestion strip powered by a small static offline word list (no logging or internet), balanced Gboard-like QWERTY key rows, larger always-present Space + Enter footer, Hindi/English toggle, emoji, long-press 1-0 on QWERTY top-row keys. Adjusted compact and comfortable keyboard heights to fit all rows. Keeps White plus 4 neon themes, Maths and Science, 923 emoji entries and basic 24-language phonetic modes. Suggested words are limited and not Gboard-grade AI predictions. Automated source smoke checks, local suggestion tests, Android build, APK signing and footer layout tests are performed in GitHub CI. Physical WhatsApp/device testing is still required." \
+              --title "S Board 1.9 • Neon Blue Screenshot Edition" \
+              --notes "S BOARD v1.9 TEST APK — native Android keyboard matching the supplied midnight-navy, neon-cyan screenshot. Two-line S Board by Saurabh's Vision branding, ABC/123/Maths/Science/Emoji/Language/Palette/Settings toolbar, larger glowing keys, a wide working Spacebar with cyan underline and cyan Enter. Preserves 24 selectable offline language/roman-phonetic modes, Hindi/Hinglish, Maths/Science symbols and Emoji. New optional local word suggestions toggle defaults OFF so the keyboard resembles the photo. Five themes retained. No Internet or keystroke logging permission. CI validates Java, APK signature and keyboard source. This debug-signed test build can require uninstalling an existing APK with a different debug signing certificate. Physical device testing remains recommended." \
               --latest=false
           fi
