@@ -17,10 +17,10 @@ public final class KeyboardBackdrop extends View {
     private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF oval=new RectF();
     private int theme;
-    private static final int[] BASE={0xff061531,0xff1a0b31,0xff05283b,0xff1c103a};
-    private static final int[] MID={0xff0f356c,0xff37225c,0xff135568,0xff46306f};
-    private static final int[] HIGHLIGHT={0xff70e7ff,0xffffcf65,0xff9df7cb,0xffd5b8ff};
-    public KeyboardBackdrop(Context context,int theme){super(context);this.theme=((theme%4)+4)%4;}
+    private static final int[] BASE={0xff061531,0xff1a0b31,0xff05283b,0xff1c103a,0xfff5f8ff};
+    private static final int[] MID={0xff0f356c,0xff37225c,0xff135568,0xff46306f,0xffe8effa};
+    private static final int[] HIGHLIGHT={0xff70e7ff,0xffffcf65,0xff9df7cb,0xffd5b8ff,0xff4a78d3};
+    public KeyboardBackdrop(Context context,int theme){super(context);this.theme=Math.floorMod(theme,5);}
     private void spot(Canvas c,float x,float y,float r,int color,int alpha){
         paint.reset();paint.setAntiAlias(true);paint.setColor(color);paint.setAlpha(alpha);
         c.drawCircle(x,y,r,paint);
@@ -44,6 +44,16 @@ public final class KeyboardBackdrop extends View {
             new float[]{0f,.56f,1f},Shader.TileMode.CLAMP));
         canvas.drawRect(0,0,w,h,paint);paint.setShader(null);
         int hi=HIGHLIGHT[theme];
+        if(theme==4){
+            // Minimal white finish: science dot-grid subtly visible beneath keys.
+            for(int y=13;y<h;y+=21)for(int x=12;x<w;x+=21)
+                spot(canvas,x,y,.8f,0xff7ca2d8,23);
+            paint.reset();paint.setAntiAlias(true);
+            paint.setColor(0xffc7d5e8);
+            paint.setStrokeWidth(Math.max(1f,w*.002f));
+            canvas.drawLine(0,h-1,w,h-1,paint);
+            return;
+        }
         for(int i=0;i<3;i++){
             float x=w*(i==0?.15f:i==1?.8f:.58f),y=h*(i==0?.16f:i==1?.65f:.99f);
             float r=w*(i==0?.38f:.28f);
