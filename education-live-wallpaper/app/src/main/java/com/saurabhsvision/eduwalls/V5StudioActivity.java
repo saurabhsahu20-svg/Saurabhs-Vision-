@@ -85,7 +85,7 @@ public final class V5StudioActivity extends Activity {
         LinearLayout head=new LinearLayout(this);head.setOrientation(LinearLayout.VERTICAL);
         head.setPadding(dp(18),dp(21),dp(18),dp(20));head.setBackground(round(NAVY,18));
         add(head,txt("🎓  SAURABH'S VISION",14,GOLD,true),0);
-        add(head,txt("VISION EDU WALLS 10.0",26,Color.WHITE,true),8);
+        add(head,txt("VISION EDU WALLS 10.1",26,Color.WHITE,true),8);
         add(head,txt("66 Static  •  66 Live  •  60 Digital Widgets",14,0xffd8e8ff,true),9);
         add(head,txt("NEW: SAME 100 3D IMAGES → 100 LIVE + 100 MATCHING DIGITAL WIDGETS",12,0xffa9cafa,false),7);
         add(root,head,12);
@@ -107,6 +107,10 @@ public final class V5StudioActivity extends Activity {
         preloaded.setOnClickListener(v->startActivity(new Intent(this,Premium100Activity.class)));
         TextView preloadInfo=txt("100 pictures included in the APK! Select any as Static, one of 100 matching Live presets or one of 100 matching Digital Widget backgrounds. Each widget can use its own 3D picture.",13,0xff315a85,false);
         add(root,preloadInfo,7);
+        Button instagram=btn("📷 Follow @saurabhs_vision on Instagram",0xffd8e5ff,NAVY);
+        instagram.setContentDescription("Open Saurabh's Vision Instagram profile");
+        add(root,instagram,12);
+        instagram.setOnClickListener(v->SocialLinks.openInstagram(this));
         Button premium=btn("🌌 OPTIONAL: IMPORT MY OWN HD ART ZIP",0xffe1efff,NAVY);
         add(root,premium,14);
         premium.setMinHeight(dp(60));

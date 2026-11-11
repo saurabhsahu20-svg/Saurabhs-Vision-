@@ -101,6 +101,10 @@ public final class Premium100Activity extends Activity {
         add(head,text("100 × 3D WALLPAPER + LIVE + WIDGET",23,Color.WHITE,true),9);
         add(head,text("100 real HD pictures • 100 matching Live presets • 100 separate 3D digital widget backgrounds. All inside the APK.",13,0xffc5ddff,false),10);
         add(root,head,0);
+        Button followInstagram=button("📷 Follow @saurabhs_vision on Instagram",0xffe3dcff,NAVY);
+        followInstagram.setContentDescription("Open Saurabh's Vision Instagram profile");
+        add(root,followInstagram,12);
+        followInstagram.setOnClickListener(v->SocialLinks.openInstagram(this));
 
         TextView how=text("Choose artwork → Static / Interactive Live / Matching Digital Widget / Save JPG. Each Home Screen widget keeps its own chosen picture.",14,0xff193c72,false);
         add(root,how,13);

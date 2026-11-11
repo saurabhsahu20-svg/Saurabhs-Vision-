@@ -80,6 +80,12 @@ jobs:
           assert 'class BuiltIn3DWidgetArt' in (base/'BuiltIn3DWidgetArt.java').read_text()
           widget=(base/'VisionWidgetProvider.java').read_text()
           setup=(base/'VisionWidgetSetupActivity.java').read_text()
+          social=(base/'SocialLinks.java').read_text()
+          assert 'https://www.instagram.com/saurabhs_vision/' in social
+          assert 'Intent.ACTION_VIEW' in social
+          assert 'SocialLinks.openInstagram(this)' in (base/'V5StudioActivity.java').read_text()
+          assert 'SocialLinks.openInstagram(this)' in (base/'Premium100Activity.java').read_text()
+          print('Verified user Instagram profile link is wired to both app screens')
           activity3d=(base/'Premium100Activity.java').read_text()
           painter=(base/'EducationPainter.java').read_text()
           assert 'BuiltIn3DWidgetArt.background(ctx,art,480,280)' in widget
@@ -163,13 +169,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | head -10
           mkdir -p deliverables
-          cp "$apk" deliverables/Vision_Edu_Walls_v10.0.0_100_MATCHED_3D_LIVE_WIDGETS_TEST.apk
+          cp "$apk" deliverables/Vision_Edu_Walls_v10.1.0_INSTAGRAM_TEST.apk
           sha256sum deliverables/*.apk | tee deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Vision_Edu_Walls_v10_100_3D_Live_Matching_Widgets_APK
+          name: Vision_Edu_Walls_v10_1_Instagram_APK
           path: deliverables/*
           retention-days: 90
 
@@ -179,10 +185,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="vision-edu-walls-v10.0.0"
+          tag="vision-edu-walls-v10.1.0"
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Release tag already exists; uploading test APK asset."
-            gh release upload "$tag" deliverables/Vision_Edu_Walls_v10.0.0_100_MATCHED_3D_LIVE_WIDGETS_TEST.apk deliverables/SHA256SUMS.txt --clobber
+            gh release upload "$tag" deliverables/Vision_Edu_Walls_v10.1.0_INSTAGRAM_TEST.apk deliverables/SHA256SUMS.txt --clobber
           else
-            gh release create "$tag" deliverables/Vision_Edu_Walls_v10.0.0_100_MATCHED_3D_LIVE_WIDGETS_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 10.0 • 100 Matching 3D Live Wallpapers and 100 Digital Widget Backgrounds" --notes "Vision Edu Walls 10.0 TEST APK: same 100 high-detail built-in 3D image artworks are each selectable as a static wallpaper, a matching 3D animated Live wallpaper preset, or a matching home-screen Digital Widget background. Widgets are individually configurable, allowing different art per widget. Android supplies clock, date and battery percent; weather is opt-in through city or permissioned approximate location. The previous 66 static/66 live/60 digital styles are retained. No ZIP needed: original 100 JPGs are embedded. Test build; Android launcher/device testing still required. Debug signing may differ from old versions." --latest=false
+            gh release create "$tag" deliverables/Vision_Edu_Walls_v10.1.0_INSTAGRAM_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 10.1 • Instagram Profile Link" --notes "Vision Edu Walls 10.1 TEST APK: adds Follow @saurabhs_vision Instagram links on the home studio and 100 3D gallery. Tapping opens the user-supplied public profile in the Instagram app or browser; no Instagram login or account data access. Keeps 100 embedded 3D images, matching Live presets, digital widget backgrounds and classic collections. Build/signature verified by GitHub CI; device installation not yet verified." --latest=false
           fi

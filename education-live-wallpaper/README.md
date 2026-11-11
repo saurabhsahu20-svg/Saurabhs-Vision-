@@ -1,4 +1,4 @@
-# SAURABH'S VISION • VISION EDU WALLS 10.0 — 100 Matching 3D Lives & Digital Widgets
+# SAURABH'S VISION • VISION EDU WALLS 10.1 — 100 Matching 3D Lives & Digital Widgets
 
 Version 10.0 builds on the successful pre-installed 100-3D-image gallery, **without deleting the older 66 static, 66 Canvas live, and 60 classic digital widget styles**.
 
@@ -35,3 +35,7 @@ No fake clock/battery/weather values are burned into the image backgrounds.
 - Educational medical/biology imagery is artistic and not a reference for clinical diagnosis.
 
 **Learn Today, Lead Tomorrow!**
+
+## Instagram Profile Link (10.1)
+
+The main studio and built-in 100-image gallery have a **Follow @saurabhs_vision on Instagram** button. It opens `https://www.instagram.com/saurabhs_vision/` using Android's ACTION_VIEW, so a supported Instagram app or browser can handle the link. The original query string from the user-provided link was removed for a cleaner canonical URL. **This is a public profile link only**: it does not log into Instagram, connect private user data, upload content, or require a password/Instagram API permissions.
