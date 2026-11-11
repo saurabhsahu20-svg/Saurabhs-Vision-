@@ -1,4 +1,4 @@
-# SAURABH'S VISION™ — Maths & Science Keyboard 1.3
+# SAURABH'S VISION™ — Maths & Science Keyboard 1.4
 
 **Type Smarter. Explore Further.**
 
@@ -57,3 +57,22 @@ The keyboard includes 5 themes: Cosmic Blue, Golden Mathematics, Science Lab, Pu
 Some Android/WhatsApp chat screens limited the height offered to this third-party keyboard. The previous KeyboardPanel clipped its children because it capped the parent measure without resizing button rows. V1.3 calculates the actual available IME height, measures each row and its contained keys, then fits all rows **before** measuring. It reserves a guaranteed final row for SPACE, Enter and punctuation, reducing the toolbar/other rows first when space is tight. Standard typing rows start at 48dp and Space row 51dp; both auto-shrink when the Android host offers less vertical space. The **SPACE** label is larger and accessible. Emoji pages also use the same adaptive panel. 
 
 In the setup screen, **Compact Keyboard (Recommended)** is enabled by default; **Comfortable / Larger Keyboard** gives larger keys if the device has room, but still auto-fits. Close/reopen keyboard after changing. User device screenshots are the best way to verify actual manufacturer-specific behavior. Build tests check source layout contracts, Java compile, IME manifest and APK signing, but do not replace manual keyboard testing on WhatsApp.
+
+## Version 1.4 — 22 Indian languages + Hinglish / English / Hindi input
+
+Use **🌐** on the compact keyboard toolbar, select a language and return to ABC. Or open keyboard Settings and choose one from the **24 options**: English, Hinglish (Roman Hindi), plus India's **22 constitutionally scheduled languages** (Hindi, Bangla/Bengali, Marathi, Tamil, Telugu, Gujarati, Kannada, Malayalam, Punjabi, Odia, Assamese, Sanskrit, Nepali, Konkani, Maithili, Dogri, Bodo, Kashmiri, Sindhi, Manipuri/Meitei, Santali/Ol Chiki, Urdu).
+
+**Hindi phonetic:** Type ordinary English letters, for example:
+`namaste` → `नमस्ते`
+`mera` → `मेरा`
+`aap` → `आप`
+`bharat` → `भारत`
+`shiksha` → `शिक्षा`
+
+Hindi mode uses Android InputConnection composition: typed Roman letters update the composing script word; Space/Enter commits the word; Backspace edits the composing Roman input and updates script. Hinglish mode types Roman letters exactly as written. English is ordinary QWERTY. Switch between Hindi and Hinglish via quick language toggle on the strip. Maths/Science/emoji are unchanged.
+
+**Important limitations:** This is a **basic offline phonetic transliteration keyboard**, NOT an English↔Hindi sentence meaning translator or a full production language IME. A finite Hindi common-word dictionary helps typical Roman spellings; other Brahmic scripts use approximate syllabic character mappings and Indic common spellings are not always linguistically accurate. Kashmiri and Sindhi use their Devanagari script options, not their Perso-Arabic spellings; Meitei Mayek, Ol Chiki and Urdu use simplified roman-letter approximation, not full orthography rules. Unsupported characters can retain source script characters. A number of Indian dialects and unscheduled languages are not covered. Users should proofread critical writing.
+
+No network needed or requested. Roman composing input is held **in memory only** while typing, without saving to disk, logging or transmission. Password fields intentionally fall back to ordinary Latin typing; the language picker is never a password collection service.
+
+Native Java smoke tests run on the GitHub builder for all 24 options, letter-to-script checks for 11 scripts, plus actual Android build, manifest and APK-signature verification. Device typing with real launchers, cursor edits and Unicode emoji requires hands-on QA. 

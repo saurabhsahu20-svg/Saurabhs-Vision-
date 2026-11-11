@@ -98,12 +98,36 @@ jobs:
           assert 'Math.max(1,budget-footer-toolbar)' in panel
           assert 'Compact Keyboard (Recommended)' in activity
           assert 'Comfortable / Larger Keyboard' in activity
+          assert (root/'java/com/saurabhsvision/keyboard/IndicLanguages.java').is_file()
+          assert (root/'java/com/saurabhsvision/keyboard/OfflinePhonetic.java').is_file()
+          assert 'mode=LANGUAGE' in ime
+          assert 'addLanguagePicker' in ime
+          assert 'addLanguageStatus' in ime
+          assert 'setComposingText' in ime and 'finishComposingText' in ime
+          assert 'isPasswordField' in ime
+          assert 'romanComposing' in ime
+          assert 'languageSpinner' in activity
+          assert 'Hinglish' in activity
+          print('24 language choices, phonetic composition, secure-password fallback verified')
           print('Space/Enter bottom row priority, adaptive fit, compact settings verified')
           print('Verified five themes, Pure White contrast, professional button skins and preview.')
           print('Verified compact IME panel + paginated emoji picker source contracts.')
           assert 'extends View' in bg
           print('Keyboard functional/input/privacy contracts checked.')
           PY
+
+      - name: Verify all 22 scheduled language modes and phonetic Hindi examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          src="vision-maths-science-keyboard/app/src/main/java/com/saurabhsvision/keyboard"
+          out="$RUNNER_TEMP/phonetic-smoke"
+          mkdir -p "$out"
+          javac -encoding UTF-8 -d "$out" \
+            "$src/IndicLanguages.java" \
+            "$src/OfflinePhonetic.java" \
+            "vision-maths-science-keyboard/PhoneticSmokeTest.java"
+          java -ea -cp "$out" PhoneticSmokeTest
 
       - name: Compile APK
         shell: bash
@@ -123,13 +147,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/Vision_Maths_Science_Keyboard_v1.3.0_SPACEBAR_FIX_TEST.apk
+          cp "$apk" keyboard-deliverables/Vision_Maths_Science_Keyboard_v1.4.0_INDIA_LANGUAGE_TEST.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Vision_Maths_Science_Keyboard_v1_3_Spacebar_AutoFit_APK
+          name: Vision_Maths_Science_Keyboard_v1_4_Indian_Language_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -139,13 +163,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="vision-maths-science-keyboard-v1.3.0"
-          file="keyboard-deliverables/Vision_Maths_Science_Keyboard_v1.3.0_SPACEBAR_FIX_TEST.apk"
+          tag="vision-maths-science-keyboard-v1.4.0"
+          file="keyboard-deliverables/Vision_Maths_Science_Keyboard_v1.4.0_INDIA_LANGUAGE_TEST.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "Vision Maths & Science Keyboard 1.3 • Spacebar Auto-Fit and Keyboard Height Fix" \
-              --notes "Vision Maths & Science Keyboard 1.3 TEST APK: fixes the bottom SPACEBAR/ENTER row being clipped on some WhatsApp / Android devices. Responsive input panel now sizes every key row to the actual IME height constraint, prioritizing last Space/Enter row. Compact height enabled by default; optional Comfortable height via keyboard app settings. Larger legible SPACE label. Preserves professional White Theme, four neon themes, Maths & Science modes and 923 emoji entries. No INTERNET permission or typing tracking. Build/signature checked in GitHub CI; please test on your physical device." \
+              --title "Vision Maths & Science Keyboard 1.4 • Hindi Phonetic, Hinglish and 22 Indian Languages" \
+              --notes "Vision Maths & Science Keyboard 1.4 TEST APK. Adds English, Hinglish Roman, and India 22 Eighth Schedule language profiles via offline phonetic roman-to-script input: Hindi namaste -> नमस्ते, mera -> मेरा, aap -> आप. 24 language options (English + Hinglish + 22 scheduled). Tap Globe in IME or choose in Settings. Basic approximate transliteration only: not full-text translation and not dictionary-perfect across all scripts, particularly Meitei, Santali and Urdu. Typing stays on-device with no Internet permission. All 5 premium themes, compact spacebar, Maths, Science and emoji retained. GitHub CI verifies source, Java transliteration tests, Android compilation, signature; physical handset QA remains required." \
               --latest=false
           fi
