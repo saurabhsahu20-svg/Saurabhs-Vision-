@@ -77,6 +77,23 @@ jobs:
           assert 'PremiumWidgetArt.choose' in (base/'ImagePackActivity.java').read_text()
           assert 'premium_hd_fx' in (base/'ImagePackActivity.java').read_text()
           print('Verified Premium 3D HD Studio, real Android widget art, four live FX')
+          assert 'class BuiltIn3DWidgetArt' in (base/'BuiltIn3DWidgetArt.java').read_text()
+          widget=(base/'VisionWidgetProvider.java').read_text()
+          setup=(base/'VisionWidgetSetupActivity.java').read_text()
+          activity3d=(base/'Premium100Activity.java').read_text()
+          painter=(base/'EducationPainter.java').read_text()
+          assert 'BuiltIn3DWidgetArt.background(ctx,art,480,280)' in widget
+          assert 'getInt("art_"+widgetId,-1)' in widget
+          assert 'editor.putInt("art_"+id,art)' in widget
+          assert 'for(int i=0;i<100;i++)' in setup
+          assert 'VisionWidgetProvider.setWidget(this,widgetId,style,art)' in setup
+          assert 'getInt("pending_art",-1)' in setup
+          assert 'applyLive(file,index)' in activity3d
+          assert 'applyWidget(index)' in activity3d
+          assert 'requestPinAppWidget' in activity3d
+          assert 'putInt("premium_3d_index",index)' in activity3d
+          assert 'drawPremium3DMatchedEffects' in painter
+          print('V10 verified: all 100 separate Live presets + per-widget 3D image skins + phone data')
           assert 'class Premium100Activity' in (base/'Premium100Activity.java').read_text(encoding='utf8')
           print('Verified: 66 static, 66 live, 60 widgets + separate 100 built-in Premium 3D gallery')
           assert 'class StillScenePainter' in (base/'StillScenePainter.java').read_text()
@@ -146,13 +163,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | head -10
           mkdir -p deliverables
-          cp "$apk" deliverables/Vision_Edu_Walls_v9.0.0_100_BUILTIN_3D_TEST.apk
+          cp "$apk" deliverables/Vision_Edu_Walls_v10.0.0_100_MATCHED_3D_LIVE_WIDGETS_TEST.apk
           sha256sum deliverables/*.apk | tee deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Vision_Edu_Walls_v9_100_Preloaded_3D_APK
+          name: Vision_Edu_Walls_v10_100_3D_Live_Matching_Widgets_APK
           path: deliverables/*
           retention-days: 90
 
@@ -162,10 +179,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="vision-edu-walls-v9.0.0"
+          tag="vision-edu-walls-v10.0.0"
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Release tag already exists; uploading test APK asset."
-            gh release upload "$tag" deliverables/Vision_Edu_Walls_v9.0.0_100_BUILTIN_3D_TEST.apk deliverables/SHA256SUMS.txt --clobber
+            gh release upload "$tag" deliverables/Vision_Edu_Walls_v10.0.0_100_MATCHED_3D_LIVE_WIDGETS_TEST.apk deliverables/SHA256SUMS.txt --clobber
           else
-            gh release create "$tag" deliverables/Vision_Edu_Walls_v9.0.0_100_BUILTIN_3D_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 9.0 • 100 Pre-installed Premium 3D Wallpapers, Live FX and Digital Widgets" --notes "V9.0: ONE HUNDRED 3D-style educational wallpapers PRE-INSTALLED INSIDE the APK. No separate ZIP import, network, or extra permission needed. Open 100 Built-in 3D gallery to preview and apply any image as static wallpaper, interactive live wallpaper with FX, or Android clock/date/battery/weather widget background; save individual JPG. Ten themed sections, 100 unique digital image compositions created from original AI art. Existing 66 static + 66 live + 60 digital widgets and optional external HD importer remain. Test APK debug-signed; on-device testing still required." --latest=false
+            gh release create "$tag" deliverables/Vision_Edu_Walls_v10.0.0_100_MATCHED_3D_LIVE_WIDGETS_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 10.0 • 100 Matching 3D Live Wallpapers and 100 Digital Widget Backgrounds" --notes "Vision Edu Walls 10.0 TEST APK: same 100 high-detail built-in 3D image artworks are each selectable as a static wallpaper, a matching 3D animated Live wallpaper preset, or a matching home-screen Digital Widget background. Widgets are individually configurable, allowing different art per widget. Android supplies clock, date and battery percent; weather is opt-in through city or permissioned approximate location. The previous 66 static/66 live/60 digital styles are retained. No ZIP needed: original 100 JPGs are embedded. Test build; Android launcher/device testing still required. Debug signing may differ from old versions." --latest=false
           fi

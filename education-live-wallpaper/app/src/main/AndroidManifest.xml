@@ -28,7 +28,7 @@
         <receiver
             android:name=".VisionWidgetProvider"
             android:exported="true"
-            android:label="Vision Edu Walls - 60 Digital Widgets">
+            android:label="Vision Edu Walls - 100 3D + 60 Digital Widgets">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>

@@ -1,25 +1,37 @@
-# VISION EDU WALLS 9.0 — 100 PREMIUM 3D WALLPAPERS BUILT IN
+# SAURABH'S VISION • VISION EDU WALLS 10.0 — 100 Matching 3D Lives & Digital Widgets
 
-SAURABH'S VISION™ • Learn Today, Lead Tomorrow!
+Version 10.0 builds on the successful pre-installed 100-3D-image gallery, **without deleting the older 66 static, 66 Canvas live, and 60 classic digital widget styles**.
 
-## What's new
-- **100 additional, individual 3D-style digital wallpaper JPG images are EMBEDDED in the Android APK**, not merely linked externally or imported after installation.
-- 10 categories × 10 each: Maths, Physics, Chemistry, Biology, Botany, Space, Technology, Learning, 3D Abstract and Motivation.
-- New **100 Built-in 3D Gallery** with categories, previews, working Static Wallpaper, Live Wallpaper (original image with animated overlay) and Digital Widget Background buttons. Save individual JPG to Documents.
-- Every image uses a unique name, composition, graphical layout and artwork pairing from original AI artworks made in this conversation. Images are **not** 100 independently generated full-scene AI artworks. They are 100 different illustrated compositions (540×960 pixels), preserving 3D-neon creative style. Not marketed as 4K.
-- Images are not copied from Pinterest screenshots.
-- Older 66 poster-style static wallpapers, 66 separately drawn Live scenes, 60 functional Android widgets and Classic image ZIP importer are preserved.
+## 100 actual embedded 3D wallpapers
+The APK includes all 100 individual JPG files and `assets/premium100/catalog.json`, injected during GitHub Actions compilation from the verified premium100-pack binary pieces. These are 3D-style educational image compositions, not 100 independent photorealistic 3D renderings. Ten categories: Maths, Physics, Chemistry, Biology, Botany, Space, Technology, Learning, 3D Abstract, Motivation.
 
-## Android architecture
-- Source ZIP archived into 8 binary Git blobs under `education-live-wallpaper/premium100-pack/part*.bin`.
-- GitHub Actions reassembles binary chunks with SHA-256 verification, checks all 100 JPGs and catalog names, then extracts them into `app/src/main/assets/premium100` **before** Gradle compiles.
-- The final **APK carries 100 real JPG asset files**. CI verifies their presence in the APK ZIP and checks its signing identity.
-- `Premium100Activity` opens the preinstalled collection with no permission, no downloads and no manual ZIP import.
-- Live option copies the selected asset into existing app-private custom art, enables wallpaper touch animation, and uses Android's live wallpaper picker.
-- Widget option uses existing `PremiumWidgetArt.choose()`, which updates wallpaper backgrounds for real system TextClock/date/battery/optional Internet weather widgets.
-- Wallpapers operate offline, but weather still requires explicitly selected city/optional approximate location and Internet.
+## 100 matching LIVE presets
+Open **100 Built-in 3D Gallery**, tap picture, select **Set as Interactive Live Wallpaper**. The selected original JPG is displayed full-screen using Android WallpaperService, overlaid by:
+- original glow/stardust/comet/orbit effects, and
+- **art-index and subject/category-specific motions** (e.g. moving Maths formula symbols, physics orbits, chemistry molecules, Biology heartbeat/DNA pulses, botany dew, space comets, circuitry, letters and progress lights).
+- touch spark effects; effects are rendered by Canvas, not video files.
+Each of the 100 live presets keeps its original artwork. Selecting a different one updates the wallpaper image and animation; Android shows one live background at a time.
+The app uses a single WallpaperService with 100 selectable presets, not 100 separately installed Android wallpaper services.
+Actual launcher gestures and performance depend on device.
 
-## Limitations
-3D-style photos are creative educational compositions, not anatomical textbook diagrams. This is a **debug-signed test APK**, not a Google Play release. Device testing of previews, OEM live-wallpaper support, widgets and performance is still required. Debug signature may differ from prior versions and an upgrade might require uninstalling only Vision Edu Walls, resetting its local custom wallpaper settings; the separate Saurabh Vision student app is unaffected.
+## 100 matching DIGITAL widget backgrounds
+Open gallery, tap an image, select **Use as Digital Widget Background**. Request a new Home Screen widget from your launcher (or long-press Home Screen > Widgets > Vision Edu Walls). The Android setup offers all 100 3D art backgrounds and 60 classic styles. **Every widget stores its own art_<appWidgetId>**, so a Maths widget can display Maths 3D while a Biology widget shows Biology 3D without one overwriting the other.
+Touch the widget header to open the 100-art gallery and change that widget's own picture.
+In every digital widget, Android `TextClock` provides system time (12/24h), date comes from the device, battery % comes from local `BatteryManager` sticky broadcast (updated periodically), and optional weather comes from Open-Meteo via chosen city or permissioned approximate location.
+No fake clock/battery/weather values are burned into the image backgrounds.
 
-Release 9.0.0 (versionCode 10). Requires Android 6.0+.
+## Usage
+1. Install the **Vision Edu Walls 10.0** APK.
+2. Tap **OPEN 100 BUILT-IN 3D WALLPAPERS + LIVE + WIDGETS**.
+3. Choose any image → Static, Live, Digital Widget, or Save JPG.
+4. For a widget, approve the Android pin prompt or long-press your home screen and use Widgets > Vision Edu Walls. Choose a different matching art per widget.
+
+## Important notes
+- Wallpaper animations and packaged image backgrounds work offline; weather uses internet only when selected.
+- No external ZIP needs importing for the 100 built-in images.
+- The older Classic and optional external-art ZIP gallery remain accessible.
+- Compiled debug-signed APK for Android 6.0+. Debug signing may differ from older releases; on install signature conflict, uninstall only older Vision Edu Walls after acknowledging local settings will reset.
+- CI checks APK compilation, package signature, 100 embedded JPG assets, and v10 gallery/widget integration. Actual device installation, battery use, launcher widget configuration, and animation smoothness need testing.
+- Educational medical/biology imagery is artistic and not a reference for clinical diagnosis.
+
+**Learn Today, Lead Tomorrow!**
