@@ -1,6 +1,9 @@
 package com.saurabhsvision.keyboard;
 
 import android.content.Context;
+import android.graphics.Point;
+import android.view.Display;
+import android.view.WindowManager;
 import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.view.View;
@@ -98,7 +101,21 @@ public final class KeyboardPanel extends LinearLayout {
             // height and then clip the lowest key row behind system navigation.
             // Cap the entire input view to a screen-relative physical height
             // BEFORE assigning space to the last Space/Enter row.
+            // getResources().getDisplayMetrics().heightPixels can describe
+            // a logical/IME window size rather than the REAL screen on OEMs.
+            // Use the physical display's shorter side instead.
             int screenPx=getResources().getDisplayMetrics().heightPixels;
+            Display display=getDisplay();
+            if(display==null){
+                WindowManager wm=(WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE);
+                if(wm!=null)display=wm.getDefaultDisplay();
+            }
+            if(display!=null){
+                Point actualScreen=new Point();
+                display.getRealSize(actualScreen);
+                if(actualScreen.x>0 && actualScreen.y>0)
+                    screenPx=Math.min(actualScreen.x,actualScreen.y);
+            }
             cap=KeyboardLayoutPolicy.landscapeHeightCap(screenPx,cap);
         }
         int specMode=View.MeasureSpec.getMode(heightSpec);
