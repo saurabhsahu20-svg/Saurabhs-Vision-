@@ -114,7 +114,7 @@ jobs:
                   name=entry['file']
                   assert '/' not in name and '\\\\' not in name
                   image=archive.read(name)
-                  assert image[:2]==b'\\xff\\xd8' and image[-2:]==b'\\xff\\xd9',name
+                  assert image[:2]==bytes([255,216]) and image[-2:]==bytes([255,217]),name
                   (destination/name).write_bytes(image)
               (destination/'catalog.json').write_bytes(archive.read('catalog.json'))
           print('Verified 100 original JPEG files, 100 unique names, 10 categories. All embedded into APK assets.')
@@ -165,7 +165,7 @@ jobs:
           tag="vision-edu-walls-v9.0.0"
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Release tag already exists; uploading test APK asset."
-            gh release upload "$tag" deliverables/Vision_Edu_Walls_v8.0.0_PREMIUM_3D_TEST.apk deliverables/SHA256SUMS.txt --clobber
+            gh release upload "$tag" deliverables/Vision_Edu_Walls_v9.0.0_100_BUILTIN_3D_TEST.apk deliverables/SHA256SUMS.txt --clobber
           else
-            gh release create "$tag" deliverables/Vision_Edu_Walls_v8.0.0_PREMIUM_3D_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 9.0 • 100 Pre-installed Premium 3D Wallpapers, Live FX and Digital Widgets" --notes "V9.0: ONE HUNDRED 3D-style educational wallpapers PRE-INSTALLED INSIDE the APK. No separate ZIP import, network, or extra permission needed. Open 100 Built-in 3D gallery to preview and apply any image as static wallpaper, interactive live wallpaper with FX, or Android clock/date/battery/weather widget background; save individual JPG. Ten themed sections, 100 unique digital image compositions created from original AI art. Existing 66 static + 66 live + 60 digital widgets and optional external HD importer remain. Test APK debug-signed; on-device testing still required." --latest=false
+            gh release create "$tag" deliverables/Vision_Edu_Walls_v9.0.0_100_BUILTIN_3D_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 9.0 • 100 Pre-installed Premium 3D Wallpapers, Live FX and Digital Widgets" --notes "V9.0: ONE HUNDRED 3D-style educational wallpapers PRE-INSTALLED INSIDE the APK. No separate ZIP import, network, or extra permission needed. Open 100 Built-in 3D gallery to preview and apply any image as static wallpaper, interactive live wallpaper with FX, or Android clock/date/battery/weather widget background; save individual JPG. Ten themed sections, 100 unique digital image compositions created from original AI art. Existing 66 static + 66 live + 60 digital widgets and optional external HD importer remain. Test APK debug-signed; on-device testing still required." --latest=false
           fi
