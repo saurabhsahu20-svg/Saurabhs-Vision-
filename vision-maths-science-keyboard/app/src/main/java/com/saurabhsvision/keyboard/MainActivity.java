@@ -26,10 +26,12 @@ public final class MainActivity extends Activity {
     private static final String PREFS="vision_keyboard_settings";
     private static final int NAVY=0xff061631;
     private static final int GOLD=0xffffd45c;
-    private static final int[] ACCENTS={0xff65e9ff,0xffffd55c,0xff9affd4,0xffeea8ff};
-    private static final String[] NAMES={"Cosmic Blue","Golden Mathematics","Science Lab","Purple Quantum"};
+    private static final int[] ACCENTS={0xff65e9ff,0xffffd55c,0xff9affd4,0xffeea8ff,0xff2563eb};
+    private static final String[] NAMES={"Cosmic Blue","Golden Mathematics","Science Lab","Purple Quantum","Pure White"};
     private LinearLayout root;
     private TextView themeStatus;
+    private LinearLayout keyPreview;
+    private final String[] previewKeys={"Q","W","E","R","T","Y","π","√","🧬","😊"};
     private int dp(float v){return (int)(getResources().getDisplayMetrics().density*v+.5f);}
     @Override public void onCreate(Bundle state){
         super.onCreate(state);
@@ -55,7 +57,8 @@ public final class MainActivity extends Activity {
         Button b=new Button(this);
         b.setText(label);b.setTextSize(16);b.setAllCaps(false);
         b.setTextColor(textColor);b.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
-        b.setMinHeight(dp(56));b.setBackground(box(color,15));
+        b.setMinHeight(dp(56));b.setBackground(box(color,16));
+        b.setElevation(dp(2));
         return b;
     }
     private void createUi(){
@@ -94,7 +97,7 @@ public final class MainActivity extends Activity {
         });
 
         add(root,text("🎨 Premium Keyboard Themes",21,NAVY,true),29);
-        add(root,text("4 अलग-अलग Maths और Science themed neon designs",13,0xff54708e,false),5);
+        add(root,text("5 professional themes • 4 Neon + 1 Pure White / Light",13,0xff54708e,false),5);
         themeStatus=text("",15,0xff16519a,true);
         add(root,themeStatus,10);
         LinearLayout themeColumn=new LinearLayout(this);
@@ -104,11 +107,15 @@ public final class MainActivity extends Activity {
             final int index=i;
             LinearLayout card=new LinearLayout(this);
             card.setGravity(Gravity.CENTER_VERTICAL);
-            card.setBackground(box(i%2==0?Color.WHITE:0xffe5ebff,15));
-            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(66));
+            GradientDrawable cardBg=box(i==4?0xfffcfdff:(i%2==0?Color.WHITE:0xffe5ebff),16);
+            cardBg.setStroke(dp(index==getSharedPreferences(PREFS,MODE_PRIVATE).getInt("theme",0)?2:1),
+                index==getSharedPreferences(PREFS,MODE_PRIVATE).getInt("theme",0)?0xff285cba:0xffd7dfed);
+            card.setBackground(cardBg);
+            card.setElevation(dp(1.5f));
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(68));
             p.topMargin=dp(7);
             themeColumn.addView(card,p);
-            TextView circle=text(i==0?"π":i==1?"∑":i==2?"⚛":"Ω",27,ACCENTS[i],true);
+            TextView circle=text(i==0?"π":i==1?"∑":i==2?"⚛":i==3?"Ω":"☀",27,i==4?0xff2563eb:ACCENTS[i],true);
             circle.setGravity(Gravity.CENTER);
             circle.setBackground(box(0xff11234b,13));
             LinearLayout.LayoutParams ilp=new LinearLayout.LayoutParams(dp(55),dp(55));
@@ -123,9 +130,14 @@ public final class MainActivity extends Activity {
             apply.setOnClickListener(v->{
                 getSharedPreferences(PREFS,MODE_PRIVATE).edit().putInt("theme",index).apply();
                 showTheme();
-                showMessage(NAMES[index]+" enabled. Switch your keyboard or reopen it to see the theme.");
+                showMessage(NAMES[index]+" applied. Reopen keyboard to see the design.");
             });
         }
+        add(root,text("⌨️ Theme Key Preview",17,NAVY,true),19);
+        keyPreview=new LinearLayout(this);
+        keyPreview.setOrientation(LinearLayout.HORIZONTAL);
+        keyPreview.setPadding(dp(6),dp(11),dp(6),dp(11));
+        add(root,keyPreview,7);
         showTheme();
 
         add(root,text("😊 New Emoji Keyboard",21,NAVY,true),27);
@@ -161,8 +173,21 @@ public final class MainActivity extends Activity {
         add(root,text("SAURABH'S VISION™ • Learn Today, Lead Tomorrow!",12,0xff5c7190,true),24);
     }
     private void showTheme(){
-        int current=getSharedPreferences(PREFS,MODE_PRIVATE).getInt("theme",0);
-        if(themeStatus!=null)themeStatus.setText("Selected: "+NAMES[Math.max(0,Math.min(3,current))]);
+        int current=Math.max(0,Math.min(4,getSharedPreferences(PREFS,MODE_PRIVATE).getInt("theme",0)));
+        if(themeStatus!=null)themeStatus.setText("Selected: "+NAMES[current]+(current==4?"  •  LIGHT MODE":""));
+        if(keyPreview==null)return;
+        keyPreview.removeAllViews();
+        keyPreview.setBackground(box(current==4?0xffe8effa:0xff0b2248,16));
+        for(String key:previewKeys){
+            TextView item=text(key,key.length()>1?14:17,current==4?0xff14243b:Color.WHITE,true);
+            item.setGravity(Gravity.CENTER);
+            GradientDrawable bg=box(current==4?Color.WHITE:0xff1b385f,10);
+            bg.setStroke(dp(1),current==4?0xffc8d7e9:ACCENTS[current]);
+            item.setBackground(bg);
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(39),1f);
+            lp.setMargins(dp(2),0,dp(2),0);
+            keyPreview.addView(item,lp);
+        }
     }
     private void showMessage(String message){
         android.widget.Toast.makeText(this,message,android.widget.Toast.LENGTH_LONG).show();
