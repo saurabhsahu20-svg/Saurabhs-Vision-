@@ -67,3 +67,15 @@ See `TEST_PLAN.md` for manual and security tests.
 The owner-supplied red/blue metallic logo is included in `assets/brand-3d.webp`, with resized app icons in `assets/vision-icon-64.png`, `assets/vision-icon-192.png`, and `assets/vision-icon-512.png`. These are referenced by the home page, navigation, favicon, and PWA manifest. Do not replace them with generic art.
 
 The `SAURABHS_VISION_PREVIEW_UPDATED.html` standalone preview is provided separately as a convenience. Firebase services require configuration and deployment; the preview does not persist submitted data.
+
+## Free public learning resources (November 2026)
+
+- **Study Desk:** `/study-desk/` — browser-local study goals, progress checklist, print view and an optional 15-minute focus timer. No registration or backend. On shared devices, students should not enter personal details and can erase their goals.
+- **Admissions Guide:** `/admissions-guide/` — verified course scopes, admissions steps, guardian-led WhatsApp enquiry, contact number, social profile and FAQs. Current batch availability and fees are intentionally not invented.
+- **Daily Study Sprint:** `/study-sprint/` — original short practice with explanations.
+- **Offline web app support:** A service worker caches a small allowlist of *public* learning pages and assets for later offline loading. It explicitly does **not** cache private account or backend traffic or the imported learning-bank library. Fresh live information always needs a network connection.
+- The sitemap and homepage include these free public pages for navigation and search discovery. No required account, subscriptions or advertising have been activated.
+
+### Launch validation
+
+GitHub Actions runs JavaScript syntax checks and `website/tests/smoke.py` before publishing via GitHub Pages. A successful workflow shows that the public frontend was deployed; it does not certify every mobile/browser workflow or remote Firebase service.
