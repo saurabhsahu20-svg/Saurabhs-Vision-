@@ -217,8 +217,8 @@ public final class OfflinePhonetic {
     }
     private static int gurmukhiFallback(char dev,int mapped){
         if(dev=='श'||dev=='ष')return 0x0A36;
-        if(dev=='ज़')return 0x0A5B;
-        if(dev=='फ़')return 0x0A5E;
+        if(dev=='ज़')return 0x0A5B;
+        if(dev=='फ़')return 0x0A5E;
         return mapped;
     }
 
