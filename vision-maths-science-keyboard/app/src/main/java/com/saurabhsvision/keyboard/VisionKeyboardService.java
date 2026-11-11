@@ -209,7 +209,7 @@ public final class VisionKeyboardService extends InputMethodService {
         caption.setIncludeFontPadding(false);
         caption.setSingleLine(true);
         brandWords.addView(caption,new LinearLayout.LayoutParams(-1,-2));
-        identity.addView(brandWords,new LinearLayout.LayoutParams(-1,-2));
+        identity.addView(brandWords,new LinearLayout.LayoutParams(0,-2,1f));
         LinearLayout.LayoutParams identityLp=new LinearLayout.LayoutParams(
             dp(narrow?151:205),dp(46));
         identityLp.setMargins(dp(1),0,dp(4),0);
