@@ -21,7 +21,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.widget.Button;
-import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.content.Intent;
@@ -34,11 +34,13 @@ import android.content.SharedPreferences;
 public final class VisionKeyboardService extends InputMethodService {
     private static final String PREFS="vision_keyboard_settings";
     private static final String KEY_THEME="theme";
-    private static final int ABC=0,NUMBER=1,MATH=2,SCIENCE=3;
+    private static final int ABC=0,NUMBER=1,MATH=2,SCIENCE=3,EMOJI=4;
+    private static final int EMOJIS_PER_PAGE=32;
+    private int emojiCategory=0,emojiPage=0;
     private static final int[] ACCENTS={0xff65e9ff,0xffffd55c,0xff9affd4,0xffeea8ff};
     private static final int[] DARK={0xff071537,0xff1c1641,0xff061e32,0xff1a1040};
     private static final int[] KEY_COLORS={0xd91b3561,0xdb45375e,0xdb21485b,0xdb3c2b67};
-    private FrameLayout keyboardFrame;
+    private KeyboardPanel keyboardFrame;
     private LinearLayout keysContent;
     private int mode=ABC,theme=0;
     private boolean shifted=false,caps=false;
@@ -57,10 +59,12 @@ public final class VisionKeyboardService extends InputMethodService {
     }
     private SharedPreferences settings(){return getSharedPreferences(PREFS,MODE_PRIVATE);}
     @Override public View onCreateInputView(){
-        keyboardFrame=new FrameLayout(this);
+        keyboardFrame=new KeyboardPanel(this,theme);
         rebuild();
         return keyboardFrame;
     }
+    /** Avoid Android's fullscreen extract editor and keep the app visible above the keyboard. */
+    @Override public boolean onEvaluateFullscreenMode(){return false;}
     @Override public void onStartInput(EditorInfo info,boolean restarting){
         super.onStartInput(info,restarting);
         if(!restarting){
@@ -86,12 +90,9 @@ public final class VisionKeyboardService extends InputMethodService {
     private void rebuild(){
         if(keyboardFrame==null)return;
         keyboardFrame.removeAllViews();
-        keyboardFrame.addView(new KeyboardBackdrop(this,theme),
-            new FrameLayout.LayoutParams(-1,-1));
-        keysContent=new LinearLayout(this);
-        keysContent.setOrientation(LinearLayout.VERTICAL);
+        keyboardFrame.setTheme(theme);
+        keysContent=keyboardFrame;
         keysContent.setPadding(dp(3),dp(5),dp(3),dp(7));
-        keyboardFrame.addView(keysContent,new FrameLayout.LayoutParams(-1,-2));
         addToolbar();
         if(mode==ABC){
             addRow("Q W E R T Y U I O P");
@@ -108,11 +109,15 @@ public final class VisionKeyboardService extends InputMethodService {
             addRow("÷ ∫ ∂ Δ θ α β γ Ω μ");
             addRow("sin( cos( tan( log( ln( x² x³ ^ → ⌫");
             addBottom();
-        }else{
+        }else if(mode==SCIENCE){
             addRow("H₂O CO₂ O₂ NaCl H⁺ OH⁻ e⁻ pH DNA RNA");
             addRow("→ ⇌ ↑ ↓ °C K mol kg m/s N");
             addRow("α β γ λ μ Ω Δ ∝ ∴ ⌫");
             addBottom();
+        }else{
+            addEmojiCategories();
+            addEmojiPage();
+            addEmojiBottom();
         }
         keyboardFrame.requestLayout();
     }
@@ -120,29 +125,29 @@ public final class VisionKeyboardService extends InputMethodService {
         LinearLayout bar=new LinearLayout(this);
         bar.setOrientation(LinearLayout.HORIZONTAL);
         bar.setGravity(Gravity.CENTER);
-        String[] ids={"ABC","123","∑ MATH","⚛ SCI","🎨","⚙"};
+        String[] ids={"ABC","123","∑","⚛","😊","🎨","⚙"};
         for(int i=0;i<ids.length;i++){
             final int idx=i;
             TextView tab=new TextView(this);
             tab.setText(ids[i]);
-            tab.setTextSize(i==2||i==3?12:13);
+            tab.setTextSize(i==2||i==3?17:13);
             tab.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
             tab.setGravity(Gravity.CENTER);
-            tab.setTextColor(i<4 && mode==i?DARK[theme]:Color.WHITE);
+            tab.setTextColor(i<5 && mode==i?DARK[theme]:Color.WHITE);
             GradientDrawable surface=new GradientDrawable();
-            boolean selected=i<4 && mode==i;
+            boolean selected=i<5 && mode==i;
             surface.setColor(selected?ACCENTS[theme]:0x66243659);
             surface.setCornerRadius(dp(12));
             surface.setStroke(dp(1),selected?ACCENTS[theme]:0x556edfff);
             tab.setBackground(surface);
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(41),i==2||i==3?1.4f:1f);
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(41),i==2||i==3?1.1f:1f);
             lp.setMargins(dp(2),0,dp(2),dp(5));
             bar.addView(tab,lp);
             tab.setContentDescription(i==4?"Change keyboard theme":i==5?"Keyboard settings":"Switch keyboard to "+ids[i]);
             tab.setOnClickListener(v->{
                 feedback(v);
-                if(idx<4){mode=idx;shifted=false;rebuild();}
-                else if(idx==4){theme=(theme+1)%4;settings().edit().putInt(KEY_THEME,theme).apply();rebuild();}
+                if(idx<5){mode=idx;shifted=false;rebuild();}
+                else if(idx==5){theme=(theme+1)%4;settings().edit().putInt(KEY_THEME,theme).apply();rebuild();}
                 else{Intent intent=new Intent(this,MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     try{startActivity(intent);}catch(RuntimeException ignored){}}
@@ -168,6 +173,85 @@ public final class VisionKeyboardService extends InputMethodService {
         }
         keysContent.addView(row,new LinearLayout.LayoutParams(-1,height+dp(3)));
     }
+    private void addEmojiCategories(){
+        HorizontalScrollView scroller=new HorizontalScrollView(this);
+        scroller.setFillViewport(false);
+        scroller.setHorizontalScrollBarEnabled(false);
+        scroller.setHorizontalFadingEdgeEnabled(true);
+        LinearLayout categories=new LinearLayout(this);
+        categories.setOrientation(LinearLayout.HORIZONTAL);
+        categories.setGravity(Gravity.CENTER_VERTICAL);
+        String[] icons={"😀","🥰","😢","👋","🧑","🐼","🌿","🍕","🎉","💯","🧬"};
+        for(int i=0;i<EmojiCatalog.count();i++){
+            final int category=i;
+            TextView chip=new TextView(this);
+            chip.setGravity(Gravity.CENTER);
+            chip.setText(icons[i]+" "+EmojiCatalog.title(i));
+            chip.setTextSize(12);
+            chip.setTextColor(category==emojiCategory?DARK[theme]:Color.WHITE);
+            chip.setContentDescription(EmojiCatalog.title(i)+" emojis");
+            GradientDrawable shape=new GradientDrawable();
+            shape.setColor(i==emojiCategory?ACCENTS[theme]:0x7a1a3560);
+            shape.setCornerRadius(dp(10));
+            chip.setBackground(shape);
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-2,dp(34));
+            lp.setMargins(dp(3),dp(2),dp(3),dp(2));
+            chip.setPadding(dp(9),0,dp(9),0);
+            categories.addView(chip,lp);
+            chip.setOnClickListener(v->{
+                emojiCategory=category;emojiPage=0;rebuild();
+            });
+        }
+        scroller.addView(categories);
+        keysContent.addView(scroller,new LinearLayout.LayoutParams(-1,dp(41)));
+        // Reopen the selection near the currently chosen category.
+        final int selected=emojiCategory;
+        scroller.post(()->{
+            if(selected>=0&&selected<categories.getChildCount()){
+                View child=categories.getChildAt(selected);
+                scroller.scrollTo(Math.max(0,child.getLeft()-dp(22)),0);
+            }
+        });
+    }
+    private void addEmojiPage(){
+        String[] emoji=EmojiCatalog.items(emojiCategory);
+        int start=emojiPage*EMOJIS_PER_PAGE;
+        boolean landscape=getResources().getConfiguration().orientation==2;
+        int height=dp(landscape?38:48);
+        for(int r=0;r<4;r++){
+            LinearLayout row=new LinearLayout(this);
+            row.setGravity(Gravity.CENTER);
+            for(int col=0;col<8;col++){
+                int index=start+r*8+col;
+                if(index<emoji.length){
+                    String e=emoji[index];
+                    addKey(row,e,e,1f,height,false);
+                }else{
+                    TextView empty=new TextView(this);
+                    row.addView(empty,new LinearLayout.LayoutParams(0,height,1f));
+                }
+            }
+            keysContent.addView(row,new LinearLayout.LayoutParams(-1,height+dp(2)));
+        }
+    }
+    private void addEmojiBottom(){
+        LinearLayout row=new LinearLayout(this);
+        row.setGravity(Gravity.CENTER);
+        int height=dp(getResources().getConfiguration().orientation==2?40:50);
+        addKey(row,"ABC","ABC",.9f,height,true);
+        addKey(row,"◀","EMOJI_PREV",.55f,height,true);
+        int pages=(EmojiCatalog.items(emojiCategory).length+EMOJIS_PER_PAGE-1)/EMOJIS_PER_PAGE;
+        TextView count=new TextView(this);
+        count.setGravity(Gravity.CENTER);count.setTextColor(ACCENTS[theme]);
+        count.setTextSize(12);count.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+        count.setText((emojiPage+1)+"/"+Math.max(1,pages));
+        row.addView(count,new LinearLayout.LayoutParams(0,height,.6f));
+        addKey(row,"▶","EMOJI_NEXT",.55f,height,true);
+        addKey(row,"space","SPACE",2.4f,height,true);
+        addKey(row,"⌫","⌫",.85f,height,true);
+        addKey(row,"↵","ENTER",.75f,height,true);
+        keysContent.addView(row,new LinearLayout.LayoutParams(-1,height+dp(2)));
+    }
     private void addBottom(){
         LinearLayout row=new LinearLayout(this);
         row.setGravity(Gravity.CENTER);
@@ -177,6 +261,7 @@ public final class VisionKeyboardService extends InputMethodService {
         if(mode==ABC)addKey(row,"∑","MATH",.95f,height,true);
         else if(mode==MATH)addKey(row,"⚛","SCI",.85f,height,true);
         else addKey(row,"π","MATH",.85f,height,true);
+        addKey(row,"😊","EMOJI",.74f,height,true);
         addKey(row,",",",",.60f,height,false);
         addKey(row,"space","SPACE",3.6f,height,true);
         addKey(row,".",".",.6f,height,false);
@@ -186,6 +271,7 @@ public final class VisionKeyboardService extends InputMethodService {
     private static boolean isAction(String value){
         return value.equals("⇧")||value.equals("⌫")||value.equals("ABC")||
             value.equals("123")||value.equals("MATH")||value.equals("SCI")||
+            value.equals("EMOJI")||value.equals("EMOJI_PREV")||value.equals("EMOJI_NEXT")||
             value.equals("SPACE")||value.equals("ENTER")||value.equals("←");
     }
     private void addKey(LinearLayout row,String display,String output,float weight,int height,boolean special){
@@ -195,7 +281,7 @@ public final class VisionKeyboardService extends InputMethodService {
         b.setText(display);
         b.setIncludeFontPadding(false);
         int length=display.length();
-        b.setTextSize(length>=5?11.5f:length>=4?13f:length>=3?15f:20f);
+        b.setTextSize(mode==EMOJI? (length>4?18f:23f) : length>=5?11.5f:length>=4?13f:length>=3?15f:20f);
         b.setTypeface(Typeface.create("sans-serif",special||isAction(output)?Typeface.BOLD:Typeface.NORMAL));
         b.setTextColor(special?ACCENTS[theme]:Color.WHITE);
         b.setPadding(0,0,0,0);b.setMinimumHeight(0);b.setMinHeight(0);b.setMinimumWidth(0);b.setMinWidth(0);
@@ -265,6 +351,15 @@ public final class VisionKeyboardService extends InputMethodService {
         if(code.equals("123")){mode=NUMBER;shifted=false;rebuild();return;}
         if(code.equals("MATH")){mode=MATH;shifted=false;rebuild();return;}
         if(code.equals("SCI")){mode=SCIENCE;shifted=false;rebuild();return;}
+        if(code.equals("EMOJI")){mode=EMOJI;emojiPage=0;shifted=false;rebuild();return;}
+        if(code.equals("EMOJI_PREV")){
+            int n=(EmojiCatalog.items(emojiCategory).length+EMOJIS_PER_PAGE-1)/EMOJIS_PER_PAGE;
+            emojiPage=(emojiPage+n-1)%Math.max(1,n);rebuild();return;
+        }
+        if(code.equals("EMOJI_NEXT")){
+            int n=(EmojiCatalog.items(emojiCategory).length+EMOJIS_PER_PAGE-1)/EMOJIS_PER_PAGE;
+            emojiPage=(emojiPage+1)%Math.max(1,n);rebuild();return;
+        }
         if(conn==null)return;
         if(code.equals("←")){
             int key=KeyEvent.KEYCODE_DPAD_LEFT;
