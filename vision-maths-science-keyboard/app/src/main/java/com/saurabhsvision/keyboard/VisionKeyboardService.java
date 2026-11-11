@@ -92,8 +92,11 @@ public final class VisionKeyboardService extends InputMethodService {
         if(keyboardFrame==null)return;
         keyboardFrame.removeAllViews();
         keyboardFrame.setTheme(theme);
+        // Default to screen-safe compact mode; optional normal size still auto-fits
+        // if Android's IME container cannot accommodate the natural key heights.
+        keyboardFrame.setCompact(settings().getBoolean("compact_height",true));
         keysContent=keyboardFrame;
-        keysContent.setPadding(dp(3),dp(5),dp(3),dp(7));
+        keysContent.setPadding(dp(3),dp(3),dp(3),dp(4));
         addToolbar();
         if(mode==ABC){
             addRow("Q W E R T Y U I O P");
@@ -143,7 +146,7 @@ public final class VisionKeyboardService extends InputMethodService {
             tab.setBackground(new RippleDrawable(
                 ColorStateList.valueOf(light()?0x402563eb:0x40ffffff),surface,null));
             tab.setElevation(dp(light()?1.2f:.7f));
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(41),i==2||i==3?1.1f:1f);
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(37),i==2||i==3?1.1f:1f);
             lp.setMargins(dp(2),0,dp(2),dp(5));
             bar.addView(tab,lp);
             tab.setContentDescription(i==5?"Change keyboard theme":i==6?"Keyboard settings":"Switch keyboard to "+ids[i]);
@@ -156,14 +159,14 @@ public final class VisionKeyboardService extends InputMethodService {
                     try{startActivity(intent);}catch(RuntimeException ignored){}}
             });
         }
-        keysContent.addView(bar,new LinearLayout.LayoutParams(-1,dp(46)));
+        keysContent.addView(bar,new LinearLayout.LayoutParams(-1,dp(41)));
     }
     private void addRow(String keys){
         String[] labels=keys.split(" ");
         LinearLayout row=new LinearLayout(this);
         row.setGravity(Gravity.CENTER);
         boolean landscape=getResources().getConfiguration().orientation==2;
-        int height=dp(landscape?45:55);
+        int height=dp(landscape?40:48);
         for(String label:labels){
             String display=label;
             String output=label;
@@ -207,7 +210,7 @@ public final class VisionKeyboardService extends InputMethodService {
             });
         }
         scroller.addView(categories);
-        keysContent.addView(scroller,new LinearLayout.LayoutParams(-1,dp(41)));
+        keysContent.addView(scroller,new LinearLayout.LayoutParams(-1,dp(38)));
         // Reopen the selection near the currently chosen category.
         final int selected=emojiCategory;
         scroller.post(()->{
@@ -221,7 +224,7 @@ public final class VisionKeyboardService extends InputMethodService {
         String[] emoji=EmojiCatalog.items(emojiCategory);
         int start=emojiPage*EMOJIS_PER_PAGE;
         boolean landscape=getResources().getConfiguration().orientation==2;
-        int height=dp(landscape?38:48);
+        int height=dp(landscape?34:40);
         for(int r=0;r<4;r++){
             LinearLayout row=new LinearLayout(this);
             row.setGravity(Gravity.CENTER);
@@ -241,7 +244,7 @@ public final class VisionKeyboardService extends InputMethodService {
     private void addEmojiBottom(){
         LinearLayout row=new LinearLayout(this);
         row.setGravity(Gravity.CENTER);
-        int height=dp(getResources().getConfiguration().orientation==2?40:50);
+        int height=dp(getResources().getConfiguration().orientation==2?38:47);
         addKey(row,"ABC","ABC",.9f,height,true);
         addKey(row,"◀","EMOJI_PREV",.55f,height,true);
         int pages=(EmojiCatalog.items(emojiCategory).length+EMOJIS_PER_PAGE-1)/EMOJIS_PER_PAGE;
@@ -259,7 +262,7 @@ public final class VisionKeyboardService extends InputMethodService {
     private void addBottom(){
         LinearLayout row=new LinearLayout(this);
         row.setGravity(Gravity.CENTER);
-        int height=dp(getResources().getConfiguration().orientation==2?45:55);
+        int height=dp(getResources().getConfiguration().orientation==2?43:51);
         if(mode!=ABC)addKey(row,"ABC","ABC",1.10f,height,true);
         else addKey(row,"123","123",1.05f,height,true);
         if(mode==ABC)addKey(row,"∑","MATH",.95f,height,true);
@@ -267,7 +270,7 @@ public final class VisionKeyboardService extends InputMethodService {
         else addKey(row,"π","MATH",.85f,height,true);
         addKey(row,"😊","EMOJI",.74f,height,true);
         addKey(row,",",",",.60f,height,false);
-        addKey(row,"space","SPACE",3.6f,height,true);
+        addKey(row,"SPACE","SPACE",3.75f,height,true);
         addKey(row,".",".",.6f,height,false);
         addKey(row,"↵","ENTER",1.05f,height,true);
         keysContent.addView(row,new LinearLayout.LayoutParams(-1,height+dp(3)));
@@ -285,7 +288,9 @@ public final class VisionKeyboardService extends InputMethodService {
         b.setText(display);
         b.setIncludeFontPadding(false);
         int length=display.length();
-        b.setTextSize(mode==EMOJI? (length>4?18f:23f) : length>=5?11.5f:length>=4?13f:length>=3?15f:20f);
+        b.setTextSize("SPACE".equals(output)?14f:
+            (mode==EMOJI? (length>4?18f:23f) :
+            length>=5?11.5f:length>=4?13f:length>=3?15f:20f));
         b.setTypeface(Typeface.create(special?"sans-serif-medium":"sans-serif",
             special||isAction(output)?Typeface.BOLD:Typeface.NORMAL));
         final boolean enter="ENTER".equals(output);
@@ -315,7 +320,7 @@ public final class VisionKeyboardService extends InputMethodService {
         LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,height-dp(4),weight);
         lp.setMargins(dp(2.4f),dp(1.1f),dp(2.4f),dp(2.5f));
         row.addView(b,lp);
-        b.setContentDescription("⌫".equals(output)?"Delete last character":("SPACE".equals(output)?"Space":output));
+        b.setContentDescription("⌫".equals(output)?"Delete last character":("SPACE".equals(output)?"Spacebar - insert space":output));
         if("⌫".equals(output)){
             b.setOnTouchListener((view,event)->{
                 switch(event.getActionMasked()){
