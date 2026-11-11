@@ -133,7 +133,9 @@ public final class VisionKeyboardService extends InputMethodService {
         keysContent=keyboardFrame;
         suggestionChips=null;
         romanPreview=null;
-        keysContent.setPadding(dp(3),dp(3),dp(3),dp(4));
+        // Keep the fourth, Space/Enter row above the device navigation inset.
+        // Bottom inset is measured by KeyboardPanel and never overlays letter keys.
+        keysContent.setPadding(dp(3),dp(5),dp(3),dp(18));
         addToolbar();
         if(mode==LANGUAGE){
             addLanguagePicker();
@@ -145,25 +147,25 @@ public final class VisionKeyboardService extends InputMethodService {
 
             addRow("Q W E R T Y U I O P");
             addRow("A S D F G H J K L");
-            // Keep Space/Enter one physical row ABOVE the last alphabet row.
-            // Some Android OEM navigation bars previously covered the last row.
-            addBottom();
+            // Exactly three letter rows followed by a separate fourth action row.
+            // Do NOT replace or shift any letters to make the Spacebar visible.
             addRow("⇧ Z X C V B N M ⌫");
+            addBottom();
         }else if(mode==NUMBER){
             addRow("1 2 3 4 5 6 7 8 9 0");
             addRow("@ # ₹ % & - + ( ) /");
-            addBottom();
             addRow("* \" ' : ; ! ? = ← ⌫");
+            addBottom();
         }else if(mode==MATH){
             addRow("π √ ∑ ∞ ≈ ≠ ≤ ≥ ± ×");
             addRow("÷ ∫ ∂ Δ θ α β γ Ω μ");
-            addBottom();
             addRow("sin( cos( tan( log( ln( x² x³ ^ → ⌫");
+            addBottom();
         }else if(mode==SCIENCE){
             addRow("H₂O CO₂ O₂ NaCl H⁺ OH⁻ e⁻ pH DNA RNA");
             addRow("→ ⇌ ↑ ↓ °C K mol kg m/s N");
-            addBottom();
             addRow("α β γ λ μ Ω Δ ∝ ∴ ⌫");
+            addBottom();
         }else{
             addEmojiCategories();
             addEmojiPage();
@@ -278,7 +280,7 @@ public final class VisionKeyboardService extends InputMethodService {
             });
         }
         scroller.addView(bar);
-        int toolHeight=dp(getResources().getConfiguration().orientation==2?39:44);
+        int toolHeight=dp(getResources().getConfiguration().orientation==2?49:51);
         keysContent.addView(scroller,new LinearLayout.LayoutParams(-1,toolHeight));
         if(active!=null && mode!=ABC){
             final View item=active;
@@ -382,7 +384,7 @@ public final class VisionKeyboardService extends InputMethodService {
         LinearLayout row=new LinearLayout(this);
         row.setGravity(Gravity.CENTER);
         boolean landscape=getResources().getConfiguration().orientation==2;
-        int height=dp(landscape?35:47);
+        int height=dp(landscape?49:55);
         for(String label:labels){
             String display=label;
             String output=label;
@@ -609,7 +611,7 @@ public final class VisionKeyboardService extends InputMethodService {
         LinearLayout row=new LinearLayout(this);
         row.setTag("sboard_space_action");
         row.setGravity(Gravity.CENTER);
-        int height=dp(getResources().getConfiguration().orientation==2?41:51);
+        int height=dp(getResources().getConfiguration().orientation==2?57:62);
         addKey(row,mode==ABC?"?123":"ABC",mode==ABC?"123":"ABC",1.02f,height,true);
         addKey(row,"☺","EMOJI",.82f,height,true);
         addKey(row,"A↔अ","LANG_TOGGLE",.85f,height,true);
