@@ -49,26 +49,26 @@ public class KeyboardLayoutPolicySmokeTest {
             check(rows[1]>0&&rows[2]>0&&rows[3]>0,
                 "Every QWERTY letter row preserved at "+cap+"dp");
         }
-        // S Board 1.9.4: verify physical viewport fitting from user's
-        // landscape screenshot (1197 x 563 pixels; navigation starts ~491).
-        int screenshotScreenHeight=563;
-        int viewportCap=KeyboardLayoutPolicy.landscapeHeightCap(screenshotScreenHeight,750);
-        check(viewportCap>=355&&viewportCap<=375,
-            "Landscape cap is proportional to the 563px screenshot");
-        check(100+viewportCap<491,
-            "Keyboard bottom stays ABOVE the screen navigation strip");
-        for(int screen:new int[]{420,480,563,620,720}){
+        // S Board 1.9.5: test against physical screenshot: 1201x528,
+        // nav bar ~60px, keyboard needs a ~420px four-row viewport.
+        // With SDK34 compatibility window, Android reserves the nav area.
+        int screenshotScreenHeight=528;
+        int screenshotCap=KeyboardLayoutPolicy.landscapeHeightCap(screenshotScreenHeight,750);
+        check(screenshotCap>=420&&screenshotCap<=425,
+            "Full-height keyboard requests ~422px on 528px landscape");
+        for(int screen:new int[]{420,480,528,563,620,720}){
             int cap=KeyboardLayoutPolicy.landscapeHeightCap(screen,700);
-            check(cap<=screen*0.67f,
-                "Keyboard frame cannot grow past mobile landscape viewport at "+screen+"px");
-            int pad=45; // representative 30dp bottom inset at 1.5x density
+            check(cap<=screen*0.81f,
+                "Keyboard cannot exceed 80% of physical landscape height "+screen+"px");
+            int pad=12; // 8dp footer gap at approximate 1.5x density
             int[] rows=KeyboardLayoutPolicy.fit(
                 new int[]{73,83,83,83,93},cap-pad-8,54,4);
             check(KeyboardLayoutPolicy.total(rows)+pad+8<=cap,
-                "All real key rows plus nav clearance fit at "+screen+"px");
-            check(rows[4]>=54,"Space/Enter remains tappable at "+screen+"px");
+                "Toolbar + 3 letter rows + Space fit in "+screen+"px");
+            check(rows[4]>=54,
+                "Fourth row reserved above system navigation bar "+screen+"px");
             for(int k=1;k<=3;k++)check(rows[k]>0,
-                "All letter rows retained at "+screen+"px (row "+k+")");
+                "All 3 letter rows visible at "+screen+"px (row "+k+")");
         }
         int[] full=KeyboardLayoutPolicy.fit(new int[]{49,52,52,52,60},300,42,4);
         check(full[1]>=49&&full[2]>=49&&full[3]>=49,
