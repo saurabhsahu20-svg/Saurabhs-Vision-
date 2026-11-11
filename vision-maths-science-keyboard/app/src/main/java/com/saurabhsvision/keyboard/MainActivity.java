@@ -183,6 +183,25 @@ public final class MainActivity extends Activity {
         });
         refreshHeight.run();
 
+        add(root,text("✨ Photo-Style Keyboard Layout",21,NAVY,true),25);
+        add(root,text("The reference design has one neon toolbar and three letter rows above a wide glowing Space key. Smart word suggestions are optional: OFF matches the picture; ON shows local word completions without Internet access.",14,0xff496284,false),7);
+        TextView suggestionStatus=text("",14,0xff1746ad,true);
+        add(root,suggestionStatus,9);
+        Runnable refreshSuggestions=()->suggestionStatus.setText(
+            getSharedPreferences(PREFS,MODE_PRIVATE).getBoolean("show_suggestions",false)
+                ?"Smart suggestions: ON (extra typing strip)"
+                :"Smart suggestions: OFF (picture-style layout)");
+        Button suggestions=button("Toggle Smart Suggestions",0xffe1f5ff,NAVY);
+        add(root,suggestions,9);
+        suggestions.setOnClickListener(v->{
+            SharedPreferences prefs=getSharedPreferences(PREFS,MODE_PRIVATE);
+            boolean enabled=!prefs.getBoolean("show_suggestions",false);
+            prefs.edit().putBoolean("show_suggestions",enabled).apply();
+            refreshSuggestions.run();
+            showMessage("Reopen S Board to apply the suggestion layout.");
+        });
+        refreshSuggestions.run();
+
         add(root,text("🎨 Premium Keyboard Themes",21,NAVY,true),29);
         add(root,text("5 professional themes • 4 Neon + 1 Pure White / Light",13,0xff54708e,false),5);
         themeStatus=text("",15,0xff16519a,true);
@@ -246,7 +265,7 @@ public final class MainActivity extends Activity {
         features.setBackground(box(Color.WHITE,18));
         add(root,features,27);
         add(features,text("✨ What's Inside",18,NAVY,true),0);
-        add(features,text("• 🌐 22 Indian languages + English and Hinglish Roman typing\n• Hindi phonetic: namaste → नमस्ते, mera → मेरा\n• Compact keyboard height: no more full-screen empty background\n• ABC QWERTY, Shift/Caps, Numbers, Maths and Science\n• 😊 Emoji keyboard with 923 options across 11 categories\n• Faces, love, feelings, gestures, people, animals and more\n• Previous/next emoji pages and responsive key touch effects\n• Backspace repeat, cursor arrows, Space and Enter",14,0xff3d5a7b,false),11);
+        add(features,text("• 🌐 22 Indian languages + English and Hinglish Roman typing\n• Hindi phonetic: namaste → नमस्ते, mera → मेरा\n• Picture-style neon QWERTY layout and glowing wide Spacebar\n• Optional offline suggestions; OFF matches the reference image\n• Compact keyboard height: no more full-screen empty background\n• ABC QWERTY, Shift/Caps, Numbers, Maths and Science\n• 😊 Emoji keyboard with 923 options across 11 categories\n• Faces, love, feelings, gestures, people, animals and more\n• Previous/next emoji pages and responsive key touch effects\n• Backspace repeat, cursor arrows, Space and Enter",14,0xff3d5a7b,false),11);
 
         add(root,text("🔒 Your Typing Stays Private",20,NAVY,true),25);
         add(root,text("इस keyboard को Internet permission नहीं दी गई है। यह आपकी typing history, passwords या clipboard को save या किसी server पर upload नहीं करता। आपके typed characters सिर्फ खुले हुए text field तक भेजे जाते हैं। Android नए keyboard को enable करते समय सामान्य सुरक्षा चेतावनी दिखाता है।",14,0xff445d7f,false),9);
