@@ -86,3 +86,11 @@ The original, newly generated blue-neon keyboard and gold book/graduation-cap ar
 The app's name, setup call-to-action, keyboard display name and theme preview now use **Saune Board** branding. Android's InputMethodService stays separate from the splash, so the animation never delays typing in other apps. The setup screen also displays whether the keyboard is enabled and currently selected as default.
 
 **Retained**: ABC, Maths, Science, numbers, Emoji categories, 5 themes including White, compact Space/Enter, 24 language options, basic offline phonetic transliteration, no Internet permission. Install as a debug-signed TEST APK and test on real Android hardware before production.
+
+## Version 1.6 — S Board (Spacebar repaired)
+
+The installed app name is now **S Board**, with an original blue/gold **S** lettermark app icon and the same logo in the animated launcher intro. The Android application ID and functionality remain unchanged so this is an update to the same keyboard.
+
+**Important WhatsApp Spacebar bug:** Previous height-fix attempts left the bottom action row cropped because the IME container's inherited LinearLayout measuring step didn't guarantee all children fit their measured window. The new `KeyboardPanel` has explicit `onMeasure` **and** `onLayout` methods and a pure-Java `KeyboardLayoutPolicy`: every child is measured EXACTLY to the allocated width and height, and the bottom action row is reserved before allocating typing rows. Layout tests cover small landscape/portrait, Hindi, emoji and language-selection cases. `␣` in the top toolbar is a **backup Space button** if a device's system UI still clips the footer; the full SPACE key also remains at the bottom. Compact height defaults to a safe value. White and 4 neon themes, Maths, Science, emoji and Indic phonetic typing remain.
+
+The new vector launcher icon is intentionally original, not copied from Google Gboard. Android system launchers generally show static app icons; the S Board activity has a matching animated splash. GitHub CI checks compile, layout regression tests and APK signing, while physical WhatsApp/Gboard-like keyboard behavior still needs on-device testing.

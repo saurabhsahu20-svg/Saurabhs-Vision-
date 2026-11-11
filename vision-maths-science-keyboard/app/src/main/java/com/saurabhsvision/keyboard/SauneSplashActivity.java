@@ -3,8 +3,7 @@ package com.saurabhsvision.keyboard;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
@@ -22,10 +21,9 @@ import android.view.View;
 import android.view.MotionEvent;
 
 /**
- * SAUNE BOARD branded native animated launch screen.
+ * S BOARD branded native animated launch screen.
  *
- * Android launcher app icons are static on ordinary launchers: the sixth
- * final frame of the supplied Saune Board logo is the installed app icon.
+ * Android launcher app icons are static on ordinary launchers: a custom S Board lettermark is the installed app icon.
  * This 60fps Canvas animation brings that SAME logo alive when the app opens,
  * without network access, video codecs or ongoing background work.
  */
@@ -61,7 +59,7 @@ public final class SauneSplashActivity extends Activity {
 
     final class SauneLogoStage extends View {
         private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
-        private final Bitmap logo;
+        private final Drawable logo;
         private ValueAnimator animation;
         private float phase=0;
         private int cyan=0xff62e8ff,gold=0xffffca56;
@@ -69,9 +67,9 @@ public final class SauneSplashActivity extends Activity {
 
         SauneLogoStage(){
             super(SauneSplashActivity.this);
-            logo=BitmapFactory.decodeResource(getResources(),R.drawable.saune_board_icon);
+            logo=SauneSplashActivity.this.getDrawable(R.drawable.s_board_icon);
             setLayerType(View.LAYER_TYPE_SOFTWARE,null);
-            setContentDescription("Animated Saune Board Maths and Science keyboard logo");
+            setContentDescription("Animated S Board Maths and Science keyboard logo");
             setClickable(true);
         }
         @Override protected void onAttachedToWindow(){
@@ -113,13 +111,12 @@ public final class SauneSplashActivity extends Activity {
                 new float[]{0f,.53f,1f},Shader.TileMode.CLAMP));
             canvas.drawCircle(x,y,extent,paint);paint.setShader(null);
 
-            // The icon's EXACT final-frame imagery, not a redraw from Google.
-            if(logo!=null&&!logo.isRecycled()){
-                float s=diameter*pulse;
-                Rect src=new Rect(0,0,logo.getWidth(),logo.getHeight());
-                RectF dst=new RectF(x-s/2,y-s/2,x+s/2,y+s/2);
-                paint.reset();paint.setAntiAlias(true);paint.setFilterBitmap(true);
-                canvas.drawBitmap(logo,src,dst,paint);
+            // Our original S Board lettermark, shared by splash and launcher.
+            if(logo!=null){
+                float size=diameter*pulse;
+                logo.setBounds((int)(x-size/2f),(int)(y-size/2f),
+                    (int)(x+size/2f),(int)(y+size/2f));
+                logo.draw(canvas);
             }
 
             // Subtle travelling blue and gold orbital light strips.
@@ -146,7 +143,7 @@ public final class SauneSplashActivity extends Activity {
             }
 
             float baseline=y+diameter*.65f;
-            label(canvas,"SAUNE BOARD",x,baseline,
+            label(canvas,"S BOARD",x,baseline,
                 Math.min(w*.087f,dp(34)),Color.WHITE,true);
             label(canvas,"MATHS  •  SCIENCE  •  INDIAN LANGUAGES",x,
                 baseline+dp(32),Math.min(w*.031f,dp(12)),0xffa8d8ff,false);

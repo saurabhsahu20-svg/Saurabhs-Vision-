@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- Original S Board identity: a shining S above a scientific keyboard. -->
+    <path android:fillColor="#06142E" android:pathData="M20,3 C10,3 3,11 3,20 L3,88 C3,99 12,105 22,105 L86,105 C97,105 105,97 105,86 L105,21 C105,11 97,3 87,3 Z"/>
+    <path android:strokeColor="#1A9DDC" android:strokeWidth="2"
+        android:fillColor="#142B59"
+        android:pathData="M20,10 L88,10 Q98,10 98,20 L98,88 Q98,98 88,98 L20,98 Q10,98 10,88 L10,20 Q10,10 20,10 Z"/>
+    <path android:fillColor="#1B74B5" android:fillAlpha="0.65"
+        android:pathData="M24,17 L84,17 Q91,17 91,25 L91,76 L17,76 L17,25 Q17,17 24,17 Z"/>
+    <path android:strokeColor="#FFD45A" android:strokeWidth="6.5"
+        android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M71,33 C63,22 43,23 36,31 C25,44 42,50 55,53 C70,58 76,66 65,77 C56,86 40,83 33,75"/>
+    <path android:strokeColor="#7AF4FF" android:strokeWidth="1.5" android:strokeLineCap="round"
+        android:fillColor="#00000000" android:pathData="M27,32 Q16,49 28,67 M80,32 Q93,50 79,69"/>
+    <path android:fillColor="#6AEBFF" android:pathData="M17,80 L90,80 L90,91 L17,91 Z"/>
+    <path android:fillColor="#0B3564" android:pathData="M20,81 L87,81 L87,89 L20,89 Z"/>
+    <path android:fillColor="#C6F9FF" android:pathData="M24,83 L32,83 L32,87 L24,87 Z M36,83 L44,83 L44,87 L36,87 Z M48,83 L60,83 L60,87 L48,87 Z M64,83 L72,83 L72,87 L64,87 Z M76,83 L84,83 L84,87 L76,87 Z"/>
+    <path android:fillColor="#FFD45A" android:pathData="M24,20 L28,20 L26,16 Z M82,20 L86,20 L84,16 Z"/>
+</vector>

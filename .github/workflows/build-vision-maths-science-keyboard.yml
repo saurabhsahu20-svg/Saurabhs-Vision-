@@ -68,7 +68,7 @@ jobs:
           assert 'RECORD_AUDIO' not in manifest
           assert 'ACTION_INPUT_METHOD_SETTINGS' in activity
           assert 'showInputMethodPicker' in activity
-          assert 'SAUNE' in activity and 'BOARD' in activity and 'Maths • Science' in activity
+          assert 'S BOARD' in activity and 'Maths • Science' in activity
           panel=(root/'java/com/saurabhsvision/keyboard/KeyboardPanel.java').read_text()
           emojis=(root/'java/com/saurabhsvision/keyboard/EmojiCatalog.java').read_text()
           assert 'extends LinearLayout' in panel
@@ -93,9 +93,9 @@ jobs:
           assert 'Spacebar - insert space' in ime
           assert 'setCompact(settings().getBoolean("compact_height",true))' in ime
           assert 'adjustKeysInside' in panel
-          assert 'heights[count-1]=footer' in panel
+          assert 'KeyboardLayoutPolicy.fit' in panel and 'onLayout(boolean changed' in panel
           assert 'Math.min(cap,View.MeasureSpec.getSize(heightSpec))' in panel
-          assert 'Math.max(1,budget-footer-toolbar)' in panel
+          assert 'Math.max(1,availableWidth' in panel
           assert 'Compact Keyboard (Recommended)' in activity
           assert 'Comfortable / Larger Keyboard' in activity
           assert (root/'java/com/saurabhsvision/keyboard/IndicLanguages.java').is_file()
@@ -109,21 +109,23 @@ jobs:
           assert 'languageSpinner' in activity
           assert 'Hinglish' in activity
           from pathlib import Path
-          logo=root/'res/drawable-nodpi/saune_board_icon.webp'
-          assert logo.is_file() and logo.stat().st_size>2000
-          bits=logo.read_bytes()
-          assert bits[:4]==b'RIFF' and bits[8:12]==b'WEBP'
+          logo=root/'res/drawable/s_board_icon.xml'
+          assert logo.is_file() and 'strokeColor' in logo.read_text()
+          
           splash=(root/'java/com/saurabhsvision/keyboard/SauneSplashActivity.java').read_text()
           manifest=(root/'AndroidManifest.xml').read_text()
           strings=(root/'res/values/strings.xml').read_text()
-          assert 'SauneSplashActivity' in manifest and 'saune_board_icon' in manifest
-          assert '<string name="app_name">Saune Board</string>' in strings
-          assert 'ValueAnimator' in splash and 'R.drawable.saune_board_icon' in splash
+          assert 'SauneSplashActivity' in manifest and 's_board_icon' in manifest
+          assert '<string name="app_name">S Board</string>' in strings
+          assert 'ValueAnimator' in splash and 'R.drawable.s_board_icon' in splash
           assert 'handler.postDelayed(enterApp,2400)' in splash
           assert 'new Intent(this,MainActivity.class)' in splash
-          assert 'animatedLogoBadge.setImageResource(R.drawable.saune_board_icon)' in activity
+          assert 'animatedLogoBadge.setImageResource(R.drawable.s_board_icon)' in activity
           assert 'refreshSetupStatus()' in activity
-          print('Saune Board branding, submitted frame icon, animated splash and setup status verified')
+          assert 'idx==6){press("SPACE")' in ime
+          assert 'setMeasuredDimension(width,Math.min(cap' in panel
+          assert 'child.layout(x,y,x+w,y+height)' in panel
+          print('S Board branding, original vector icon, animated splash and setup status verified')
 
           print('24 language choices, phonetic composition, secure-password fallback verified')
           print('Space/Enter bottom row priority, adaptive fit, compact settings verified')
@@ -146,6 +148,17 @@ jobs:
             "vision-maths-science-keyboard/PhoneticSmokeTest.java"
           java -ea -cp "$out" PhoneticSmokeTest
 
+      - name: Regression test spacebar always fits
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="vision-maths-science-keyboard"
+          src="$base/app/src/main/java/com/saurabhsvision/keyboard"
+          out="$RUNNER_TEMP/keyboard-layout-test"
+          mkdir -p "$out"
+          javac -encoding UTF-8 -d "$out" "$src/KeyboardLayoutPolicy.java" "$base/KeyboardLayoutPolicySmokeTest.java"
+          java -ea -cp "$out" KeyboardLayoutPolicySmokeTest
+
       - name: Compile APK
         shell: bash
         run: |
@@ -164,13 +177,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/Saune_Board_v1.5.0_Neon_Icon_TEST.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.6.0_SPACEBAR_FIXED_TEST.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Saune_Board_v1_5_Neon_Icon_APK
+          name: S_Board_v1_6_Spacebar_Protected_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -180,13 +193,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="saune-board-v1.5.0"
-          file="keyboard-deliverables/Saune_Board_v1.5.0_Neon_Icon_TEST.apk"
+          tag="s-board-v1.6.0"
+          file="keyboard-deliverables/S_Board_v1.6.0_SPACEBAR_FIXED_TEST.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "Saune Board 1.5 • Animated Neon Logo + Professional Keyboard" \
-              --notes "SAUNE BOARD 1.5 TEST APK: premium original user-approved blue/gold Maths & Science logo final frame is installed as the static Android launcher icon, plus a matching smoothly animated startup screen with glowing orbits and pulsating logo. Android standard launcher icons are static; animation runs when opening the app, not continuously on the home screen. Renamed display brand to Saune Board by Saurabhs Vision without changing package ID; added helpful Enabled / Default keyboard status. Retains five premium themes including Pure White, ABC/Maths/Science, 11 emoji categories, compact Space/Enter, 24 language choices with offline Hindi/Hinglish phonetic input and no INTERNET permission. GitHub CI verifies packaged logo asset, splash wiring, compilation and APK signature. Physical device test still required." \
+              --title "S Board 1.6 • Fixed Spacebar + Premium Maths Science Keyboard" \
+              --notes "S BOARD 1.6 TEST APK: fixes Spacebar and Enter row clipping in WhatsApp and restricted Android IME viewports by replacing inherited LinearLayout measurement with explicit child measurement and layout; reserved footer height is verified in pure Java tests for small landscape, portrait, Hindi, Emoji and language picker. Always-visible backup Space shortcut in toolbar. Display name and launcher app icon changed to S Board with original blue-gold S keyboard logo and matching animated startup. Package ID unchanged to allow updates; Maths, Science, Hinglish, 24-language choices, 923 emoji entries, white+neon themes and offline privacy retained. Build, APK signature and layout-policy tests pass in CI. Physical device testing still required." \
               --latest=false
           fi

@@ -80,28 +80,28 @@ public final class MainActivity extends Activity {
         copy.setPadding(dp(20),dp(17),dp(114),dp(17));
         hero.addView(copy,new FrameLayout.LayoutParams(-1,-1));
         add(copy,text("BY SAURABH'S VISION™",12,GOLD,true),0);
-        add(copy,text("SAUNE\nBOARD",32,Color.WHITE,true),8);
+        add(copy,text("S BOARD",34,Color.WHITE,true),8);
         add(copy,text("Maths • Science • Languages",13,0xffbde9ff,false),7);
         add(copy,text("π  √  ∑  ∞  ⚛  🧬  😊",18,0xff8df0ff,true),12);
         ImageView animatedLogoBadge=new ImageView(this);
-        animatedLogoBadge.setImageResource(R.drawable.saune_board_icon);
+        animatedLogoBadge.setImageResource(R.drawable.s_board_icon);
         animatedLogoBadge.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        animatedLogoBadge.setContentDescription("Saune Board premium blue-gold keyboard logo");
+        animatedLogoBadge.setContentDescription("S Board premium blue-gold keyboard logo");
         FrameLayout.LayoutParams badgeParams=new FrameLayout.LayoutParams(dp(105),dp(105),
             Gravity.RIGHT|Gravity.CENTER_VERTICAL);
         badgeParams.rightMargin=dp(8);
         hero.addView(animatedLogoBadge,badgeParams);
         LinearLayout.LayoutParams hp=new LinearLayout.LayoutParams(-1,dp(222));root.addView(hero,hp);
 
-        add(root,text("⌨️ Set Up Saune Board",20,NAVY,true),25);
+        add(root,text("⌨️ Set Up S Board",20,NAVY,true),25);
         add(root,text("एक बार keyboard enable करें, फिर default keyboard चुनें। उसके बाद WhatsApp, Notes और दूसरे text fields में भी इस्तेमाल कर पाएँगे।",14,0xff496284,false),10);
-        Button enable=button("① Enable Saune Board Keyboard",0xff1949ad,Color.WHITE);
+        Button enable=button("① Enable S Board Keyboard",0xff1949ad,Color.WHITE);
         add(root,enable,15);
         enable.setOnClickListener(v->{
             try{startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));}
             catch(RuntimeException e){showMessage("Keyboard Settings नहीं खुल सकीं। Android Settings → System → Keyboard पर जाएँ।");}
         });
-        Button choose=button("② Set Saune Board as Default",GOLD,NAVY);
+        Button choose=button("② Set S Board as Default",GOLD,NAVY);
         add(root,choose,10);
         choose.setOnClickListener(v->{
             InputMethodManager manager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -279,7 +279,7 @@ public final class MainActivity extends Activity {
         boolean selected=current!=null&&current.startsWith(getPackageName()+"/");
         setupStatus.setText(
             (enabled?"✅ Keyboard enabled":"① Enable keyboard in Android settings")+"\n"+
-            (selected?"✅ Saune Board selected":"② Choose Saune Board as your keyboard"));
+            (selected?"✅ S Board selected":"② Choose S Board as your keyboard"));
     }
     private void showTheme(){
         int current=Math.max(0,Math.min(4,getSharedPreferences(PREFS,MODE_PRIVATE).getInt("theme",0)));
