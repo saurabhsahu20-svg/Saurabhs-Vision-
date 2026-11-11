@@ -142,7 +142,7 @@ async function onSubmit(event){const form=event.target,id=form.id;const d=Object
         d.preferredTime?'Preferred time: '+String(d.preferredTime).trim():'',
         d.message?'Question: '+String(d.message).trim():'',
         'Please share the next steps. Thank you.'
-      ].filter(Boolean).join('\\n');
+      ].filter(Boolean).join('\n');
       const link='https://wa.me/918085808586?text='+encodeURIComponent(lines);
       window.open(link,'_blank','noopener,noreferrer');
       status('#form-status','WhatsApp draft opened. Review it and tap Send in WhatsApp. This site has not submitted or stored your enquiry.','success');
