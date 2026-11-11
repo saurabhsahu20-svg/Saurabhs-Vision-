@@ -56,7 +56,7 @@ jobs:
           method=(root/'res/xml/method.xml').read_text()
           for token in ('extends InputMethodService','onCreateInputView','onStartInputView',
                         'getCurrentInputConnection','commitText','deleteSurroundingText',
-                        'performEditorAction','addToolbar','addRow','startRepeat','Theme',
+                        'performEditorAction','addToolbar','addRow','startRepeat','KEY_THEME',
                         'π √ ∑ ∞','H₂O CO₂ O₂'):
               assert token in ime, ('Missing key or IME behavior',token)
           assert 'android.permission.BIND_INPUT_METHOD' in manifest
@@ -68,7 +68,7 @@ jobs:
           assert 'RECORD_AUDIO' not in manifest
           assert 'ACTION_INPUT_METHOD_SETTINGS' in activity
           assert 'showInputMethodPicker' in activity
-          assert 'Maths & Science' in activity
+          assert 'MATHS & SCIENCE' in activity
           assert 'extends View' in bg
           print('Keyboard functional/input/privacy contracts checked.')
           PY
