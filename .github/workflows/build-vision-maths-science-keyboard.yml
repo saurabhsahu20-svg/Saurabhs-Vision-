@@ -235,35 +235,6 @@ jobs:
           cp "$apk" keyboard-deliverables/S_Board_v1.9.5_REAL_IME_FIX.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
-      - name: Enable KVM acceleration for Android Emulator
-        shell: bash
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-sboard-kvm.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
-      - name: Real Android 15 emulator — full Spacebar visibility
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 35
-          target: default
-          arch: x86_64
-          profile: pixel_6
-          disable-animations: true
-          emulator-boot-timeout: 900
-          script: bash vision-maths-science-keyboard/scripts/verify_spacebar_visible.sh
-
-      - name: Save emulator keyboard screenshot for visibility audit
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: S_Board_1_9_5_Emulator_Visibility_Audit
-          path: |
-            /tmp/sboard-visual.png
-            /tmp/sboard-window.xml
-          if-no-files-found: ignore
-          retention-days: 30
-
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
@@ -287,3 +258,35 @@ jobs:
               --notes "S Board 1.9.5 fixes the cropped bottom Space/Enter row using Android 15 IME navigation-bar compatibility rather than another padding-only adjustment. The debug sideload build temporarily targets SDK 34 to avoid Android 15's enforced edge-to-edge navigation overlay, while still compiling with SDK 35. The keyboard reads the physical display dimensions and requests its true safe landscape height, with only 8dp internal bottom spacing. QWERTY's three complete rows plus a fourth row with Space, emoji, Hindi-English, punctuation and Enter remain intact. Maths, Science, offline phonetic languages and the neon theme are unchanged. Automated tests verify layout, Hindi typing, signing and an Android 15 emulator Space-key visibility probe. Please verify on the actual phone before treating the OEM-specific issue as resolved; target SDK must be modernized again with proper insets for Play Store submission." \
               --latest=false
           fi
+
+      - name: Enable KVM acceleration for Android Emulator
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-sboard-kvm.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Real Android 15 emulator — full Spacebar visibility
+        if: github.event_name == 'workflow_dispatch'
+        continue-on-error: true
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: default
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-boot-timeout: 900
+          script: bash vision-maths-science-keyboard/scripts/verify_spacebar_visible.sh
+
+      - name: Save emulator keyboard screenshot for visibility audit
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: S_Board_1_9_5_Emulator_Visibility_Audit
+          path: |
+            /tmp/sboard-visual.png
+            /tmp/sboard-window.xml
+          if-no-files-found: ignore
+          retention-days: 30
