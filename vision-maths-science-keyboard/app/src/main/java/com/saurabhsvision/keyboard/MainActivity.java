@@ -132,7 +132,7 @@ public final class MainActivity extends Activity {
         add(root,text("नीचे बॉक्स पर टैप करें और Maths/Science keyboard से लिखकर देखें:",14,0xff496284,false),8);
         EditText test=new EditText(this);
         test.setTextSize(17);test.setTextColor(NAVY);
-        test.setTextColorHint(0xff6785a0);
+        test.setHintTextColor(0xff6785a0);
         test.setHint("Try: π × r², H₂O, E = mc²");
         test.setSingleLine(false);test.setMinLines(3);
         test.setPadding(dp(15),dp(12),dp(15),dp(12));
