@@ -96,6 +96,30 @@ public final class MainActivity extends Activity {
             else showMessage("Android keyboard picker उपलब्ध नहीं है।");
         });
 
+        add(root,text("📏 Keyboard Height & Spacebar",20,NAVY,true),26);
+        add(root,text("Compact height is recommended on phones where the bottom SPACE / ENTER row was hidden. Both options automatically fit their rows inside the available screen height.",14,0xff496284,false),7);
+        TextView heightStatus=text("",14,0xff1848a0,true);
+        add(root,heightStatus,9);
+        Runnable refreshHeight=()->heightStatus.setText(
+            getSharedPreferences(PREFS,MODE_PRIVATE).getBoolean("compact_height",true)
+                ?"Selected: Compact (Recommended) — Spacebar visible"
+                :"Selected: Comfortable — adjusts to available screen height");
+        Button compact=button("✅ Compact Keyboard (Recommended)",0xff2360c6,Color.WHITE);
+        add(root,compact,9);
+        compact.setOnClickListener(v->{
+            getSharedPreferences(PREFS,MODE_PRIVATE).edit().putBoolean("compact_height",true).apply();
+            refreshHeight.run();
+            showMessage("Compact keyboard enabled. Close and reopen the keyboard.");
+        });
+        Button comfortable=button("Comfortable / Larger Keyboard",0xffe5edfb,NAVY);
+        add(root,comfortable,7);
+        comfortable.setOnClickListener(v->{
+            getSharedPreferences(PREFS,MODE_PRIVATE).edit().putBoolean("compact_height",false).apply();
+            refreshHeight.run();
+            showMessage("Comfortable layout enabled. The Spacebar will still auto-fit.");
+        });
+        refreshHeight.run();
+
         add(root,text("🎨 Premium Keyboard Themes",21,NAVY,true),29);
         add(root,text("5 professional themes • 4 Neon + 1 Pure White / Light",13,0xff54708e,false),5);
         themeStatus=text("",15,0xff16519a,true);
