@@ -43,7 +43,14 @@ await check('mobile-navigation',async(page)=>{
   assert.ok(await page.locator('.mobile-panel').isVisible(),'mobile menu visible');
   await page.locator('.mobile-panel a[href="#/courses"]').click();
   assert.ok(page.url().includes('#/courses'),'mobile navigation changes route');
-  const dimensions=await page.evaluate(()=>({document:document.documentElement.scrollWidth,viewport:innerWidth}));
+  const dimensions=await page.evaluate(()=>{
+    const offenders=[...document.querySelectorAll('body *')].map(el=>({
+      name:el.tagName.toLowerCase()+'.'+String(el.className||'').replaceAll(' ','\.'),
+      text:(el.textContent||'').trim().slice(0,40),
+      right:Math.round(el.getBoundingClientRect().right),left:Math.round(el.getBoundingClientRect().left)
+    })).filter(el=>el.right>innerWidth+2).slice(0,12);
+    return {document:document.documentElement.scrollWidth,viewport:innerWidth,offenders};
+  });
   assert.ok(dimensions.document<=dimensions.viewport+5,'no sideways mobile scrolling: '+JSON.stringify(dimensions));
 });
 await check('admission-class-and-whatsapp',async page=>{
