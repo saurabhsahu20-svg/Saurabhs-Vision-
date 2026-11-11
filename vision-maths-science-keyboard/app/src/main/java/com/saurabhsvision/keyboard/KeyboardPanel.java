@@ -93,6 +93,14 @@ public final class KeyboardPanel extends LinearLayout {
         boolean landscape=getResources().getConfiguration().orientation
             ==Configuration.ORIENTATION_LANDSCAPE;
         int cap=dp(landscape?landscapeMaxDp:portraitMaxDp);
+        if(landscape){
+            // On short landscape displays Android may supply UNSPECIFIED
+            // height and then clip the lowest key row behind system navigation.
+            // Cap the entire input view to a screen-relative physical height
+            // BEFORE assigning space to the last Space/Enter row.
+            int screenPx=getResources().getDisplayMetrics().heightPixels;
+            cap=KeyboardLayoutPolicy.landscapeHeightCap(screenPx,cap);
+        }
         int specMode=View.MeasureSpec.getMode(heightSpec);
         if(specMode!=View.MeasureSpec.UNSPECIFIED)
             cap=Math.min(cap,View.MeasureSpec.getSize(heightSpec));
