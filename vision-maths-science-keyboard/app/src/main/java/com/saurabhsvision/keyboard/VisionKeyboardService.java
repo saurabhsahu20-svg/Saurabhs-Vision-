@@ -138,7 +138,9 @@ public final class VisionKeyboardService extends InputMethodService {
         if(mode==LANGUAGE){
             addLanguagePicker();
         }else if(mode==ABC){
-            addSuggestions();
+            // Reference screenshot has a single tools row above the keys.
+            // Local predictions remain available as an optional setting.
+            if(settings().getBoolean("show_suggestions",false))addSuggestions();
             if(selectedLanguage!=IndicLanguages.ENGLISH)addLanguageStatus();
 
             addRow("Q W E R T Y U I O P");
@@ -175,69 +177,97 @@ public final class VisionKeyboardService extends InputMethodService {
         HorizontalScrollView scroller=new HorizontalScrollView(this);
         scroller.setHorizontalScrollBarEnabled(false);
         scroller.setFillViewport(true);
-        scroller.setContentDescription("S Board toolbar; swipe horizontally for more keyboard tools");
+        scroller.setContentDescription("S Board toolbar; swipe horizontally for ABC, numbers, maths, science, emoji, languages, themes and settings");
         LinearLayout bar=new LinearLayout(this);
         bar.setGravity(Gravity.CENTER_VERTICAL);
         bar.setOrientation(LinearLayout.HORIZONTAL);
+        int screenWidthDp=getResources().getConfiguration().screenWidthDp;
+        final boolean narrow=screenWidthDp<500;
         LinearLayout identity=new LinearLayout(this);
+        identity.setOrientation(LinearLayout.HORIZONTAL);
         identity.setGravity(Gravity.CENTER_VERTICAL);
         ImageView logo=new ImageView(this);
         logo.setImageResource(R.drawable.s_board_logo);
         logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        logo.setContentDescription("S Board logo");
-        identity.addView(logo,new LinearLayout.LayoutParams(dp(29),dp(29)));
+        logo.setContentDescription("S Board logo by Saurabh's Vision");
+        identity.addView(logo,new LinearLayout.LayoutParams(dp(narrow?33:43),dp(narrow?33:43)));
+        LinearLayout brandWords=new LinearLayout(this);
+        brandWords.setOrientation(LinearLayout.VERTICAL);
+        brandWords.setGravity(Gravity.CENTER_VERTICAL);
+        brandWords.setPadding(dp(5),0,dp(1),0);
         TextView brand=new TextView(this);
         brand.setText("S Board");
-        brand.setTextColor(light()?0xff134da9:0xffffffff);
-        brand.setTextSize(12);
-        brand.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
-        brand.setGravity(Gravity.CENTER_VERTICAL);
-        brand.setPadding(dp(3),0,0,0);
-        identity.addView(brand,new LinearLayout.LayoutParams(dp(53),dp(30)));
-        LinearLayout.LayoutParams identityLp=new LinearLayout.LayoutParams(dp(87),dp(37));
-        identityLp.setMargins(dp(1),0,dp(5),0);
+        brand.setTextColor(light()?0xff123b83:Color.WHITE);
+        brand.setTextSize(narrow?16:20);
+        brand.setTypeface(Typeface.create("sans-serif",Typeface.BOLD));
+        brand.setIncludeFontPadding(false);
+        brandWords.addView(brand,new LinearLayout.LayoutParams(-1,-2));
+        TextView caption=new TextView(this);
+        caption.setText("by Saurabh's Vision™");
+        caption.setTextColor(light()?0xff326fb4:0xff8ce4ff);
+        caption.setTextSize(narrow?8:10);
+        caption.setIncludeFontPadding(false);
+        caption.setSingleLine(true);
+        brandWords.addView(caption,new LinearLayout.LayoutParams(-1,-2));
+        identity.addView(brandWords,new LinearLayout.LayoutParams(-1,-2));
+        LinearLayout.LayoutParams identityLp=new LinearLayout.LayoutParams(
+            dp(narrow?151:205),dp(46));
+        identityLp.setMargins(dp(1),0,dp(4),0);
         bar.addView(identity,identityLp);
+        View separator=new View(this);
+        separator.setBackgroundColor(light()?0xff438fcf:0xff5aeaff);
+        LinearLayout.LayoutParams separatorLp=
+            new LinearLayout.LayoutParams(dp(1),dp(32));
+        separatorLp.setMargins(0,0,dp(8),0);
+        bar.addView(separator,separatorLp);
 
-        String[] ids={"ABC","123","∑ Math","⚛ Sci","😊","🌐","␣","☀","⚙"};
+        // Screenshot-inspired ordering: no redundant toolbar Space control.
+        // The real wide Space key always lives in the bottom row.
+        String[] ids={"ABC","123","∑ Math","⚛ Sci","😊","🌐","🎨","⚙"};
         View active=null;
         for(int i=0;i<ids.length;i++){
             final int index=i;
             TextView tab=new TextView(this);
             tab.setText(ids[i]);
             tab.setGravity(Gravity.CENTER);
-            tab.setTextSize(i<2?13:((i==2||i==3)?12:17));
-            tab.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+            tab.setTextSize(i<2?15:((i==2||i==3)?13:20));
+            tab.setTypeface(Typeface.create("sans-serif-medium",Typeface.BOLD));
             boolean chosen=index<5&&mode==index;
-            tab.setTextColor(chosen?(light()?Color.WHITE:0xff061e35):
-                (light()?0xff193354:Color.WHITE));
+            tab.setTextColor(chosen?(light()?Color.WHITE:0xff041b33):
+                (light()?0xff193c69:Color.WHITE));
             GradientDrawable background=new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
-                chosen?new int[]{light()?0xff3c80f1:0xff88ffff,light()?0xff2255c7:0xff2adeeb}:
-                light()?new int[]{0xffebf1fa,0xffe5edf9}:
-                new int[]{0xff1c4269,0xff0b2747});
-            background.setCornerRadius(dp(13));
+                chosen?
+                    (light()?new int[]{0xff387cfa,0xff235dd1}:
+                        new int[]{0xff7bffff,0xff0ed5ee}):
+                    (light()?new int[]{0xfff4f8fd,0xffdce7f4}:
+                        new int[]{0xff19476d,0xff061d3c}));
+            background.setCornerRadius(dp(15));
             background.setStroke(dp(1),chosen?ACCENTS[theme]:
-                (light()?0xffc8d8ed:0xff30bfe7));
+                (light()?0xffbfd4ed:0xff29cfff));
             tab.setBackground(new RippleDrawable(
-                ColorStateList.valueOf(light()?0x332562d9:0x55ffffff),
+                ColorStateList.valueOf(light()?0x332b61c6:0x55b5ffff),
                 background,null));
-            tab.setElevation(dp(1));
-            int width=index==2||index==3?dp(66):index==0||index==1?dp(55):dp(48);
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(width,dp(36));
-            lp.setMargins(dp(2),0,dp(2),0);
+            tab.setElevation(dp(2));
+            int width=(index==2||index==3)?dp(narrow?73:87):
+                (index<2?dp(narrow?60:75):dp(narrow?51:63));
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(width,dp(41));
+            lp.setMargins(dp(3),0,dp(3),0);
             bar.addView(tab,lp);
             if(chosen)active=tab;
             tab.setContentDescription(index==5?"Choose Indian language":
-                index==6?"Type Space":index==7?"Change keyboard theme":
-                index==8?"Keyboard settings":"Switch keyboard to "+ids[i]);
+                index==6?"Change keyboard theme":
+                index==7?"Keyboard settings":"Switch keyboard to "+ids[i]);
             tab.setOnClickListener(v->{
                 feedback(v);
-                if(index<5){finishRomanWord();mode=index;shifted=false;rebuild();}
-                else if(index==5){finishRomanWord();mode=LANGUAGE;rebuild();}
-                else if(index==6){press("SPACE");}
-                else if(index==7){theme=(theme+1)%5;
-                    settings().edit().putInt(KEY_THEME,theme).apply();rebuild();}
-                else{
+                if(index<5){
+                    finishRomanWord();mode=index;shifted=false;rebuild();
+                }else if(index==5){
+                    finishRomanWord();mode=LANGUAGE;rebuild();
+                }else if(index==6){
+                    theme=(theme+1)%5;
+                    settings().edit().putInt(KEY_THEME,theme).apply();rebuild();
+                }else{
                     finishRomanWord();
                     Intent intent=new Intent(this,MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -246,11 +276,11 @@ public final class VisionKeyboardService extends InputMethodService {
             });
         }
         scroller.addView(bar);
-        keysContent.addView(scroller,new LinearLayout.LayoutParams(-1,dp(40)));
-        if(active!=null){
+        keysContent.addView(scroller,new LinearLayout.LayoutParams(-1,dp(49)));
+        if(active!=null && mode!=ABC){
             final View item=active;
             scroller.post(()->scroller.smoothScrollTo(
-                Math.max(0,item.getLeft()-dp(107)),0));
+                Math.max(0,item.getLeft()-dp(narrow?163:210)),0));
         }
     }
     /**
@@ -349,7 +379,7 @@ public final class VisionKeyboardService extends InputMethodService {
         LinearLayout row=new LinearLayout(this);
         row.setGravity(Gravity.CENTER);
         boolean landscape=getResources().getConfiguration().orientation==2;
-        int height=dp(landscape?40:48);
+        int height=dp(landscape?43:54);
         for(String label:labels){
             String display=label;
             String output=label;
@@ -575,7 +605,7 @@ public final class VisionKeyboardService extends InputMethodService {
         // Gboard-like bottom row, with mandatory wide Space key in all modes.
         LinearLayout row=new LinearLayout(this);
         row.setGravity(Gravity.CENTER);
-        int height=dp(getResources().getConfiguration().orientation==2?43:53);
+        int height=dp(getResources().getConfiguration().orientation==2?48:58);
         addKey(row,mode==ABC?"?123":"ABC",mode==ABC?"123":"ABC",1.02f,height,true);
         addKey(row,"☺","EMOJI",.82f,height,true);
         addKey(row,"A↔अ","LANG_TOGGLE",.85f,height,true);
@@ -593,22 +623,24 @@ public final class VisionKeyboardService extends InputMethodService {
             value.startsWith("LANG_");
     }
     private void addKey(LinearLayout row,String display,String output,float weight,int height,boolean special){
-        Button b=new Button(this);
+        SBoardKeyButton b=new SBoardKeyButton(this);
+        b.setSpaceIndicator("SPACE".equals(output),light());
         b.setAllCaps(false);
         b.setGravity(Gravity.CENTER);
         b.setText(display);
         b.setIncludeFontPadding(false);
         int length=display.length();
-        b.setTextSize("SPACE".equals(output)?15f:
+        b.setTextSize("SPACE".equals(output)?17f:
             (mode==EMOJI? (length>4?18f:23f) :
-            length>=5?11.5f:length>=4?13f:length>=3?15f:20f));
-        b.setTypeface(Typeface.create(special?"sans-serif-medium":"sans-serif",
+            length>=5?11.5f:length>=4?13f:length>=3?15f:22f));
+        b.setTypeface(Typeface.create("sans-serif-medium",
             special||isAction(output)?Typeface.BOLD:Typeface.NORMAL));
         final boolean enter="ENTER".equals(output);
         final boolean functionKey=special||isAction(output);
         b.setTextColor(light()?
             (enter?Color.WHITE:(functionKey?0xff2056bb:0xff162338)):
-            (enter?0xff082440:(functionKey?0xff8dffff:Color.WHITE)));
+            (enter?0xff082440:("SPACE".equals(output)?Color.WHITE:
+                (functionKey?0xffadf9ff:Color.WHITE))));
         b.setPadding(0,0,0,0);b.setMinimumHeight(0);b.setMinHeight(0);
         b.setMinimumWidth(0);b.setMinWidth(0);
         int upper,lower,stroke;
@@ -618,13 +650,15 @@ public final class VisionKeyboardService extends InputMethodService {
             stroke=enter?0xff245fd7:0xffcbd6e6;
         }else{
             // Glossy neon navy keycaps like the supplied visual design.
-            upper=enter?0xff53f8ff:(functionKey?0xff235477:0xff275d90);
-            lower=enter?0xff04b9e8:(functionKey?0xff0c2e52:0xff081e43);
-            stroke=enter?0xffabffff:0xff43d6ff;
+            upper=enter?0xff68ffff:("SPACE".equals(output)?0xff2865a4:
+                (functionKey?0xff1c4a80:0xff2d6397));
+            lower=enter?0xff0bbce9:("SPACE".equals(output)?0xff082753:
+                (functionKey?0xff0c2c51:0xff071d40));
+            stroke=enter?0xffb0ffff:0xff3cdbff;
         }
         GradientDrawable shape=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
             new int[]{upper,lower});
-        shape.setCornerRadius(dp(13));
+        shape.setCornerRadius(dp(14));
         shape.setStroke(dp(1),stroke);
         b.setBackground(new RippleDrawable(
             ColorStateList.valueOf(light()?0x452563eb:0x6affffff),shape,null));
