@@ -1,4 +1,4 @@
-# SAURABH'S VISION™ — Maths & Science Keyboard 1.2
+# SAURABH'S VISION™ — Maths & Science Keyboard 1.3
 
 **Type Smarter. Explore Further.**
 
@@ -51,3 +51,9 @@ Compatibility: Upgrading a previously installed debug-signed APK may conflict wi
 ## 1.2 Update — professional keycaps and Pure White
 
 The keyboard includes 5 themes: Cosmic Blue, Golden Mathematics, Science Lab, Purple Quantum, and **Pure White**. Light mode uses a clean grey-white science grid, high-contrast dark text on bright keys, powder-blue function keys, a strong blue Enter key, and matching active tabs. Every theme has smoother rounded key shapes, soft borders/elevation, Android ripple response and subtle pressed-scale feedback, while keeping the compact-height design. The setup screen offers five theme cards and a matching key-style preview. Use the ☀ button in the keyboard toolbar to cycle themes, or select Pure White in app settings. All Maths, Science and emoji modes are retained. No Internet or typing-record permissions are added. Real device tests remain required.
+
+## Version 1.3 — Spacebar row no longer cropped
+
+Some Android/WhatsApp chat screens limited the height offered to this third-party keyboard. The previous KeyboardPanel clipped its children because it capped the parent measure without resizing button rows. V1.3 calculates the actual available IME height, measures each row and its contained keys, then fits all rows **before** measuring. It reserves a guaranteed final row for SPACE, Enter and punctuation, reducing the toolbar/other rows first when space is tight. Standard typing rows start at 48dp and Space row 51dp; both auto-shrink when the Android host offers less vertical space. The **SPACE** label is larger and accessible. Emoji pages also use the same adaptive panel. 
+
+In the setup screen, **Compact Keyboard (Recommended)** is enabled by default; **Comfortable / Larger Keyboard** gives larger keys if the device has room, but still auto-fits. Close/reopen keyboard after changing. User device screenshots are the best way to verify actual manufacturer-specific behavior. Build tests check source layout contracts, Java compile, IME manifest and APK signing, but do not replace manual keyboard testing on WhatsApp.
