@@ -18,7 +18,7 @@ public final class KeyboardPanel extends LinearLayout {
     private KeyboardBackdrop painter;
     private final WeakHashMap<View,Integer> naturalRows=new WeakHashMap<>();
     private final WeakHashMap<View,Integer> naturalKeys=new WeakHashMap<>();
-    private int portraitMaxDp=295,landscapeMaxDp=205;
+    private int portraitMaxDp=328,landscapeMaxDp=245;
     private int[] heights=new int[0];
 
     public KeyboardPanel(Context context,int theme){
@@ -37,8 +37,8 @@ public final class KeyboardPanel extends LinearLayout {
     }
     public void setCompact(boolean compact){
         // Smaller keys are preferable to a missing SPACEBAR.
-        portraitMaxDp=compact?234:295;
-        landscapeMaxDp=compact?175:205;
+        portraitMaxDp=compact?285:328;
+        landscapeMaxDp=compact?214:245;
         requestLayout();
     }
     private int dp(float v){
