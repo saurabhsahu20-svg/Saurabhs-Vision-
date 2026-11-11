@@ -18,9 +18,9 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * 50 configurable Android Smart Dashboard widgets with system time, local date,
- * device battery percentage and opt-in current weather. TextClock renders time
- * continuously via the Android system (even if the receiver isn't running).
+ * 160 configurable Android dashboards: 60 classic + 100 built-in 3D artwork skins.
+ * All styles show genuine device time, date and battery plus optional weather.
+ * Time is rendered continuously by Android's system TextClock.
  */
 public final class VisionWidgetProvider extends AppWidgetProvider {
     public static final String PREFS="vision_widget_settings";
@@ -31,6 +31,15 @@ public final class VisionWidgetProvider extends AppWidgetProvider {
     public static void setStyle(Context context,int id,int style){
         context.getSharedPreferences(PREFS,Context.MODE_PRIVATE).edit()
             .putInt("style_"+id,WidgetCatalog.norm(style)).apply();
+        updateWidget(context,AppWidgetManager.getInstance(context),id);
+    }
+    /** Each Home Screen widget keeps its own chosen built-in artwork. */
+    public static void setWidget(Context context,int id,int style,int art){
+        SharedPreferences.Editor editor=context.getSharedPreferences(PREFS,Context.MODE_PRIVATE).edit()
+            .putInt("style_"+id,WidgetCatalog.norm(style));
+        if(BuiltIn3DWidgetArt.valid(art))editor.putInt("art_"+id,art);
+        else editor.remove("art_"+id);
+        editor.apply();
         updateWidget(context,AppWidgetManager.getInstance(context),id);
     }
     public static void updateAll(Context context){
@@ -56,12 +65,15 @@ public final class VisionWidgetProvider extends AppWidgetProvider {
         int style=WidgetCatalog.norm(pref.getInt("style_"+widgetId,pref.getInt("pending",0)));
         int category=style/10, accent=WidgetCatalog.accent(style);
         RemoteViews views=new RemoteViews(ctx.getPackageName(),R.layout.vision_widget);
-        // User-selected real HD wallpaper, darkened for readable clock/weather.
-        // Otherwise use one of the original 60 digital widget compositions.
-        Bitmap bg=PremiumWidgetArt.background(ctx,480,280);
+        // Per-widget 3D artwork takes precedence, so two widgets can use DIFFERENT
+        // images from the 100-picture gallery without replacing each other.
+        int art=pref.getInt("art_"+widgetId,pref.getInt("pending_art",-1));
+        Bitmap bg=BuiltIn3DWidgetArt.background(ctx,art,480,280);
+        if(bg==null)bg=PremiumWidgetArt.background(ctx,480,280);
         if(bg==null)bg=WidgetCatalog.background(style,480,280);
         views.setImageViewBitmap(R.id.widget_background,bg);
-        views.setTextViewText(R.id.widget_title,WidgetCatalog.name(style));
+        views.setTextViewText(R.id.widget_title,
+            BuiltIn3DWidgetArt.valid(art)?BuiltIn3DWidgetArt.title(ctx,art):WidgetCatalog.name(style));
         views.setTextColor(R.id.widget_title,accent);
         views.setTextViewText(R.id.widget_city,WeatherRepository.city(ctx));
         views.setTextViewText(R.id.widget_weather,WeatherRepository.display(ctx));
@@ -142,7 +154,10 @@ public final class VisionWidgetProvider extends AppWidgetProvider {
     }
     @Override public void onDeleted(Context ctx,int[] ids){
         SharedPreferences.Editor editor=ctx.getSharedPreferences(PREFS,Context.MODE_PRIVATE).edit();
-        for(int id:ids)editor.remove("style_"+id);
+        for(int id:ids){
+            editor.remove("style_"+id);
+            editor.remove("art_"+id);
+        }
         editor.apply();
         super.onDeleted(ctx,ids);
     }
