@@ -142,13 +142,19 @@ jobs:
           assert 'addKey(row,"Space","SPACE",4.35f' in ime
           assert 'A↔अ' in ime and 'LANG_TOGGLE' in ime
           assert 'b.setOnLongClickListener' in ime
-          assert 'portraitMaxDp=compact?285:328' in panel
+          assert 'portraitMaxDp=compact?330:365' in panel
+          assert 'landscapeMaxDp=compact?305:340' in panel
           assert 'row.setTag("sboard_space_action")' in ime
           assert 'KeyboardLayoutPolicy.fit(desired,budget,dp(36),actionIndex)' in panel
-          assert 'int height=dp(landscape?35:47);' in ime
-          assert 'orientation==2?41:51' in ime
-          assert ime.index('addRow("A S D F G H J K L");') < ime.index('addBottom();') < ime.index('addRow("⇧ Z X C V B N M ⌫");')
-          print('One-row-raised Spacebar and compact landscape layout verified')
+          assert 'int height=dp(landscape?49:55);' in ime
+          assert 'orientation==2?57:62' in ime
+          assert 'keysContent.setPadding(dp(3),dp(5),dp(3),dp(18));' in ime
+          assert ime.index('addRow("Q W E R T Y U I O P");') < ime.index('addRow("A S D F G H J K L");') < ime.index('addRow("⇧ Z X C V B N M ⌫");') < ime.index('addBottom();')
+          for lastrow in ('* \\" \' : ; ! ? = ← ⌫','sin( cos( tan( log( ln( x² x³ ^ → ⌫','α β γ λ μ Ω Δ ∝ ∴ ⌫'):
+              assert lastrow in ime
+          assert 'row.setTag("sboard_space_action")' in ime
+          print('PASS: THREE complete letter rows followed by full-height visible Spacebar, with 18dp navigation inset')
+          print('Full four-row S Board layout and enlarged keyboard viewport verified')
           assert (root/'java/com/saurabhsvision/keyboard/WordSuggestions.java').is_file()
           print('Confirmed neon input view, live suggestion strip, stable Spacebar and real long-press number keys')
           print('S Board branding, user-selected 3D logo image, animated splash and setup status verified')
@@ -214,13 +220,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.1_SPACEBAR_FIXED.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.2_FULL_4_ROW_KEYBOARD.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_1_Spacebar_Fixed_APK
+          name: S_Board_v1_9_2_Full_4_Row_Keyboard_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -230,13 +236,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.1"
-          file="keyboard-deliverables/S_Board_v1.9.1_SPACEBAR_FIXED.apk"
+          tag="s-board-v1.9.2"
+          file="keyboard-deliverables/S_Board_v1.9.2_FULL_4_ROW_KEYBOARD.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.9.1 • Spacebar Visible Fix" \
-              --notes "S Board 1.9.1: fixes Space/Enter row clipped behind Android navigation bar. Moves real Spacebar line one physical row above Z/X/C/Backspace, reduces landscape and compact key heights, and reserves space row in layout measurement on small device viewports. Keeps original neon design, Hindi/Hinglish, 24 basic phonetic language modes, Maths/Science, Emoji and privacy safeguards. GitHub CI compiles and verifies APK and runs small-screen layout regressions. This is a debug-signed test APK; physical device verification still needed." \
+              --title "S Board 1.9.2 • Full 4-Row Keyboard" \
+              --notes "S Board 1.9.2: restores the exact four-row screenshot design with all QWERTY letters on THREE independent lines followed by a complete fourth Space / Emoji / Hindi-English / Comma / Period / Enter action row. Unlike v1.9.1, Space is NOT moved above ZXC. Enlarges requested Android keyboard surface in portrait and landscape, full-sized luminous navy/cyan keys and a measured 18dp bottom inset to avoid Android navigation overlap. Includes original logo, Maths, Science, 24 basic language/phonetic modes, emoji, and all previous features. Compiled, signed-for-testing debug APK with automated source, layout and phonetic tests. Real-device verification still required." \
               --latest=false
           fi
