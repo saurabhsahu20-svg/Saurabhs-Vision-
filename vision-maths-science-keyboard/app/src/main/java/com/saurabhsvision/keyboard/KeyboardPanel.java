@@ -11,15 +11,16 @@ import java.util.WeakHashMap;
 /**
  * Measured S Board keyboard. The previous LinearLayout inherited measurement
  * could let fixed-height children exceed the visible IME viewport. This class
- * measures AND lays out every row explicitly so rows are never outside
- * its own bounds. Space / Enter may sit directly above the bottom letter row,
- * and is explicitly given priority when there is limited screen height.
+ * measures AND lays out every row explicitly. All three alphabet rows come
+ * first, then the separate wide Space / Enter row as the FOURTH key row.
+ * It requests enough physical IME height to fit all four rows, with a bottom
+ * navigation safety inset, instead of hiding/reordering the last letter row.
  */
 public final class KeyboardPanel extends LinearLayout {
     private KeyboardBackdrop painter;
     private final WeakHashMap<View,Integer> naturalRows=new WeakHashMap<>();
     private final WeakHashMap<View,Integer> naturalKeys=new WeakHashMap<>();
-    private int portraitMaxDp=328,landscapeMaxDp=245;
+    private int portraitMaxDp=365,landscapeMaxDp=340;
     private int[] heights=new int[0];
 
     public KeyboardPanel(Context context,int theme){
@@ -37,9 +38,10 @@ public final class KeyboardPanel extends LinearLayout {
         invalidate();
     }
     public void setCompact(boolean compact){
-        // Smaller keys are preferable to a missing SPACEBAR.
-        portraitMaxDp=compact?285:328;
-        landscapeMaxDp=compact?214:245;
+        // Compact no longer means deleting/clipping the fourth row.
+        // Expand the IME surface itself; the OS can still constrain it.
+        portraitMaxDp=compact?330:365;
+        landscapeMaxDp=compact?305:340;
         requestLayout();
     }
     private int dp(float v){
