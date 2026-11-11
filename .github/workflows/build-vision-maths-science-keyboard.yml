@@ -148,12 +148,14 @@ jobs:
           assert 'KeyboardLayoutPolicy.fit(desired,budget,dp(36),actionIndex)' in panel
           assert 'int height=dp(landscape?49:55);' in ime
           assert 'orientation==2?57:62' in ime
-          assert 'keysContent.setPadding(dp(3),dp(5),dp(3),dp(18));' in ime
+          assert 'keysContent.setPadding(dp(3),dp(5),dp(3),dp(landscape?58:22));' in ime
+          assert 'boolean landscape=getResources().getConfiguration().orientation' in ime
+          assert ime.index('addRow("Q W E R T Y U I O P");') < ime.index('addRow("A S D F G H J K L");') < ime.index('addRow("⇧ Z X C V B N M ⌫");') < ime.index('addBottom();')
           assert ime.index('addRow("Q W E R T Y U I O P");') < ime.index('addRow("A S D F G H J K L");') < ime.index('addRow("⇧ Z X C V B N M ⌫");') < ime.index('addBottom();')
           for lastrow in ('* \\" \' : ; ! ? = ← ⌫','sin( cos( tan( log( ln( x² x³ ^ → ⌫','α β γ λ μ Ω Δ ∝ ∴ ⌫'):
               assert lastrow in ime
           assert 'row.setTag("sboard_space_action")' in ime
-          print('PASS: THREE complete letter rows followed by full-height visible Spacebar, with 18dp navigation inset')
+          print('PASS: THREE complete letter rows followed by full-height Spacebar with 58dp landscape navigation safety')
           print('Full four-row S Board layout and enlarged keyboard viewport verified')
           assert (root/'java/com/saurabhsvision/keyboard/WordSuggestions.java').is_file()
           print('Confirmed neon input view, live suggestion strip, stable Spacebar and real long-press number keys')
@@ -220,13 +222,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.2_FULL_4_ROW_KEYBOARD.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.3_VISIBLE_SPACEBAR.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_2_Full_4_Row_Keyboard_APK
+          name: S_Board_v1_9_3_Visible_Spacebar_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -236,13 +238,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.2"
-          file="keyboard-deliverables/S_Board_v1.9.2_FULL_4_ROW_KEYBOARD.apk"
+          tag="s-board-v1.9.3"
+          file="keyboard-deliverables/S_Board_v1.9.3_VISIBLE_SPACEBAR.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.9.2 • Full 4-Row Keyboard" \
-              --notes "S Board 1.9.2: restores the exact four-row screenshot design with all QWERTY letters on THREE independent lines followed by a complete fourth Space / Emoji / Hindi-English / Comma / Period / Enter action row. Unlike v1.9.1, Space is NOT moved above ZXC. Enlarges requested Android keyboard surface in portrait and landscape, full-sized luminous navy/cyan keys and a measured 18dp bottom inset to avoid Android navigation overlap. Includes original logo, Maths, Science, 24 basic language/phonetic modes, emoji, and all previous features. Compiled, signed-for-testing debug APK with automated source, layout and phonetic tests. Real-device verification still required." \
+              --title "S Board 1.9.3 • Last Row Visibility Fix" \
+              --notes "S Board 1.9.3 fixes the cropped bottom row visible in the owner's real-device screenshot. It keeps the full 3 QWERTY letter rows and fourth Space/Enter row in their original order, but reserves a much larger landscape bottom-safe strip (58dp) above Android navigation controls, letting the final row rise within the keyboard viewport. Portrait retains a modest 22dp reserve. No letter, layout order, branding, Math, Science, emoji, or Hindi/Hinglish feature is removed. Automated regression tests validate all four keyboard rows, constrained viewport budgets, phonetic typing, Android APK compilation and signature. This is a debug-signed test APK; the final result must also be checked on the actual phone." \
               --latest=false
           fi
