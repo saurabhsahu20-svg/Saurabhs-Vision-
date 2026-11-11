@@ -70,6 +70,21 @@ public final class KeyboardLayoutPolicy {
         result[actionIndex]=fitted[n-1];
         return result;
     }
+    /**
+     * Keep the entire IME above the visible Android navigation / gesture bar
+     * in landscape. Fixed dp heights (305dp) are not safe on low-height phones:
+     * Android can clip the final row without exposing the real viewport size
+     * via the IME's UNSPECIFIED measure spec. Use actual screen-height pixels.
+     *
+     * 66% of the landscape display leaves room for the focused app and the
+     * system navigation bar while keeping FOUR rows in the real input view.
+     * The input panel then proportionally fits all its rows into that height.
+     */
+    public static int landscapeHeightCap(int screenHeightPx,int maxConfiguredPx){
+        if(screenHeightPx<=0)return Math.max(1,maxConfiguredPx);
+        int safe=(int)(screenHeightPx*0.66f);
+        return Math.max(1,Math.min(Math.max(1,maxConfiguredPx),Math.max(1,safe)));
+    }
     public static int total(int[] rows){
         int sum=0;for(int height:rows)sum+=height;return sum;
     }
