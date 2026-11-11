@@ -133,13 +133,12 @@ public final class VisionKeyboardService extends InputMethodService {
         keysContent=keyboardFrame;
         suggestionChips=null;
         romanPreview=null;
-        // OEM landscape keyboards (including ChatGPT/WhatsApp) can draw behind
-        // the Android navigation bar. Reserve an additional safe strip inside
-        // the measured input view, so ALL three alphabet rows remain unchanged
-        // and the fourth Space/Enter row moves up into the visible viewport.
+        // The measured IME is now screen-height bounded (KeyboardPanel).
+        // Keep a practical gesture-navigation gap, without the old oversized
+        // 58dp blank strip that stole height from actual letter/Space keys.
         boolean landscape=getResources().getConfiguration().orientation
             ==android.content.res.Configuration.ORIENTATION_LANDSCAPE;
-        keysContent.setPadding(dp(3),dp(5),dp(3),dp(landscape?58:22));
+        keysContent.setPadding(dp(3),dp(5),dp(3),dp(landscape?30:22));
         addToolbar();
         if(mode==LANGUAGE){
             addLanguagePicker();
