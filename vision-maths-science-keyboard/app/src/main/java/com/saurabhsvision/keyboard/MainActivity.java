@@ -17,6 +17,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.view.inputmethod.InputMethodInfo;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -33,6 +35,7 @@ public final class MainActivity extends Activity {
     private static final String[] NAMES={"Cosmic Blue","Golden Mathematics","Science Lab","Purple Quantum","Pure White"};
     private LinearLayout root;
     private TextView themeStatus;
+    private TextView setupStatus;
     private LinearLayout keyPreview;
     private final String[] previewKeys={"Q","W","E","R","T","Y","π","√","🧬","😊"};
     private int dp(float v){return (int)(getResources().getDisplayMetrics().density*v+.5f);}
@@ -74,30 +77,42 @@ public final class MainActivity extends Activity {
         hero.setBackground(box(NAVY,24));
         hero.addView(new KeyboardBackdrop(this,0),new FrameLayout.LayoutParams(-1,-1));
         LinearLayout copy=new LinearLayout(this);copy.setOrientation(LinearLayout.VERTICAL);
-        copy.setPadding(dp(22),dp(20),dp(22),dp(20));
-        FrameLayout.LayoutParams cp=new FrameLayout.LayoutParams(-1,-1);
-        hero.addView(copy,cp);
-        add(copy,text("🎓 SAURABH'S VISION™",14,GOLD,true),0);
-        add(copy,text("MATHS & SCIENCE\nKEYBOARD",30,Color.WHITE,true),10);
-        add(copy,text("Type Smarter. Explore Further.",15,0xffbde9ff,false),8);
-        add(copy,text("π   √   ∑   ∞   🧬   ⚛️   😊   🥰   💯",25,0xff8df0ff,true),18);
+        copy.setPadding(dp(20),dp(17),dp(114),dp(17));
+        hero.addView(copy,new FrameLayout.LayoutParams(-1,-1));
+        add(copy,text("BY SAURABH'S VISION™",12,GOLD,true),0);
+        add(copy,text("SAUNE\nBOARD",32,Color.WHITE,true),8);
+        add(copy,text("Maths • Science • Languages",13,0xffbde9ff,false),7);
+        add(copy,text("π  √  ∑  ∞  ⚛  🧬  😊",18,0xff8df0ff,true),12);
+        ImageView animatedLogoBadge=new ImageView(this);
+        animatedLogoBadge.setImageResource(R.drawable.saune_board_icon);
+        animatedLogoBadge.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        animatedLogoBadge.setContentDescription("Saune Board premium blue-gold keyboard logo");
+        FrameLayout.LayoutParams badgeParams=new FrameLayout.LayoutParams(dp(105),dp(105),
+            Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        badgeParams.rightMargin=dp(8);
+        hero.addView(animatedLogoBadge,badgeParams);
         LinearLayout.LayoutParams hp=new LinearLayout.LayoutParams(-1,dp(222));root.addView(hero,hp);
 
-        add(root,text("⌨️ Set as your Android Keyboard",20,NAVY,true),25);
+        add(root,text("⌨️ Set Up Saune Board",20,NAVY,true),25);
         add(root,text("एक बार keyboard enable करें, फिर default keyboard चुनें। उसके बाद WhatsApp, Notes और दूसरे text fields में भी इस्तेमाल कर पाएँगे।",14,0xff496284,false),10);
-        Button enable=button("① Enable Vision Keyboard",0xff1949ad,Color.WHITE);
+        Button enable=button("① Enable Saune Board Keyboard",0xff1949ad,Color.WHITE);
         add(root,enable,15);
         enable.setOnClickListener(v->{
             try{startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));}
             catch(RuntimeException e){showMessage("Keyboard Settings नहीं खुल सकीं। Android Settings → System → Keyboard पर जाएँ।");}
         });
-        Button choose=button("② Choose Default Keyboard",GOLD,NAVY);
+        Button choose=button("② Set Saune Board as Default",GOLD,NAVY);
         add(root,choose,10);
         choose.setOnClickListener(v->{
             InputMethodManager manager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
             if(manager!=null)manager.showInputMethodPicker();
             else showMessage("Android keyboard picker उपलब्ध नहीं है।");
         });
+        setupStatus=text("",14,0xff1b5eb9,true);
+        setupStatus.setPadding(dp(12),dp(11),dp(12),dp(11));
+        setupStatus.setBackground(box(Color.WHITE,13));
+        add(root,setupStatus,12);
+        refreshSetupStatus();
 
         add(root,text("🌐 Indian Languages • हिन्दी / Hinglish / English",21,NAVY,true),26);
         add(root,text("Choose English, Roman Hinglish or phonetic typing in any of India's 22 scheduled languages. Type with normal English keys; in Hindi mode, namaste → नमस्ते. No Internet needed.",14,0xff496284,false),8);
@@ -243,6 +258,28 @@ public final class MainActivity extends Activity {
             catch(RuntimeException ex){showMessage("Instagram link नहीं खुल पाया।");}
         });
         add(root,text("SAURABH'S VISION™ • Learn Today, Lead Tomorrow!",12,0xff5c7190,true),24);
+    }
+    @Override protected void onResume(){
+        super.onResume();
+        refreshSetupStatus();
+    }
+    private void refreshSetupStatus(){
+        if(setupStatus==null)return;
+        InputMethodManager im=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        boolean enabled=false;
+        if(im!=null){
+            for(InputMethodInfo entry:im.getEnabledInputMethodList()){
+                if(getPackageName().equals(entry.getPackageName())){
+                    enabled=true;break;
+                }
+            }
+        }
+        String current=Settings.Secure.getString(getContentResolver(),
+            Settings.Secure.DEFAULT_INPUT_METHOD);
+        boolean selected=current!=null&&current.startsWith(getPackageName()+"/");
+        setupStatus.setText(
+            (enabled?"✅ Keyboard enabled":"① Enable keyboard in Android settings")+"\n"+
+            (selected?"✅ Saune Board selected":"② Choose Saune Board as your keyboard"));
     }
     private void showTheme(){
         int current=Math.max(0,Math.min(4,getSharedPreferences(PREFS,MODE_PRIVATE).getInt("theme",0)));

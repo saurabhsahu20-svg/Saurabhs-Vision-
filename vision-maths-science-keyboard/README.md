@@ -1,4 +1,4 @@
-# SAURABH'S VISION™ — Maths & Science Keyboard 1.4
+# SAURABH'S VISION™ — Maths & Science Keyboard 1.5
 
 **Type Smarter. Explore Further.**
 
@@ -76,3 +76,13 @@ Hindi mode uses Android InputConnection composition: typed Roman letters update 
 No network needed or requested. Roman composing input is held **in memory only** while typing, without saving to disk, logging or transmission. Password fields intentionally fall back to ordinary Latin typing; the language picker is never a password collection service.
 
 Native Java smoke tests run on the GitHub builder for all 24 options, letter-to-script checks for 11 scripts, plus actual Android build, manifest and APK-signature verification. Device typing with real launchers, cursor edits and Unicode emoji requires hands-on QA. 
+
+## V1.5 — Saune Board brand, user's own original neon animated logo
+
+**New app display name:** **Saune Board**, by Saurabh's Vision. Android application ID remains `com.saurabhsvision.keyboard` to keep the installed keyboard identity.
+
+The original, newly generated blue-neon keyboard and gold book/graduation-cap artwork is included in the APK as `res/drawable-nodpi/saune_board_icon.webp`. This **last frame of the 6-frame user-approved animation** is the native launcher icon and the app's hero illustration. The launch screen features the SAME icon framed by bright animated cyan/gold orbital trails, smooth pulsing and subtle stars. Ordinary Android launcher icons do not animate: the startup screen does (approximately 2.4 seconds, tap to skip). No network/media permissions.
+
+The app's name, setup call-to-action, keyboard display name and theme preview now use **Saune Board** branding. Android's InputMethodService stays separate from the splash, so the animation never delays typing in other apps. The setup screen also displays whether the keyboard is enabled and currently selected as default.
+
+**Retained**: ABC, Maths, Science, numbers, Emoji categories, 5 themes including White, compact Space/Enter, 24 language options, basic offline phonetic transliteration, no Internet permission. Install as a debug-signed TEST APK and test on real Android hardware before production.
