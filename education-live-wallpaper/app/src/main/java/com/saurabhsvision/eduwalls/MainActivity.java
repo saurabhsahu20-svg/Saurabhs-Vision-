@@ -243,6 +243,7 @@ public final class MainActivity extends Activity {
             customArt=true;poster=-1;
             prefs.edit().putBoolean(EduWallpaperService.V6_LIVE_ENABLED,false)
                 .putBoolean(EduWallpaperService.CUSTOM_ART,true)
+                .putInt("premium_3d_index",-1)
                 .putInt(EduWallpaperService.POSTER,-1)
                 .putLong(EduWallpaperService.CUSTOM_VERSION,System.currentTimeMillis()).apply();
             if(preview!=null)preview.end();
