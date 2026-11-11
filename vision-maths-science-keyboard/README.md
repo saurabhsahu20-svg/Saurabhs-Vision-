@@ -1,8 +1,24 @@
-# SAURABH'S VISION™ — Maths & Science Keyboard 1.5
+# S BOARD 1.9 — Neon Blue Maths & Science Keyboard by SAURABH'S VISION™
 
 **Type Smarter. Explore Further.**
 
 A separate, **native functional Android Input Method Editor (IME)**; not a keyboard mockup, theme-only wallpaper, or browser page. Package: `com.saurabhsvision.keyboard`.
+
+## S Board 1.9 — Screenshot-inspired native keyboard
+
+This is a working Android InputMethodService keyboard (not a visual mockup). The first screen uses the reference's midnight-blue / cyan gradient look:
+
+- Existing official **S Board** logo and two-line **S Board / by Saurabh's Vision™** header.
+- Horizontally scrollable functional toolbar: **ABC, 123, ∑ Math, ⚛ Sci, 😊 Emoji, 🌐 Languages, 🎨 Theme, ⚙ Settings**. On narrow portrait phones, swipe the toolbar to access the tabs to the right.
+- Bold glowing navy/cyan QWERTY keys, white labels, turquoise Enter, and an actual **wide Space key** with a thin glowing underline, not an image-only decorative spacebar.
+- **Suggestions OFF by default** so the screen matches the supplied reference. Open Settings → Photo-Style Keyboard Layout → Toggle Smart Suggestions to enable existing offline English/Hinglish suggestions.
+- Keyboard height automatically fits the real IME viewport in portrait and landscape. Compact mode is recommended for small screens. Other colours (Gold, Science Green, Purple, White) remain available.
+- Language selection (English, Hinglish and 22 Indian scheduled languages via basic offline transliteration), Maths, Science and Emoji are preserved.
+- No Internet permission, microphone permission, read-clipboard permission, typing telemetry, or stored keystroke history.
+
+**Download:** Use the GitHub Releases entry **s-board-v1.9.0** once CI completes. The artifact is a signed-for-testing *debug* APK, not a Play Store release or a permanently signed production build. A previous debug APK with a different certificate may need uninstalling before installation; this resets that app's local settings. Never disable system security checks to install APKs.
+
+**Verification:** GitHub Actions tests the phonetic core, layout algorithm, suggestion core, compiles Android APK and checks the debug APK signature. Physical installation and testing in WhatsApp, Notes, and password fields are still necessary.
 
 ## Features
 
