@@ -22,6 +22,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.content.Intent;
@@ -47,6 +48,8 @@ public final class VisionKeyboardService extends InputMethodService {
     private boolean sensitiveField=false;
     private final StringBuilder romanComposing=new StringBuilder();
     private TextView romanPreview;
+    private TextView[] suggestionChips;
+    private boolean updatingSuggestions=false;
     private boolean shifted=false,caps=false;
     private long lastShift=0L;
     private final Handler repeatHandler=new Handler(Looper.getMainLooper());
@@ -74,6 +77,7 @@ public final class VisionKeyboardService extends InputMethodService {
         finishRomanWord();
         super.onStartInput(info,restarting);
         sensitiveField=isPasswordField(info);
+        if(suggestionChips!=null)updateSuggestions();
         if(!restarting){
             int type=info==null?InputType.TYPE_CLASS_TEXT:(info.inputType&InputType.TYPE_MASK_CLASS);
             mode=(type==InputType.TYPE_CLASS_NUMBER || type==InputType.TYPE_CLASS_PHONE)
@@ -97,7 +101,15 @@ public final class VisionKeyboardService extends InputMethodService {
         super.onStartInputView(info,restarting);
         theme=Math.floorMod(settings().getInt(KEY_THEME,0),5);
         selectedLanguage=IndicLanguages.norm(settings().getInt("language",IndicLanguages.ENGLISH));
+        sensitiveField=isPasswordField(info);
         if(keyboardFrame!=null)rebuild();
+    }
+    @Override public void onUpdateSelection(int oldSelStart,int oldSelEnd,
+        int newSelStart,int newSelEnd,int candidatesStart,int candidatesEnd){
+        super.onUpdateSelection(oldSelStart,oldSelEnd,
+            newSelStart,newSelEnd,candidatesStart,candidatesEnd);
+        // Word candidates are calculated locally only, never stored/logged.
+        if(!updatingSuggestions && mode==ABC)updateSuggestions();
     }
     @Override public void onFinishInputView(boolean finishingInput){
         stopRepeat();
@@ -119,11 +131,14 @@ public final class VisionKeyboardService extends InputMethodService {
         // if Android's IME container cannot accommodate the natural key heights.
         keyboardFrame.setCompact(settings().getBoolean("compact_height",true));
         keysContent=keyboardFrame;
+        suggestionChips=null;
+        romanPreview=null;
         keysContent.setPadding(dp(3),dp(3),dp(3),dp(4));
         addToolbar();
         if(mode==LANGUAGE){
             addLanguagePicker();
         }else if(mode==ABC){
+            addSuggestions();
             if(selectedLanguage!=IndicLanguages.ENGLISH)addLanguageStatus();
 
             addRow("Q W E R T Y U I O P");
@@ -152,45 +167,182 @@ public final class VisionKeyboardService extends InputMethodService {
         }
         keyboardFrame.requestLayout();
     }
+    /**
+     * Real keyboard toolbar: branded icon and scrollable functionality tabs.
+     * Brand is part of InputMethodService input view, not just launcher preview.
+     */
     private void addToolbar(){
+        HorizontalScrollView scroller=new HorizontalScrollView(this);
+        scroller.setHorizontalScrollBarEnabled(false);
+        scroller.setFillViewport(true);
+        scroller.setContentDescription("S Board toolbar; swipe horizontally for more keyboard tools");
         LinearLayout bar=new LinearLayout(this);
+        bar.setGravity(Gravity.CENTER_VERTICAL);
         bar.setOrientation(LinearLayout.HORIZONTAL);
-        bar.setGravity(Gravity.CENTER);
-        String[] ids={"ABC","123","∑","⚛","😊","🌐","␣","☀","⚙"};
+        LinearLayout identity=new LinearLayout(this);
+        identity.setGravity(Gravity.CENTER_VERTICAL);
+        ImageView logo=new ImageView(this);
+        logo.setImageResource(R.drawable.s_board_logo);
+        logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        logo.setContentDescription("S Board logo");
+        identity.addView(logo,new LinearLayout.LayoutParams(dp(29),dp(29)));
+        TextView brand=new TextView(this);
+        brand.setText("S Board");
+        brand.setTextColor(light()?0xff134da9:0xffffffff);
+        brand.setTextSize(12);
+        brand.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+        brand.setGravity(Gravity.CENTER_VERTICAL);
+        brand.setPadding(dp(3),0,0,0);
+        identity.addView(brand,new LinearLayout.LayoutParams(dp(53),dp(30)));
+        LinearLayout.LayoutParams identityLp=new LinearLayout.LayoutParams(dp(87),dp(37));
+        identityLp.setMargins(dp(1),0,dp(5),0);
+        bar.addView(identity,identityLp);
+
+        String[] ids={"ABC","123","∑ Math","⚛ Sci","😊","🌐","␣","☀","⚙"};
+        View active=null;
         for(int i=0;i<ids.length;i++){
-            final int idx=i;
+            final int index=i;
             TextView tab=new TextView(this);
             tab.setText(ids[i]);
-            tab.setTextSize(i==2||i==3||i==5||i==6?17:13);
-            tab.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
             tab.setGravity(Gravity.CENTER);
-            tab.setTextColor(i<5 && mode==i?DARK[theme]:(light()?0xff253955:Color.WHITE));
-            GradientDrawable surface=new GradientDrawable();
-            boolean selected=i<5 && mode==i;
-            surface.setColor(selected?ACCENTS[theme]:(light()?0xffe4ebf6:0x66243659));
-            surface.setCornerRadius(dp(14));
-            surface.setStroke(dp(1),selected?ACCENTS[theme]:(light()?0xffd0dced:0x556edfff));
+            tab.setTextSize(i<2?13:((i==2||i==3)?12:17));
+            tab.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+            boolean chosen=index<5&&mode==index;
+            tab.setTextColor(chosen?(light()?Color.WHITE:0xff061e35):
+                (light()?0xff193354:Color.WHITE));
+            GradientDrawable background=new GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                chosen?new int[]{light()?0xff3c80f1:0xff88ffff,light()?0xff2255c7:0xff2adeeb}:
+                light()?new int[]{0xffebf1fa,0xffe5edf9}:
+                new int[]{0xff1c4269,0xff0b2747});
+            background.setCornerRadius(dp(13));
+            background.setStroke(dp(1),chosen?ACCENTS[theme]:
+                (light()?0xffc8d8ed:0xff30bfe7));
             tab.setBackground(new RippleDrawable(
-                ColorStateList.valueOf(light()?0x402563eb:0x40ffffff),surface,null));
-            tab.setElevation(dp(light()?1.2f:.7f));
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(37),i==2||i==3?1.1f:1f);
-            lp.setMargins(dp(2),0,dp(2),dp(5));
+                ColorStateList.valueOf(light()?0x332562d9:0x55ffffff),
+                background,null));
+            tab.setElevation(dp(1));
+            int width=index==2||index==3?dp(66):index==0||index==1?dp(55):dp(48);
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(width,dp(36));
+            lp.setMargins(dp(2),0,dp(2),0);
             bar.addView(tab,lp);
-            tab.setContentDescription(i==5?"Choose Indian language":
-                i==6?"Type a space (quick-access Spacebar)":i==7?"Change keyboard theme":
-                i==8?"Keyboard settings":"Switch keyboard to "+ids[i]);
+            if(chosen)active=tab;
+            tab.setContentDescription(index==5?"Choose Indian language":
+                index==6?"Type Space":index==7?"Change keyboard theme":
+                index==8?"Keyboard settings":"Switch keyboard to "+ids[i]);
             tab.setOnClickListener(v->{
                 feedback(v);
-                if(idx<5){finishRomanWord();mode=idx;shifted=false;rebuild();}
-                else if(idx==5){finishRomanWord();mode=LANGUAGE;rebuild();}
-                else if(idx==6){press("SPACE");}
-                else if(idx==7){theme=(theme+1)%5;settings().edit().putInt(KEY_THEME,theme).apply();rebuild();}
-                else{finishRomanWord();Intent intent=new Intent(this,MainActivity.class);
+                if(index<5){finishRomanWord();mode=index;shifted=false;rebuild();}
+                else if(index==5){finishRomanWord();mode=LANGUAGE;rebuild();}
+                else if(index==6){press("SPACE");}
+                else if(index==7){theme=(theme+1)%5;
+                    settings().edit().putInt(KEY_THEME,theme).apply();rebuild();}
+                else{
+                    finishRomanWord();
+                    Intent intent=new Intent(this,MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    try{startActivity(intent);}catch(RuntimeException ignored){}}
+                    try{startActivity(intent);}catch(RuntimeException ignored){}
+                }
             });
         }
-        keysContent.addView(bar,new LinearLayout.LayoutParams(-1,dp(41)));
+        scroller.addView(bar);
+        keysContent.addView(scroller,new LinearLayout.LayoutParams(-1,dp(40)));
+        if(active!=null){
+            final View item=active;
+            scroller.post(()->scroller.smoothScrollTo(
+                Math.max(0,item.getLeft()-dp(107)),0));
+        }
+    }
+    /**
+     * Gboard-style local completions for ABC/Hinglish and a phonetic preview.
+     * All contents are read only from the active field, never written to disk.
+     */
+    private void addSuggestions(){
+        LinearLayout strip=new LinearLayout(this);
+        strip.setOrientation(LinearLayout.HORIZONTAL);
+        strip.setGravity(Gravity.CENTER_VERTICAL);
+        suggestionChips=new TextView[3];
+        for(int i=0;i<3;i++){
+            final int position=i;
+            TextView chip=new TextView(this);
+            chip.setGravity(Gravity.CENTER);
+            chip.setSingleLine(true);
+            chip.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            chip.setTypeface(Typeface.create("sans-serif-medium",Typeface.NORMAL));
+            chip.setTextSize(14);
+            chip.setTextColor(light()?0xff26364f:0xfff0f8ff);
+            chip.setBackground(new RippleDrawable(
+                ColorStateList.valueOf(light()?0x332b61c6:0x44a4ecff),
+                new GradientDrawable(),null));
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(34),1f);
+            lp.setMargins(dp(1),0,dp(1),0);
+            strip.addView(chip,lp);
+            chip.setOnClickListener(v->{
+                if(sensitiveField)return;
+                Object tag=chip.getTag();
+                if(tag instanceof String)applySuggestion((String)tag);
+            });
+            suggestionChips[i]=chip;
+            if(position<2){
+                View divider=new View(this);
+                divider.setBackgroundColor(light()?0xffc6d3e7:0x7048a5cb);
+                strip.addView(divider,new LinearLayout.LayoutParams(dp(1),dp(17)));
+            }
+        }
+        keysContent.addView(strip,new LinearLayout.LayoutParams(-1,dp(37)));
+        updateSuggestions();
+    }
+    private void updateSuggestions(){
+        if(suggestionChips==null||updatingSuggestions)return;
+        updatingSuggestions=true;
+        try{
+            String typed="";
+            InputConnection conn=getCurrentInputConnection();
+            boolean phonetic=IndicLanguages.phonetic(selectedLanguage);
+            if(phonetic){
+                typed=romanComposing.toString();
+            }else if(conn!=null&&!sensitiveField){
+                typed=WordSuggestions.trailingWord(conn.getTextBeforeCursor(36,0));
+            }
+            String[] candidates=sensitiveField||mode!=ABC?
+                new String[0]:WordSuggestions.get(typed,
+                    selectedLanguage!=IndicLanguages.ENGLISH,3);
+            String[] fallback=sensitiveField?
+                new String[]{"Private typing","",""}:
+                new String[]{"S Board","by Saurabh's Vision™","⌨ Type to see suggestions"};
+            for(int i=0;i<suggestionChips.length;i++){
+                TextView chip=suggestionChips[i];
+                if(i<candidates.length){
+                    String raw=candidates[i];
+                    String label=phonetic?OfflinePhonetic.convert(raw,selectedLanguage):raw;
+                    chip.setText(label);
+                    chip.setTag(raw);
+                    chip.setClickable(true);
+                    chip.setTypeface(Typeface.DEFAULT,i==0?Typeface.BOLD:Typeface.NORMAL);
+                }else{
+                    chip.setText(candidates.length==0?fallback[i]:"");
+                    chip.setTag(null);
+                    chip.setClickable(false);
+                    chip.setTypeface(Typeface.DEFAULT,Typeface.NORMAL);
+                }
+            }
+        }finally{updatingSuggestions=false;}
+    }
+    private void applySuggestion(String suggestion){
+        InputConnection conn=getCurrentInputConnection();
+        if(conn==null||sensitiveField||suggestion==null||suggestion.isEmpty())return;
+        if(phoneticEnabled()){
+            conn.setComposingText(
+                OfflinePhonetic.convert(suggestion,selectedLanguage),1);
+            conn.finishComposingText();
+            romanComposing.setLength(0);
+            conn.commitText(" ",1);
+        }else{
+            String before=WordSuggestions.trailingWord(conn.getTextBeforeCursor(36,0));
+            if(!before.isEmpty())conn.deleteSurroundingText(before.length(),0);
+            conn.commitText(suggestion+" ",1);
+        }
+        updateSuggestions();
     }
     private void addRow(String keys){
         String[] labels=keys.split(" ");
@@ -337,6 +489,7 @@ public final class VisionKeyboardService extends InputMethodService {
         connection.setComposingText(
             OfflinePhonetic.convert(romanComposing.toString(),selectedLanguage),1);
         refreshRomanPreview();
+        updateSuggestions();
     }
     private void addEmojiCategories(){
         HorizontalScrollView scroller=new HorizontalScrollView(this);
@@ -419,19 +572,17 @@ public final class VisionKeyboardService extends InputMethodService {
         keysContent.addView(row,new LinearLayout.LayoutParams(-1,height+dp(2)));
     }
     private void addBottom(){
+        // Gboard-like bottom row, with mandatory wide Space key in all modes.
         LinearLayout row=new LinearLayout(this);
         row.setGravity(Gravity.CENTER);
-        int height=dp(getResources().getConfiguration().orientation==2?43:51);
-        if(mode!=ABC)addKey(row,"ABC","ABC",1.10f,height,true);
-        else addKey(row,"123","123",1.05f,height,true);
-        if(mode==ABC)addKey(row,"∑","MATH",.95f,height,true);
-        else if(mode==MATH)addKey(row,"⚛","SCI",.85f,height,true);
-        else addKey(row,"π","MATH",.85f,height,true);
-        addKey(row,"😊","EMOJI",.74f,height,true);
+        int height=dp(getResources().getConfiguration().orientation==2?43:53);
+        addKey(row,mode==ABC?"?123":"ABC",mode==ABC?"123":"ABC",1.02f,height,true);
+        addKey(row,"☺","EMOJI",.82f,height,true);
+        addKey(row,"A↔अ","LANG_TOGGLE",.85f,height,true);
+        addKey(row,"Space","SPACE",4.35f,height,true);
         addKey(row,",",",",.60f,height,false);
-        addKey(row,"SPACE","SPACE",3.75f,height,true);
-        addKey(row,".",".",.6f,height,false);
-        addKey(row,"↵","ENTER",1.05f,height,true);
+        addKey(row,".",".",.60f,height,false);
+        addKey(row,"↵","ENTER",1.16f,height,true);
         keysContent.addView(row,new LinearLayout.LayoutParams(-1,height+dp(3)));
     }
     private static boolean isAction(String value){
@@ -448,7 +599,7 @@ public final class VisionKeyboardService extends InputMethodService {
         b.setText(display);
         b.setIncludeFontPadding(false);
         int length=display.length();
-        b.setTextSize("SPACE".equals(output)?14f:
+        b.setTextSize("SPACE".equals(output)?15f:
             (mode==EMOJI? (length>4?18f:23f) :
             length>=5?11.5f:length>=4?13f:length>=3?15f:20f));
         b.setTypeface(Typeface.create(special?"sans-serif-medium":"sans-serif",
@@ -457,7 +608,7 @@ public final class VisionKeyboardService extends InputMethodService {
         final boolean functionKey=special||isAction(output);
         b.setTextColor(light()?
             (enter?Color.WHITE:(functionKey?0xff2056bb:0xff162338)):
-            (enter?0xff072043:(functionKey?ACCENTS[theme]:Color.WHITE)));
+            (enter?0xff082440:(functionKey?0xff8dffff:Color.WHITE)));
         b.setPadding(0,0,0,0);b.setMinimumHeight(0);b.setMinHeight(0);
         b.setMinimumWidth(0);b.setMinWidth(0);
         int upper,lower,stroke;
@@ -466,9 +617,10 @@ public final class VisionKeyboardService extends InputMethodService {
             lower=enter?0xff1d55cf:(functionKey?0xffdbe7f8:0xfff7faff);
             stroke=enter?0xff245fd7:0xffcbd6e6;
         }else{
-            upper=enter?ACCENTS[theme]:(functionKey?0xff2e507b:KEY_COLORS[theme]);
-            lower=enter?0xff78e5ff:(functionKey?0xff15365c:0xff10284e);
-            stroke=functionKey?ACCENTS[theme]:0x608db9e9;
+            // Glossy neon navy keycaps like the supplied visual design.
+            upper=enter?0xff53f8ff:(functionKey?0xff235477:0xff275d90);
+            lower=enter?0xff04b9e8:(functionKey?0xff0c2e52:0xff081e43);
+            stroke=enter?0xffabffff:0xff43d6ff;
         }
         GradientDrawable shape=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
             new int[]{upper,lower});
@@ -476,11 +628,19 @@ public final class VisionKeyboardService extends InputMethodService {
         shape.setStroke(dp(1),stroke);
         b.setBackground(new RippleDrawable(
             ColorStateList.valueOf(light()?0x452563eb:0x6affffff),shape,null));
-        b.setElevation(dp(light()?1.7f:1.2f));
+        b.setElevation(dp(light()?1.7f:2.3f));
         LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,height-dp(4),weight);
         lp.setMargins(dp(2.4f),dp(1.1f),dp(2.4f),dp(2.5f));
         row.addView(b,lp);
         b.setContentDescription("⌫".equals(output)?"Delete last character":("SPACE".equals(output)?"Spacebar - insert space":output));
+        if(mode==ABC && output.length()==1){
+            int index="qwertyuiop".indexOf(output.toLowerCase(java.util.Locale.ROOT));
+            if(index>=0){
+                final String num=index==9?"0":String.valueOf(index+1);
+                b.setOnLongClickListener(v->{feedback(v);press(num);return true;});
+                b.setLongClickable(true);
+            }
+        }
         if("⌫".equals(output)){
             b.setOnTouchListener((view,event)->{
                 switch(event.getActionMasked()){
@@ -540,10 +700,12 @@ public final class VisionKeyboardService extends InputMethodService {
                     OfflinePhonetic.convert(romanComposing.toString(),selectedLanguage),1);
             }
             refreshRomanPreview();
+            updateSuggestions();
             return;
         }
         if(android.os.Build.VERSION.SDK_INT>=24)conn.deleteSurroundingTextInCodePoints(1,0);
         else conn.deleteSurroundingText(1,0);
+        updateSuggestions();
     }
     private void press(String code){
         InputConnection conn=getCurrentInputConnection();
@@ -553,6 +715,10 @@ public final class VisionKeyboardService extends InputMethodService {
             else if(caps){caps=false;shifted=false;}
             else shifted=!shifted;
             lastShift=now;rebuild();return;
+        }
+        if(code.equals("LANG_TOGGLE")){
+            selectLanguage(selectedLanguage==IndicLanguages.HINDI?
+                IndicLanguages.ENGLISH:IndicLanguages.HINDI);return;
         }
         if(code.equals("LANG_HINDI")){selectLanguage(IndicLanguages.HINDI);return;}
         if(code.equals("LANG_HINGLISH")){selectLanguage(IndicLanguages.HINGLISH);return;}
@@ -577,7 +743,7 @@ public final class VisionKeyboardService extends InputMethodService {
             conn.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,key));
             conn.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP,key));return;
         }
-        if(code.equals("SPACE")){finishRomanWord();conn.commitText(" ",1);return;}
+        if(code.equals("SPACE")){finishRomanWord();conn.commitText(" ",1);updateSuggestions();return;}
         if(code.equals("ENTER")){
             finishRomanWord();
             EditorInfo info=getCurrentInputEditorInfo();
@@ -594,6 +760,7 @@ public final class VisionKeyboardService extends InputMethodService {
             finishRomanWord();
             conn.commitText(code,1);
         }
+        updateSuggestions();
         if(mode==ABC && shifted && !caps && code.length()==1 && Character.isLetter(code.charAt(0))){
             shifted=false;rebuild();
         }
