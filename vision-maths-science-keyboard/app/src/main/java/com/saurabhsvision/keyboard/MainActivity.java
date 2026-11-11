@@ -74,7 +74,7 @@ public final class MainActivity extends Activity {
         add(copy,text("🎓 SAURABH'S VISION™",14,GOLD,true),0);
         add(copy,text("MATHS & SCIENCE\nKEYBOARD",30,Color.WHITE,true),10);
         add(copy,text("Type Smarter. Explore Further.",15,0xffbde9ff,false),8);
-        add(copy,text("π   √   ∑   ∞   α   β   H₂O   DNA   Ω",25,0xff8df0ff,true),18);
+        add(copy,text("π   √   ∑   ∞   🧬   ⚛️   😊   🥰   💯",25,0xff8df0ff,true),18);
         LinearLayout.LayoutParams hp=new LinearLayout.LayoutParams(-1,dp(222));root.addView(hero,hp);
 
         add(root,text("⌨️ Set as your Android Keyboard",20,NAVY,true),25);
@@ -128,6 +128,8 @@ public final class MainActivity extends Activity {
         }
         showTheme();
 
+        add(root,text("😊 New Emoji Keyboard",21,NAVY,true),27);
+        add(root,text("Emoji tab खोलें, Faces, Love, Feelings, Hands, People, Animals, Nature, Food, Fun, Symbols और Science चुनें। ◀ ▶ से नए emoji pages देखें। कुल 923 entries हैं; कुछ emojis Android version के अनुसार अलग दिख सकते हैं।",14,0xff496284,false),8);
         add(root,text("🧪 Test Your Keyboard",21,NAVY,true),30);
         add(root,text("नीचे बॉक्स पर टैप करें और Maths/Science keyboard से लिखकर देखें:",14,0xff496284,false),8);
         EditText test=new EditText(this);
@@ -145,7 +147,7 @@ public final class MainActivity extends Activity {
         features.setBackground(box(Color.WHITE,18));
         add(root,features,27);
         add(features,text("✨ What's Inside",18,NAVY,true),0);
-        add(features,text("• Full ABC QWERTY + Shift + Caps Lock\n• Maths symbols, powers, integrals and Greek letters\n• Science formulas, chemistry symbols and units\n• Responsive neon key animations and haptic feedback\n• Backspace repeat, cursor arrows and Enter\n• Works with Android text fields as an Input Method",14,0xff3d5a7b,false),11);
+        add(features,text("• Compact keyboard height: no more full-screen empty background\n• ABC QWERTY, Shift/Caps, Numbers, Maths and Science\n• 😊 Emoji keyboard with 923 options across 11 categories\n• Faces, love, feelings, gestures, people, animals and more\n• Previous/next emoji pages and responsive key touch effects\n• Backspace repeat, cursor arrows, Space and Enter",14,0xff3d5a7b,false),11);
 
         add(root,text("🔒 Your Typing Stays Private",20,NAVY,true),25);
         add(root,text("इस keyboard को Internet permission नहीं दी गई है। यह आपकी typing history, passwords या clipboard को save या किसी server पर upload नहीं करता। आपके typed characters सिर्फ खुले हुए text field तक भेजे जाते हैं। Android नए keyboard को enable करते समय सामान्य सुरक्षा चेतावनी दिखाता है।",14,0xff445d7f,false),9);

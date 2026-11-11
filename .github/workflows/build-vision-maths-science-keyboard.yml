@@ -69,7 +69,21 @@ jobs:
           assert 'ACTION_INPUT_METHOD_SETTINGS' in activity
           assert 'showInputMethodPicker' in activity
           assert 'MATHS & SCIENCE' in activity
-          assert 'extends View' in bg
+          panel=(root/'java/com/saurabhsvision/keyboard/KeyboardPanel.java').read_text()
+          emojis=(root/'java/com/saurabhsvision/keyboard/EmojiCatalog.java').read_text()
+          assert 'extends LinearLayout' in panel
+          assert 'WRAP_CONTENT' in panel
+          assert 'AT_MOST' in panel
+          assert 'new KeyboardBackdrop(this,theme),' not in ime
+          assert 'onEvaluateFullscreenMode(){return false;}' in ime
+          assert 'keyboardFrame=new KeyboardPanel(this,theme)' in ime
+          assert 'addEmojiCategories' in ime and 'addEmojiPage' in ime
+          assert 'EMOJIS_PER_PAGE=32' in ime
+          assert 'getCurrentInputConnection' in ime
+          assert 'CATEGORIES' in emojis and 'Love' in emojis and 'Feelings' in emojis
+          assert 'drawArtwork' in bg
+          print('Verified compact IME panel + paginated emoji picker source contracts.')
+                    assert 'extends View' in bg
           print('Keyboard functional/input/privacy contracts checked.')
           PY
 
@@ -91,13 +105,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/Vision_Maths_Science_Keyboard_v1.0.0_TEST.apk
+          cp "$apk" keyboard-deliverables/Vision_Maths_Science_Keyboard_v1.1.0_EMOJI_COMPACT_TEST.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Vision_Maths_Science_Keyboard_v1_APK
+          name: Vision_Maths_Science_Keyboard_v1_1_Emoji_Compact_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -107,13 +121,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="vision-maths-science-keyboard-v1.0.0"
-          file="keyboard-deliverables/Vision_Maths_Science_Keyboard_v1.0.0_TEST.apk"
+          tag="vision-maths-science-keyboard-v1.1.0"
+          file="keyboard-deliverables/Vision_Maths_Science_Keyboard_v1.1.0_EMOJI_COMPACT_TEST.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "Vision Maths & Science Keyboard 1.0 • Neon Android Keyboard" \
-              --notes "Functional offline Android input method with ABC QWERTY, number, Maths symbol and Science formula layouts, 4 neon themes, Shift, caps, backspace and repeat, keyboard setup screen. No Internet permission or typing data storage. Debug-signed TEST APK: enable in Android Settings, then choose Vision Maths & Science as default. CI validates build and signature; real device tests still required." \
+              --title "Vision Maths & Science Keyboard 1.1 • Compact Height + Emojis" \
+              --notes "Vision Maths & Science Keyboard v1.1 TEST APK. Fix: the keyboard now stays compact instead of filling the display; neon backgrounds render within the key panel only, and fullscreen extract mode is disabled. Added 923 emoji choices in 11 categories including emotions, faces, love, gestures and science, with paging. Retains Maths and Science symbol input, ABC/123, 4 neon themes and offline privacy. Android APK compile and signature verified by GitHub; physical device keyboard height, emoji glyphs and compatibility still require testing." \
               --latest=false
           fi

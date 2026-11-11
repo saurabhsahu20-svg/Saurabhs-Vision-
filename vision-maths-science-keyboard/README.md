@@ -1,4 +1,4 @@
-# SAURABH'S VISION™ — Maths & Science Keyboard 1.0
+# SAURABH'S VISION™ — Maths & Science Keyboard 1.1
 
 **Type Smarter. Explore Further.**
 
@@ -39,3 +39,11 @@ gradle --no-daemon :app:assembleDebug
 The GitHub Actions release distributes a **debug-signed test APK**. Do not treat it as a Play Store-ready release; use a stable private signing key for production, and test IME privacy and UX on a device.
 
 **SAURABH'S VISION™ — Learn Today, Lead Tomorrow!**
+
+## 1.1 Update — fixed full-screen background and added emoji panel
+
+The first version showed a very tall empty neon background under the typing keys on some Android devices. This version eliminates the independent MATCH_PARENT wallpaper View. The full Maths/Science background is **painted by a KeyboardPanel containing only toolbar and key rows**, measured WRAP_CONTENT with a strict max height, and Android fullscreen extract mode is disabled. ChatGPT, WhatsApp and Notes should remain visible above the keyboard instead of being hidden behind unused blue space. A device test is still needed.
+
+Choose the **😊** toolbar tab or bottom-row emoji key. The offline EmojiCatalog offers **923 emoji entries across 11 groups** (795 distinct strings), emphasizing facial emotions, love, feelings, hand gestures, people and more. Use the horizontal category bar and ◀ ▶ for 32 emoji per page. Emoji insertion uses the active InputConnection with Unicode, so combined emojis and skin tones depend on Android/font/app support. This is not the complete Unicode emoji standard and does not include a GIF or sticker browser.
+
+Compatibility: Upgrading a previously installed debug-signed APK may conflict with a different debug signing certificate. If upgrading fails, uninstall only the old Vision Maths & Science Keyboard after first switching to the phone's original keyboard; then install this new APK. Settings and custom themes may reset. Do not uninstall the Android system keyboard.
