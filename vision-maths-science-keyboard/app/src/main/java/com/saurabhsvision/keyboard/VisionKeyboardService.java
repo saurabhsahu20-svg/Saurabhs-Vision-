@@ -34,7 +34,7 @@ import android.content.SharedPreferences;
 public final class VisionKeyboardService extends InputMethodService {
     private static final String PREFS="vision_keyboard_settings";
     private static final String KEY_THEME="theme";
-    private static final int ABC=0,NUMBER=1,MATH=2,SCIENCE=3,EMOJI=4;
+    private static final int ABC=0,NUMBER=1,MATH=2,SCIENCE=3,EMOJI=4,LANGUAGE=5;
     private static final int EMOJIS_PER_PAGE=32;
     private int emojiCategory=0,emojiPage=0;
     private static final int[] ACCENTS={0xff65e9ff,0xffffd55c,0xff9affd4,0xffeea8ff,0xff2563eb};
@@ -43,6 +43,10 @@ public final class VisionKeyboardService extends InputMethodService {
     private KeyboardPanel keyboardFrame;
     private LinearLayout keysContent;
     private int mode=ABC,theme=0;
+    private int selectedLanguage=IndicLanguages.ENGLISH;
+    private boolean sensitiveField=false;
+    private final StringBuilder romanComposing=new StringBuilder();
+    private TextView romanPreview;
     private boolean shifted=false,caps=false;
     private long lastShift=0L;
     private final Handler repeatHandler=new Handler(Looper.getMainLooper());
@@ -53,6 +57,7 @@ public final class VisionKeyboardService extends InputMethodService {
     @Override public void onCreate(){
         super.onCreate();
         theme=Math.floorMod(getSharedPreferences(PREFS,MODE_PRIVATE).getInt(KEY_THEME,0),5);
+        selectedLanguage=IndicLanguages.norm(settings().getInt("language",IndicLanguages.ENGLISH));
     }
     private int dp(float value){
         return (int)(value*getResources().getDisplayMetrics().density+.5f);
@@ -66,24 +71,42 @@ public final class VisionKeyboardService extends InputMethodService {
     /** Avoid Android's fullscreen extract editor and keep the app visible above the keyboard. */
     @Override public boolean onEvaluateFullscreenMode(){return false;}
     @Override public void onStartInput(EditorInfo info,boolean restarting){
+        finishRomanWord();
         super.onStartInput(info,restarting);
+        sensitiveField=isPasswordField(info);
         if(!restarting){
-            mode=info!=null && (info.inputType&InputType.TYPE_MASK_CLASS)==InputType.TYPE_CLASS_NUMBER
+            int type=info==null?InputType.TYPE_CLASS_TEXT:(info.inputType&InputType.TYPE_MASK_CLASS);
+            mode=(type==InputType.TYPE_CLASS_NUMBER || type==InputType.TYPE_CLASS_PHONE)
                 ?NUMBER:ABC;
             shifted=false;caps=false;
         }
     }
+    private boolean isPasswordField(EditorInfo info){
+        if(info==null)return false;
+        int type=info.inputType;
+        int cls=type&InputType.TYPE_MASK_CLASS;
+        int variation=type&InputType.TYPE_MASK_VARIATION;
+        return (cls==InputType.TYPE_CLASS_TEXT &&
+            (variation==InputType.TYPE_TEXT_VARIATION_PASSWORD||
+             variation==InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD||
+             variation==InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD))||
+            (cls==InputType.TYPE_CLASS_NUMBER &&
+             variation==InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+    }
     @Override public void onStartInputView(EditorInfo info,boolean restarting){
         super.onStartInputView(info,restarting);
         theme=Math.floorMod(settings().getInt(KEY_THEME,0),5);
+        selectedLanguage=IndicLanguages.norm(settings().getInt("language",IndicLanguages.ENGLISH));
         if(keyboardFrame!=null)rebuild();
     }
     @Override public void onFinishInputView(boolean finishingInput){
         stopRepeat();
+        finishRomanWord();
         super.onFinishInputView(finishingInput);
     }
     @Override public void onDestroy(){
         stopRepeat();
+        finishRomanWord();
         repeatHandler.removeCallbacksAndMessages(null);
         super.onDestroy();
     }
@@ -98,7 +121,11 @@ public final class VisionKeyboardService extends InputMethodService {
         keysContent=keyboardFrame;
         keysContent.setPadding(dp(3),dp(3),dp(3),dp(4));
         addToolbar();
-        if(mode==ABC){
+        if(mode==LANGUAGE){
+            addLanguagePicker();
+        }else if(mode==ABC){
+            if(selectedLanguage!=IndicLanguages.ENGLISH)addLanguageStatus();
+
             addRow("Q W E R T Y U I O P");
             addRow("A S D F G H J K L");
             addRow("⇧ Z X C V B N M ⌫");
@@ -129,12 +156,12 @@ public final class VisionKeyboardService extends InputMethodService {
         LinearLayout bar=new LinearLayout(this);
         bar.setOrientation(LinearLayout.HORIZONTAL);
         bar.setGravity(Gravity.CENTER);
-        String[] ids={"ABC","123","∑","⚛","😊","☀","⚙"};
+        String[] ids={"ABC","123","∑","⚛","😊","🌐","☀","⚙"};
         for(int i=0;i<ids.length;i++){
             final int idx=i;
             TextView tab=new TextView(this);
             tab.setText(ids[i]);
-            tab.setTextSize(i==2||i==3?17:13);
+            tab.setTextSize(i==2||i==3||i==5?17:13);
             tab.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
             tab.setGravity(Gravity.CENTER);
             tab.setTextColor(i<5 && mode==i?DARK[theme]:(light()?0xff253955:Color.WHITE));
@@ -149,12 +176,14 @@ public final class VisionKeyboardService extends InputMethodService {
             LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(37),i==2||i==3?1.1f:1f);
             lp.setMargins(dp(2),0,dp(2),dp(5));
             bar.addView(tab,lp);
-            tab.setContentDescription(i==5?"Change keyboard theme":i==6?"Keyboard settings":"Switch keyboard to "+ids[i]);
+            tab.setContentDescription(i==5?"Choose Indian language":i==6?"Change keyboard theme":
+                i==7?"Keyboard settings":"Switch keyboard to "+ids[i]);
             tab.setOnClickListener(v->{
                 feedback(v);
-                if(idx<5){mode=idx;shifted=false;rebuild();}
-                else if(idx==5){theme=(theme+1)%5;settings().edit().putInt(KEY_THEME,theme).apply();rebuild();}
-                else{Intent intent=new Intent(this,MainActivity.class);
+                if(idx<5){finishRomanWord();mode=idx;shifted=false;rebuild();}
+                else if(idx==5){finishRomanWord();mode=LANGUAGE;rebuild();}
+                else if(idx==6){theme=(theme+1)%5;settings().edit().putInt(KEY_THEME,theme).apply();rebuild();}
+                else{finishRomanWord();Intent intent=new Intent(this,MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     try{startActivity(intent);}catch(RuntimeException ignored){}}
             });
@@ -178,6 +207,134 @@ public final class VisionKeyboardService extends InputMethodService {
             addKey(row,display,output,weight,height,false);
         }
         keysContent.addView(row,new LinearLayout.LayoutParams(-1,height+dp(3)));
+    }
+    private void selectLanguage(int lang){
+        finishRomanWord();
+        selectedLanguage=IndicLanguages.norm(lang);
+        settings().edit().putInt("language",selectedLanguage).apply();
+        mode=ABC;shifted=false;caps=false;
+        rebuild();
+    }
+    /**
+     * Two horizontally scrollable rows cover English + Hinglish + all 22 scheduled
+     * Indian languages, without growing the IME taller than the viewport.
+     */
+    private void addLanguagePicker(){
+        TextView title=new TextView(this);
+        title.setText("🌐 Select language · Swipe sideways to see all 24 options");
+        title.setTextSize(12);title.setGravity(Gravity.CENTER_VERTICAL);
+        title.setTextColor(light()?0xff243f70:0xffe1edff);
+        title.setPadding(dp(7),0,dp(4),0);
+        keysContent.addView(title,new LinearLayout.LayoutParams(-1,dp(29)));
+        for(int row=0;row<2;row++){
+            HorizontalScrollView scroll=new HorizontalScrollView(this);
+            scroll.setHorizontalScrollBarEnabled(false);
+            scroll.setFillViewport(false);
+            LinearLayout choices=new LinearLayout(this);
+            choices.setOrientation(LinearLayout.HORIZONTAL);
+            choices.setGravity(Gravity.CENTER_VERTICAL);
+            for(int i=row*12;i<Math.min((row+1)*12,IndicLanguages.count());i++){
+                final int choice=i;
+                TextView item=new TextView(this);
+                item.setText(IndicLanguages.nativeName(i)+"\n"+IndicLanguages.name(i));
+                item.setGravity(Gravity.CENTER);
+                item.setTextSize(12);
+                item.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+                boolean current=i==selectedLanguage;
+                item.setTextColor(current?DARK[theme]:(light()?0xff253955:Color.WHITE));
+                GradientDrawable shape=new GradientDrawable();
+                shape.setColor(current?ACCENTS[theme]:(light()?0xffe6edf9:0xaa20395c));
+                shape.setCornerRadius(dp(11));
+                shape.setStroke(dp(1),current?ACCENTS[theme]:0x6689b3df);
+                item.setBackground(shape);
+                LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(120),dp(54));
+                lp.setMargins(dp(3),dp(2),dp(3),dp(2));
+                choices.addView(item,lp);
+                item.setContentDescription("Choose "+IndicLanguages.name(i)+" keyboard");
+                item.setOnClickListener(v->{feedback(v);selectLanguage(choice);});
+            }
+            scroll.addView(choices);
+            keysContent.addView(scroll,new LinearLayout.LayoutParams(-1,dp(59)));
+        }
+        TextView note=new TextView(this);
+        note.setText("English = Latin   •   Hinglish = Roman Hindi   •   Other languages = phonetic script");
+        note.setTextSize(11);note.setTextColor(light()?0xff476183:0xffb8d8fc);
+        note.setGravity(Gravity.CENTER);
+        keysContent.addView(note,new LinearLayout.LayoutParams(-1,dp(37)));
+        LinearLayout footer=new LinearLayout(this);footer.setGravity(Gravity.CENTER);
+        int height=dp(47);
+        addKey(footer,"ABC","ABC",1.2f,height,true);
+        addKey(footer,"🇮🇳 Hindi","LANG_HINDI",1.5f,height,true);
+        addKey(footer,"Hinglish","LANG_HINGLISH",1.5f,height,true);
+        addKey(footer,"English","LANG_ENGLISH",1.5f,height,true);
+        keysContent.addView(footer,new LinearLayout.LayoutParams(-1,height+dp(2)));
+    }
+    private void addLanguageStatus(){
+        LinearLayout row=new LinearLayout(this);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        TextView name=new TextView(this);
+        name.setText(selectedLanguage==IndicLanguages.HINGLISH?"Hinglish":
+            IndicLanguages.nativeName(selectedLanguage));
+        name.setTextSize(12);name.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+        name.setTextColor(light()?0xff2257b7:ACCENTS[theme]);
+        name.setPadding(dp(4),0,dp(5),0);
+        row.addView(name,new LinearLayout.LayoutParams(-2,-1));
+        romanPreview=new TextView(this);
+        romanPreview.setSingleLine(true);
+        romanPreview.setTextSize(12);
+        romanPreview.setGravity(Gravity.CENTER_VERTICAL);
+        romanPreview.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        romanPreview.setTextColor(light()?0xff213754:0xffeaf5ff);
+        row.addView(romanPreview,new LinearLayout.LayoutParams(0,-1,1f));
+        TextView swap=new TextView(this);
+        swap.setText(selectedLanguage==IndicLanguages.HINDI?"Hinglish":"हिंदी");
+        swap.setGravity(Gravity.CENTER);
+        swap.setTextColor(light()?0xff1c5acc:ACCENTS[theme]);
+        swap.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+        swap.setTextSize(12);
+        swap.setPadding(dp(7),0,dp(7),0);
+        row.addView(swap,new LinearLayout.LayoutParams(-2,-1));
+        swap.setContentDescription("Toggle between Hindi phonetic and Hinglish");
+        swap.setOnClickListener(v->selectLanguage(selectedLanguage==IndicLanguages.HINDI?
+            IndicLanguages.HINGLISH:IndicLanguages.HINDI));
+        keysContent.addView(row,new LinearLayout.LayoutParams(-1,dp(31)));
+        refreshRomanPreview();
+    }
+    private void refreshRomanPreview(){
+        if(romanPreview==null)return;
+        if(sensitiveField){
+            romanPreview.setText("Private field · English letters only");
+        }else if(selectedLanguage==IndicLanguages.HINGLISH){
+            romanPreview.setText("Type Hindi in English letters: namaste");
+        }else if(romanComposing.length()>0){
+            romanPreview.setText(romanComposing+" → "+
+                OfflinePhonetic.convert(romanComposing.toString(),selectedLanguage));
+        }else{
+            romanPreview.setText("Type namaste → "+
+                OfflinePhonetic.convert("namaste",selectedLanguage));
+        }
+    }
+    private void finishRomanWord(){
+        if(romanComposing.length()==0)return;
+        InputConnection connection=getCurrentInputConnection();
+        if(connection!=null)connection.finishComposingText();
+        romanComposing.setLength(0);
+        refreshRomanPreview();
+    }
+    private boolean phoneticEnabled(){
+        return mode==ABC && IndicLanguages.phonetic(selectedLanguage) && !sensitiveField;
+    }
+    private boolean isAsciiLetter(String code){
+        return code.length()==1 && (
+            (code.charAt(0)>='a'&&code.charAt(0)<='z')||
+            (code.charAt(0)>='A'&&code.charAt(0)<='Z'));
+    }
+    private void appendRoman(String code,InputConnection connection){
+        if(romanComposing.length()>=48)finishRomanWord();
+        romanComposing.append(code.toLowerCase(java.util.Locale.ROOT));
+        connection.setComposingText(
+            OfflinePhonetic.convert(romanComposing.toString(),selectedLanguage),1);
+        refreshRomanPreview();
     }
     private void addEmojiCategories(){
         HorizontalScrollView scroller=new HorizontalScrollView(this);
@@ -279,7 +436,8 @@ public final class VisionKeyboardService extends InputMethodService {
         return value.equals("⇧")||value.equals("⌫")||value.equals("ABC")||
             value.equals("123")||value.equals("MATH")||value.equals("SCI")||
             value.equals("EMOJI")||value.equals("EMOJI_PREV")||value.equals("EMOJI_NEXT")||
-            value.equals("SPACE")||value.equals("ENTER")||value.equals("←");
+            value.equals("SPACE")||value.equals("ENTER")||value.equals("←")||
+            value.startsWith("LANG_");
     }
     private void addKey(LinearLayout row,String display,String output,float weight,int height,boolean special){
         Button b=new Button(this);
@@ -371,6 +529,17 @@ public final class VisionKeyboardService extends InputMethodService {
     private void deleteOne(){
         InputConnection conn=getCurrentInputConnection();
         if(conn==null)return;
+        if(phoneticEnabled() && romanComposing.length()>0){
+            romanComposing.deleteCharAt(romanComposing.length()-1);
+            if(romanComposing.length()==0){
+                conn.setComposingText("",1);conn.finishComposingText();
+            }else{
+                conn.setComposingText(
+                    OfflinePhonetic.convert(romanComposing.toString(),selectedLanguage),1);
+            }
+            refreshRomanPreview();
+            return;
+        }
         if(android.os.Build.VERSION.SDK_INT>=24)conn.deleteSurroundingTextInCodePoints(1,0);
         else conn.deleteSurroundingText(1,0);
     }
@@ -383,11 +552,14 @@ public final class VisionKeyboardService extends InputMethodService {
             else shifted=!shifted;
             lastShift=now;rebuild();return;
         }
-        if(code.equals("ABC")){mode=ABC;shifted=false;rebuild();return;}
-        if(code.equals("123")){mode=NUMBER;shifted=false;rebuild();return;}
-        if(code.equals("MATH")){mode=MATH;shifted=false;rebuild();return;}
-        if(code.equals("SCI")){mode=SCIENCE;shifted=false;rebuild();return;}
-        if(code.equals("EMOJI")){mode=EMOJI;emojiPage=0;shifted=false;rebuild();return;}
+        if(code.equals("LANG_HINDI")){selectLanguage(IndicLanguages.HINDI);return;}
+        if(code.equals("LANG_HINGLISH")){selectLanguage(IndicLanguages.HINGLISH);return;}
+        if(code.equals("LANG_ENGLISH")){selectLanguage(IndicLanguages.ENGLISH);return;}
+        if(code.equals("ABC")){finishRomanWord();mode=ABC;shifted=false;rebuild();return;}
+        if(code.equals("123")){finishRomanWord();mode=NUMBER;shifted=false;rebuild();return;}
+        if(code.equals("MATH")){finishRomanWord();mode=MATH;shifted=false;rebuild();return;}
+        if(code.equals("SCI")){finishRomanWord();mode=SCIENCE;shifted=false;rebuild();return;}
+        if(code.equals("EMOJI")){finishRomanWord();mode=EMOJI;emojiPage=0;shifted=false;rebuild();return;}
         if(code.equals("EMOJI_PREV")){
             int n=(EmojiCatalog.items(emojiCategory).length+EMOJIS_PER_PAGE-1)/EMOJIS_PER_PAGE;
             emojiPage=(emojiPage+n-1)%Math.max(1,n);rebuild();return;
@@ -398,12 +570,14 @@ public final class VisionKeyboardService extends InputMethodService {
         }
         if(conn==null)return;
         if(code.equals("←")){
+            finishRomanWord();
             int key=KeyEvent.KEYCODE_DPAD_LEFT;
             conn.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,key));
             conn.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP,key));return;
         }
-        if(code.equals("SPACE")){conn.commitText(" ",1);return;}
+        if(code.equals("SPACE")){finishRomanWord();conn.commitText(" ",1);return;}
         if(code.equals("ENTER")){
+            finishRomanWord();
             EditorInfo info=getCurrentInputEditorInfo();
             int action=info==null?EditorInfo.IME_ACTION_NONE:
                 (info.imeOptions&EditorInfo.IME_MASK_ACTION);
@@ -412,7 +586,12 @@ public final class VisionKeyboardService extends InputMethodService {
             else conn.commitText("\n",1);
             return;
         }
-        conn.commitText(code,1);
+        if(phoneticEnabled() && isAsciiLetter(code)){
+            appendRoman(code,conn);
+        }else{
+            finishRomanWord();
+            conn.commitText(code,1);
+        }
         if(mode==ABC && shifted && !caps && code.length()==1 && Character.isLetter(code.charAt(0))){
             shifted=false;rebuild();
         }
