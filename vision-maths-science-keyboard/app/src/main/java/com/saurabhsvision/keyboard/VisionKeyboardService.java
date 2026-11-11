@@ -37,9 +37,9 @@ public final class VisionKeyboardService extends InputMethodService {
     private static final int ABC=0,NUMBER=1,MATH=2,SCIENCE=3,EMOJI=4;
     private static final int EMOJIS_PER_PAGE=32;
     private int emojiCategory=0,emojiPage=0;
-    private static final int[] ACCENTS={0xff65e9ff,0xffffd55c,0xff9affd4,0xffeea8ff};
-    private static final int[] DARK={0xff071537,0xff1c1641,0xff061e32,0xff1a1040};
-    private static final int[] KEY_COLORS={0xd91b3561,0xdb45375e,0xdb21485b,0xdb3c2b67};
+    private static final int[] ACCENTS={0xff65e9ff,0xffffd55c,0xff9affd4,0xffeea8ff,0xff2563eb};
+    private static final int[] DARK={0xff071537,0xff1c1641,0xff061e32,0xff1a1040,0xffffffff};
+    private static final int[] KEY_COLORS={0xd91b3561,0xdb45375e,0xdb21485b,0xdb3c2b67,0xfff8fbff};
     private KeyboardPanel keyboardFrame;
     private LinearLayout keysContent;
     private int mode=ABC,theme=0;
@@ -52,7 +52,7 @@ public final class VisionKeyboardService extends InputMethodService {
 
     @Override public void onCreate(){
         super.onCreate();
-        theme=getSharedPreferences(PREFS,MODE_PRIVATE).getInt(KEY_THEME,0)%4;
+        theme=getSharedPreferences(PREFS,MODE_PRIVATE).Math.floorMod(getInt(KEY_THEME,0),5);
     }
     private int dp(float value){
         return (int)(value*getResources().getDisplayMetrics().density+.5f);
@@ -75,7 +75,7 @@ public final class VisionKeyboardService extends InputMethodService {
     }
     @Override public void onStartInputView(EditorInfo info,boolean restarting){
         super.onStartInputView(info,restarting);
-        theme=Math.floorMod(settings().getInt(KEY_THEME,0),4);
+        theme=Math.floorMod(settings().getInt(KEY_THEME,0),5);
         if(keyboardFrame!=null)rebuild();
     }
     @Override public void onFinishInputView(boolean finishingInput){
@@ -87,6 +87,7 @@ public final class VisionKeyboardService extends InputMethodService {
         repeatHandler.removeCallbacksAndMessages(null);
         super.onDestroy();
     }
+    private boolean light(){return theme==4;}
     private void rebuild(){
         if(keyboardFrame==null)return;
         keyboardFrame.removeAllViews();
@@ -125,7 +126,7 @@ public final class VisionKeyboardService extends InputMethodService {
         LinearLayout bar=new LinearLayout(this);
         bar.setOrientation(LinearLayout.HORIZONTAL);
         bar.setGravity(Gravity.CENTER);
-        String[] ids={"ABC","123","∑","⚛","😊","🎨","⚙"};
+        String[] ids={"ABC","123","∑","⚛","😊","☀","⚙"};
         for(int i=0;i<ids.length;i++){
             final int idx=i;
             TextView tab=new TextView(this);
@@ -133,21 +134,23 @@ public final class VisionKeyboardService extends InputMethodService {
             tab.setTextSize(i==2||i==3?17:13);
             tab.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
             tab.setGravity(Gravity.CENTER);
-            tab.setTextColor(i<5 && mode==i?DARK[theme]:Color.WHITE);
+            tab.setTextColor(i<5 && mode==i?DARK[theme]:(light()?0xff253955:Color.WHITE));
             GradientDrawable surface=new GradientDrawable();
             boolean selected=i<5 && mode==i;
-            surface.setColor(selected?ACCENTS[theme]:0x66243659);
-            surface.setCornerRadius(dp(12));
-            surface.setStroke(dp(1),selected?ACCENTS[theme]:0x556edfff);
-            tab.setBackground(surface);
+            surface.setColor(selected?ACCENTS[theme]:(light()?0xffe4ebf6:0x66243659));
+            surface.setCornerRadius(dp(14));
+            surface.setStroke(dp(1),selected?ACCENTS[theme]:(light()?0xffd0dced:0x556edfff));
+            tab.setBackground(new RippleDrawable(
+                ColorStateList.valueOf(light()?0x402563eb:0x40ffffff),surface,null));
+            tab.setElevation(dp(light()?1.2f:.7f));
             LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(41),i==2||i==3?1.1f:1f);
             lp.setMargins(dp(2),0,dp(2),dp(5));
             bar.addView(tab,lp);
-            tab.setContentDescription(i==4?"Change keyboard theme":i==5?"Keyboard settings":"Switch keyboard to "+ids[i]);
+            tab.setContentDescription(i==5?"Change keyboard theme":i==6?"Keyboard settings":"Switch keyboard to "+ids[i]);
             tab.setOnClickListener(v->{
                 feedback(v);
                 if(idx<5){mode=idx;shifted=false;rebuild();}
-                else if(idx==5){theme=(theme+1)%4;settings().edit().putInt(KEY_THEME,theme).apply();rebuild();}
+                else if(idx==5){theme=(theme+1)%5;settings().edit().putInt(KEY_THEME,theme).apply();rebuild();}
                 else{Intent intent=new Intent(this,MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     try{startActivity(intent);}catch(RuntimeException ignored){}}
@@ -188,11 +191,12 @@ public final class VisionKeyboardService extends InputMethodService {
             chip.setGravity(Gravity.CENTER);
             chip.setText(icons[i]+" "+EmojiCatalog.title(i));
             chip.setTextSize(12);
-            chip.setTextColor(category==emojiCategory?DARK[theme]:Color.WHITE);
+            chip.setTextColor(category==emojiCategory?DARK[theme]:(light()?0xff263a56:Color.WHITE));
             chip.setContentDescription(EmojiCatalog.title(i)+" emojis");
             GradientDrawable shape=new GradientDrawable();
-            shape.setColor(i==emojiCategory?ACCENTS[theme]:0x7a1a3560);
-            shape.setCornerRadius(dp(10));
+            shape.setColor(i==emojiCategory?ACCENTS[theme]:(light()?0xffe2eaf5:0x7a1a3560));
+            shape.setStroke(dp(1),light()?0xffc9d7ec:0x477ab5d9);
+            shape.setCornerRadius(dp(12));
             chip.setBackground(shape);
             LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-2,dp(34));
             lp.setMargins(dp(3),dp(2),dp(3),dp(2));
@@ -242,7 +246,7 @@ public final class VisionKeyboardService extends InputMethodService {
         addKey(row,"◀","EMOJI_PREV",.55f,height,true);
         int pages=(EmojiCatalog.items(emojiCategory).length+EMOJIS_PER_PAGE-1)/EMOJIS_PER_PAGE;
         TextView count=new TextView(this);
-        count.setGravity(Gravity.CENTER);count.setTextColor(ACCENTS[theme]);
+        count.setGravity(Gravity.CENTER);count.setTextColor(light()?0xff245bcc:ACCENTS[theme]);
         count.setTextSize(12);count.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
         count.setText((emojiPage+1)+"/"+Math.max(1,pages));
         row.addView(count,new LinearLayout.LayoutParams(0,height,.6f));
@@ -282,16 +286,34 @@ public final class VisionKeyboardService extends InputMethodService {
         b.setIncludeFontPadding(false);
         int length=display.length();
         b.setTextSize(mode==EMOJI? (length>4?18f:23f) : length>=5?11.5f:length>=4?13f:length>=3?15f:20f);
-        b.setTypeface(Typeface.create("sans-serif",special||isAction(output)?Typeface.BOLD:Typeface.NORMAL));
-        b.setTextColor(special?ACCENTS[theme]:Color.WHITE);
-        b.setPadding(0,0,0,0);b.setMinimumHeight(0);b.setMinHeight(0);b.setMinimumWidth(0);b.setMinWidth(0);
+        b.setTypeface(Typeface.create(special?"sans-serif-medium":"sans-serif",
+            special||isAction(output)?Typeface.BOLD:Typeface.NORMAL));
+        final boolean enter="ENTER".equals(output);
+        final boolean functionKey=special||isAction(output);
+        b.setTextColor(light()?
+            (enter?Color.WHITE:(functionKey?0xff2056bb:0xff162338)):
+            (enter?0xff072043:(functionKey?ACCENTS[theme]:Color.WHITE)));
+        b.setPadding(0,0,0,0);b.setMinimumHeight(0);b.setMinHeight(0);
+        b.setMinimumWidth(0);b.setMinWidth(0);
+        int upper,lower,stroke;
+        if(light()){
+            upper=enter?0xff3c82f6:(functionKey?0xffe6eefb:0xffffffff);
+            lower=enter?0xff1d55cf:(functionKey?0xffdbe7f8:0xfff7faff);
+            stroke=enter?0xff245fd7:0xffcbd6e6;
+        }else{
+            upper=enter?ACCENTS[theme]:(functionKey?0xff2e507b:KEY_COLORS[theme]);
+            lower=enter?0xff78e5ff:(functionKey?0xff15365c:0xff10284e);
+            stroke=functionKey?ACCENTS[theme]:0x608db9e9;
+        }
         GradientDrawable shape=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-            new int[]{special?0xeb293c68:KEY_COLORS[theme],special?0xea102345:0xed0c2146});
-        shape.setCornerRadius(dp(8));
-        shape.setStroke(dp(1),special?ACCENTS[theme]:0x4b79bdff);
-        b.setBackground(new RippleDrawable(ColorStateList.valueOf(ACCENTS[theme]),shape,null));
-        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,height-dp(3),weight);
-        lp.setMargins(dp(2),dp(1),dp(2),dp(2));
+            new int[]{upper,lower});
+        shape.setCornerRadius(dp(13));
+        shape.setStroke(dp(1),stroke);
+        b.setBackground(new RippleDrawable(
+            ColorStateList.valueOf(light()?0x452563eb:0x6affffff),shape,null));
+        b.setElevation(dp(light()?1.7f:1.2f));
+        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,height-dp(4),weight);
+        lp.setMargins(dp(2.4f),dp(1.1f),dp(2.4f),dp(2.5f));
         row.addView(b,lp);
         b.setContentDescription("⌫".equals(output)?"Delete last character":("SPACE".equals(output)?"Space":output));
         if("⌫".equals(output)){
@@ -310,6 +332,15 @@ public final class VisionKeyboardService extends InputMethodService {
                 }
             });
         }else{
+            b.setOnTouchListener((view,event)->{
+                if(event.getActionMasked()==MotionEvent.ACTION_DOWN){
+                    view.animate().scaleX(.96f).scaleY(.94f).setDuration(65).start();
+                }else if(event.getActionMasked()==MotionEvent.ACTION_UP||
+                         event.getActionMasked()==MotionEvent.ACTION_CANCEL){
+                    view.animate().scaleX(1f).scaleY(1f).setDuration(85).start();
+                }
+                return false;
+            });
             b.setOnClickListener(v->{feedback(v);press(output);});
         }
     }
