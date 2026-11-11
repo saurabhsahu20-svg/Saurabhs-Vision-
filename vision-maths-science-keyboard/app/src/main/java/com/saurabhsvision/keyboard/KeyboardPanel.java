@@ -11,8 +11,9 @@ import java.util.WeakHashMap;
 /**
  * Measured S Board keyboard. The previous LinearLayout inherited measurement
  * could let fixed-height children exceed the visible IME viewport. This class
- * measures AND lays out every row explicitly so the action row is never outside
- * its own bounds. The last child is ALWAYS Space / Enter (or an action footer).
+ * measures AND lays out every row explicitly so rows are never outside
+ * its own bounds. Space / Enter may sit directly above the bottom letter row,
+ * and is explicitly given priority when there is limited screen height.
  */
 public final class KeyboardPanel extends LinearLayout {
     private KeyboardBackdrop painter;
@@ -103,14 +104,15 @@ public final class KeyboardPanel extends LinearLayout {
         int n=getChildCount();
         int padH=getPaddingTop()+getPaddingBottom();
         int[] desired=new int[n];
-        int margins=0;
+        int margins=0,actionIndex=n-1;
         for(int i=0;i<n;i++){
             View child=getChildAt(i);
             desired[i]=original(child,naturalRows);
             margins+=topMargin(child)+bottomMargin(child);
+            if("sboard_space_action".equals(child.getTag()))actionIndex=i;
         }
         int budget=Math.max(n,cap-padH-margins);
-        heights=KeyboardLayoutPolicy.fit(desired,budget,dp(36));
+        heights=KeyboardLayoutPolicy.fit(desired,budget,dp(36),actionIndex);
         int availableWidth=Math.max(1,width-getPaddingLeft()-getPaddingRight());
         for(int i=0;i<n;i++){
             View child=getChildAt(i);
