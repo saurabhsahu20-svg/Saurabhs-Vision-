@@ -186,8 +186,7 @@ public final class VisionKeyboardService extends InputMethodService {
     private static boolean isAction(String value){
         return value.equals("⇧")||value.equals("⌫")||value.equals("ABC")||
             value.equals("123")||value.equals("MATH")||value.equals("SCI")||
-            value.equals("SPACE")||value.equals("ENTER")||value.equals("←")||
-            value.equals("→");
+            value.equals("SPACE")||value.equals("ENTER")||value.equals("←");
     }
     private void addKey(LinearLayout row,String display,String output,float weight,int height,boolean special){
         Button b=new Button(this);
@@ -267,8 +266,8 @@ public final class VisionKeyboardService extends InputMethodService {
         if(code.equals("MATH")){mode=MATH;shifted=false;rebuild();return;}
         if(code.equals("SCI")){mode=SCIENCE;shifted=false;rebuild();return;}
         if(conn==null)return;
-        if(code.equals("←")||code.equals("→")){
-            int key=code.equals("←")?KeyEvent.KEYCODE_DPAD_LEFT:KeyEvent.KEYCODE_DPAD_RIGHT;
+        if(code.equals("←")){
+            int key=KeyEvent.KEYCODE_DPAD_LEFT;
             conn.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,key));
             conn.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP,key));return;
         }
