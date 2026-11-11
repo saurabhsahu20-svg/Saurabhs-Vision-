@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#071B49">
+<meta name="description" content="Free SAURABH'S VISION Study Desk: make a daily study plan, track revision and use a focus timer. No login, no ads, and works entirely in your browser.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/study-desk/">
+<link rel="icon" type="image/png" href="../assets/vision-icon-64.png">
+<meta property="og:type" content="website"><meta property="og:title" content="Free Study Desk | SAURABH'S VISION">
+<meta property="og:description" content="Make your daily study plan, revise topics and take a short focus session. Free, no login.">
+<meta property="og:url" content="https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/study-desk/">
+<title>Free Study Desk – Planner, Revision & Focus | SAURABH'S VISION</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#102547;background:#f3f7ff;color-scheme:light}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 90% 0%,#dae6ff,transparent 40%),#f3f7ff;min-height:100vh}
+a{color:#1452ae}a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #00c8ec;outline-offset:3px}
+.wrap{width:min(100% - 32px,1060px);margin:auto}header{background:#071b49;color:white;box-shadow:0 6px 30px #08163330}
+.bar{min-height:82px;display:flex;align-items:center;gap:18px;justify-content:space-between}
+.brand{color:white;text-decoration:none;display:flex;align-items:center;gap:12px}.brand img{width:52px;height:52px;border-radius:13px;object-fit:cover}
+.brand strong{display:block;font-size:clamp(16px,3.5vw,22px);letter-spacing:.02em}.brand small{display:block;color:#ffe072;font-size:11px;font-weight:700;margin-top:3px}
+.nav{display:flex;gap:12px;flex-wrap:wrap}.nav a{color:white;text-decoration:none;font-size:14px;font-weight:650}
+.hero{background:linear-gradient(135deg,#071b49,#1746d2 80%);padding:53px 0 57px;color:white}
+.kicker{font-size:12px;color:#ffe173;letter-spacing:.13em;font-weight:900;text-transform:uppercase}
+h1{font-size:clamp(34px,6vw,59px);letter-spacing:-.04em;margin:11px 0 13px;line-height:1.12}
+.hero p{font-size:17px;max-width:740px;line-height:1.65;color:#e7edff;margin-bottom:20px}
+.tag{display:inline-block;background:#ffffff20;border:1px solid #ffffff38;padding:9px 13px;border-radius:22px;font-size:12px}
+main{padding:25px 0 60px}.columns{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,1fr);gap:18px}
+.panel{background:white;border:1px solid #dce6f7;border-radius:20px;padding:clamp(18px,3.1vw,30px);margin-bottom:18px;box-shadow:0 12px 34px #071b4910}
+h2{color:#071b49;font-size:clamp(21px,3vw,29px);letter-spacing:-.03em;margin:0 0 8px}
+h3{margin:0 0 8px;color:#071b49}.muted{color:#536784;font-size:14px;line-height:1.65}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.formgrid .wide{grid-column:1/-1}
+label{display:block;font-weight:750;font-size:13px;margin-bottom:6px}
+input,select{display:block;width:100%;border:1px solid #bfcde3;border-radius:11px;padding:12px;color:#102547;background:white;font:inherit}
+button,.button{border:0;border-radius:11px;background:#1746d2;color:white;padding:12px 17px;font:inherit;font-weight:800;cursor:pointer;display:inline-block;text-decoration:none}
+button:disabled{opacity:.5;cursor:not-allowed}.button.secondary,button.secondary{background:#ebf1ff;color:#1746d2}
+button.danger{background:#fff1f1;color:#a32435}.actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:16px}
+.tip{border-left:4px solid #ffcf40;background:#fff8e4;padding:13px 15px;border-radius:8px;font-size:13px;line-height:1.6;color:#624921}
+.tasks{margin-top:18px;display:grid;gap:11px}.task{border:1px solid #d9e4f5;border-radius:13px;display:flex;align-items:flex-start;gap:10px;padding:13px;background:#fbfdff}
+.task input{width:21px;height:21px;margin:3px 1px 0 0;accent-color:#1746d2;flex:none}
+.task .name{font-weight:800;overflow-wrap:anywhere}.task.done .name{text-decoration:line-through;color:#64728a}
+.task .small{font-size:12px;color:#556883;margin-top:5px}.task .spacer{flex:1;min-width:0}
+.task button{padding:8px 10px;font-size:12px}.pill{display:inline-flex;padding:6px 10px;border-radius:20px;font-size:12px;font-weight:750;background:#e9f4ff;color:#0b5590}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:15px 0}
+.stat{background:#edf3ff;border-radius:13px;padding:15px;text-align:center}.stat b{font-size:26px;display:block;color:#1746d2}.stat span{font-size:11px;color:#476181}
+.progress{height:12px;background:#dfe8f6;border-radius:20px;overflow:hidden}.progress>span{display:block;height:100%;width:0%;background:linear-gradient(90deg,#1746d2,#08b9c5);transition:width .2s}
+.timer{text-align:center;font-size:clamp(45px,9vw,70px);font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.03em;color:#0b3b91;margin:12px 0}
+.quick{display:grid;gap:9px}.quick a{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:12px;text-decoration:none;background:#f3f7ff;font-weight:750}
+li{line-height:1.7}footer{background:#071b49;color:#dbe5fb;padding:28px 0;font-size:13px}footer a{color:#ffe47d}
+#toast{min-height:24px;font-size:13px;color:#134f7d;margin-top:9px}
+@media(max-width:750px){.columns{grid-template-columns:1fr}.nav{display:none}.formgrid{grid-template-columns:1fr}.bar{min-height:75px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media print{header,.hero,.actions,.quick,.timer-controls,.tip,footer,.remove,.nav{display:none!important}body{background:white}main{padding:0}.panel{box-shadow:none;border:1px solid #ccc}.columns{display:block}.task{break-inside:avoid}}
+</style></head><body>
+<a href="#main" style="position:absolute;left:-9999px;top:0" onfocus="this.style.left='12px'" onblur="this.style.left='-9999px'">Skip to main content</a>
+<header><div class="wrap bar"><a class="brand" href="../"><img src="../assets/vision-icon-192.png" alt=""><span><strong>SAURABH'S VISION</strong><small>LEARN TODAY, LEAD TOMORROW!</small></span></a>
+<nav class="nav" aria-label="Site navigation"><a href="../">Home</a><a href="../courses/">Courses</a><a href="../quiz-club/">Quiz Club</a><a href="../contact/">Contact</a></nav></div></header>
+<section class="hero"><div class="wrap"><div class="kicker">FREE STUDENT TOOLKIT • निःशुल्क स्टडी प्लानर</div><h1>My Vision Study Desk</h1><p>Make a simple study plan, mark topics as revised and use a focus timer. कोई लॉगिन नहीं — अपनी पढ़ाई को एक जगह व्यवस्थित करें।</p><span class="tag">🔒 Only on this browser &nbsp; • &nbsp; No account required &nbsp; • &nbsp; Works offline after the page has loaded</span></div></section>
+<main class="wrap" id="main"><div class="columns"><div>
+<section class="panel"><h2>📝 Daily Study Planner</h2><p class="muted">अपनी क्लास चुनें और पढ़ाई के छोटे लक्ष्य लिखें। Each goal stays in this browser only.</p>
+<form id="plan-form"><div class="formgrid">
+<div><label for="grade">Class / कक्षा</label><select id="grade" required><option value="">Select class</option><option value="1">Class 1</option><option value="2">Class 2</option><option value="3">Class 3</option><option value="4">Class 4</option><option value="5">Class 5</option><option value="6">Class 6</option><option value="7">Class 7</option><option value="8">Class 8</option><option value="9">Class 9</option><option value="10">Class 10</option></select></div>
+<div><label for="subject">Subject / विषय</label><select id="subject" required><option value="">Choose class first</option></select></div>
+<div class="wide"><label for="topic">Topic or goal / आज क्या पढ़ना है?</label><input id="topic" maxlength="110" minlength="2" required placeholder="Example: Revise fractions / प्रकाश के प्रश्न"></div>
+<div><label for="due">Target date / तारीख</label><input id="due" type="date" required></div>
+<div style="align-self:end"><button style="width:100%" type="submit">+ Add Study Goal</button></div>
+</div></form><div id="toast" role="status" aria-live="polite"></div>
+<div class="stats" aria-label="Study goal statistics"><div class="stat"><b id="total">0</b><span>Total Goals</span></div><div class="stat"><b id="done">0</b><span>Completed</span></div><div class="stat"><b id="left">0</b><span>To Revise</span></div></div>
+<div class="progress" role="progressbar" aria-label="Study goals completed" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress"><span id="progress-fill"></span></div>
+<div class="actions"><button type="button" class="secondary" id="print">🖨️ Print Study Plan</button><button type="button" class="secondary" id="clear-completed">Clear completed</button><button type="button" class="danger" id="clear-all">Erase all goals</button></div>
+<div class="tasks" id="tasks" aria-live="polite"></div>
+</section>
+</div><aside>
+<section class="panel"><h2>⏱️ Focus Timer</h2><p class="muted">Try a short, comfortable revision session. टाइमर केवल इस खुले पेज पर चलता है।</p>
+<div class="timer" id="timer" role="timer" aria-label="Minutes and seconds remaining">15:00</div>
+<div class="timer-controls actions" style="justify-content:center"><button type="button" id="start">Start</button><button type="button" id="pause" class="secondary">Pause</button><button type="button" id="reset" class="secondary">Reset</button></div>
+<p id="timer-state" class="muted" role="status" style="text-align:center">15-minute optional study session</p></section>
+<section class="panel"><h2>🎓 Free Learning</h2><div class="quick">
+<a href="../study-sprint/">🎯 5-Question Daily Sprint <span aria-hidden="true">→</span></a>
+<a href="../quiz-club/">🧠 Maths & Science Quiz Club <span aria-hidden="true">→</span></a>
+<a href="../#/universe">🌌 Learning Universe <span aria-hidden="true">→</span></a>
+<a href="../#/admissions">📩 Ask About Coaching <span aria-hidden="true">→</span></a></div></section>
+<section class="panel"><h2>📚 Revision Ideas</h2><ul class="muted"><li>Read one concept carefully.</li><li>Solve a few practice questions.</li><li>Explain the answer in your own words.</li><li>Review any mistakes and try again later.</li></ul><div class="tip"><strong>Privacy notice:</strong> Study goals are saved only in this browser's local storage. They do not sync between devices. Anyone using the same browser profile may see them, so avoid adding personal information on shared devices. Use “Erase all goals” when finished.</div></section>
+</aside></div></main>
+<footer><div class="wrap"><strong>SAURABH'S VISION™</strong> · Learn Today, Lead Tomorrow!<br>Near Mahamaya Temple, Bhanpuri, Raipur, Chhattisgarh.<br><a href="../contact/">Contact & Admissions</a> · <a href="../#/privacy">Privacy Policy</a> · <a href="../">Back to website</a></div></footer>
+<script>
+(function(){
+ 'use strict';
+ const KEY='sv-study-desk-v1';
+ const $=s=>document.querySelector(s);
+ const primary=['Mathematics','English','Hindi','EVS / Science','General Knowledge','Other Subject'];
+ const senior=['Mathematics','Physics','Chemistry','Biology','Science','Other Subject'];
+ let tasks=[];
+ function read(){try{const d=JSON.parse(localStorage.getItem(KEY)||'[]');if(Array.isArray(d))return d.filter(x=>x&&typeof x.id==='string'&&typeof x.topic==='string'&&typeof x.subject==='string'&&typeof x.day==='string').slice(-200)}catch(e){}return [];}
+ function save(){try{localStorage.setItem(KEY,JSON.stringify(tasks));return true}catch(e){$('#toast').textContent='Browser storage unavailable. Goals may not remain after this page closes.';return false}}
+ function today(){const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
+ function el(tag,cl,text){const x=document.createElement(tag);if(cl)x.className=cl;if(text!=null)x.textContent=text;return x}
+ function render(){
+   const n=tasks.length,completed=tasks.filter(t=>t.done).length;
+   $('#total').textContent=n;$('#done').textContent=completed;$('#left').textContent=n-completed;
+   const pct=n?Math.round(completed/n*100):0;$('#progress-fill').style.width=pct+'%';$('#progress').setAttribute('aria-valuenow',String(pct));
+   const host=$('#tasks');host.replaceChildren();
+   if(!n){host.append(el('p','muted','No goals yet. Add a topic to begin your study plan.'));return}
+   const sorted=[...tasks].sort((a,b)=>a.done-b.done||a.day.localeCompare(b.day));
+   for(const task of sorted){
+     const box=el('div','task'+(task.done?' done':''));const check=el('input');check.type='checkbox';check.checked=Boolean(task.done);check.setAttribute('aria-label','Mark '+task.topic+' completed');
+     check.addEventListener('change',()=>{task.done=check.checked;save();render()});
+     const body=el('div','spacer');body.append(el('div','name',task.topic));body.append(el('div','small','Class '+task.grade+' • '+task.subject+' • '+task.day));
+     const remove=el('button','danger remove','Remove');remove.type='button';remove.setAttribute('aria-label','Remove '+task.topic);remove.addEventListener('click',()=>{tasks=tasks.filter(t=>t.id!==task.id);save();render()});
+     box.append(check,body,remove);host.append(box);
+   }
+ }
+ $('#grade').addEventListener('change',()=>{
+   const g=Number($('#grade').value),subject=$('#subject');subject.replaceChildren();
+   const placeholder=el('option',null,'Select subject');placeholder.value='';subject.append(placeholder);
+   for(const name of (g<=5?primary:senior)){const option=el('option',null,name);option.value=name;subject.append(option);}
+ });
+ $('#due').value=today(); tasks=read();render();
+ $('#plan-form').addEventListener('submit',e=>{
+   e.preventDefault();
+   if(!e.target.reportValidity())return;
+   const grade=$('#grade').value,subject=$('#subject').value,topic=$('#topic').value.trim(),day=$('#due').value;
+   if(topic.length<2||!subject)return;
+   if(tasks.length>=200){$('#toast').textContent='Limit of 200 goals reached. Clear some goals first.';return}
+   const id=Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9);
+   tasks.push({id,grade,subject,topic,day,done:false});save();render();
+   $('#topic').value='';$('#topic').focus();$('#toast').textContent='Study goal added ✓';
+ });
+ $('#clear-completed').addEventListener('click',()=>{tasks=tasks.filter(x=>!x.done);save();render();$('#toast').textContent='Completed goals cleared.'});
+ $('#clear-all').addEventListener('click',()=>{if(!tasks.length)return;if(confirm('Erase all saved study goals from this browser?')){tasks=[];save();render();$('#toast').textContent='All saved goals erased.'}});
+ $('#print').addEventListener('click',()=>window.print());
+ const duration=15*60;let seconds=duration,interval=null,finishAt=0;
+ function drawClock(){const m=Math.floor(seconds/60),s=seconds%60;$('#timer').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
+ function stop(){if(interval!==null){clearInterval(interval);interval=null}}
+ function tick(){seconds=Math.max(0,Math.ceil((finishAt-Date.now())/1000));drawClock();if(!seconds){stop();$('#timer-state').textContent='Session complete. A break is fine!'}}
+ $('#start').addEventListener('click',()=>{if(interval!==null)return;if(!seconds)seconds=duration;finishAt=Date.now()+seconds*1000;interval=setInterval(tick,250);$('#timer-state').textContent='Study session running';tick()});
+ $('#pause').addEventListener('click',()=>{if(interval!==null){tick();stop();$('#timer-state').textContent='Paused'}});
+ $('#reset').addEventListener('click',()=>{stop();seconds=duration;drawClock();$('#timer-state').textContent='15-minute optional study session'});
+ window.addEventListener('pagehide',stop);
+})();
+</script></body></html>
