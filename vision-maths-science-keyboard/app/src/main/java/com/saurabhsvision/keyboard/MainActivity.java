@@ -20,6 +20,9 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 
 /** Native onboarding, theme settings and typing-test screen for the Android IME. */
 public final class MainActivity extends Activity {
@@ -96,6 +99,51 @@ public final class MainActivity extends Activity {
             else showMessage("Android keyboard picker उपलब्ध नहीं है।");
         });
 
+        add(root,text("🌐 Indian Languages • हिन्दी / Hinglish / English",21,NAVY,true),26);
+        add(root,text("Choose English, Roman Hinglish or phonetic typing in any of India's 22 scheduled languages. Type with normal English keys; in Hindi mode, namaste → नमस्ते. No Internet needed.",14,0xff496284,false),8);
+        final TextView langPreview=text("",15,0xff2153ad,true);
+        String[] languageOptions=new String[IndicLanguages.count()];
+        for(int i=0;i<languageOptions.length;i++)languageOptions[i]=IndicLanguages.label(i);
+        final Spinner languageSpinner=new Spinner(this);
+        ArrayAdapter<String> langAdapter=new ArrayAdapter<>(this,
+            android.R.layout.simple_spinner_item,languageOptions);
+        langAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        languageSpinner.setAdapter(langAdapter);
+        languageSpinner.setBackground(box(Color.WHITE,15));
+        languageSpinner.setPadding(dp(12),dp(10),dp(12),dp(10));
+        add(root,languageSpinner,12);
+        add(root,langPreview,10);
+        int initialLanguage=IndicLanguages.norm(
+            getSharedPreferences(PREFS,MODE_PRIVATE).getInt("language",IndicLanguages.ENGLISH));
+        languageSpinner.setSelection(initialLanguage);
+        languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+            @Override public void onItemSelected(AdapterView<?> parent,View view,int position,long id){
+                int lang=IndicLanguages.norm(position);
+                getSharedPreferences(PREFS,MODE_PRIVATE).edit().putInt("language",lang).apply();
+                langPreview.setText("Example: namaste → "+
+                    OfflinePhonetic.convert("namaste",lang)+
+                    (lang==IndicLanguages.HINGLISH?" (Roman Hinglish)":
+                     lang==IndicLanguages.ENGLISH?" (English)":
+                     " · "+IndicLanguages.nativeName(lang)));
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent){}
+        });
+        LinearLayout quickLanguages=new LinearLayout(this);
+        quickLanguages.setOrientation(LinearLayout.HORIZONTAL);
+        add(root,quickLanguages,12);
+        int[] quickIds={IndicLanguages.ENGLISH,IndicLanguages.HINGLISH,IndicLanguages.HINDI};
+        String[] quickNames={"ABC English","Hinglish","हिन्दी"};
+        for(int i=0;i<quickIds.length;i++){
+            final int selected=quickIds[i];
+            Button quick=button(quickNames[i],i==2?0xff235dcc:0xffe6eefb,i==2?Color.WHITE:NAVY);
+            quick.setTextSize(12);
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(49),1f);
+            lp.setMargins(dp(2),0,dp(2),0);
+            quickLanguages.addView(quick,lp);
+            quick.setOnClickListener(v->languageSpinner.setSelection(selected));
+        }
+        add(root,text("ℹ️ Roman phonetic input writes sounds in another script; it does NOT translate sentence meaning. Non-Hindi spellings, Urdu and minority scripts are basic approximations.",12,0xff607590,false),9);
+
         add(root,text("📏 Keyboard Height & Spacebar",20,NAVY,true),26);
         add(root,text("Compact height is recommended on phones where the bottom SPACE / ENTER row was hidden. Both options automatically fit their rows inside the available screen height.",14,0xff496284,false),7);
         TextView heightStatus=text("",14,0xff1848a0,true);
@@ -171,7 +219,7 @@ public final class MainActivity extends Activity {
         EditText test=new EditText(this);
         test.setTextSize(17);test.setTextColor(NAVY);
         test.setHintTextColor(0xff6785a0);
-        test.setHint("Try: π × r², H₂O, E = mc²");
+        test.setHint("Try: namaste → नमस्ते, π × r², H₂O, 😊");
         test.setSingleLine(false);test.setMinLines(3);
         test.setPadding(dp(15),dp(12),dp(15),dp(12));
         test.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE);
@@ -183,7 +231,7 @@ public final class MainActivity extends Activity {
         features.setBackground(box(Color.WHITE,18));
         add(root,features,27);
         add(features,text("✨ What's Inside",18,NAVY,true),0);
-        add(features,text("• Compact keyboard height: no more full-screen empty background\n• ABC QWERTY, Shift/Caps, Numbers, Maths and Science\n• 😊 Emoji keyboard with 923 options across 11 categories\n• Faces, love, feelings, gestures, people, animals and more\n• Previous/next emoji pages and responsive key touch effects\n• Backspace repeat, cursor arrows, Space and Enter",14,0xff3d5a7b,false),11);
+        add(features,text("• 🌐 22 Indian languages + English and Hinglish Roman typing\n• Hindi phonetic: namaste → नमस्ते, mera → मेरा\n• Compact keyboard height: no more full-screen empty background\n• ABC QWERTY, Shift/Caps, Numbers, Maths and Science\n• 😊 Emoji keyboard with 923 options across 11 categories\n• Faces, love, feelings, gestures, people, animals and more\n• Previous/next emoji pages and responsive key touch effects\n• Backspace repeat, cursor arrows, Space and Enter",14,0xff3d5a7b,false),11);
 
         add(root,text("🔒 Your Typing Stays Private",20,NAVY,true),25);
         add(root,text("इस keyboard को Internet permission नहीं दी गई है। यह आपकी typing history, passwords या clipboard को save या किसी server पर upload नहीं करता। आपके typed characters सिर्फ खुले हुए text field तक भेजे जाते हैं। Android नए keyboard को enable करते समय सामान्य सुरक्षा चेतावनी दिखाता है।",14,0xff445d7f,false),9);
