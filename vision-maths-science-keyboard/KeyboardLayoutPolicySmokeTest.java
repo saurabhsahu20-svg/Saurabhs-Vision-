@@ -20,18 +20,23 @@ public class KeyboardLayoutPolicySmokeTest {
         test("Hindi phonetic 6-row layout",new int[]{41,31,43,43,43,54},180,36);
         test("Emoji 8-row layout",new int[]{41,38,42,42,42,42,47,49},186,36);
         test("Language selector",new int[]{41,29,59,59,37,49},190,36);
-        // Screenshot regression: the Space/Enter key row is at index 3,
-        // directly ABOVE the shifted Z-X-C row (index 4).
-        for(int budget: new int[]{192,174,153,135,118}){
-            int[] wanted={39,38,38,44,38};
-            int[] lifted=KeyboardLayoutPolicy.fit(wanted,budget,34,3);
-            check(lifted.length==5,"Lifted Space action row present: "+budget);
-            check(KeyboardLayoutPolicy.total(lifted)<=budget,
-                "Lifted Space and bottom alphabet fit into "+budget);
-            check(lifted[3]>=Math.min(34,budget-4),
-                "Lifted Space row receives reserved height: "+budget);
-            check(lifted[4]>0,"Last alphabet/Backspace row also visible: "+budget);
+        // v1.9.2 reference regression: toolbar + THREE letter rows + Space footer.
+        // Physical screen expands, rather than relocating Space ahead of Z-X-C.
+        for(int budget: new int[]{307,284,255,210,170,142}){
+            int[] wanted={49,52,52,52,60};
+            int[] measured=KeyboardLayoutPolicy.fit(wanted,budget,42,4);
+            check(measured.length==5,"All four key rows present: "+budget);
+            check(KeyboardLayoutPolicy.total(measured)<=budget,
+                "Keyboard fits within IME budget: "+budget);
+            for(int row=1;row<=3;row++)
+                check(measured[row]>0,"Alphabet row "+row+" remains visible: "+budget);
+            check(measured[4]>=Math.min(42,budget-4),
+                "Real last Spacebar row visible: "+budget);
         }
+        int[] full=KeyboardLayoutPolicy.fit(new int[]{49,52,52,52,60},300,42,4);
+        check(full[1]>=49&&full[2]>=49&&full[3]>=49,
+            "Larger keys preserved when four full rows fit");
+        check(full[4]>=57,"Full-height Spacebar preserved on large screen");
         System.out.println("All Spacebar layout regression cases passed.");
     }
 }
