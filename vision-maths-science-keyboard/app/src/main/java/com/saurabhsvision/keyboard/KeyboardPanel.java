@@ -58,19 +58,19 @@ public final class KeyboardPanel extends LinearLayout {
     }
     private int topMargin(View view){
         ViewGroup.LayoutParams lp=view.getLayoutParams();
-        return lp instanceof MarginLayoutParams?((MarginLayoutParams)lp).topMargin:0;
+        return lp instanceof ViewGroup.MarginLayoutParams?((ViewGroup.MarginLayoutParams)lp).topMargin:0;
     }
     private int bottomMargin(View view){
         ViewGroup.LayoutParams lp=view.getLayoutParams();
-        return lp instanceof MarginLayoutParams?((MarginLayoutParams)lp).bottomMargin:0;
+        return lp instanceof ViewGroup.MarginLayoutParams?((ViewGroup.MarginLayoutParams)lp).bottomMargin:0;
     }
     private int leftMargin(View view){
         ViewGroup.LayoutParams lp=view.getLayoutParams();
-        return lp instanceof MarginLayoutParams?((MarginLayoutParams)lp).leftMargin:0;
+        return lp instanceof ViewGroup.MarginLayoutParams?((ViewGroup.MarginLayoutParams)lp).leftMargin:0;
     }
     private int rightMargin(View view){
         ViewGroup.LayoutParams lp=view.getLayoutParams();
-        return lp instanceof MarginLayoutParams?((MarginLayoutParams)lp).rightMargin:0;
+        return lp instanceof ViewGroup.MarginLayoutParams?((ViewGroup.MarginLayoutParams)lp).rightMargin:0;
     }
     private void resizeKeyChildren(View row,int availableHeight){
         if(!(row instanceof LinearLayout))return;
