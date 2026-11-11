@@ -120,4 +120,4 @@ $('tracks').addEventListener('click',e=>{const button=e.target.closest('button[d
 $('start').addEventListener('click',start);$('again').addEventListener('click',start);$('next').addEventListener('click',()=>{i++;if(i===questions.length)finish();else render()});$('leave').addEventListener('click',showSetup);$('restart').addEventListener('click',showSetup);
 $('clear').addEventListener('click',()=>{try{localStorage.removeItem(localKey);$('clear-note').textContent='Local Study Sprint history cleared.'}catch{$('clear-note').textContent='Storage is unavailable.'}updateHistory()});updateHistory();
 })();
-</script></body></html>
+</script><script>if('serviceWorker' in navigator && location.protocol==='https:'){window.addEventListener('load',()=>navigator.serviceWorker.register('../service-worker.js').catch(()=>{}));}</script></body></html>
