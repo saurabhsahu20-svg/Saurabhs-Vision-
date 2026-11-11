@@ -76,13 +76,15 @@ public final class KeyboardLayoutPolicy {
      * Android can clip the final row without exposing the real viewport size
      * via the IME's UNSPECIFIED measure spec. Use actual screen-height pixels.
      *
-     * 66% of the landscape display leaves room for the focused app and the
-     * system navigation bar while keeping FOUR rows in the real input view.
-     * The input panel then proportionally fits all its rows into that height.
+     * An IME occupies up to 80% of the physical landscape screen's shorter
+     * side. The real system navigation inset is handled by Android's
+     * non-edge-to-edge compatibility IME window (target SDK 34), so the last
+     * action row is no longer drawn underneath the system navigation buttons.
+     * Other row sizes shrink proportionally only when needed.
      */
-    public static int landscapeHeightCap(int screenHeightPx,int maxConfiguredPx){
-        if(screenHeightPx<=0)return Math.max(1,maxConfiguredPx);
-        int safe=(int)(screenHeightPx*0.66f);
+    public static int landscapeHeightCap(int shortScreenSidePx,int maxConfiguredPx){
+        if(shortScreenSidePx<=0)return Math.max(1,maxConfiguredPx);
+        int safe=(int)(shortScreenSidePx*0.80f);
         return Math.max(1,Math.min(Math.max(1,maxConfiguredPx),Math.max(1,safe)));
     }
     public static int total(int[] rows){
