@@ -85,9 +85,9 @@ public final class V5StudioActivity extends Activity {
         LinearLayout head=new LinearLayout(this);head.setOrientation(LinearLayout.VERTICAL);
         head.setPadding(dp(18),dp(21),dp(18),dp(20));head.setBackground(round(NAVY,18));
         add(head,txt("🎓  SAURABH'S VISION",14,GOLD,true),0);
-        add(head,txt("VISION EDU WALLS 8.0",26,Color.WHITE,true),8);
+        add(head,txt("VISION EDU WALLS 9.0",26,Color.WHITE,true),8);
         add(head,txt("66 Static  •  66 Live  •  60 Digital Widgets",14,0xffd8e8ff,true),9);
-        add(head,txt("NEW: Premium 3D HD Art Studio • Moving Comets • Glass Widgets",12,0xffa9cafa,false),7);
+        add(head,txt("NEW: 100 Real 3D-Style Wallpapers PRELOADED • No ZIP Needed",12,0xffa9cafa,false),7);
         add(root,head,12);
 
         LinearLayout nav=new LinearLayout(this);
@@ -102,11 +102,16 @@ public final class V5StudioActivity extends Activity {
         }
         add(root,nav,18);
 
-        Button premium=btn("🌌 OPEN PREMIUM 3D HD ART STUDIO",GOLD,NAVY);
+        Button preloaded=btn("💎 OPEN 100 NEW BUILT-IN 3D WALLPAPERS",GOLD,NAVY);
+        add(root,preloaded,14);preloaded.setMinHeight(dp(63));
+        preloaded.setOnClickListener(v->startActivity(new Intent(this,Premium100Activity.class)));
+        TextView preloadInfo=txt("100 pictures already included in this APK. Browse Maths, Physics, Chemistry, Biology, Space and more; set Static/Live/Widget instantly without importing anything.",13,0xff315a85,false);
+        add(root,preloadInfo,7);
+        Button premium=btn("🌌 OPTIONAL: IMPORT MY OWN HD ART ZIP",0xffe1efff,NAVY);
         add(root,premium,14);
         premium.setMinHeight(dp(60));
         premium.setOnClickListener(v->openPremiumStudio());
-        TextView premiumInfo=txt("Import the HD art pack once. Use glowing images as static wallpaper, animated live wallpaper, or as the background for real clock/date/weather/battery widgets.",12,0xff49668c,false);
+        TextView premiumInfo=txt("The new 100 premium wallpapers are already built into Version 9.0. Use this optional import only for your own external image packs.",12,0xff49668c,false);
         add(root,premiumInfo,8);
 
         label=txt("",21,NAVY,true);add(root,label,18);
@@ -120,7 +125,7 @@ public final class V5StudioActivity extends Activity {
         TextView heading=txt("CHOOSE YOUR DESIGN",19,NAVY,true);add(root,heading,24);
         gallery=new LinearLayout(this);gallery.setOrientation(LinearLayout.VERTICAL);
         add(root,gallery,12);
-        Button hd=btn("📦 Premium 3D HD Art Pack / Import ZIP",0xffe1efff,NAVY);
+        Button hd=btn("📦 OPTIONAL: External Art Pack / Import ZIP",0xffe1efff,NAVY);
         add(root,hd,19);
         hd.setOnClickListener(v->openPremiumStudio());
         Button old=btn("📚 Open Classic Wallpapers (Version 4 Collection)",0xffe1eaff,NAVY);

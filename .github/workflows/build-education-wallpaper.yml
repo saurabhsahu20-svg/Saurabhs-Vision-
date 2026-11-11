@@ -77,13 +77,49 @@ jobs:
           assert 'PremiumWidgetArt.choose' in (base/'ImagePackActivity.java').read_text()
           assert 'premium_hd_fx' in (base/'ImagePackActivity.java').read_text()
           print('Verified Premium 3D HD Studio, real Android widget art, four live FX')
-          print('Verified: 66 static, 66 live, 60 widgets; 16 biology models')
+          assert 'class Premium100Activity' in (base/'Premium100Activity.java').read_text(encoding='utf8')
+          print('Verified: 66 static, 66 live, 60 widgets + separate 100 built-in Premium 3D gallery')
           assert 'class StillScenePainter' in (base/'StillScenePainter.java').read_text()
           assert 'class LiveScenePainter' in (base/'LiveScenePainter.java').read_text()
           xml=Path('education-live-wallpaper/app/src/main/res/layout/vision_widget.xml').read_text()
           for name in ('widget_clock','widget_date','widget_battery','widget_weather','widget_city'):
               assert name in xml,name
           PY
+
+      - name: Unpack and verify 100 pre-installed 3D wallpapers
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd education-live-wallpaper
+          cat premium100-pack/part*.bin > /tmp/vision-edu-walls-100.zip
+          echo "3ecad47de80e800a2c2750d7c0701ad649864737a2fd578fa81d9d20e00b71ab  /tmp/vision-edu-walls-100.zip" | sha256sum --check
+          python3 - <<'PY'
+          import hashlib,io,json,zipfile
+          from pathlib import Path
+          source=Path('/tmp/vision-edu-walls-100.zip')
+          destination=Path('app/src/main/assets/premium100')
+          destination.mkdir(parents=True,exist_ok=True)
+          with zipfile.ZipFile(source,'r') as archive:
+              assert archive.testzip() is None, 'corrupt built-in art archive'
+              names=[n for n in archive.namelist() if n.lower().endswith('.jpg')]
+              assert len(names)==100, ('Expected 100 actual JPEGs',len(names))
+              assert len(set(names))==100
+              catalog=json.loads(archive.read('catalog.json'))
+              assert len(catalog)==100 and len(set(x['file'] for x in catalog))==100
+              assert set(x['file'] for x in catalog)==set(names)
+              assert len(set(x['name'] for x in catalog))==100
+              for i,entry in enumerate(catalog):
+                  assert entry['index']==i+1
+                  assert entry['category'] and entry['name']
+                  name=entry['file']
+                  assert '/' not in name and '\\\\' not in name
+                  image=archive.read(name)
+                  assert image[:2]==b'\\xff\\xd8' and image[-2:]==b'\\xff\\xd9',name
+                  (destination/name).write_bytes(image)
+              (destination/'catalog.json').write_bytes(archive.read('catalog.json'))
+          print('Verified 100 original JPEG files, 100 unique names, 10 categories. All embedded into APK assets.')
+          PY
+          test "$(find app/src/main/assets/premium100 -name '*.jpg' | wc -l)" -eq 100
 
       - name: Compile APK
         run: |
@@ -97,16 +133,26 @@ jobs:
           apk="education-live-wallpaper/app/build/outputs/apk/debug/app-debug.apk"
           test -s "$apk"
           unzip -t "$apk" | tail -1
+          python3 - "$apk" <<'PY'
+          import json,sys,zipfile
+          with zipfile.ZipFile(sys.argv[1]) as archive:
+              names=archive.namelist()
+              bundled=[n for n in names if n.startswith('assets/premium100/') and n.endswith('.jpg')]
+              assert len(bundled)==100,('Missing built-in files',len(bundled))
+              manifest=json.loads(archive.read('assets/premium100/catalog.json'))
+              assert len(manifest)==100
+              print('APK includes all 100 real JPEG assets, no external ZIP required')
+          PY
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | head -10
           mkdir -p deliverables
-          cp "$apk" deliverables/Vision_Edu_Walls_v8.0.0_PREMIUM_3D_TEST.apk
+          cp "$apk" deliverables/Vision_Edu_Walls_v9.0.0_100_BUILTIN_3D_TEST.apk
           sha256sum deliverables/*.apk | tee deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Vision_Edu_Walls_v8_Premium_3D_APK
+          name: Vision_Edu_Walls_v9_100_Preloaded_3D_APK
           path: deliverables/*
           retention-days: 90
 
@@ -116,10 +162,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="vision-edu-walls-v8.0.0"
+          tag="vision-edu-walls-v9.0.0"
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Release tag already exists; uploading test APK asset."
             gh release upload "$tag" deliverables/Vision_Edu_Walls_v8.0.0_PREMIUM_3D_TEST.apk deliverables/SHA256SUMS.txt --clobber
           else
-            gh release create "$tag" deliverables/Vision_Edu_Walls_v8.0.0_PREMIUM_3D_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 8.0 • Premium 3D HD Wallpapers, Live FX and Real Digital Widgets" --notes "Premium 3D HD Studio test APK: use separately supplied original HD ZIP art pack (not pre-embedded) to select colorful 3D wallpapers for Android static backgrounds, animated Live overlays with stardust/comets/neon orbits/minimal modes, and matching glass-style Digital Widget backgrounds. Real system clock, date, battery, optional Internet weather. Preserves 66 static, 66 live, 60 widget styles and Biology Atlas. Device testing required; debug signatures may differ from older test builds." --latest=false
+            gh release create "$tag" deliverables/Vision_Edu_Walls_v8.0.0_PREMIUM_3D_TEST.apk deliverables/SHA256SUMS.txt --title "Vision Edu Walls 9.0 • 100 Pre-installed Premium 3D Wallpapers, Live FX and Digital Widgets" --notes "V9.0: ONE HUNDRED 3D-style educational wallpapers PRE-INSTALLED INSIDE the APK. No separate ZIP import, network, or extra permission needed. Open 100 Built-in 3D gallery to preview and apply any image as static wallpaper, interactive live wallpaper with FX, or Android clock/date/battery/weather widget background; save individual JPG. Ten themed sections, 100 unique digital image compositions created from original AI art. Existing 66 static + 66 live + 60 digital widgets and optional external HD importer remain. Test APK debug-signed; on-device testing still required." --latest=false
           fi

@@ -22,12 +22,13 @@
         </activity>
         <activity android:name=".MainActivity" android:exported="false"/>
         <activity android:name=".ImagePackActivity" android:exported="false"/>
+        <activity android:name=".Premium100Activity" android:exported="false" android:label="100 Built-in 3D Wallpapers" />
         <activity android:name=".WeatherSettingsActivity" android:exported="false" android:label="Smart Widget Weather" />
         <activity android:name=".VisionWidgetSetupActivity" android:exported="true" android:label="Choose Vision Widget" />
         <receiver
             android:name=".VisionWidgetProvider"
             android:exported="true"
-            android:label="Vision Edu Walls - 50 Widgets">
+            android:label="Vision Edu Walls - 60 Digital Widgets">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
