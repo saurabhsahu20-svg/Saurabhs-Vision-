@@ -67,7 +67,7 @@ public final class VisionWidgetProvider extends AppWidgetProvider {
         RemoteViews views=new RemoteViews(ctx.getPackageName(),R.layout.vision_widget);
         // Per-widget 3D artwork takes precedence, so two widgets can use DIFFERENT
         // images from the 100-picture gallery without replacing each other.
-        int art=pref.getInt("art_"+widgetId,pref.getInt("pending_art",-1));
+        int art=pref.getInt("art_"+widgetId,-1);
         Bitmap bg=BuiltIn3DWidgetArt.background(ctx,art,480,280);
         if(bg==null)bg=PremiumWidgetArt.background(ctx,480,280);
         if(bg==null)bg=WidgetCatalog.background(style,480,280);
@@ -96,8 +96,9 @@ public final class VisionWidgetProvider extends AppWidgetProvider {
             PendingIntent.getActivity(ctx,widgetId+100000,weather,FLAGS));
         views.setOnClickPendingIntent(R.id.widget_city,
             PendingIntent.getActivity(ctx,widgetId+100000,weather,FLAGS));
-        Intent open=new Intent(ctx,V5StudioActivity.class);
-        open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Intent open=new Intent(ctx,Premium100Activity.class);
+        open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        open.putExtra("edit_widget_id",widgetId);
         views.setOnClickPendingIntent(R.id.widget_title,
             PendingIntent.getActivity(ctx,widgetId+200000,open,FLAGS));
         Intent refresh=new Intent(ctx,VisionWidgetProvider.class);
