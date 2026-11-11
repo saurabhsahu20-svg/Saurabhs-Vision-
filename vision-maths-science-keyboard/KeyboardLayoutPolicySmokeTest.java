@@ -33,6 +33,22 @@ public class KeyboardLayoutPolicySmokeTest {
             check(measured[4]>=Math.min(42,budget-4),
                 "Real last Spacebar row visible: "+budget);
         }
+        // OEM landscape navigation overlays part of the IME surface. The
+        // keyboard now explicitly reserves a 58dp strip BELOW the Space row.
+        // We simulate the remaining drawable area (305dp cap - 58dp nav inset
+        // - 5dp top padding), including constrained screens.
+        for(int cap: new int[]{305,275,245}){
+            int safeInset=58,topInset=5;
+            int budget=cap-safeInset-topInset;
+            int[] rows=KeyboardLayoutPolicy.fit(
+                new int[]{51,58,58,58,65},budget,42,4);
+            check(KeyboardLayoutPolicy.total(rows)+topInset+safeInset<=cap,
+                "Navigation-safe four-row keyboard fits in "+cap+"dp");
+            check(rows[4]>=42,
+                "Space/Enter keeps tappable height above nav bar at "+cap+"dp");
+            check(rows[1]>0&&rows[2]>0&&rows[3]>0,
+                "Every QWERTY letter row preserved at "+cap+"dp");
+        }
         int[] full=KeyboardLayoutPolicy.fit(new int[]{49,52,52,52,60},300,42,4);
         check(full[1]>=49&&full[2]>=49&&full[3]>=49,
             "Larger keys preserved when four full rows fit");
