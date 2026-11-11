@@ -50,6 +50,26 @@ public final class KeyboardLayoutPolicy {
         }
         return result;
     }
+    /**
+     * Reserve Space/Enter even when its row is lifted one level above the last
+     * alphabet row. Legacy layouts continue using the last row by default.
+     */
+    public static int[] fit(int[] natural,int budget,int minimumActionHeight,int actionIndex){
+        if(natural==null||natural.length==0)return new int[0];
+        int n=natural.length;
+        if(actionIndex<0||actionIndex>=n||actionIndex==n-1)
+            return fit(natural,budget,minimumActionHeight);
+        int[] reordered=new int[n];
+        int at=0;
+        for(int i=0;i<n;i++)if(i!=actionIndex)reordered[at++]=natural[i];
+        reordered[n-1]=natural[actionIndex];
+        int[] fitted=fit(reordered,budget,minimumActionHeight);
+        int[] result=new int[n];
+        at=0;
+        for(int i=0;i<n;i++)if(i!=actionIndex)result[i]=fitted[at++];
+        result[actionIndex]=fitted[n-1];
+        return result;
+    }
     public static int total(int[] rows){
         int sum=0;for(int height:rows)sum+=height;return sum;
     }
