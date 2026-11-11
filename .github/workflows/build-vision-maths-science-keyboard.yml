@@ -89,7 +89,7 @@ jobs:
           assert 'scaleX(.96f)' in ime
           assert 'setCornerRadius(dp(13))' in ime
           assert 'Pure White' in activity and 'keyPreview' in activity
-          assert 'SPACE","SPACE",3.75f' in ime
+          assert 'addKey(row,"Space","SPACE",4.35f' in ime
           assert 'Spacebar - insert space' in ime
           assert 'setCompact(settings().getBoolean("compact_height",true))' in ime
           assert 'resizeKeyChildren' in panel
@@ -124,9 +124,18 @@ jobs:
           assert 'new Intent(this,MainActivity.class)' in splash
           assert 'animatedLogoBadge.setImageResource(R.drawable.s_board_logo)' in activity
           assert 'refreshSetupStatus()' in activity
-          assert 'idx==6){press("SPACE")' in ime
+          assert 'index==6){press("SPACE")' in ime
           assert 'setMeasuredDimension(width,Math.min(cap' in panel
           assert 'child.layout(x,y,x+w,y+height)' in panel
+          assert 'addSuggestions()' in ime and 'WordSuggestions.get' in ime
+          assert 'onUpdateSelection' in ime and 'applySuggestion' in ime
+          assert 'S Board toolbar' in ime and 'R.drawable.s_board_logo' in ime
+          assert 'addKey(row,"Space","SPACE",4.35f' in ime
+          assert 'A↔अ' in ime and 'LANG_TOGGLE' in ime
+          assert 'b.setOnLongClickListener' in ime
+          assert 'portraitMaxDp=compact?285:328' in panel
+          assert (root/'java/com/saurabhsvision/keyboard/WordSuggestions.java').is_file()
+          print('Confirmed neon input view, live suggestion strip, stable Spacebar and real long-press number keys')
           print('S Board branding, user-selected 3D logo image, animated splash and setup status verified')
 
           print('24 language choices, phonetic composition, secure-password fallback verified')
@@ -161,6 +170,17 @@ jobs:
           javac -encoding UTF-8 -d "$out" "$src/KeyboardLayoutPolicy.java" "$base/KeyboardLayoutPolicySmokeTest.java"
           java -ea -cp "$out" KeyboardLayoutPolicySmokeTest
 
+      - name: Test offline word suggestions without Android or Internet
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="vision-maths-science-keyboard"
+          src="$base/app/src/main/java/com/saurabhsvision/keyboard"
+          out="$RUNNER_TEMP/s-board-word-suggestions"
+          mkdir -p "$out"
+          javac -encoding UTF-8 -d "$out" "$src/WordSuggestions.java" "$base/WordSuggestionsSmokeTest.java"
+          java -ea -cp "$out" WordSuggestionsSmokeTest
+
       - name: Compile APK
         shell: bash
         run: |
@@ -179,13 +199,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.7.0_3D_NEON_LOGO_TEST.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.8.0_NEON_KEYBOARD_TEST.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_7_3D_Neon_Icon_APK
+          name: S_Board_v1_8_Neon_Keyboard_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -195,13 +215,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.7.0"
-          file="keyboard-deliverables/S_Board_v1.7.0_3D_NEON_LOGO_TEST.apk"
+          tag="s-board-v1.8.0"
+          file="keyboard-deliverables/S_Board_v1.8.0_NEON_KEYBOARD_TEST.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.7 • Your 3D Neon Logo as App Icon" \
-              --notes "S BOARD v1.7 TEST APK. Replaces old simple vector app icon with user's selected red-and-blue 3D neon S BOARD keyboard artwork (bundled original-design WebP launcher icon). Startup animation and settings hero show same image. No Google/Gboard art. Android app package and official S Board display name unchanged. Preserves compact Spacebar, English/Hinglish/Indian phonetic input, Maths and Science symbols, 923 emoji entries, five themes including Pure White, and no Internet permission. Automatic CI tests check actual packaged graphic, Java/Android compilation and APK signing; real device visual testing not yet completed." \
+              --title "S Board 1.8 • Neon Keyboard + Word Suggestions" \
+              --notes "S BOARD v1.8 TEST APK. Implements the actual glossy-neon blue S Board keyboard seen in the design reference inside Android InputMethodService—not just a picture. Adds scrollable branded toolbar with 3D S Board icon, 3-cell English/Hinglish suggestion strip powered by a small static offline word list (no logging or internet), balanced Gboard-like QWERTY key rows, larger always-present Space + Enter footer, Hindi/English toggle, emoji, long-press 1-0 on QWERTY top-row keys. Adjusted compact and comfortable keyboard heights to fit all rows. Keeps White plus 4 neon themes, Maths and Science, 923 emoji entries and basic 24-language phonetic modes. Suggested words are limited and not Gboard-grade AI predictions. Automated source smoke checks, local suggestion tests, Android build, APK signing and footer layout tests are performed in GitHub CI. Physical WhatsApp/device testing is still required." \
               --latest=false
           fi
