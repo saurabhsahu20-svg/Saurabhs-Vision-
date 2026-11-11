@@ -137,4 +137,4 @@ li{line-height:1.7}footer{background:#071b49;color:#dbe5fb;padding:28px 0;font-s
  $('#reset').addEventListener('click',()=>{stop();seconds=duration;drawClock();$('#timer-state').textContent='15-minute optional study session'});
  window.addEventListener('pagehide',stop);
 })();
-</script></body></html>
+</script><script>if('serviceWorker' in navigator && location.protocol==='https:'){window.addEventListener('load',()=>navigator.serviceWorker.register('../service-worker.js').catch(()=>{}));}</script></body></html>
