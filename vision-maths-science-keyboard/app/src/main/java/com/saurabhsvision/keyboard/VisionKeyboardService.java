@@ -52,7 +52,7 @@ public final class VisionKeyboardService extends InputMethodService {
 
     @Override public void onCreate(){
         super.onCreate();
-        theme=getSharedPreferences(PREFS,MODE_PRIVATE).Math.floorMod(getInt(KEY_THEME,0),5);
+        theme=Math.floorMod(getSharedPreferences(PREFS,MODE_PRIVATE).getInt(KEY_THEME,0),5);
     }
     private int dp(float value){
         return (int)(value*getResources().getDisplayMetrics().density+.5f);
