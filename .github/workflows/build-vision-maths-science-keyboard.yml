@@ -149,16 +149,19 @@ jobs:
           assert 'KeyboardLayoutPolicy.fit(desired,budget,dp(36),actionIndex)' in panel
           assert 'int height=dp(landscape?49:55);' in ime
           assert 'orientation==2?57:62' in ime
-          assert 'keysContent.setPadding(dp(3),dp(5),dp(3),dp(landscape?30:22));' in ime
+          assert 'keysContent.setPadding(dp(3),dp(4),dp(3),dp(8));' in ime
+          assert 'display.getRealSize(actualScreen)' in panel
+          assert "targetSdk 34" in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
+          assert Path('vision-maths-science-keyboard/scripts/verify_spacebar_visible.sh').is_file()
           assert 'KeyboardLayoutPolicy.landscapeHeightCap(screenPx,cap)' in panel
-          assert 'landscapeHeightCap(int screenHeightPx,int maxConfiguredPx)' in policy
-          assert 'boolean landscape=getResources().getConfiguration().orientation' in ime
+          assert 'landscapeHeightCap(int shortScreenSidePx,int maxConfiguredPx)' in policy
+          assert 'keysContent.setPadding(dp(3),dp(4),dp(3),dp(8));' in ime
           assert ime.index('addRow("Q W E R T Y U I O P");') < ime.index('addRow("A S D F G H J K L");') < ime.index('addRow("⇧ Z X C V B N M ⌫");') < ime.index('addBottom();')
           assert ime.index('addRow("Q W E R T Y U I O P");') < ime.index('addRow("A S D F G H J K L");') < ime.index('addRow("⇧ Z X C V B N M ⌫");') < ime.index('addBottom();')
           for lastrow in ('* \\" \' : ; ! ? = ← ⌫','sin( cos( tan( log( ln( x² x³ ^ → ⌫','α β γ λ μ Ω Δ ∝ ∴ ⌫'):
               assert lastrow in ime
           assert 'row.setTag("sboard_space_action")' in ime
-          print('PASS: all three QWERTY rows and bottom Space fit within screen-height-aware landscape IME')
+          print('PASS: three QWERTY rows plus final Space; non-edge-to-edge IME and physical display measurements')
           print('Full four-row S Board layout and enlarged keyboard viewport verified')
           assert (root/'java/com/saurabhsvision/keyboard/WordSuggestions.java').is_file()
           print('Confirmed neon input view, live suggestion strip, stable Spacebar and real long-press number keys')
@@ -225,13 +228,42 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.4_LAST_ROW_FULLY_VISIBLE.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.5_REAL_IME_FIX.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
+
+      - name: Enable KVM acceleration for Android Emulator
+        shell: bash
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-sboard-kvm.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Real Android 15 emulator — full Spacebar visibility
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-boot-timeout: 900
+          script: bash vision-maths-science-keyboard/scripts/verify_spacebar_visible.sh
+
+      - name: Save emulator keyboard screenshot for visibility audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: S_Board_1_9_5_Emulator_Visibility_Audit
+          path: |
+            /tmp/sboard-visual.png
+            /tmp/sboard-window.xml
+          if-no-files-found: ignore
+          retention-days: 30
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_4_Last_Row_Fully_Visible_APK
+          name: S_Board_v1_9_5_REAL_IME_FIX_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -241,13 +273,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.4"
-          file="keyboard-deliverables/S_Board_v1.9.4_LAST_ROW_FULLY_VISIBLE.apk"
+          tag="s-board-v1.9.5"
+          file="keyboard-deliverables/S_Board_v1.9.5_REAL_IME_FIX.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.9.4 • Landscape Last Row Fit" \
-              --notes "S Board 1.9.4 fixes the last Space/Enter row being cut off on a 1197x563 landscape Android screen. Unlike the earlier 1.9.3 padding-only adjustment, this version caps the actual keyboard input view to 66 percent of the real landscape screen height and proportionally fits ALL letter rows and the action row in that measured viewport. The old oversized bottom gap is reduced to 30dp. Original S Board branding, neon style, QWERTY layout, Maths, Science, Hindi/Hinglish and 24 language modes are unchanged. Automated tests cover a screen matching the user's screenshot, smaller OEM landscape viewports, Hindi phonetic typing and APK signing. This is a debug-signed test build; on-device confirmation is still required." \
+              --title "S Board 1.9.5 • Full Spacebar & Android Navigation Fix" \
+              --notes "S Board 1.9.5 fixes the cropped bottom Space/Enter row using Android 15 IME navigation-bar compatibility rather than another padding-only adjustment. The debug sideload build temporarily targets SDK 34 to avoid Android 15's enforced edge-to-edge navigation overlay, while still compiling with SDK 35. The keyboard reads the physical display dimensions and requests its true safe landscape height, with only 8dp internal bottom spacing. QWERTY's three complete rows plus a fourth row with Space, emoji, Hindi-English, punctuation and Enter remain intact. Maths, Science, offline phonetic languages and the neon theme are unchanged. Automated tests verify layout, Hindi typing, signing and an Android 15 emulator Space-key visibility probe. Please verify on the actual phone before treating the OEM-specific issue as resolved; target SDK must be modernized again with proper insets for Play Store submission." \
               --latest=false
           fi
