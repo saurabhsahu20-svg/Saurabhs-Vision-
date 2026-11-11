@@ -9,25 +9,24 @@ import android.widget.LinearLayout;
 import java.util.WeakHashMap;
 
 /**
- * Adaptive, wrap-content IME container.
- *
- * The prior implementation capped the measured parent height WITHOUT shrinking
- * the child key rows. On phones where Android offered less height, this clipped
- * the last Space/Enter row. This one reflows ALL child rows to the actual space.
- * The final row gets priority, so the spacebar is never sacrificed to decoration.
+ * Measured S Board keyboard. The previous LinearLayout inherited measurement
+ * could let fixed-height children exceed the visible IME viewport. This class
+ * measures AND lays out every row explicitly so the action row is never outside
+ * its own bounds. The last child is ALWAYS Space / Enter (or an action footer).
  */
 public final class KeyboardPanel extends LinearLayout {
     private KeyboardBackdrop painter;
     private final WeakHashMap<View,Integer> naturalRows=new WeakHashMap<>();
     private final WeakHashMap<View,Integer> naturalKeys=new WeakHashMap<>();
-    private int portraitMaxDp=325,landscapeMaxDp=225;
+    private int portraitMaxDp=295,landscapeMaxDp=205;
+    private int[] heights=new int[0];
 
     public KeyboardPanel(Context context,int theme){
         super(context);
         setOrientation(VERTICAL);
         setWillNotDraw(false);
-        setClipChildren(true);
         setClipToPadding(true);
+        setClipChildren(true);
         setLayoutParams(new ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
         setTheme(theme);
@@ -37,108 +36,105 @@ public final class KeyboardPanel extends LinearLayout {
         invalidate();
     }
     public void setCompact(boolean compact){
-        portraitMaxDp=compact?264:325;
-        landscapeMaxDp=compact?189:225;
+        // Smaller keys are preferable to a missing SPACEBAR.
+        portraitMaxDp=compact?234:295;
+        landscapeMaxDp=compact?175:205;
         requestLayout();
     }
-    private int dp(float value){
-        return (int)(value*getResources().getDisplayMetrics().density+.5f);
+    private int dp(float v){
+        return (int)(v*getResources().getDisplayMetrics().density+.5f);
     }
     @Override protected void onDraw(Canvas canvas){
         if(painter!=null)painter.drawArtwork(canvas,getWidth(),getHeight());
         super.onDraw(canvas);
     }
-    private int baseHeight(View view,WeakHashMap<View,Integer> cache){
-        Integer saved=cache.get(view);
-        if(saved!=null)return saved;
-        ViewGroup.LayoutParams lp=view.getLayoutParams();
-        int height=lp!=null?lp.height:0;
-        if(height<=0)height=dp(42);
-        cache.put(view,height);
-        return height;
+    private int original(View v,WeakHashMap<View,Integer> map){
+        Integer old=map.get(v);
+        if(old!=null)return old;
+        ViewGroup.LayoutParams lp=v.getLayoutParams();
+        int h=lp==null||lp.height<=0?dp(38):lp.height;
+        map.put(v,h);
+        return h;
     }
-    private int margins(View view){
+    private int topMargin(View view){
         ViewGroup.LayoutParams lp=view.getLayoutParams();
-        if(lp instanceof ViewGroup.MarginLayoutParams){
-            ViewGroup.MarginLayoutParams m=(ViewGroup.MarginLayoutParams)lp;
-            return m.topMargin+m.bottomMargin;
-        }
-        return 0;
+        return lp instanceof MarginLayoutParams?((MarginLayoutParams)lp).topMargin:0;
     }
-    private void adjustKeysInside(View row,int rowHeight){
+    private int bottomMargin(View view){
+        ViewGroup.LayoutParams lp=view.getLayoutParams();
+        return lp instanceof MarginLayoutParams?((MarginLayoutParams)lp).bottomMargin:0;
+    }
+    private int leftMargin(View view){
+        ViewGroup.LayoutParams lp=view.getLayoutParams();
+        return lp instanceof MarginLayoutParams?((MarginLayoutParams)lp).leftMargin:0;
+    }
+    private int rightMargin(View view){
+        ViewGroup.LayoutParams lp=view.getLayoutParams();
+        return lp instanceof MarginLayoutParams?((MarginLayoutParams)lp).rightMargin:0;
+    }
+    private void resizeKeyChildren(View row,int availableHeight){
         if(!(row instanceof LinearLayout))return;
         LinearLayout inner=(LinearLayout)row;
-        int available=Math.max(1,rowHeight-inner.getPaddingTop()-inner.getPaddingBottom());
-        for(int j=0;j<inner.getChildCount();j++){
-            View key=inner.getChildAt(j);
-            if(key.getLayoutParams()==null)continue;
-            int natural=baseHeight(key,naturalKeys);
-            int fit=Math.max(1,available-margins(key));
-            key.getLayoutParams().height=Math.min(natural,fit);
+        int rowBudget=Math.max(1,availableHeight-inner.getPaddingTop()-inner.getPaddingBottom());
+        for(int i=0;i<inner.getChildCount();i++){
+            View child=inner.getChildAt(i);
+            ViewGroup.LayoutParams lp=child.getLayoutParams();
+            if(lp==null)continue;
+            int natural=original(child,naturalKeys);
+            // LinearLayout treats the child's explicit height as exact even
+            // if its parent was measured smaller. Fit children too.
+            lp.height=Math.max(1,Math.min(natural,rowBudget-topMargin(child)-bottomMargin(child)));
         }
     }
     @Override protected void onMeasure(int widthSpec,int heightSpec){
         boolean landscape=getResources().getConfiguration().orientation
             ==Configuration.ORIENTATION_LANDSCAPE;
         int cap=dp(landscape?landscapeMaxDp:portraitMaxDp);
-        int mode=View.MeasureSpec.getMode(heightSpec);
-        if(mode!=View.MeasureSpec.UNSPECIFIED){
+        int specMode=View.MeasureSpec.getMode(heightSpec);
+        if(specMode!=View.MeasureSpec.UNSPECIFIED)
             cap=Math.min(cap,View.MeasureSpec.getSize(heightSpec));
-        }
         cap=Math.max(1,cap);
-        int count=getChildCount();
-        if(count>0){
-            int totalMargins=getPaddingTop()+getPaddingBottom();
-            int desired=0;
-            int[] natural=new int[count];
-            for(int i=0;i<count;i++){
-                View child=getChildAt(i);
-                natural[i]=baseHeight(child,naturalRows);
-                totalMargins+=margins(child);
-                desired+=natural[i];
-            }
-            int budget=Math.max(1,cap-totalMargins);
-            int[] heights=new int[count];
-            if(desired<=budget){
-                System.arraycopy(natural,0,heights,0,count);
-            }else if(count<=2){
-                for(int i=0;i<count;i++)
-                    heights[i]=Math.max(1,(int)((long)budget*natural[i]/Math.max(1,desired)));
-            }else{
-                // First child: top mode toolbar. Last child: mandatory spacebar.
-                // Preserve bottom row before distributing space to other rows.
-                int footer=Math.min(natural[count-1],
-                    Math.min(Math.max(dp(36),(int)(budget*.23f)),budget/2));
-                int toolbar=Math.min(natural[0],
-                    Math.min(Math.max(dp(28),(int)(budget*.15f)),budget/4));
-                footer=Math.max(1,footer);toolbar=Math.max(1,toolbar);
-                int middle=Math.max(1,budget-footer-toolbar);
-                int middleNatural=0;
-                for(int i=1;i<count-1;i++)middleNatural+=natural[i];
-                heights[0]=toolbar;
-                heights[count-1]=footer;
-                int assigned=0;
-                for(int i=1;i<count-1;i++){
-                    int slice=(int)((long)middle*natural[i]/Math.max(1,middleNatural));
-                    heights[i]=Math.max(1,slice);
-                    assigned+=heights[i];
-                }
-                // Assign rounding difference to the penultimate row, never the
-                // bottom spacebar row, keeping the last row fully visible.
-                heights[count-2]=Math.max(1,heights[count-2]+middle-assigned);
-            }
-            for(int i=0;i<count;i++){
-                View child=getChildAt(i);
-                ViewGroup.LayoutParams lp=child.getLayoutParams();
-                if(lp!=null){
-                    lp.height=heights[i];
-                    adjustKeysInside(child,heights[i]);
-                }
-            }
+
+        int width=View.MeasureSpec.getSize(widthSpec);
+        if(View.MeasureSpec.getMode(widthSpec)==View.MeasureSpec.UNSPECIFIED)
+            width=getResources().getDisplayMetrics().widthPixels;
+        width=Math.max(1,width);
+
+        int n=getChildCount();
+        int padH=getPaddingTop()+getPaddingBottom();
+        int[] desired=new int[n];
+        int margins=0;
+        for(int i=0;i<n;i++){
+            View child=getChildAt(i);
+            desired[i]=original(child,naturalRows);
+            margins+=topMargin(child)+bottomMargin(child);
         }
-        // The Android IME parent may offer only a short viewport. Child rows
-        // were fit BEFORE measurement, so the last Space/Enter row cannot clip.
-        super.onMeasure(widthSpec,
-            View.MeasureSpec.makeMeasureSpec(cap,View.MeasureSpec.AT_MOST));
+        int budget=Math.max(n,cap-padH-margins);
+        heights=KeyboardLayoutPolicy.fit(desired,budget,dp(36));
+        int availableWidth=Math.max(1,width-getPaddingLeft()-getPaddingRight());
+        for(int i=0;i<n;i++){
+            View child=getChildAt(i);
+            resizeKeyChildren(child,heights[i]);
+            int childWidth=Math.max(1,availableWidth-leftMargin(child)-rightMargin(child));
+            child.measure(View.MeasureSpec.makeMeasureSpec(childWidth,View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(Math.max(1,heights[i]),View.MeasureSpec.EXACTLY));
+        }
+        int usedHeight=padH+margins+KeyboardLayoutPolicy.total(heights);
+        // Never report a height smaller than the sum of the rows we laid out.
+        // Android can now reserve the correct IME surface for Space + Enter.
+        setMeasuredDimension(width,Math.min(cap,Math.max(1,usedHeight)));
+    }
+    @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
+        int y=getPaddingTop();
+        int availableWidth=Math.max(1,r-l-getPaddingLeft()-getPaddingRight());
+        for(int i=0;i<getChildCount();i++){
+            View child=getChildAt(i);
+            y+=topMargin(child);
+            int x=getPaddingLeft()+leftMargin(child);
+            int w=Math.max(1,availableWidth-leftMargin(child)-rightMargin(child));
+            int height=i<heights.length?heights[i]:Math.max(1,child.getMeasuredHeight());
+            child.layout(x,y,x+w,y+height);
+            y+=height+bottomMargin(child);
+        }
     }
 }
