@@ -82,6 +82,14 @@ jobs:
           assert 'getCurrentInputConnection' in ime
           assert 'CATEGORIES' in emojis and 'Love' in emojis and 'Feelings' in emojis
           assert 'drawArtwork' in bg
+          assert '0xfff5f8ff' in bg and 'if(theme==4)' in bg
+          assert 'Math.floorMod(theme,5)' in bg
+          assert 'theme=(theme+1)%5' in ime
+          assert 'theme==4' in ime
+          assert 'scaleX(.96f)' in ime
+          assert 'setCornerRadius(dp(13))' in ime
+          assert 'Pure White' in activity and 'keyPreview' in activity
+          print('Verified five themes, Pure White contrast, professional button skins and preview.')
           print('Verified compact IME panel + paginated emoji picker source contracts.')
           assert 'extends View' in bg
           print('Keyboard functional/input/privacy contracts checked.')
@@ -105,13 +113,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/Vision_Maths_Science_Keyboard_v1.1.0_EMOJI_COMPACT_TEST.apk
+          cp "$apk" keyboard-deliverables/Vision_Maths_Science_Keyboard_v1.2.0_PRO_WHITE_TEST.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Vision_Maths_Science_Keyboard_v1_1_Emoji_Compact_APK
+          name: Vision_Maths_Science_Keyboard_v1_2_Pro_White_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -121,13 +129,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="vision-maths-science-keyboard-v1.1.0"
-          file="keyboard-deliverables/Vision_Maths_Science_Keyboard_v1.1.0_EMOJI_COMPACT_TEST.apk"
+          tag="vision-maths-science-keyboard-v1.2.0"
+          file="keyboard-deliverables/Vision_Maths_Science_Keyboard_v1.2.0_PRO_WHITE_TEST.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "Vision Maths & Science Keyboard 1.1 • Compact Height + Emojis" \
-              --notes "Vision Maths & Science Keyboard v1.1 TEST APK. Fix: the keyboard now stays compact instead of filling the display; neon backgrounds render within the key panel only, and fullscreen extract mode is disabled. Added 923 emoji choices in 11 categories including emotions, faces, love, gestures and science, with paging. Retains Maths and Science symbol input, ABC/123, 4 neon themes and offline privacy. Android APK compile and signature verified by GitHub; physical device keyboard height, emoji glyphs and compatibility still require testing." \
+              --title "Vision Maths & Science Keyboard 1.2 • Professional Buttons + White Theme" \
+              --notes "Vision Maths & Science Keyboard v1.2 TEST APK: adds a polished Pure White/light mode with readable dark letters, blue selected toolbar buttons, pale function keys, and blue Enter. Upgraded all five theme layouts with rounded elevated keys, gentle ripple/scale touch feedback, larger borders and professional setup theme cards + key preview. Preserves compact keyboard, ABC/123, Maths/Science, 11-category emoji keyboard with 923 entries, no INTERNET permission. GitHub compile and signature checks verify this test APK; handset display and interaction still require testing." \
               --latest=false
           fi

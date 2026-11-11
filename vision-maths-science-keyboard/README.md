@@ -1,4 +1,4 @@
-# SAURABH'S VISION™ — Maths & Science Keyboard 1.1
+# SAURABH'S VISION™ — Maths & Science Keyboard 1.2
 
 **Type Smarter. Explore Further.**
 
@@ -10,7 +10,7 @@ A separate, **native functional Android Input Method Editor (IME)**; not a keybo
 - **123** digits and symbols, including ₹ and punctuation.
 - **Maths ∑**: π, √, ∑, ∞, ≈, ≠, ≤, ≥, ±, ×, ÷, ∫, ∂, Δ, θ, Greek letters, powers, and function shortcuts.
 - **Science ⚛**: H₂O, CO₂, O₂, NaCl, H⁺, OH⁻, e⁻, pH, DNA, RNA, reversible-reaction arrow, units and physics symbols.
-- **4 original neon designs**: Cosmic Blue, Golden Mathematics, Science Lab, Purple Quantum. Lightweight Canvas background and clickable ripple keys.
+- **5 keyboard themes**: Cosmic Blue, Golden Mathematics, Science Lab, Purple Quantum. Lightweight Canvas background and clickable ripple keys.
 - Hindi + English walkthrough inside the app, with setup buttons and typing test box.
 - Official public Instagram profile shortcut: `https://www.instagram.com/saurabhs_vision/`.
 
@@ -25,7 +25,7 @@ Android may show a standard warning when enabling any third-party keyboard. Revi
 
 ## Privacy and limitations
 
-This keyboard requests **no Internet permission** and does not log or upload keystrokes, passwords, clipboard contents, messages or typing history. It uses the Android InputMethodService API to send keys **only to the active input field** via InputConnection. It contains no autocorrect dictionary, text prediction, voice typing, GIF search, multilingual transliteration or emoji picker yet. Scientific shortcuts insert Unicode strings, not rendered equations or LaTeX. No cloud storage, analytics or ad SDK.
+This keyboard requests **no Internet permission** and does not log or upload keystrokes, passwords, clipboard contents, messages or typing history. It uses the Android InputMethodService API to send keys **only to the active input field** via InputConnection. It contains no autocorrect dictionary, text prediction, voice typing, GIF search or multilingual transliteration. Scientific shortcuts insert Unicode strings, not rendered equations or LaTeX. No cloud storage, analytics or ad SDK.
 
 Built with Java 17, Android SDK 35, AGP 8.7.3, Gradle 8.9; minSdk 23 (Android 6.0). The automated GitHub build checks compilation, APK integrity, signing, package metadata and InputMethodService registration. **Real handset testing is still required**, especially on OEM keyboards, screen sizes and password-entry fields.
 
@@ -47,3 +47,7 @@ The first version showed a very tall empty neon background under the typing keys
 Choose the **😊** toolbar tab or bottom-row emoji key. The offline EmojiCatalog offers **923 emoji entries across 11 groups** (795 distinct strings), emphasizing facial emotions, love, feelings, hand gestures, people and more. Use the horizontal category bar and ◀ ▶ for 32 emoji per page. Emoji insertion uses the active InputConnection with Unicode, so combined emojis and skin tones depend on Android/font/app support. This is not the complete Unicode emoji standard and does not include a GIF or sticker browser.
 
 Compatibility: Upgrading a previously installed debug-signed APK may conflict with a different debug signing certificate. If upgrading fails, uninstall only the old Vision Maths & Science Keyboard after first switching to the phone's original keyboard; then install this new APK. Settings and custom themes may reset. Do not uninstall the Android system keyboard.
+
+## 1.2 Update — professional keycaps and Pure White
+
+The keyboard includes 5 themes: Cosmic Blue, Golden Mathematics, Science Lab, Purple Quantum, and **Pure White**. Light mode uses a clean grey-white science grid, high-contrast dark text on bright keys, powder-blue function keys, a strong blue Enter key, and matching active tabs. Every theme has smoother rounded key shapes, soft borders/elevation, Android ripple response and subtle pressed-scale feedback, while keeping the compact-height design. The setup screen offers five theme cards and a matching key-style preview. Use the ☀ button in the keyboard toolbar to cycle themes, or select Pure White in app settings. All Maths, Science and emoji modes are retained. No Internet or typing-record permissions are added. Real device tests remain required.
