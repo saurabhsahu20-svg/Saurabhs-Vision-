@@ -5,8 +5,8 @@
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:usesCleartextTraffic="false"
-        android:icon="@drawable/s_board_icon"
-        android:roundIcon="@drawable/s_board_icon"
+        android:icon="@drawable/s_board_logo"
+        android:roundIcon="@drawable/s_board_logo"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">

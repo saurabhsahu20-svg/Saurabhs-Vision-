@@ -109,23 +109,25 @@ jobs:
           assert 'languageSpinner' in activity
           assert 'Hinglish' in activity
           from pathlib import Path
-          logo=root/'res/drawable/s_board_icon.xml'
-          assert logo.is_file() and 'strokeColor' in logo.read_text()
+          logo=root/'res/drawable-nodpi/s_board_logo.webp'
+          assert logo.is_file() and logo.stat().st_size>3000
+          raw_logo=logo.read_bytes()
+          assert raw_logo[:4]==b'RIFF' and raw_logo[8:12]==b'WEBP'
           
           splash=(root/'java/com/saurabhsvision/keyboard/SauneSplashActivity.java').read_text()
           manifest=(root/'AndroidManifest.xml').read_text()
           strings=(root/'res/values/strings.xml').read_text()
-          assert 'SauneSplashActivity' in manifest and 's_board_icon' in manifest
+          assert 'SauneSplashActivity' in manifest and 's_board_logo' in manifest
           assert '<string name="app_name">S Board</string>' in strings
-          assert 'ValueAnimator' in splash and 'R.drawable.s_board_icon' in splash
+          assert 'ValueAnimator' in splash and 'R.drawable.s_board_logo' in splash
           assert 'handler.postDelayed(enterApp,2400)' in splash
           assert 'new Intent(this,MainActivity.class)' in splash
-          assert 'animatedLogoBadge.setImageResource(R.drawable.s_board_icon)' in activity
+          assert 'animatedLogoBadge.setImageResource(R.drawable.s_board_logo)' in activity
           assert 'refreshSetupStatus()' in activity
           assert 'idx==6){press("SPACE")' in ime
           assert 'setMeasuredDimension(width,Math.min(cap' in panel
           assert 'child.layout(x,y,x+w,y+height)' in panel
-          print('S Board branding, original vector icon, animated splash and setup status verified')
+          print('S Board branding, user-selected 3D logo image, animated splash and setup status verified')
 
           print('24 language choices, phonetic composition, secure-password fallback verified')
           print('Space/Enter bottom row priority, adaptive fit, compact settings verified')
@@ -177,13 +179,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.6.0_SPACEBAR_FIXED_TEST.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.7.0_3D_NEON_LOGO_TEST.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_6_Spacebar_Protected_APK
+          name: S_Board_v1_7_3D_Neon_Icon_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -193,13 +195,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.6.0"
-          file="keyboard-deliverables/S_Board_v1.6.0_SPACEBAR_FIXED_TEST.apk"
+          tag="s-board-v1.7.0"
+          file="keyboard-deliverables/S_Board_v1.7.0_3D_NEON_LOGO_TEST.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.6 • Fixed Spacebar + Premium Maths Science Keyboard" \
-              --notes "S BOARD 1.6 TEST APK: fixes Spacebar and Enter row clipping in WhatsApp and restricted Android IME viewports by replacing inherited LinearLayout measurement with explicit child measurement and layout; reserved footer height is verified in pure Java tests for small landscape, portrait, Hindi, Emoji and language picker. Always-visible backup Space shortcut in toolbar. Display name and launcher app icon changed to S Board with original blue-gold S keyboard logo and matching animated startup. Package ID unchanged to allow updates; Maths, Science, Hinglish, 24-language choices, 923 emoji entries, white+neon themes and offline privacy retained. Build, APK signature and layout-policy tests pass in CI. Physical device testing still required." \
+              --title "S Board 1.7 • Your 3D Neon Logo as App Icon" \
+              --notes "S BOARD v1.7 TEST APK. Replaces old simple vector app icon with user's selected red-and-blue 3D neon S BOARD keyboard artwork (bundled original-design WebP launcher icon). Startup animation and settings hero show same image. No Google/Gboard art. Android app package and official S Board display name unchanged. Preserves compact Spacebar, English/Hinglish/Indian phonetic input, Maths and Science symbols, 923 emoji entries, five themes including Pure White, and no Internet permission. Automatic CI tests check actual packaged graphic, Java/Android compilation and APK signing; real device visual testing not yet completed." \
               --latest=false
           fi

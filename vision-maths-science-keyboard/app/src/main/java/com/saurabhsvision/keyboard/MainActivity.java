@@ -84,7 +84,7 @@ public final class MainActivity extends Activity {
         add(copy,text("Maths • Science • Languages",13,0xffbde9ff,false),7);
         add(copy,text("π  √  ∑  ∞  ⚛  🧬  😊",18,0xff8df0ff,true),12);
         ImageView animatedLogoBadge=new ImageView(this);
-        animatedLogoBadge.setImageResource(R.drawable.s_board_icon);
+        animatedLogoBadge.setImageResource(R.drawable.s_board_logo);
         animatedLogoBadge.setScaleType(ImageView.ScaleType.FIT_CENTER);
         animatedLogoBadge.setContentDescription("S Board premium blue-gold keyboard logo");
         FrameLayout.LayoutParams badgeParams=new FrameLayout.LayoutParams(dp(105),dp(105),

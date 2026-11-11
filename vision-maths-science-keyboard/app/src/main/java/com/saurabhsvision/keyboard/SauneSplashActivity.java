@@ -67,7 +67,7 @@ public final class SauneSplashActivity extends Activity {
 
         SauneLogoStage(){
             super(SauneSplashActivity.this);
-            logo=SauneSplashActivity.this.getDrawable(R.drawable.s_board_icon);
+            logo=SauneSplashActivity.this.getDrawable(R.drawable.s_board_logo);
             setLayerType(View.LAYER_TYPE_SOFTWARE,null);
             setContentDescription("Animated S Board Maths and Science keyboard logo");
             setClickable(true);
