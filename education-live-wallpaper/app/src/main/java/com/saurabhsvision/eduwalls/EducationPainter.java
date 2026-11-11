@@ -132,9 +132,13 @@ public final class EducationPainter {
             else drawPlanet(c,cx,cy,size,hi,sec,time);
             drawKnowledgePulse(c,w,h,theme,time,hi,sec);
         } else {
-            int effect=ctx.getSharedPreferences(EduWallpaperService.PREFS,Context.MODE_PRIVATE)
-                .getInt("premium_hd_fx",0);
+            android.content.SharedPreferences prefs=ctx.getSharedPreferences(EduWallpaperService.PREFS,Context.MODE_PRIVATE);
+            int effect=prefs.getInt("premium_hd_fx",0);
             drawPremiumArtEffects(c,w,h,time,hi,sec,effect);
+            int artIndex=prefs.getInt("premium_3d_index",-1);
+            if(BuiltIn3DWidgetArt.valid(artIndex)){
+                drawPremium3DMatchedEffects(c,w,h,time,artIndex);
+            }
         }
 
         // Elegant border arc and title/brand.
@@ -303,6 +307,134 @@ public final class EducationPainter {
                 float pulse=.55f+.3f*(float)Math.sin(t*.30f+j);
                 dot(c,x,y,z*.004f,Color.WHITE,(int)(95*pulse));
             }
+        }
+    }
+    /**
+     * V10: category-specific LIVE motion that sits on top of the same V9 JPG image.
+     * 100 built-in images keep 100 individual animated presets. Drawing uses a
+     * few Canvas objects per frame to preserve the original photographic detail.
+     */
+    private void drawPremium3DMatchedEffects(Canvas c,int w,int h,float t,int artIndex){
+        final int group=artIndex/10,variant=artIndex%10;
+        final int[] palette={
+            0xffffca60,0xff74d9ff,0xffe59bff,0xffff849e,0xff9afa80,
+            0xff63d7ff,0xff71eafa,0xffffe2a2,0xffee9cff,0xffffc58f};
+        final int accent=palette[group],white=Color.WHITE;
+        final float z=Math.min(w,h);
+        final float phase=t*(.68f+variant*.042f);
+
+        // Per-art individual particle arrangements, with varied direction and rate.
+        for(int j=0;j<22;j++){
+            float seed=artIndex*11.37f+j*3.13f;
+            float x=w*frac(noise((int)(seed*7)+17)+
+                (float)Math.sin(phase*.29f+j*.36f)*.026f);
+            float y=h*frac(noise((int)(seed*13)+41)-phase*(.005f+.0013f*(j%4)));
+            float radius=z*(.0016f+.00045f*(j%5));
+            int opacity=72+(int)(53*(1+Math.sin(phase+j*.71f)));
+            dot(c,x,y,radius,j%4==0?white:accent,opacity);
+        }
+        switch(group){
+            case 0: { // Maths: moving sinusoidal strands with illuminated terms.
+                for(int j=1;j<31;j++){
+                    float x=w*(.06f+j*.029f);
+                    float y=h*(.52f+.035f*(float)Math.sin(j*.36f+phase*.92f));
+                    dot(c,x,y,z*.003f,accent,132);
+                }
+                String[] n={"π","Σ","∞","√","x²"};
+                for(int j=0;j<4;j++){
+                    float x=w*(.15f+j*.22f);
+                    float y=h*(.34f+(float)Math.sin(phase*.43f+j)*.035f);
+                    text(c,n[(j+variant)%n.length],x,y,z*.060f,accent,104,true);
+                }
+                break;
+            }
+            case 1: { // Physics: dotted electric/magnetic orbit path.
+                orbitDots(c,w,h,phase,variant,accent,white,3);
+                break;
+            }
+            case 2: { // Chemistry: glowing molecule bonds and bubbles.
+                for(int j=0;j<9;j++){
+                    float a=phase*.24f+j*.67f,xx=w*(.48f+(float)Math.cos(a)*.30f);
+                    float yy=h*(.49f+(float)Math.sin(a)*.13f);
+                    dot(c,xx,yy,z*.012f,accent,106+j%3*24);
+                    if(j%2==0)line(c,xx,yy,w*.5f,h*.50f,accent,72,1.35f);
+                }
+                break;
+            }
+            case 3: { // Biology: heartbeat and double-helix electric pulses.
+                float pulse=.7f+.3f*(float)Math.sin(phase*2.2f);
+                float cx=w*.5f,cy=h*.49f;
+                color(accent,(int)(90*pulse));
+                p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(z*.004f);
+                oval.set(cx-z*.14f*pulse,cy-z*.14f*pulse,
+                    cx+z*.14f*pulse,cy+z*.14f*pulse);
+                c.drawOval(oval,p);p.setStyle(Paint.Style.FILL);
+                for(int j=0;j<10;j++){
+                    float y=h*(.2f+j*.052f);
+                    float x=w*(.5f+(float)Math.sin(j*.64f+phase*.32f)*.17f);
+                    dot(c,x,y,z*.004f,accent,84);
+                }
+                break;
+            }
+            case 4: { // Botany: soft glowing chlorophyll dew / rising light.
+                for(int j=0;j<13;j++){
+                    float x=w*(.06f+noise(j+artIndex+90)*.87f);
+                    float y=h*frac(noise(j+artIndex+25)-phase*.008f);
+                    float r=z*(.004f+(j%3)*.001f);
+                    dot(c,x,y,r,accent,117);
+                }
+                break;
+            }
+            case 5: { // Space: orbital points and a comet.
+                orbitDots(c,w,h,phase,variant,accent,white,4);
+                float px=w*frac(phase*.025f+variant*.07f),py=h*(.28f+(float)Math.sin(phase*.3f)*.11f);
+                for(int j=0;j<9;j++)dot(c,px-j*z*.016f,py+j*z*.004f,
+                        z*.003f,accent,178-j*16);
+                break;
+            }
+            case 6: { // Technology: traveling pulses along circuit paths.
+                for(int row=0;row<5;row++){
+                    float y=h*(.25f+row*.14f);
+                    float px=w*frac(phase*.031f+row*.14f+variant*.011f);
+                    line(c,w*.14f,y,w*.85f,y,accent,45,1.5f);
+                    dot(c,px,y,z*.008f,accent,180);
+                }
+                break;
+            }
+            case 7: { // Learning: glowing book and letter glints.
+                String[] letters={"A","B","C","1","2","3"};
+                for(int j=0;j<8;j++){
+                    float x=w*(.13f+noise(j+artIndex+150)*.73f);
+                    float y=h*frac(noise(j+artIndex+70)-phase*.012f);
+                    text(c,letters[(j+variant)%letters.length],x,y,z*.040f,
+                        accent,90,true);
+                }
+                break;
+            }
+            case 8: { // 3D Abstract: changing polygon orbits.
+                orbitDots(c,w,h,phase,variant,accent,white,5);
+                break;
+            }
+            default: { // Motivation: slowly rising glowing progress lights.
+                for(int j=0;j<7;j++){
+                    float x=w*(.19f+j*.102f);
+                    float y=h*(.81f-(float)Math.sin(phase*.6f+j*.5f)*.07f);
+                    dot(c,x,y,z*.014f,accent,74);
+                    dot(c,x,y,z*.004f,white,183);
+                }
+            }
+        }
+    }
+    private void orbitDots(Canvas c,int w,int h,float phase,int variant,int accent,int white,int rings){
+        float z=Math.min(w,h);
+        for(int ring=0;ring<rings;ring++){
+            float cx=w*(.48f+ring*.015f),cy=h*(.44f+ring*.035f);
+            float rx=w*(.20f+ring*.075f),ry=h*(.070f+ring*.017f);
+            float angle=phase*(.26f+ring*.071f)+variant*.5f+ring*1.7f;
+            float x=cx+(float)Math.cos(angle)*rx,
+                  y=cy+(float)Math.sin(angle)*ry;
+            dot(c,x,y,z*.013f,accent,188);
+            dot(c,x,y,z*.005f,white,249);
         }
     }
     private void drawPosterShimmer(Canvas c,int w,int h,float t,int hi,int sec){
