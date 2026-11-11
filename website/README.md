@@ -1,6 +1,6 @@
 # SAURABH’S VISION™ — Website source package
 
-**Project status:** A functional static public website + interactive practice modules + Firebase-connected workflows (after setup). It is **NOT deployed** and has **NOT been connected to your Google account**. Authentication, remote admissions, private data dashboards, and booking confirmations need a real Firebase project and role provisioning. There is no fake login, fake student score or pretend form submission.
+**Public website:** https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/ — GitHub Pages deploys the public frontend from the `main` branch. Public admissions and demo requests use guardian-initiated WhatsApp drafts when Firebase is not configured. The website does not submit or store those draft enquiries: visitors must review and press Send in WhatsApp. Authentication, remote admission records, private student dashboards, and confirmed demo bookings still require a properly configured Firebase backend, security rules and role provisioning. Do not advertise these private services as active until verified.
 
 ## Preview immediately (without credentials)
 
@@ -32,8 +32,8 @@
 
 ### Important deployment and privacy notes
 
-- **Do not publish to a public domain without approval.** Preview locally or in a private developer workflow first. Firebase Hosting URLs can be accessed by anyone who has the URL; hidden/unindexed is **not** equivalent to private. For a fully private site, use an identity-gated hosting layer and enforce all backend role-based authorization.
-- Admission enquiries currently rely on Firestore security rules and App Check but no server-enforced per-IP limit. Before accepting real public traffic, add a rate-limited backend (e.g. HTTPS Cloud Function with verified App Check, spam checks, per-IP quotas and abuse monitoring). Until then, limit the forms to trusted test users.
+- **Publication approved by owner in this conversation.** The GitHub Pages frontend is publicly accessible; avoid placing private student records, account exports, Firebase credentials or signing keys in this repository. A Firebase Hosting URL is likewise not private without identity gating; private educational records always require strict backend role-based authorization.
+- On the public GitHub Pages site with Firebase disabled, the admission and demo forms open a WhatsApp draft only after guardian consent and a visitor click. The browser does not persist or submit this information itself. WhatsApp processes the message only when the visitor chooses to send it. If Firebase is enabled later, configure and independently test a rate-limited, consent-aware backend (App Check, spam checks, per-IP quotas, retention controls) before accepting public traffic.
 - Security rules **must be reviewed and tested against Firestore Rules Emulator** with adversarial cases before production use. Firebase rules do not provide a substitute for server-side score verification in formal examinations.
 - Student practice score saving is client-generated and deliberately labeled *unverified practice*. Formal exams require a separate server-graded submission pipeline.
 - The public gallery/results are blank until real, consent-approved content is uploaded. Never invent names, marks, ranks or testimonials.
