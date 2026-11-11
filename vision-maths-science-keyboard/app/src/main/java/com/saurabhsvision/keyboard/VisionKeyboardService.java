@@ -156,12 +156,12 @@ public final class VisionKeyboardService extends InputMethodService {
         LinearLayout bar=new LinearLayout(this);
         bar.setOrientation(LinearLayout.HORIZONTAL);
         bar.setGravity(Gravity.CENTER);
-        String[] ids={"ABC","123","∑","⚛","😊","🌐","☀","⚙"};
+        String[] ids={"ABC","123","∑","⚛","😊","🌐","␣","☀","⚙"};
         for(int i=0;i<ids.length;i++){
             final int idx=i;
             TextView tab=new TextView(this);
             tab.setText(ids[i]);
-            tab.setTextSize(i==2||i==3||i==5?17:13);
+            tab.setTextSize(i==2||i==3||i==5||i==6?17:13);
             tab.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
             tab.setGravity(Gravity.CENTER);
             tab.setTextColor(i<5 && mode==i?DARK[theme]:(light()?0xff253955:Color.WHITE));
@@ -176,13 +176,15 @@ public final class VisionKeyboardService extends InputMethodService {
             LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(37),i==2||i==3?1.1f:1f);
             lp.setMargins(dp(2),0,dp(2),dp(5));
             bar.addView(tab,lp);
-            tab.setContentDescription(i==5?"Choose Indian language":i==6?"Change keyboard theme":
-                i==7?"Keyboard settings":"Switch keyboard to "+ids[i]);
+            tab.setContentDescription(i==5?"Choose Indian language":
+                i==6?"Type a space (quick-access Spacebar)":i==7?"Change keyboard theme":
+                i==8?"Keyboard settings":"Switch keyboard to "+ids[i]);
             tab.setOnClickListener(v->{
                 feedback(v);
                 if(idx<5){finishRomanWord();mode=idx;shifted=false;rebuild();}
                 else if(idx==5){finishRomanWord();mode=LANGUAGE;rebuild();}
-                else if(idx==6){theme=(theme+1)%5;settings().edit().putInt(KEY_THEME,theme).apply();rebuild();}
+                else if(idx==6){press("SPACE");}
+                else if(idx==7){theme=(theme+1)%5;settings().edit().putInt(KEY_THEME,theme).apply();rebuild();}
                 else{finishRomanWord();Intent intent=new Intent(this,MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     try{startActivity(intent);}catch(RuntimeException ignored){}}
