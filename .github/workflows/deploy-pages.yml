@@ -27,6 +27,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Validate public website before publishing
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check website/app.js
+          node --check website/firebase-service.js
+          python3 website/tests/smoke.py
+          grep -q 'wa.me/918085808586' website/app.js
+          grep -q 'Parent / guardian' website/app.js
       - name: Create static publish directory
         shell: bash
         run: |
