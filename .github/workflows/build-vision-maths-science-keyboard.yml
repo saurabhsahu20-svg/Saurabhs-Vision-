@@ -1,0 +1,119 @@
+name: Build Vision Maths and Science Keyboard APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'vision-maths-science-keyboard/**'
+      - '.github/workflows/build-vision-maths-science-keyboard.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Compile Android IME keyboard APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitHub source
+        uses: actions/checkout@v4
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Use installed Android SDK
+        shell: bash
+        run: |
+          set -e
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --version
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+
+      - name: Install Android SDK 35
+        shell: bash
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Check working IME, four modes and privacy declarations
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path('vision-maths-science-keyboard/app/src/main')
+          ime=(root/'java/com/saurabhsvision/keyboard/VisionKeyboardService.java').read_text()
+          activity=(root/'java/com/saurabhsvision/keyboard/MainActivity.java').read_text()
+          bg=(root/'java/com/saurabhsvision/keyboard/KeyboardBackdrop.java').read_text()
+          manifest=(root/'AndroidManifest.xml').read_text()
+          method=(root/'res/xml/method.xml').read_text()
+          for token in ('extends InputMethodService','onCreateInputView','onStartInputView',
+                        'getCurrentInputConnection','commitText','deleteSurroundingText',
+                        'performEditorAction','addToolbar','addRow','startRepeat','Theme',
+                        'π √ ∑ ∞','H₂O CO₂ O₂'):
+              assert token in ime, ('Missing key or IME behavior',token)
+          assert 'android.permission.BIND_INPUT_METHOD' in manifest
+          assert 'android.view.InputMethod' in manifest
+          assert 'android:resource="@xml/method"' in manifest
+          assert 'settingsActivity' in method
+          assert 'INTERNET' not in manifest
+          assert 'READ_CLIPBOARD' not in manifest
+          assert 'RECORD_AUDIO' not in manifest
+          assert 'ACTION_INPUT_METHOD_SETTINGS' in activity
+          assert 'showInputMethodPicker' in activity
+          assert 'Maths & Science' in activity
+          assert 'extends View' in bg
+          print('Keyboard functional/input/privacy contracts checked.')
+          PY
+
+      - name: Compile APK
+        shell: bash
+        run: |
+          cd vision-maths-science-keyboard
+          gradle --no-daemon --stacktrace :app:assembleDebug
+
+      - name: Validate installable APK, manifest and signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk="vision-maths-science-keyboard/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$apk"
+          unzip -t "$apk" | tail -1
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | head -13
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
+          mkdir -p keyboard-deliverables
+          cp "$apk" keyboard-deliverables/Vision_Maths_Science_Keyboard_v1.0.0_TEST.apk
+          sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
+
+      - name: Upload downloadable APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Vision_Maths_Science_Keyboard_v1_APK
+          path: keyboard-deliverables/*
+          retention-days: 90
+
+      - name: Publish direct-download GitHub test Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="vision-maths-science-keyboard-v1.0.0"
+          file="keyboard-deliverables/Vision_Maths_Science_Keyboard_v1.0.0_TEST.apk"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
+          else
+            gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
+              --title "Vision Maths & Science Keyboard 1.0 • Neon Android Keyboard" \
+              --notes "Functional offline Android input method with ABC QWERTY, number, Maths symbol and Science formula layouts, 4 neon themes, Shift, caps, backspace and repeat, keyboard setup screen. No Internet permission or typing data storage. Debug-signed TEST APK: enable in Android Settings, then choose Vision Maths & Science as default. CI validates build and signature; real device tests still required." \
+              --latest=false
+          fi
