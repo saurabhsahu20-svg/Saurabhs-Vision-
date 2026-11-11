@@ -1,0 +1,168 @@
+package com.saurabhsvision.keyboard;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.text.InputType;
+import android.view.Gravity;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+
+/** Native onboarding, theme settings and typing-test screen for the Android IME. */
+public final class MainActivity extends Activity {
+    private static final String PREFS="vision_keyboard_settings";
+    private static final int NAVY=0xff061631;
+    private static final int GOLD=0xffffd45c;
+    private static final int[] ACCENTS={0xff65e9ff,0xffffd55c,0xff9affd4,0xffeea8ff};
+    private static final String[] NAMES={"Cosmic Blue","Golden Mathematics","Science Lab","Purple Quantum"};
+    private LinearLayout root;
+    private TextView themeStatus;
+    private int dp(float v){return (int)(getResources().getDisplayMetrics().density*v+.5f);}
+    @Override public void onCreate(Bundle state){
+        super.onCreate(state);
+        getWindow().setStatusBarColor(NAVY);
+        getWindow().setNavigationBarColor(NAVY);
+        createUi();
+    }
+    private GradientDrawable box(int fill,int radius){
+        GradientDrawable g=new GradientDrawable();
+        g.setColor(fill);g.setCornerRadius(dp(radius));return g;
+    }
+    private TextView text(String content,int size,int color,boolean bold){
+        TextView v=new TextView(this);v.setText(content);v.setTextSize(size);
+        v.setTextColor(color);v.setGravity(Gravity.CENTER_VERTICAL);
+        if(bold)v.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+        return v;
+    }
+    private void add(LinearLayout layout,View child,int top){
+        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,-2);
+        lp.topMargin=dp(top);layout.addView(child,lp);
+    }
+    private Button button(String label,int color,int textColor){
+        Button b=new Button(this);
+        b.setText(label);b.setTextSize(16);b.setAllCaps(false);
+        b.setTextColor(textColor);b.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+        b.setMinHeight(dp(56));b.setBackground(box(color,15));
+        return b;
+    }
+    private void createUi(){
+        ScrollView scroll=new ScrollView(this);
+        scroll.setFillViewport(true);scroll.setBackgroundColor(0xffeff5ff);
+        root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);
+        root.setPadding(dp(16),dp(16),dp(16),dp(30));
+        scroll.addView(root);setContentView(scroll);
+        FrameLayout hero=new FrameLayout(this);
+        hero.setBackground(box(NAVY,24));
+        hero.addView(new KeyboardBackdrop(this,0),new FrameLayout.LayoutParams(-1,-1));
+        LinearLayout copy=new LinearLayout(this);copy.setOrientation(LinearLayout.VERTICAL);
+        copy.setPadding(dp(22),dp(20),dp(22),dp(20));
+        FrameLayout.LayoutParams cp=new FrameLayout.LayoutParams(-1,-1);
+        hero.addView(copy,cp);
+        add(copy,text("🎓 SAURABH'S VISION™",14,GOLD,true),0);
+        add(copy,text("MATHS & SCIENCE\nKEYBOARD",30,Color.WHITE,true),10);
+        add(copy,text("Type Smarter. Explore Further.",15,0xffbde9ff,false),8);
+        add(copy,text("π   √   ∑   ∞   α   β   H₂O   DNA   Ω",25,0xff8df0ff,true),18);
+        LinearLayout.LayoutParams hp=new LinearLayout.LayoutParams(-1,dp(222));root.addView(hero,hp);
+
+        add(root,text("⌨️ Set as your Android Keyboard",20,NAVY,true),25);
+        add(root,text("एक बार keyboard enable करें, फिर default keyboard चुनें। उसके बाद WhatsApp, Notes और दूसरे text fields में भी इस्तेमाल कर पाएँगे।",14,0xff496284,false),10);
+        Button enable=button("① Enable Vision Keyboard",0xff1949ad,Color.WHITE);
+        add(root,enable,15);
+        enable.setOnClickListener(v->{
+            try{startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));}
+            catch(RuntimeException e){showMessage("Keyboard Settings नहीं खुल सकीं। Android Settings → System → Keyboard पर जाएँ।");}
+        });
+        Button choose=button("② Choose Default Keyboard",GOLD,NAVY);
+        add(root,choose,10);
+        choose.setOnClickListener(v->{
+            InputMethodManager manager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            if(manager!=null)manager.showInputMethodPicker();
+            else showMessage("Android keyboard picker उपलब्ध नहीं है।");
+        });
+
+        add(root,text("🎨 Premium Keyboard Themes",21,NAVY,true),29);
+        add(root,text("4 अलग-अलग Maths और Science themed neon designs",13,0xff54708e,false),5);
+        themeStatus=text("",15,0xff16519a,true);
+        add(root,themeStatus,10);
+        LinearLayout themeColumn=new LinearLayout(this);
+        themeColumn.setOrientation(LinearLayout.VERTICAL);
+        add(root,themeColumn,8);
+        for(int i=0;i<NAMES.length;i++){
+            final int index=i;
+            LinearLayout card=new LinearLayout(this);
+            card.setGravity(Gravity.CENTER_VERTICAL);
+            card.setBackground(box(i%2==0?Color.WHITE:0xffe5ebff,15));
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(66));
+            p.topMargin=dp(7);
+            themeColumn.addView(card,p);
+            TextView circle=text(i==0?"π":i==1?"∑":i==2?"⚛":"Ω",27,ACCENTS[i],true);
+            circle.setGravity(Gravity.CENTER);
+            circle.setBackground(box(0xff11234b,13));
+            LinearLayout.LayoutParams ilp=new LinearLayout.LayoutParams(dp(55),dp(55));
+            ilp.leftMargin=dp(6);card.addView(circle,ilp);
+            TextView label=text(NAMES[i],16,NAVY,true);
+            LinearLayout.LayoutParams t=new LinearLayout.LayoutParams(0,-2,1);
+            t.leftMargin=dp(14);card.addView(label,t);
+            Button apply=button("Use",0xff1746b1,Color.WHITE);apply.setTextSize(13);
+            LinearLayout.LayoutParams blp=new LinearLayout.LayoutParams(dp(71),dp(48));
+            blp.rightMargin=dp(7);
+            card.addView(apply,blp);
+            apply.setOnClickListener(v->{
+                getSharedPreferences(PREFS,MODE_PRIVATE).edit().putInt("theme",index).apply();
+                showTheme();
+                showMessage(NAMES[index]+" enabled. Switch your keyboard or reopen it to see the theme.");
+            });
+        }
+        showTheme();
+
+        add(root,text("🧪 Test Your Keyboard",21,NAVY,true),30);
+        add(root,text("नीचे बॉक्स पर टैप करें और Maths/Science keyboard से लिखकर देखें:",14,0xff496284,false),8);
+        EditText test=new EditText(this);
+        test.setTextSize(17);test.setTextColor(NAVY);
+        test.setTextColorHint(0xff6785a0);
+        test.setHint("Try: π × r², H₂O, E = mc²");
+        test.setSingleLine(false);test.setMinLines(3);
+        test.setPadding(dp(15),dp(12),dp(15),dp(12));
+        test.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        test.setBackground(box(Color.WHITE,15));
+        add(root,test,12);
+
+        LinearLayout features=new LinearLayout(this);features.setOrientation(LinearLayout.VERTICAL);
+        features.setPadding(dp(17),dp(16),dp(17),dp(16));
+        features.setBackground(box(Color.WHITE,18));
+        add(root,features,27);
+        add(features,text("✨ What's Inside",18,NAVY,true),0);
+        add(features,text("• Full ABC QWERTY + Shift + Caps Lock\n• Maths symbols, powers, integrals and Greek letters\n• Science formulas, chemistry symbols and units\n• Responsive neon key animations and haptic feedback\n• Backspace repeat, cursor arrows and Enter\n• Works with Android text fields as an Input Method",14,0xff3d5a7b,false),11);
+
+        add(root,text("🔒 Your Typing Stays Private",20,NAVY,true),25);
+        add(root,text("इस keyboard को Internet permission नहीं दी गई है। यह आपकी typing history, passwords या clipboard को save या किसी server पर upload नहीं करता। आपके typed characters सिर्फ खुले हुए text field तक भेजे जाते हैं। Android नए keyboard को enable करते समय सामान्य सुरक्षा चेतावनी दिखाता है।",14,0xff445d7f,false),9);
+
+        Button instagram=button("📷 Follow @saurabhs_vision on Instagram",0xffddd9fc,NAVY);
+        add(root,instagram,21);
+        instagram.setOnClickListener(v->{
+            try{startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("https://www.instagram.com/saurabhs_vision/")));}
+            catch(RuntimeException ex){showMessage("Instagram link नहीं खुल पाया।");}
+        });
+        add(root,text("SAURABH'S VISION™ • Learn Today, Lead Tomorrow!",12,0xff5c7190,true),24);
+    }
+    private void showTheme(){
+        int current=getSharedPreferences(PREFS,MODE_PRIVATE).getInt("theme",0);
+        if(themeStatus!=null)themeStatus.setText("Selected: "+NAMES[Math.max(0,Math.min(3,current))]);
+    }
+    private void showMessage(String message){
+        android.widget.Toast.makeText(this,message,android.widget.Toast.LENGTH_LONG).show();
+    }
+}
