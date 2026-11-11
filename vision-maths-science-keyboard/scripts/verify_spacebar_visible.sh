@@ -10,9 +10,9 @@ adb shell wm size 1200x528
 adb shell wm density 240
 adb shell settings put system accelerometer_rotation 0 || true
 adb shell settings put system user_rotation 1 || true
+adb install -r "$APK"
 adb shell ime enable com.saurabhsvision.keyboard/.VisionKeyboardService
 adb shell ime set com.saurabhsvision.keyboard/.VisionKeyboardService
-adb install -r "$APK"
 adb shell am start -n com.saurabhsvision.keyboard/.KeyboardVisibilityTestActivity
 
 file=/tmp/sboard-window.xml
