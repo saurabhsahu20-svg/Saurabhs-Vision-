@@ -11,6 +11,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: s-board-apk-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Compile Android IME keyboard APK
@@ -242,7 +246,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
-          target: google_apis
+          target: default
           arch: x86_64
           profile: pixel_6
           disable-animations: true
