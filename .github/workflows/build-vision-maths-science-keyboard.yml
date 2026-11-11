@@ -143,6 +143,12 @@ jobs:
           assert 'A↔अ' in ime and 'LANG_TOGGLE' in ime
           assert 'b.setOnLongClickListener' in ime
           assert 'portraitMaxDp=compact?285:328' in panel
+          assert 'row.setTag("sboard_space_action")' in ime
+          assert 'KeyboardLayoutPolicy.fit(desired,budget,dp(36),actionIndex)' in panel
+          assert 'int height=dp(landscape?35:47);' in ime
+          assert 'orientation==2?41:51' in ime
+          assert ime.index('addRow("A S D F G H J K L");') < ime.index('addBottom();') < ime.index('addRow("⇧ Z X C V B N M ⌫");')
+          print('One-row-raised Spacebar and compact landscape layout verified')
           assert (root/'java/com/saurabhsvision/keyboard/WordSuggestions.java').is_file()
           print('Confirmed neon input view, live suggestion strip, stable Spacebar and real long-press number keys')
           print('S Board branding, user-selected 3D logo image, animated splash and setup status verified')
@@ -208,13 +214,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.0_NEON_PRO_KEYBOARD_TEST.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.1_SPACEBAR_FIXED.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_Neon_Pro_Keyboard_APK
+          name: S_Board_v1_9_1_Spacebar_Fixed_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -224,13 +230,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.0"
-          file="keyboard-deliverables/S_Board_v1.9.0_NEON_PRO_KEYBOARD_TEST.apk"
+          tag="s-board-v1.9.1"
+          file="keyboard-deliverables/S_Board_v1.9.1_SPACEBAR_FIXED.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.9 • Neon Blue Screenshot Edition" \
-              --notes "S BOARD v1.9 TEST APK — native Android keyboard matching the supplied midnight-navy, neon-cyan screenshot. Two-line S Board by Saurabh's Vision branding, ABC/123/Maths/Science/Emoji/Language/Palette/Settings toolbar, larger glowing keys, a wide working Spacebar with cyan underline and cyan Enter. Preserves 24 selectable offline language/roman-phonetic modes, Hindi/Hinglish, Maths/Science symbols and Emoji. New optional local word suggestions toggle defaults OFF so the keyboard resembles the photo. Five themes retained. No Internet or keystroke logging permission. CI validates Java, APK signature and keyboard source. This debug-signed test build can require uninstalling an existing APK with a different debug signing certificate. Physical device testing remains recommended." \
+              --title "S Board 1.9.1 • Spacebar Visible Fix" \
+              --notes "S Board 1.9.1: fixes Space/Enter row clipped behind Android navigation bar. Moves real Spacebar line one physical row above Z/X/C/Backspace, reduces landscape and compact key heights, and reserves space row in layout measurement on small device viewports. Keeps original neon design, Hindi/Hinglish, 24 basic phonetic language modes, Maths/Science, Emoji and privacy safeguards. GitHub CI compiles and verifies APK and runs small-screen layout regressions. This is a debug-signed test APK; physical device verification still needed." \
               --latest=false
           fi
