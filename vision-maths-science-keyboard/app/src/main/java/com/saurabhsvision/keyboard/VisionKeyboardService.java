@@ -145,23 +145,25 @@ public final class VisionKeyboardService extends InputMethodService {
 
             addRow("Q W E R T Y U I O P");
             addRow("A S D F G H J K L");
-            addRow("⇧ Z X C V B N M ⌫");
+            // Keep Space/Enter one physical row ABOVE the last alphabet row.
+            // Some Android OEM navigation bars previously covered the last row.
             addBottom();
+            addRow("⇧ Z X C V B N M ⌫");
         }else if(mode==NUMBER){
             addRow("1 2 3 4 5 6 7 8 9 0");
             addRow("@ # ₹ % & - + ( ) /");
-            addRow("* \" ' : ; ! ? = ← ⌫");
             addBottom();
+            addRow("* \" ' : ; ! ? = ← ⌫");
         }else if(mode==MATH){
             addRow("π √ ∑ ∞ ≈ ≠ ≤ ≥ ± ×");
             addRow("÷ ∫ ∂ Δ θ α β γ Ω μ");
-            addRow("sin( cos( tan( log( ln( x² x³ ^ → ⌫");
             addBottom();
+            addRow("sin( cos( tan( log( ln( x² x³ ^ → ⌫");
         }else if(mode==SCIENCE){
             addRow("H₂O CO₂ O₂ NaCl H⁺ OH⁻ e⁻ pH DNA RNA");
             addRow("→ ⇌ ↑ ↓ °C K mol kg m/s N");
-            addRow("α β γ λ μ Ω Δ ∝ ∴ ⌫");
             addBottom();
+            addRow("α β γ λ μ Ω Δ ∝ ∴ ⌫");
         }else{
             addEmojiCategories();
             addEmojiPage();
@@ -276,7 +278,8 @@ public final class VisionKeyboardService extends InputMethodService {
             });
         }
         scroller.addView(bar);
-        keysContent.addView(scroller,new LinearLayout.LayoutParams(-1,dp(49)));
+        int toolHeight=dp(getResources().getConfiguration().orientation==2?39:44);
+        keysContent.addView(scroller,new LinearLayout.LayoutParams(-1,toolHeight));
         if(active!=null && mode!=ABC){
             final View item=active;
             scroller.post(()->scroller.smoothScrollTo(
@@ -379,7 +382,7 @@ public final class VisionKeyboardService extends InputMethodService {
         LinearLayout row=new LinearLayout(this);
         row.setGravity(Gravity.CENTER);
         boolean landscape=getResources().getConfiguration().orientation==2;
-        int height=dp(landscape?43:54);
+        int height=dp(landscape?35:47);
         for(String label:labels){
             String display=label;
             String output=label;
@@ -604,8 +607,9 @@ public final class VisionKeyboardService extends InputMethodService {
     private void addBottom(){
         // Gboard-like bottom row, with mandatory wide Space key in all modes.
         LinearLayout row=new LinearLayout(this);
+        row.setTag("sboard_space_action");
         row.setGravity(Gravity.CENTER);
-        int height=dp(getResources().getConfiguration().orientation==2?48:58);
+        int height=dp(getResources().getConfiguration().orientation==2?41:51);
         addKey(row,mode==ABC?"?123":"ABC",mode==ABC?"123":"ABC",1.02f,height,true);
         addKey(row,"☺","EMOJI",.82f,height,true);
         addKey(row,"A↔अ","LANG_TOGGLE",.85f,height,true);
