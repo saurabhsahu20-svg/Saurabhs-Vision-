@@ -1,0 +1,126 @@
+name: Build VISION CALC Scientific Calculator APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'vision-scientific-calculator/**'
+      - '.github/workflows/build-vision-scientific-calculator.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vision-calc-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Test scientific maths and build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Install Android SDK 35
+        shell: bash
+        run: |
+          set -e
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Validate real app, offline permissions and Android source
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('vision-scientific-calculator')
+          manifest=(p/'app/src/main/AndroidManifest.xml').read_text()
+          source=(p/'app/src/main/java/com/saurabhsvision/visioncalc/MainActivity.java').read_text()
+          engine=(p/'app/src/main/java/com/saurabhsvision/visioncalc/ExpressionEngine.java').read_text()
+          converter=(p/'app/src/main/java/com/saurabhsvision/visioncalc/UnitConverter.java').read_text()
+          for forbidden in ('android.permission.INTERNET','READ_CONTACTS','RECORD_AUDIO',
+                            'ACCESS_FINE_LOCATION','READ_EXTERNAL_STORAGE'):
+              assert forbidden not in manifest, forbidden
+          assert 'allowBackup="false"' in manifest
+          assert 'extends Activity' in source
+          for item in ('UNIT CONVERTER','RECENT CALCULATIONS','sin','log','factorial',
+                       'history','memory','ClipboardManager','DEG','RAD'):
+              assert item in source or item in engine, item
+          assert 'UnitConverter.count()' in source or 'UnitConverter.names()' in source
+          assert 'versionName \'1.0.0\'' in (p/'app/build.gradle').read_text()
+          assert 'Math.pow' in engine and 'Math.sin' in engine
+          assert 'Temperature' in converter and 'Frequency' in converter
+          assert (p/'app/src/main/res/drawable/ic_vision_calc.xml').is_file()
+          print('PASS: VISION CALC native Android app and permission-free offline code')
+          PY
+
+      - name: Compile and accuracy-test the Java calculation engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          p="vision-scientific-calculator"
+          src="$p/app/src/main/java/com/saurabhsvision/visioncalc"
+          out="$RUNNER_TEMP/vision-calc-core"
+          mkdir -p "$out"
+          javac -encoding UTF-8 -d "$out" \
+            "$src/ExpressionEngine.java" \
+            "$src/UnitConverter.java" \
+            "$p/tests/CalculatorCoreTest.java"
+          java -ea -cp "$out" CalculatorCoreTest
+
+      - name: Compile real Android APK
+        shell: bash
+        run: |
+          cd vision-scientific-calculator
+          gradle --no-daemon --stacktrace :app:assembleDebug
+
+      - name: Verify APK package and debug signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk="vision-scientific-calculator/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$apk"
+          unzip -t "$apk" | tail -1
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.visioncalc'"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q MainActivity
+          mkdir -p calc-deliverables
+          cp "$apk" calc-deliverables/VISION_CALC_v1.0.0_SCIENTIFIC_APK.apk
+          ( cd calc-deliverables && sha256sum *.apk > SHA256SUMS.txt )
+
+      - name: Upload downloadable calculator APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: VISION_CALC_v1_0_0_Scientific_APK
+          path: calc-deliverables/*
+          retention-days: 90
+
+      - name: Publish public GitHub test APK Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="vision-calc-v1.0.0"
+          apk="calc-deliverables/VISION_CALC_v1.0.0_SCIENTIFIC_APK.apk"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$apk" calc-deliverables/SHA256SUMS.txt --clobber
+          else
+            gh release create "$tag" "$apk" calc-deliverables/SHA256SUMS.txt \
+              --title "VISION CALC 1.0 • Scientific Calculator + 12 Unit Converters" \
+              --notes "VISION CALC by Saurabh's Vision: a genuine native Android scientific calculator. Offline arithmetic, brackets, powers, factorial, trig DEG/RAD, logarithms, combinatorics and permutations, constants, ANS and memory. A 12-category converter handles length, mass, temperature, area, volume, time, speed, pressure, energy, angle, data and frequency. Local-only history, copy result, accessible dark navy/cyan/gold keypad. No login, no ads, no Internet permissions or data collection. Java core math tests and Android signature validation run in CI. Debug-signed TEST APK, not Play Store production package. Smartphone manual UI checks remain recommended. IEEE-754 double precision limitations apply." \
+              --latest=false
+          fi
