@@ -827,6 +827,7 @@ public final class MainActivity extends Activity {
                 break;
             case "10^x":expression+="10^(";break;
             case "x²":expression+=expression.isEmpty()?"Ans^2":"^2";break;
+            case "x³":expression+=expression.isEmpty()?"Ans^3":"^3";break;
             case "nCr":expression+="comb(";break;
             case "nPr":expression+="perm(";break;
             case "mod":expression+="mod";break;
@@ -846,6 +847,14 @@ public final class MainActivity extends Activity {
                         expression.offsetByCodePoints(expression.length(),-1));
                 updatePreview();return;
             case "=":calculateNow();return;
+            case "EXP":
+                // EXP inserts scientific E notation: 2 EXP 3 => 2E3.
+                // It must follow a number, never create an invalid leading E.
+                if(!expression.isEmpty() &&
+                    Character.isDigit(expression.charAt(expression.length()-1))){
+                    expression+="E";
+                }
+                updatePreview();return;
             case "()":
                 int depth=0;
                 for(int i=0;i<expression.length();i++){
@@ -900,17 +909,17 @@ public final class MainActivity extends Activity {
         if(expression.isEmpty()){
             answerView.setText("0");
             statusView.setText("Offline • Scientific • Accurate");
-            statusView.setTextColor(MUTED);
+            statusView.setTextColor(tab<=1?0xff325577:MUTED);
             return;
         }
         try{
             answerView.setText(formattedResult());
             statusView.setText("PREVIEW  •  tap = to save");
-            statusView.setTextColor(MUTED);
+            statusView.setTextColor(tab<=1?0xff325577:MUTED);
         }catch(ExpressionEngine.CalcException ex){
             answerView.setText("—");
             statusView.setText("Complete expression, then tap =");
-            statusView.setTextColor(MUTED);
+            statusView.setTextColor(tab<=1?0xff325577:MUTED);
         }
     }
     private String displayExpression(String value){
@@ -931,10 +940,10 @@ public final class MainActivity extends Activity {
             expressionView.setText(displayExpression(readable));
             answerView.setText(readable);
             statusView.setText("SAVED TO HISTORY  ✓");
-            statusView.setTextColor(CYAN);
+            statusView.setTextColor(tab<=1?0xff135b64:CYAN);
         }catch(ExpressionEngine.CalcException ex){
             statusView.setText(ex.getMessage());
-            statusView.setTextColor(RED);
+            statusView.setTextColor(tab<=1?0xffa72337:RED);
             answerView.setText("Error");
         }
     }
