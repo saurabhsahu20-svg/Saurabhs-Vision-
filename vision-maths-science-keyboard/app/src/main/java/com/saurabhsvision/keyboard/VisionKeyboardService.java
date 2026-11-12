@@ -374,9 +374,16 @@ public final class VisionKeyboardService extends InputMethodService {
             romanComposing.setLength(0);
             conn.commitText(" ",1);
         }else{
-            String before=WordSuggestions.trailingWord(conn.getTextBeforeCursor(36,0));
-            if(!before.isEmpty())conn.deleteSurroundingText(before.length(),0);
-            conn.commitText(suggestion+" ",1);
+            // Keep replacement atomic for IME editors and avoid intermediate
+            // partial words appearing in the host application.
+            conn.beginBatchEdit();
+            try{
+                String before=WordSuggestions.trailingWord(conn.getTextBeforeCursor(36,0));
+                if(!before.isEmpty())conn.deleteSurroundingText(before.length(),0);
+                conn.commitText(suggestion+" ",1);
+            }finally{
+                conn.endBatchEdit();
+            }
         }
         updateSuggestions();
     }
@@ -525,7 +532,8 @@ public final class VisionKeyboardService extends InputMethodService {
         connection.setComposingText(
             OfflinePhonetic.convert(romanComposing.toString(),selectedLanguage),1);
         refreshRomanPreview();
-        updateSuggestions();
+        // press() refreshes suggestions once after committing this key.
+        // Do not duplicate the same expensive InputConnection lookup here.
     }
     private void addEmojiCategories(){
         HorizontalScrollView scroller=new HorizontalScrollView(this);
@@ -671,7 +679,8 @@ public final class VisionKeyboardService extends InputMethodService {
             ColorStateList.valueOf(light()?0x452563eb:0x6affffff),shape,null));
         b.setElevation(dp(light()?1.7f:2.3f));
         LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,height-dp(4),weight);
-        lp.setMargins(dp(2.4f),dp(1.1f),dp(2.4f),dp(2.5f));
+        // Increase practical tap target without changing rows or key labels.
+        lp.setMargins(dp(1.5f),dp(1.0f),dp(1.5f),dp(2.0f));
         row.addView(b,lp);
         b.setContentDescription("⌫".equals(output)?"Delete last character":("SPACE".equals(output)?"Spacebar - insert space":output));
         if(mode==ABC && output.length()==1){
@@ -700,10 +709,12 @@ public final class VisionKeyboardService extends InputMethodService {
         }else{
             b.setOnTouchListener((view,event)->{
                 if(event.getActionMasked()==MotionEvent.ACTION_DOWN){
-                    view.animate().scaleX(.96f).scaleY(.94f).setDuration(65).start();
+                    // Shorter/smaller visual movement reduces missed edge taps
+                    // during rapid typing while retaining native ripple feedback.
+                    view.animate().scaleX(.985f).scaleY(.985f).setDuration(35).start();
                 }else if(event.getActionMasked()==MotionEvent.ACTION_UP||
                          event.getActionMasked()==MotionEvent.ACTION_CANCEL){
-                    view.animate().scaleX(1f).scaleY(1f).setDuration(85).start();
+                    view.animate().scaleX(1f).scaleY(1f).setDuration(45).start();
                 }
                 return false;
             });
