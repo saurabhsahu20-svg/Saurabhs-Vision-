@@ -60,6 +60,12 @@ public final class MainActivity extends Activity {
     private TextView keypadFooter;
     private int keyExpansionPx=0;
     private String expression="";
+    // Last successful preview is reused on '=' and Copy, avoiding duplicate
+    // parsing and formatting of the same keypress on the main UI thread.
+    private String cachedExpression=null,cachedFormatted=null;
+    private boolean cachedDegrees;
+    private long cachedAnsBits,cachedMemoryBits;
+    private double cachedResult=0;
     private double ans=0,memory=0;
     private boolean degrees=true;
     private int tab=0;
@@ -600,8 +606,32 @@ public final class MainActivity extends Activity {
         }
         updatePreview();
     }
+    private boolean cacheMatches(){
+        return cachedExpression!=null && cachedExpression.equals(expression) &&
+            cachedDegrees==degrees &&
+            cachedAnsBits==Double.doubleToLongBits(ans) &&
+            cachedMemoryBits==Double.doubleToLongBits(memory);
+    }
     private double evaluate() throws ExpressionEngine.CalcException{
-        return ExpressionEngine.calculate(expression,degrees,ans,memory);
+        if(cacheMatches())return cachedResult;
+        double value=ExpressionEngine.calculate(expression,degrees,ans,memory);
+        cachedExpression=expression;
+        cachedDegrees=degrees;
+        cachedAnsBits=Double.doubleToLongBits(ans);
+        cachedMemoryBits=Double.doubleToLongBits(memory);
+        cachedResult=value;
+        cachedFormatted=null;
+        return value;
+    }
+    private String formattedResult() throws ExpressionEngine.CalcException{
+        double value=evaluate();
+        if(cachedFormatted==null){
+            // Exact decimal path for ordinary arithmetic, while scientific
+            // functions continue using their established double engine.
+            String exact=DecimalArithmetic.tryFormat(expression);
+            cachedFormatted=exact!=null?exact:ExpressionEngine.format(value);
+        }
+        return cachedFormatted;
     }
     private void updatePreview(){
         if(expressionView==null||answerView==null||statusView==null)return;
@@ -613,8 +643,7 @@ public final class MainActivity extends Activity {
             return;
         }
         try{
-            double value=evaluate();
-            answerView.setText(ExpressionEngine.format(value));
+            answerView.setText(formattedResult());
             statusView.setText("PREVIEW  •  tap = to save");
             statusView.setTextColor(MUTED);
         }catch(ExpressionEngine.CalcException ex){
@@ -631,12 +660,15 @@ public final class MainActivity extends Activity {
         try{
             String entered=expression;
             double result=evaluate();
-            String readable=ExpressionEngine.format(result);
+            String readable=formattedResult();
             appendHistory(displayExpression(entered),readable);
             ans=result;
             prefs.edit().putLong("ansBits",Double.doubleToLongBits(ans)).apply();
             expression=readable;
-            updatePreview();
+            // Avoid a second immediate evaluation after '='; display the
+            // confirmed result directly, leaving next keypress to recalculate.
+            expressionView.setText(displayExpression(readable));
+            answerView.setText(readable);
             statusView.setText("SAVED TO HISTORY  ✓");
             statusView.setTextColor(CYAN);
         }catch(ExpressionEngine.CalcException ex){
@@ -652,7 +684,7 @@ public final class MainActivity extends Activity {
                 case "MR":expression+="M";updatePreview();return;
                 case "COPY":{
                     String output=expression.isEmpty()?ExpressionEngine.format(ans):
-                        ExpressionEngine.format(evaluate());
+                        formattedResult();
                     copy(output);
                     return;
                 }
