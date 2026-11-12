@@ -50,7 +50,7 @@ public final class MainActivity extends Activity {
     private int NAVY, PANEL, CARD, CYAN, GOLD, WHITE, MUTED, SOFT, RED;
     private boolean darkMode=false, scientificOpen=false;
     private TextView themeToggle;
-    private static final String[] TAB_NAMES={"CALCULATOR","UNIT CONVERTER","HISTORY"};
+    private static final String[] TAB_NAMES={"SCIENTIFIC","ADVANCED","CONVERTER","HISTORY"};
     private SharedPreferences prefs;
     private LinearLayout root, screen;
     private TextView expressionView,answerView,statusView,degreeButton;
@@ -81,7 +81,13 @@ public final class MainActivity extends Activity {
     @Override public void onCreate(Bundle saved){
         super.onCreate(saved);
         prefs=getSharedPreferences(PREFS,MODE_PRIVATE);
-        darkMode=prefs.getBoolean("darkMode",false);
+        // Introduce the reference-inspired dark neon design once. Users can
+        // freely switch theme afterwards; preference is never forced again.
+        if(!prefs.getBoolean("proV15ThemeApplied",false)){
+            prefs.edit().putBoolean("darkMode",true)
+                .putBoolean("proV15ThemeApplied",true).apply();
+        }
+        darkMode=prefs.getBoolean("darkMode",true);
         scientificOpen=prefs.getBoolean("scientificOpen",false);
         applyPalette();
         degrees=prefs.getBoolean("degrees",true);
@@ -191,7 +197,7 @@ public final class MainActivity extends Activity {
         fill.topMargin=dp(6);
         root.addView(screen,fill);
         showTab();
-        if(tab==0) scroll.post(this::expandKeypadToViewport);
+        if(tab<=1) scroll.post(this::expandKeypadToViewport);
     }
 
     /** Expand all five numeric rows equally into the viewport's unused bottom
@@ -200,7 +206,7 @@ public final class MainActivity extends Activity {
      * forcing a fixed-key-height layout on short/landscape displays.
      */
     private void expandKeypadToViewport(){
-        if(tab!=0||keypadRows.size()!=5||keypadFooter==null||
+        if(tab>1||keypadRows.size()!=4||keypadFooter==null||
             scroll.getHeight()<=0||screen.getParent()!=root)return;
         int footerBottom=screen.getTop()+keypadFooter.getBottom();
         int currentKeyHeight=((LinearLayout.LayoutParams)
@@ -226,67 +232,118 @@ public final class MainActivity extends Activity {
     private void buildHeader(){
         LinearLayout row=new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
+        TextView menu=text("☰",23,WHITE,true);
+        menu.setGravity(Gravity.CENTER);
+        menu.setBackground(gradient(0xff234878,0xff0c234a,11,0xff528dff));
+        menu.setContentDescription("Menu and settings");
+        row.addView(menu,new LinearLayout.LayoutParams(dp(40),dp(40)));
+        menu.setOnClickListener(v->showProMenu());
+
         ImageView icon=new ImageView(this);
         icon.setImageResource(R.drawable.ic_s_calc);
         icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        icon.setContentDescription("Premium S CALC calculator icon");
-        row.addView(icon,new LinearLayout.LayoutParams(dp(39),dp(39)));
+        icon.setContentDescription("S CALC app icon");
+        LinearLayout.LayoutParams iLp=new LinearLayout.LayoutParams(dp(40),dp(40));
+        iLp.leftMargin=dp(9);
+        row.addView(icon,iLp);
 
         LinearLayout titles=new LinearLayout(this);
         titles.setOrientation(LinearLayout.VERTICAL);
-        titles.setPadding(dp(9),0,0,0);
-        TextView brand=text("VISION CALC",19,WHITE,true);
+        titles.setPadding(dp(6),0,0,0);
+        TextView brand=text("SAURABH'S VISION™",13,
+            darkMode?0xffffd767:0xff35558a,true);
         titles.addView(brand);
-        TextView tag=text("SAURABH'S VISION™  •  Learn & Calculate",10,MUTED,false);
-        titles.addView(tag);
+        TextView sub=text("S CALC  •  Scientific Calculator",11,MUTED,false);
+        titles.addView(sub);
         row.addView(titles,new LinearLayout.LayoutParams(0,-2,1f));
 
-        TextView historyIcon=text("◷",26,WHITE,true);
-        historyIcon.setGravity(Gravity.CENTER);
-        historyIcon.setBackground(shape(CARD,14,0));
-        historyIcon.setContentDescription("Open calculation history");
-        LinearLayout.LayoutParams hLp=new LinearLayout.LayoutParams(dp(38),dp(38));
-        hLp.rightMargin=dp(7);row.addView(historyIcon,hLp);
-        historyIcon.setOnClickListener(v->{tab=2;buildUi();});
+        TextView recent=text("◷",24,WHITE,true);
+        recent.setGravity(Gravity.CENTER);
+        recent.setBackground(gradient(0xff194a78,0xff0d2448,11,0xff328bd9));
+        recent.setContentDescription("Open calculation history");
+        LinearLayout.LayoutParams rLp=new LinearLayout.LayoutParams(dp(40),dp(40));
+        rLp.rightMargin=dp(6);
+        row.addView(recent,rLp);
+        recent.setOnClickListener(v->{tab=3;buildUi();});
 
-        themeToggle=text(darkMode?"☀":"☾",25,WHITE,true);
+        themeToggle=text("⚙",24,WHITE,true);
         themeToggle.setGravity(Gravity.CENTER);
-        themeToggle.setBackground(shape(CARD,14,0));
-        themeToggle.setContentDescription(darkMode?"Switch to light theme":"Switch to dark theme");
-        row.addView(themeToggle,new LinearLayout.LayoutParams(dp(38),dp(38)));
-        themeToggle.setOnClickListener(v->{
-            darkMode=!darkMode;
-            prefs.edit().putBoolean("darkMode",darkMode).apply();
-            applyPalette();
-            buildUi();
-        });
+        themeToggle.setBackground(gradient(0xff194a78,0xff0d2448,11,0xff328bd9));
+        themeToggle.setContentDescription("Calculator settings");
+        row.addView(themeToggle,new LinearLayout.LayoutParams(dp(40),dp(40)));
+        themeToggle.setOnClickListener(v->showProMenu());
         add(root,row,2);
+
+        TextView ribbon=text("S CALC",25,Color.WHITE,true);
+        ribbon.setGravity(Gravity.CENTER);
+        ribbon.setLetterSpacing(.085f);
+        ribbon.setBackground(gradient(
+            darkMode?0xffd43c2c:0xffb35273,
+            darkMode?0xff8c181d:0xff773459,17,0xffffc85b));
+        ribbon.setContentDescription("S CALC by Saurabh's Vision");
+        LinearLayout.LayoutParams ribbonParams=new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,dp(43));
+        ribbonParams.setMargins(dp(48),dp(9),dp(48),0);
+        root.addView(ribbon,ribbonParams);
+    }
+    private void showProMenu(){
+        String[] choices={
+            darkMode?"Switch to Light Theme":"Switch to Neon Dark Theme",
+            degrees?"Angle: Degrees (switch to RAD)":"Angle: Radians (switch to DEG)",
+            "Open Calculation History", "Open Unit Converter",
+            "Advanced Functions"
+        };
+        new AlertDialog.Builder(this).setTitle("S CALC • Settings")
+            .setItems(choices,(dialog,which)->{
+                switch(which){
+                    case 0:
+                        darkMode=!darkMode;
+                        prefs.edit().putBoolean("darkMode",darkMode).apply();
+                        applyPalette();buildUi();break;
+                    case 1:
+                        degrees=!degrees;
+                        prefs.edit().putBoolean("degrees",degrees).apply();
+                        buildUi();break;
+                    case 2:tab=3;buildUi();break;
+                    case 3:tab=2;buildUi();break;
+                    case 4:tab=1;buildUi();break;
+                    default:break;
+                }
+            }).show();
     }
     private void buildTabs(){
         LinearLayout tabs=new LinearLayout(this);
-        tabs.setOrientation(LinearLayout.HORIZONTAL);
-        tabs.setBackground(shape(PANEL,18,0));
-        tabs.setPadding(dp(4),dp(4),dp(4),dp(4));
+        tabs.setGravity(Gravity.CENTER_VERTICAL);
+        tabs.setPadding(dp(2),dp(3),dp(2),dp(3));
+        tabs.setBackground(shape(PANEL,12,0xff245782));
+        String[] symbols={"⚗","∑","⇄","◷"};
         for(int i=0;i<TAB_NAMES.length;i++){
-            final int index=i;
-            TextView chip=text(TAB_NAMES[i],11,
-                i==tab?(darkMode?NAVY:0xffffffff):MUTED,true);
-            chip.setGravity(Gravity.CENTER);
-            chip.setSingleLine(true);
-            chip.setTextScaleX(.94f);
-            chip.setBackground(shape(i==tab?CYAN:CARD,13,0));
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(35),1f);
-            lp.setMargins(dp(2),0,dp(2),0);
-            tabs.addView(chip,lp);
-            chip.setContentDescription("Open "+TAB_NAMES[i]+" tab");
-            chip.setOnClickListener(v->{tab=index;buildUi();});
+            final int idx=i;
+            LinearLayout column=new LinearLayout(this);
+            column.setGravity(Gravity.CENTER);
+            column.setOrientation(LinearLayout.VERTICAL);
+            int top=idx==tab?0xff9c22c8:0xff153d6b;
+            int bottom=idx==tab?0xff53139a:0xff071b39;
+            int outline=idx==tab?0xffee99ff:0xff2ea4ed;
+            column.setBackground(gradient(top,bottom,12,outline));
+            TextView mark=text(symbols[i],17,Color.WHITE,true);
+            mark.setGravity(Gravity.CENTER);
+            column.addView(mark);
+            TextView name=text(TAB_NAMES[i],9,Color.WHITE,true);
+            name.setGravity(Gravity.CENTER);
+            column.addView(name);
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(54),1);
+            lp.setMargins(dp(2),dp(2),dp(2),dp(2));
+            tabs.addView(column,lp);
+            column.setContentDescription("Open "+TAB_NAMES[i]+" tab");
+            column.setOnClickListener(v->{tab=idx;buildUi();});
         }
         add(root,tabs,9);
     }
     private void showTab(){
         screen.removeAllViews();
-        if(tab==0)buildCalculator();
-        else if(tab==1)buildConverter();
+        if(tab<=1)buildProCalculator();
+        else if(tab==2)buildConverter();
         else buildHistory();
     }
     // The reference screenshot uses large, softly rounded 4-column keys.
