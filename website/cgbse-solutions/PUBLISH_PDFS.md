@@ -5,8 +5,8 @@
 ## Current improved complete archive (12 November 2026)
 
 - **Release asset filename (must match):** `CGBSE_2026_27_All_1050_PDF_Booklets.zip`
-- **New size:** 124,190,382 bytes.
-- **SHA-256:** `ebfe805f7f75c844b6e4b8d4cd2f7e0c27627af8b6fb0b09458d4e620c9887d9`
+- **New size:** 124,478,473 bytes.
+- **SHA-256:** `8714eb5e43266f39a680362acb1278ecb993882852d8a446317834e3d6b930c4`
 - **Contains exactly 1,050 PDFs**, each directly navigable by the existing route `/cgbse-solutions/pdfs/<class>_<subject>/Set_XX.pdf`.
 - **300 improved PDFs:** 10 Science, 10 Mathematics, 12 Mathematics, 12 Physics, 12 Chemistry, 12 Biology (50 sets per subject). They have question text, answers, topic-aligned explanations, new labelled diagrams where relevant, and a light transparent SAURABH'S VISION watermark.
 - **750 retained PDFs:** Other 15 subjects use previously generated answer/draft booklets, **not** newly expert-verified fully worked solutions.
