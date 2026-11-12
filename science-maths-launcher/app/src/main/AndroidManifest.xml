@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Scoped package visibility: discover launchable apps, without QUERY_ALL_PACKAGES. -->
+    <!-- Scoped app discovery: only applications exposing LAUNCHER activities. -->
     <queries>
         <intent>
             <action android:name="android.intent.action.MAIN"/>
