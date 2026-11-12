@@ -43,9 +43,11 @@ import java.util.Locale;
  */
 public final class MainActivity extends Activity {
     private static final String PREFS="vision_calc_local";
-    private static final int NAVY=0xff06162d, PANEL=0xff0d2545, CARD=0xff14335a;
-    private static final int CYAN=0xff23dbf0, GOLD=0xffffd16b, WHITE=0xfff7fbff;
-    private static final int MUTED=0xffa8c7dd, SOFT=0xff173b65, RED=0xffff9b9b;
+    // Dynamic palette. The screenshot-inspired light appearance is the default;
+    // the original dark neon navy look remains available with one tap.
+    private int NAVY, PANEL, CARD, CYAN, GOLD, WHITE, MUTED, SOFT, RED;
+    private boolean darkMode=false, scientificOpen=false;
+    private TextView themeToggle;
     private static final String[] TAB_NAMES={"CALCULATOR","UNIT CONVERTER","HISTORY"};
     private SharedPreferences prefs;
     private LinearLayout root, screen;
@@ -67,6 +69,9 @@ public final class MainActivity extends Activity {
     @Override public void onCreate(Bundle saved){
         super.onCreate(saved);
         prefs=getSharedPreferences(PREFS,MODE_PRIVATE);
+        darkMode=prefs.getBoolean("darkMode",false);
+        scientificOpen=prefs.getBoolean("scientificOpen",false);
+        applyPalette();
         degrees=prefs.getBoolean("degrees",true);
         memory=Double.longBitsToDouble(prefs.getLong("memoryBits",Double.doubleToLongBits(0)));
         ans=Double.longBitsToDouble(prefs.getLong("ansBits",Double.doubleToLongBits(0)));
@@ -76,15 +81,31 @@ public final class MainActivity extends Activity {
             expression=saved.getString("expression","");
             tab=saved.getInt("tab",0);
         }
-        getWindow().setStatusBarColor(NAVY);
-        getWindow().setNavigationBarColor(NAVY);
-        getWindow().getDecorView().setSystemUiVisibility(0);
+        applySystemBars();
         buildUi();
     }
     @Override protected void onSaveInstanceState(Bundle state){
         super.onSaveInstanceState(state);
         state.putString("expression",expression);
         state.putInt("tab",tab);
+    }
+    private void applyPalette(){
+        if(darkMode){
+            NAVY=0xff06162d; PANEL=0xff0d2545; CARD=0xff14335a;
+            CYAN=0xff23dbf0; GOLD=0xffffd16b; WHITE=0xfff7fbff;
+            MUTED=0xffa8c7dd; SOFT=0xff173b65; RED=0xffff9b9b;
+        }else{
+            NAVY=0xfff8f7fc; PANEL=0xfff1f0f8; CARD=0xffe4e5ee;
+            CYAN=0xff4a6da8; GOLD=0xff634366; WHITE=0xff1c2330;
+            MUTED=0xff697187; SOFT=0xffdee0ea; RED=0xffa23a54;
+        }
+    }
+    private void applySystemBars(){
+        getWindow().setStatusBarColor(NAVY);
+        getWindow().setNavigationBarColor(NAVY);
+        int visibility=darkMode?0:(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR|
+            View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+        getWindow().getDecorView().setSystemUiVisibility(visibility);
     }
     private GradientDrawable shape(int color,int radius,int stroke){
         GradientDrawable drawable=new GradientDrawable();
@@ -129,63 +150,77 @@ public final class MainActivity extends Activity {
         return b;
     }
     private void buildUi(){
+        applySystemBars();
         scroll=new ScrollView(this);
         scroll.setFillViewport(true);
+        scroll.setVerticalScrollBarEnabled(false);
         scroll.setBackgroundColor(NAVY);
         root=new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setPadding(dp(12),dp(9),dp(12),dp(22));
+        root.setPadding(dp(13),dp(9),dp(13),dp(16));
         scroll.addView(root);
         setContentView(scroll);
         buildHeader();
         buildTabs();
         screen=new LinearLayout(this);
         screen.setOrientation(LinearLayout.VERTICAL);
-        add(root,screen,10);
+        LinearLayout.LayoutParams fill=new LinearLayout.LayoutParams(-1,0,1f);
+        fill.topMargin=dp(10);
+        root.addView(screen,fill);
         showTab();
     }
     private void buildHeader(){
         LinearLayout row=new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
         ImageView icon=new ImageView(this);
-        icon.setImageResource(com.saurabhsvision.visioncalc.R.drawable.ic_vision_calc);
+        icon.setImageResource(R.drawable.ic_vision_calc);
         icon.setContentDescription("VISION CALC calculator logo");
-        row.addView(icon,new LinearLayout.LayoutParams(dp(49),dp(49)));
+        row.addView(icon,new LinearLayout.LayoutParams(dp(45),dp(45)));
+
         LinearLayout titles=new LinearLayout(this);
         titles.setOrientation(LinearLayout.VERTICAL);
         titles.setPadding(dp(9),0,0,0);
-        TextView brand=text("VISION CALC",22,WHITE,true);
+        TextView brand=text("VISION CALC",21,WHITE,true);
         titles.addView(brand);
-        TextView tag=text("by SAURABH'S VISION™  •  Smart Maths",11,CYAN,false);
+        TextView tag=text("SAURABH'S VISION™  •  Learn & Calculate",10,MUTED,false);
         titles.addView(tag);
         row.addView(titles,new LinearLayout.LayoutParams(0,-2,1f));
-        degreeButton=text(degrees?"DEG":"RAD",14,WHITE,true);
-        degreeButton.setGravity(Gravity.CENTER);
-        degreeButton.setBackground(gradient(0xff1c5c7a,0xff0d354e,12,CYAN));
-        degreeButton.setContentDescription("Angle mode toggle, currently "+(degrees?"degrees":"radians"));
-        row.addView(degreeButton,new LinearLayout.LayoutParams(dp(62),dp(44)));
-        degreeButton.setOnClickListener(v->{
-            degrees=!degrees;
-            prefs.edit().putBoolean("degrees",degrees).apply();
-            degreeButton.setText(degrees?"DEG":"RAD");
-            degreeButton.setContentDescription("Angle mode toggle, currently "+(degrees?"degrees":"radians"));
-            updatePreview();
-            toast(degrees?"Degrees mode selected":"Radians mode selected");
+
+        TextView historyIcon=text("◷",26,WHITE,true);
+        historyIcon.setGravity(Gravity.CENTER);
+        historyIcon.setBackground(shape(CARD,14,0));
+        historyIcon.setContentDescription("Open calculation history");
+        LinearLayout.LayoutParams hLp=new LinearLayout.LayoutParams(dp(42),dp(42));
+        hLp.rightMargin=dp(7);row.addView(historyIcon,hLp);
+        historyIcon.setOnClickListener(v->{tab=2;buildUi();});
+
+        themeToggle=text(darkMode?"☀":"☾",25,WHITE,true);
+        themeToggle.setGravity(Gravity.CENTER);
+        themeToggle.setBackground(shape(CARD,14,0));
+        themeToggle.setContentDescription(darkMode?"Switch to light theme":"Switch to dark theme");
+        row.addView(themeToggle,new LinearLayout.LayoutParams(dp(42),dp(42)));
+        themeToggle.setOnClickListener(v->{
+            darkMode=!darkMode;
+            prefs.edit().putBoolean("darkMode",darkMode).apply();
+            applyPalette();
+            buildUi();
         });
         add(root,row,4);
     }
     private void buildTabs(){
         LinearLayout tabs=new LinearLayout(this);
         tabs.setOrientation(LinearLayout.HORIZONTAL);
-        tabs.setBackground(shape(PANEL,13,0));
+        tabs.setBackground(shape(PANEL,18,0));
         tabs.setPadding(dp(4),dp(4),dp(4),dp(4));
         for(int i=0;i<TAB_NAMES.length;i++){
             final int index=i;
-            TextView chip=text(TAB_NAMES[i],11,i==tab?NAVY:MUTED,true);
+            TextView chip=text(TAB_NAMES[i],11,
+                i==tab?(darkMode?NAVY:0xffffffff):MUTED,true);
             chip.setGravity(Gravity.CENTER);
-            chip.setPadding(dp(1),0,dp(1),0);
-            chip.setBackground(shape(i==tab?CYAN:CARD,10,0));
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(41),1f);
+            chip.setSingleLine(true);
+            chip.setTextScaleX(.94f);
+            chip.setBackground(shape(i==tab?CYAN:CARD,13,0));
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(40),1f);
             lp.setMargins(dp(2),0,dp(2),0);
             tabs.addView(chip,lp);
             chip.setContentDescription("Open "+TAB_NAMES[i]+" tab");
