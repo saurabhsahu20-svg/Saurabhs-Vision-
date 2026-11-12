@@ -37,7 +37,8 @@ public final class ExpressionEngine {
     }
     public static String format(double value){
         if(!Double.isFinite(value))return "Math error";
-        if(value==0||Math.abs(value)<1e-14)return "0";
+        // Never hide scientifically meaningful tiny results (e.g. 1 electron-volt).
+        if(value==0)return "0";
         BigDecimal decimal=BigDecimal.valueOf(value)
             .round(new MathContext(12,RoundingMode.HALF_UP)).stripTrailingZeros();
         String plain=decimal.toPlainString();
@@ -202,6 +203,11 @@ public final class ExpressionEngine {
         }
         double degreesToRadians(double n){return degrees?Math.toRadians(n):n;}
         double radiansToDegrees(double n){return degrees?Math.toDegrees(n):n;}
+        double trigRounded(double n) throws CalcException{
+            // Trigonometric functions have machine-error residuals at 0, 90, 180°.
+            if(Math.abs(n)<1e-14)return 0;
+            return finite(n);
+        }
         void oneArg(double[] args,String name) throws CalcException {
             if(args.length!=1)throw new CalcException(name+" needs one argument");
         }
@@ -216,9 +222,15 @@ public final class ExpressionEngine {
         double function(String name,double[] args) throws CalcException{
             double n=args[0];
             switch(name){
-                case "sin":oneArg(args,name);return finite(Math.sin(degreesToRadians(n)));
-                case "cos":oneArg(args,name);return finite(Math.cos(degreesToRadians(n)));
-                case "tan":oneArg(args,name);return finite(Math.tan(degreesToRadians(n)));
+                case "sin":oneArg(args,name);return trigRounded(Math.sin(degreesToRadians(n)));
+                case "cos":oneArg(args,name);return trigRounded(Math.cos(degreesToRadians(n)));
+                case "tan":{
+                    oneArg(args,name);
+                    double rad=degreesToRadians(n);
+                    if(Math.abs(Math.cos(rad))<1e-13)
+                        throw new CalcException("Tangent is undefined at this angle");
+                    return finite(Math.tan(rad));
+                }
                 case "asin":oneArg(args,name);return finite(radiansToDegrees(Math.asin(n)));
                 case "acos":oneArg(args,name);return finite(radiansToDegrees(Math.acos(n)));
                 case "atan":oneArg(args,name);return finite(radiansToDegrees(Math.atan(n)));
@@ -245,6 +257,11 @@ public final class ExpressionEngine {
                 case "root":
                     twoArgs(args,name);
                     if(n==0)throw new CalcException("Zeroth root is undefined");
+                    if(args[1]<0){
+                        if(n!=Math.rint(n)||Math.abs(n%2)!=1)
+                            throw new CalcException("Even root of a negative number is undefined");
+                        return finite(-Math.pow(-args[1],1/n));
+                    }
                     return finite(Math.pow(args[1],1/n));
                 case "pow":twoArgs(args,name);return finite(Math.pow(n,args[1]));
                 case "min":twoArgs(args,name);return Math.min(n,args[1]);
