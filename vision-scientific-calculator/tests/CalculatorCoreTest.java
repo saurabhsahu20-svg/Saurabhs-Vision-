@@ -49,6 +49,7 @@ public final class CalculatorCoreTest {
         near(calc("gcd(24,18)",true),6,1e-13,"gcd");
         near(calc("lcm(12,18)",true),36,1e-13,"lcm");
         near(calc("root(3,27)",true),3,1e-13,"nth root");
+        near(calc("root(3,-8)",true),-2,1e-13,"odd root of negative value");
         near(calc("pow(2,10)",true),1024,1e-13,"power function");
         near(calc("max(8,13)-min(5,3)",true),10,1e-13,"min max");
         near(calc("10mod3",true),1,1e-13,"modulus");
@@ -63,6 +64,8 @@ public final class CalculatorCoreTest {
         error("sqrt(-1)","Math domain");
         error("ln(0)","Math domain");
         error("171!","Factorial");
+        error("tan(90)","Tangent is undefined");
+        error("root(2,-9)","Even root");
         error("3+","Incomplete expression");
         error("(2+3","Missing closing bracket");
         error("comb(3,7)","nCr");
@@ -74,6 +77,9 @@ public final class CalculatorCoreTest {
         near(UnitConverter.convert(273.15,2,2,0),0,1e-13,"Kelvin to Celsius");
         near(UnitConverter.convert(1,6,2,1),1.609344,1e-12,"mph to km/h");
         near(UnitConverter.convert(1,8,5,0),3600000,1e-12,"kWh to joule");
+        if("0".equals(ExpressionEngine.format(UnitConverter.convert(1,8,6,0))))
+            throw new AssertionError("Small eV values must NOT be formatted as zero");
+        checks++;
         near(UnitConverter.convert(1,10,5,1),1024,1e-12,"KiB to byte");
         near(UnitConverter.convert(180,9,0,1),Math.PI,1e-12,"degree to rad");
         near(UnitConverter.convert(60,11,4,0),1,1e-12,"rpm to Hz");
