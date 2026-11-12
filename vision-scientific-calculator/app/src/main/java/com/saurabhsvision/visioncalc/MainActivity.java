@@ -158,6 +158,14 @@ public final class MainActivity extends Activity {
         root=new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(dp(13),dp(9),dp(13),dp(16));
+        // Android 15 enforces edge-to-edge content on modern target SDKs.
+        // Keep the last equals key and converter actions clear of the navbar.
+        scroll.setOnApplyWindowInsetsListener((view,insets)->{
+            int navInset=insets.getSystemWindowInsetBottom();
+            root.setPadding(dp(13),dp(9),dp(13),
+                Math.max(dp(16),navInset+dp(13)));
+            return insets;
+        });
         scroll.addView(root);
         setContentView(scroll);
         buildHeader();
@@ -427,7 +435,7 @@ public final class MainActivity extends Activity {
             row.setGravity(Gravity.CENTER_VERTICAL);
             for(String key:keys){
                 Button b=numericKey(key,
-                    "÷×−+%".contains(key)&&key.length()==1,
+                    (key.equals("()")||("÷×−+%".contains(key)&&key.length()==1)),
                     key.equals("AC"),key.equals("="));
                 LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,keyHeight,1f);
                 lp.setMargins(dp(2),dp(3),dp(2),dp(3));
