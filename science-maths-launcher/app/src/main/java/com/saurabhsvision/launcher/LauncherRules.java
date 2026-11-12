@@ -7,7 +7,7 @@ public final class LauncherRules {
     private LauncherRules(){}
     public static int themeIndex(int raw,int count){
         if(count<=0)throw new IllegalArgumentException("No available themes");
-        return Math.floorMod(raw,count);
+        return ((raw%count)+count)%count;
     }
     public static boolean matches(String title,String pkg,String query){
         if(query==null||query.trim().isEmpty())return true;
