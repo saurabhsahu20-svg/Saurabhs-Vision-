@@ -17,10 +17,10 @@ public final class KeyboardBackdrop extends View {
     private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF oval=new RectF();
     private int theme;
-    private static final int[] BASE={0xff061531,0xff1a0b31,0xff05283b,0xff1c103a,0xfff5f8ff};
-    private static final int[] MID={0xff0f356c,0xff37225c,0xff135568,0xff46306f,0xffe8effa};
-    private static final int[] HIGHLIGHT={0xff70e7ff,0xffffcf65,0xff9df7cb,0xffd5b8ff,0xff4a78d3};
-    public KeyboardBackdrop(Context context,int theme){super(context);this.theme=Math.floorMod(theme,5);}
+    private static final int[] BASE=ThemePalette.BASE;
+    private static final int[] MID=ThemePalette.MID;
+    private static final int[] HIGHLIGHT=ThemePalette.HIGHLIGHT;
+    public KeyboardBackdrop(Context context,int theme){super(context);this.theme=ThemePalette.norm(theme);}
     private void spot(Canvas c,float x,float y,float r,int color,int alpha){
         paint.reset();paint.setAntiAlias(true);paint.setColor(color);paint.setAlpha(alpha);
         c.drawCircle(x,y,r,paint);
@@ -44,10 +44,10 @@ public final class KeyboardBackdrop extends View {
             new float[]{0f,.56f,1f},Shader.TileMode.CLAMP));
         canvas.drawRect(0,0,w,h,paint);paint.setShader(null);
         int hi=HIGHLIGHT[theme];
-        if(theme==4){
-            // Minimal white finish: science dot-grid subtly visible beneath keys.
+        if(ThemePalette.isLight(theme)){
+            // Minimal white and metallic silver finishes: faint technical grid.
             for(int y=13;y<h;y+=21)for(int x=12;x<w;x+=21)
-                spot(canvas,x,y,.8f,0xff7ca2d8,23);
+                spot(canvas,x,y,.8f,theme==6?0xff617a9b:0xff7ca2d8,theme==6?34:23);
             paint.reset();paint.setAntiAlias(true);
             paint.setColor(0xffc7d5e8);
             paint.setStrokeWidth(Math.max(1f,w*.002f));
@@ -72,7 +72,9 @@ public final class KeyboardBackdrop extends View {
                 i%5==0?hi:Color.WHITE,45+(i%4)*18);
         }
         float sz=Math.min(w,h);
-        label(canvas,theme==0?"π² + E = mc²":theme==1?"∞   ∑   √":theme==2?"H₂O   DNA   ⚛":"α   β   Ω   λ",
+        label(canvas,theme==0?"π² + E = mc²":theme==1?"∞   ∑   √":theme==2?"H₂O   DNA   ⚛":
+            theme==5?"♥   π   ⚛":theme==7?"DNA   ⚛   φ":theme==8?"∫   λ   ∑":
+            theme==9?"π   ✦   H₂O":theme==10?"∞   ⚛   √":"α   β   Ω   λ",
             w*.06f,h*.37f,sz*.065f,hi,68);
         canvas.save();
         canvas.rotate(-12,w*.76f,h*.52f);
