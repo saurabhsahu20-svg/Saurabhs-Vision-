@@ -60,7 +60,7 @@ jobs:
                        'history','memory','ClipboardManager','DEG','RAD'):
               assert item in source or item in engine, item
           assert 'UnitConverter.count()' in source or 'UnitConverter.names()' in source
-          assert 'versionName \'1.1.0\'' in (p/'app/build.gradle').read_text()
+          assert 'versionName \'1.2.0\'' in (p/'app/build.gradle').read_text()
           # The visual reference demands a four-column keypad with real maths.
           assert 'String[][] rows={' in source
           for row in ('{"AC","()","%","÷"}', '{"7","8","9","×"}',
@@ -80,6 +80,17 @@ jobs:
           assert 'case ",":' in source
           assert 'case "π":case "e":' in source
           assert 'new LinearLayout.LayoutParams(-1,0,1f)' not in source
+          assert 'scientificChip(token)' in source
+          assert 'scienceGrid.addView(row' in source
+          assert 'dp(50)' in source
+          assert 'keypadRows.add(row)' in source
+          assert 'keypadFooter=footer' in source
+          assert 'expandKeypadToViewport()' in source
+          assert 'CalculatorLayoutPolicy.extraPerKeyRow(' in source
+          assert 'getSystemWindowInsetTop()' in source
+          assert 'getSystemWindowInsetBottom()' in source
+          assert (p/'app/src/main/java/com/saurabhsvision/visioncalc/CalculatorLayoutPolicy.java').is_file()
+          print('PASS: colorful science grid and adaptive numeric keypad consume unused height')
           print('PASS: screenshot-inspired four-column design and functioning controls')
           assert 'Math.pow' in engine and 'Math.sin' in engine
           assert 'Temperature' in converter and 'Frequency' in converter
@@ -101,6 +112,19 @@ jobs:
             "$p/tests/CalculatorCoreTest.java"
           java -ea -cp "$out" CalculatorCoreTest
 
+      - name: Test responsive keypad sizing on tall and short screens
+        shell: bash
+        run: |
+          set -euo pipefail
+          p="vision-scientific-calculator"
+          src="$p/app/src/main/java/com/saurabhsvision/visioncalc"
+          out="$RUNNER_TEMP/vision-calc-layout"
+          mkdir -p "$out"
+          javac -encoding UTF-8 -d "$out" \
+            "$src/CalculatorLayoutPolicy.java" \
+            "$p/tests/CalculatorLayoutPolicyTest.java"
+          java -ea -cp "$out" CalculatorLayoutPolicyTest
+
       - name: Compile real Android APK
         shell: bash
         run: |
@@ -118,13 +142,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.visioncalc'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q MainActivity
           mkdir -p calc-deliverables
-          cp "$apk" calc-deliverables/VISION_CALC_v1.1.0_PREMIUM_UI_APK.apk
+          cp "$apk" calc-deliverables/VISION_CALC_v1.2.0_SCIENTIFIC_GRID_FULL_KEYPAD.apk
           ( cd calc-deliverables && sha256sum *.apk > SHA256SUMS.txt )
 
       - name: Upload downloadable calculator APK
         uses: actions/upload-artifact@v4
         with:
-          name: VISION_CALC_v1_1_0_Premium_UI_APK
+          name: VISION_CALC_v1_2_0_Scientific_Grid_Full_Keypad_APK
           path: calc-deliverables/*
           retention-days: 90
 
@@ -134,13 +158,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="vision-calc-v1.1.0"
-          apk="calc-deliverables/VISION_CALC_v1.1.0_PREMIUM_UI_APK.apk"
+          tag="vision-calc-v1.2.0"
+          apk="calc-deliverables/VISION_CALC_v1.2.0_SCIENTIFIC_GRID_FULL_KEYPAD.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$apk" calc-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$apk" calc-deliverables/SHA256SUMS.txt \
-              --title "VISION CALC 1.1 • Premium Light Calculator + Scientific Tools" \
-              --notes "VISION CALC 1.1 by Saurabh's Vision updates the native Android interface using a premium light lavender/pearl design inspired by the user's screenshot. Bigger, fully functional FOUR-COLUMN rounded-pill numeric buttons (AC, parentheses, %, divide, digits, multiply, minus, plus, backspace, equals) are laid out responsively to use screen height effectively. The formerly empty upper space contains a large live calculation/result display, recent-result preview, angle toggle, quick scientific tools and memory controls. Expand scientific functions or switch Light/Dark appearance without losing calculations. Unit Converter and local History also receive coherent light-theme styling; earlier scientific calculations, offline privacy and all 12 converters are preserved. Fixed π/√ chip insertion and added comma for nCr/nPr inputs. CI tests expression accuracy, screen layout source, Android build and APK signature. This is a debug-signed TEST APK; please verify actual device layouts. IEEE-754 math precision limits apply." \
+              --title "VISION CALC 1.2 • Bold Science Buttons & Full-Screen Keypad" \
+              --notes "VISION CALC v1.2: screenshot-based UI improvement by SAURABH'S VISION. Scientific buttons are now LARGE, color-coded, high-contrast rounded keys (trigonometry teal, constants violet, other science functions blue), with 12 quick functions in a visible 4-column by 3-row scientific grid on portrait screens. More functions remain in Show All. The four-column numeric keypad is dynamically expanded into unused space at the BOTTOM of tall Android displays. Resizing uses the actual visible ScrollView height, preserves system status/navigation insets, and is capped; short and landscape screens remain fully scrollable rather than clipping Equals. Existing light/dark themes, offline scientific maths, unit converter, memory, history and DEG/RAD are preserved. CI verifies scientific accuracy, layout cases, APK package and signature. Debug-signed test APK; verify actual phone layout." \
               --latest=false
           fi
