@@ -311,12 +311,38 @@ public final class MainActivity extends Activity {
         Button chip=button(label,
             darkMode?0xff1c4871:0xffe6e6f0,
             darkMode?0xff0c2e50:0xffdedfec,
-            darkMode?0xff367f9b:0,
-            WHITE);
+            darkMode?0xff367f9b:0,WHITE);
         chip.setBackground(shape(darkMode?0xff1c4871:0xffe7e7f0,15,0));
         chip.setTextSize(13);
         chip.setElevation(0);
         return chip;
+    }
+    /** Distinct large scientific keys (trig teal, power indigo, constants
+     * gold/violet), with legible labels and a minimum 48dp touch height.
+     */
+    private Button scientificChip(String token){
+        boolean trig=token.equals("sin")||token.equals("cos")||token.equals("tan")||
+            token.equals("asin")||token.equals("acos")||token.equals("atan");
+        boolean constant=token.equals("π")||token.equals("e")||
+            token.equals("τ")||token.equals("φ");
+        int top,bottom,stroke,foreground;
+        if(darkMode){
+            top=trig?0xff147e91:constant?0xff7962a1:0xff345a97;
+            bottom=trig?0xff0a4563:constant?0xff43356e:0xff203768;
+            stroke=trig?0xff4af4e8:constant?0xffeac5ff:0xff74a7fb;
+            foreground=0xffffffff;
+        }else{
+            top=trig?0xffd2f2f4:constant?0xfff1dff3:0xffe0e8fd;
+            bottom=trig?0xffbee7eb:constant?0xffe4d3ea:0xffccd9f3;
+            stroke=trig?0xff7ec5d3:constant?0xffcfabd4:0xffa5bce7;
+            foreground=trig?0xff165d71:constant?0xff603d75:0xff294c81;
+        }
+        Button b=button(token,top,bottom,stroke,foreground);
+        b.setBackground(gradient(top,bottom,18,stroke));
+        b.setTextSize(token.length()>3?15:18);
+        b.setElevation(dp(darkMode?1.0f:0.4f));
+        b.setContentDescription("Scientific "+token);
+        return b;
     }
     private String recentResult(){
         try{
@@ -405,33 +431,52 @@ public final class MainActivity extends Activity {
         });
         add(screen,toolTitle,1);
 
-        HorizontalScrollView chipsScroll=new HorizontalScrollView(this);
-        chipsScroll.setHorizontalScrollBarEnabled(false);
-        LinearLayout chips=new LinearLayout(this);
-        chips.setGravity(Gravity.CENTER_VERTICAL);
         String[] quick={"sin","cos","tan","√","π","x²","log","ln","nCr",",","nPr","e"};
         String[] extra={"asin","acos","atan","cbrt","abs","exp","sinh","cosh",
             "tanh","root","gcd","lcm","floor","ceil","mod","1/x","10^x","τ",
             "φ","rad","deg","max","min"};
-        for(String token:quick){
-            Button chip=compactChip(token);
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(
-                dp(token.length()>3?65:57),dp(38));
-            lp.setMargins(0,0,dp(6),0);
-            chips.addView(chip,lp);
-            chip.setOnClickListener(v->appendFunction(token));
+        if(compact){
+            // Landscape keeps science in one horizontally scrollable strip.
+            HorizontalScrollView strip=new HorizontalScrollView(this);
+            strip.setHorizontalScrollBarEnabled(false);
+            LinearLayout row=new LinearLayout(this);
+            for(String token:quick){
+                Button chip=scientificChip(token);
+                LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(77),dp(48));
+                lp.setMargins(dp(2),0,dp(4),0);
+                row.addView(chip,lp);
+                chip.setOnClickListener(v->appendFunction(token));
+            }
+            strip.addView(row);
+            add(screen,strip,0);
+        }else{
+            // 4 × 3 visible science keys: no tiny buttons or hidden functions.
+            LinearLayout scienceGrid=new LinearLayout(this);
+            scienceGrid.setOrientation(LinearLayout.VERTICAL);
+            for(int r=0;r<3;r++){
+                LinearLayout row=new LinearLayout(this);
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                for(int c=0;c<4;c++){
+                    final String token=quick[r*4+c];
+                    Button chip=scientificChip(token);
+                    LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(50),1);
+                    lp.setMargins(dp(2),dp(3),dp(2),dp(3));
+                    row.addView(chip,lp);
+                    chip.setOnClickListener(v->appendFunction(token));
+                }
+                scienceGrid.addView(row,new LinearLayout.LayoutParams(-1,-2));
+            }
+            add(screen,scienceGrid,0);
         }
-        chipsScroll.addView(chips);
-        add(screen,chipsScroll,0);
         if(scientificOpen){
             HorizontalScrollView extraScroll=new HorizontalScrollView(this);
             extraScroll.setHorizontalScrollBarEnabled(false);
             LinearLayout row=new LinearLayout(this);
             for(String token:extra){
-                Button chip=compactChip(token);
+                Button chip=scientificChip(token);
                 LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(
-                    dp(token.length()>4?72:60),dp(38));
-                lp.setMargins(0,0,dp(6),0);
+                    dp(token.length()>4?86:77),dp(50));
+                lp.setMargins(dp(2),0,dp(5),0);
                 row.addView(chip,lp);
                 chip.setOnClickListener(v->appendFunction(token));
             }
@@ -473,6 +518,7 @@ public final class MainActivity extends Activity {
         for(String[] keys:rows){
             LinearLayout row=new LinearLayout(this);
             row.setGravity(Gravity.CENTER_VERTICAL);
+            keypadRows.add(row);
             for(String key:keys){
                 Button b=numericKey(key,
                     (key.equals("()")||("÷×−+%".contains(key)&&key.length()==1)),
@@ -487,6 +533,7 @@ public final class MainActivity extends Activity {
         TextView footer=text("CALCULATE SMART  •  LEARN BETTER",9,MUTED,true);
         footer.setGravity(Gravity.CENTER);
         add(screen,footer,4);
+        keypadFooter=footer;
         updatePreview();
     }
     private void appendFunction(String f){
