@@ -91,8 +91,11 @@ jobs:
           assert 'Math.floorMod(theme,5)' in bg
           assert 'theme=(theme+1)%5' in ime
           assert 'theme==4' in ime
-          assert 'scaleX(.985f)' in ime
-          assert 'setDuration(35).start()' in ime
+          assert 'view.animate().scaleX' not in ime
+          assert 'new RippleDrawable(' in ime
+          assert 'lastSuggestionKey=null' in ime
+          assert 'lookupKey.equals(lastSuggestionKey)' in ime
+          assert 'Toolbar actions do not need an editor IPC round-trip.' in ime
           assert 'lp.setMargins(dp(1.5f),dp(1.0f),dp(1.5f),dp(2.0f));' in ime
           assert 'conn.beginBatchEdit()' in ime and 'conn.endBatchEdit()' in ime
           assert 'Do not duplicate the same expensive InputConnection lookup' in ime
@@ -249,13 +252,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.6_FAST_ACCURATE_TYPING.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.7_SMOOTH_RESPONSE.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_6_FAST_ACCURATE_TYPING_APK
+          name: S_Board_v1_9_7_SMOOTH_RESPONSE_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -265,14 +268,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.6"
-          file="keyboard-deliverables/S_Board_v1.9.6_FAST_ACCURATE_TYPING.apk"
+          tag="s-board-v1.9.7"
+          file="keyboard-deliverables/S_Board_v1.9.7_SMOOTH_RESPONSE.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.9.6 • Speed & Accuracy Update" \
-              --notes "S Board 1.9.6 performance and accuracy release. Preserves the working 1.9.5 neon layout, QWERTY rows and fully visible Spacebar. Removes duplicate phonetic suggestion refresh, batches suggestion replacement into one editor operation, increases key tap area slightly without changing row order, and shortens keypress animations to 35/45ms. Adds common Hindi Roman spellings such as aapne, banao, neeche, upar, keyboard and spacebar to the offline transliteration lexicon. No Internet, keystroke logging or data collection. GitHub CI checks Hindi/English output, offline core throughput, Android build and signature. Benchmark measures a JVM algorithm core—not real phone typing speed or accuracy; physical handset testing is recommended. This remains a debug-signed test APK targeting SDK34 for Android navigation compatibility." \
+              --title "S Board 1.9.7 • Smooth Response Update" \
+              --notes "S Board 1.9.7 smooth typing response: keeps the proven 1.9.5–1.9.6 four-row neon S Board, logo, full visible Spacebar, key sizes, Hindi/Hinglish, Maths, Science and all language features unchanged. Reduces UI work per keypress by using the native ripple feedback without scheduling extra key-scale animations, and skips duplicate suggestion rendering when a host app repeats the same cursor update. Toolbar actions no longer request editor InputConnection unnecessarily. No new permissions, network calls, tracking, or typed-text history. Automated phonetic, suggestion, benchmark, Spacebar layout, APK build and signing checks passed before release. Real typing latency on specific phones requires on-device testing. Debug-signed testing APK, not a Play Store binary." \
               --latest=false
           fi
 
