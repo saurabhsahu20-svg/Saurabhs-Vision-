@@ -234,94 +234,207 @@ public final class MainActivity extends Activity {
         else if(tab==1)buildConverter();
         else buildHistory();
     }
+    // The reference screenshot uses large, softly rounded 4-column keys.
+    // Keep science tools available above the grid instead of squeezing the keys.
+    private Button numericKey(String label,boolean operation,boolean clear,boolean equals){
+        int top,bottom,stroke,ink;
+        if(darkMode){
+            top=equals?0xff67f5f9:clear?0xff844051:operation?0xff2a5a84:0xff234a74;
+            bottom=equals?0xff10bbdb:clear?0xff632839:operation?0xff102d56:0xff0a264b;
+            stroke=equals?0xffb7ffff:clear?0xffa55a68:0xff2e8cad;
+            ink=equals?0xff032034:0xfff8fbff;
+        }else{
+            top=equals?0xff674868:clear?0xff6884bd:operation?0xff798096:0xffe7e7ee;
+            bottom=equals?0xff503551:clear?0xff5e74a6:operation?0xff6b7288:0xffe1e2eb;
+            stroke=0;
+            ink=operation||clear||equals?Color.WHITE:0xff1c1c24;
+        }
+        Button b=button(label,top,bottom,stroke,ink);
+        b.setTextSize(label.equals("()")?25:label.equals("⌫")?26:30);
+        b.setElevation(dp(darkMode?1.6f:0));
+        b.setBackground(gradient(top,bottom,27,stroke));
+        b.setContentDescription(label.equals("⌫")?"Backspace":label.equals("=")?"Calculate result":
+            label.equals("()")?"Open or close bracket":label.equals("AC")?"Clear all":
+            label.equals("÷")?"Divide":label.equals("×")?"Multiply":
+            label.equals("−")?"Subtract":label.equals("+")?"Add":label);
+        return b;
+    }
+    private Button compactChip(String label){
+        Button chip=button(label,
+            darkMode?0xff1c4871:0xffe6e6f0,
+            darkMode?0xff0c2e50:0xffdedfec,
+            darkMode?0xff367f9b:0,
+            WHITE);
+        chip.setBackground(shape(darkMode?0xff1c4871:0xffe7e7f0,15,0));
+        chip.setTextSize(13);
+        chip.setElevation(0);
+        return chip;
+    }
+    private String recentResult(){
+        try{
+            JSONArray items=new JSONArray(prefs.getString("history","[]"));
+            JSONObject first=items.optJSONObject(0);
+            if(first!=null)return first.optString("expression","")+
+                "  =  "+first.optString("result","");
+        }catch(Exception ignored){}
+        return "Try sin(30) × 200  or  (2+3)²";
+    }
     private void buildCalculator(){
-        LinearLayout panel=new LinearLayout(this);
-        panel.setOrientation(LinearLayout.VERTICAL);
-        panel.setPadding(dp(16),dp(10),dp(16),dp(14));
-        panel.setBackground(gradient(0xff0e2c51,0xff071d3a,17,0xff1b567b));
-        TextView title=text("SCIENTIFIC EXPRESSION",11,CYAN,true);
-        add(panel,title,0);
-        expressionView=text(expression.isEmpty()?"0":expression,25,WHITE,true);
-        expressionView.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        final boolean compact=landscape();
+        LinearLayout display=new LinearLayout(this);
+        display.setOrientation(LinearLayout.VERTICAL);
+        display.setPadding(dp(17),dp(compact?10:14),dp(17),dp(12));
+        display.setBackground(darkMode?
+            gradient(0xff12355a,0xff081e3b,23,0xff235b80):
+            gradient(0xffffffff,0xfff0eff8,23,0xffe5e3ee));
+
+        LinearLayout displayHeading=new LinearLayout(this);
+        displayHeading.setGravity(Gravity.CENTER_VERTICAL);
+        TextView title=text("YOUR CALCULATION",11,MUTED,true);
+        displayHeading.addView(title,new LinearLayout.LayoutParams(0,dp(36),1f));
+        degreeButton=text(degrees?"DEG":"RAD",13,
+            darkMode?NAVY:Color.WHITE,true);
+        degreeButton.setGravity(Gravity.CENTER);
+        degreeButton.setBackground(shape(CYAN,12,0));
+        degreeButton.setContentDescription(
+            "Angle mode: "+(degrees?"degrees":"radians")+". Tap to switch.");
+        displayHeading.addView(degreeButton,new LinearLayout.LayoutParams(dp(58),dp(36)));
+        degreeButton.setOnClickListener(v->{
+            degrees=!degrees;
+            prefs.edit().putBoolean("degrees",degrees).apply();
+            degreeButton.setText(degrees?"DEG":"RAD");
+            degreeButton.setContentDescription(
+                "Angle mode: "+(degrees?"degrees":"radians")+". Tap to switch.");
+            updatePreview();
+        });
+        add(display,displayHeading,0);
+
+        expressionView=text(expression.isEmpty()?"0":displayExpression(expression),
+            compact?24:30,WHITE,true);
+        expressionView.setGravity(Gravity.END|Gravity.CENTER_VERTICAL);
         expressionView.setSingleLine(true);
         expressionView.setEllipsize(TextUtils.TruncateAt.START);
-        expressionView.setContentDescription("Expression "+(expression.isEmpty()?"empty":expression));
-        add(panel,expressionView,5);
-        answerView=text("0",28,GOLD,true);
-        answerView.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        expressionView.setMinHeight(dp(compact?32:44));
+        add(display,expressionView,4);
+
+        answerView=text("0",compact?34:43,GOLD,true);
+        answerView.setGravity(Gravity.END|Gravity.CENTER_VERTICAL);
         answerView.setSingleLine(true);
         answerView.setEllipsize(TextUtils.TruncateAt.START);
-        add(panel,answerView,7);
-        statusView=text("Offline • DEG/RAD • 12 converters",11,MUTED,false);
-        statusView.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
-        add(panel,statusView,7);
-        add(screen,panel,0);
+        answerView.setMinHeight(dp(compact?42:55));
+        add(display,answerView,2);
 
-        String[] memoryKeys={"MC","MR","M+","M−","MS","COPY"};
+        statusView=text("OFFLINE  •  INSTANT RESULT",11,MUTED,false);
+        statusView.setGravity(Gravity.END|Gravity.CENTER_VERTICAL);
+        add(display,statusView,1);
+        add(screen,display,0);
+
+        LinearLayout recall=new LinearLayout(this);
+        recall.setGravity(Gravity.CENTER_VERTICAL);
+        TextView historyLabel=text("↶  "+recentResult(),11,MUTED,false);
+        historyLabel.setSingleLine(true);
+        historyLabel.setEllipsize(TextUtils.TruncateAt.END);
+        recall.addView(historyLabel,new LinearLayout.LayoutParams(0,dp(34),1f));
+        TextView recallAction=text("HISTORY ›",10,CYAN,true);
+        recallAction.setGravity(Gravity.CENTER);
+        recall.addView(recallAction,new LinearLayout.LayoutParams(dp(72),dp(34)));
+        recall.setContentDescription("Open recent calculations");
+        recall.setOnClickListener(v->{tab=2;buildUi();});
+        add(screen,recall,3);
+
+        LinearLayout toolTitle=new LinearLayout(this);
+        toolTitle.setGravity(Gravity.CENTER_VERTICAL);
+        TextView scienceLabel=text("∑  SCIENTIFIC TOOLS",12,WHITE,true);
+        toolTitle.addView(scienceLabel,new LinearLayout.LayoutParams(0,dp(30),1f));
+        TextView expand=text(scientificOpen?"SHOW LESS  ⌃":"SHOW ALL  ⌄",11,CYAN,true);
+        expand.setGravity(Gravity.CENTER);
+        toolTitle.addView(expand,new LinearLayout.LayoutParams(dp(108),dp(34)));
+        toolTitle.setContentDescription("Expand or collapse scientific functions");
+        toolTitle.setOnClickListener(v->{
+            scientificOpen=!scientificOpen;
+            prefs.edit().putBoolean("scientificOpen",scientificOpen).apply();
+            buildUi();
+        });
+        add(screen,toolTitle,5);
+
+        HorizontalScrollView chipsScroll=new HorizontalScrollView(this);
+        chipsScroll.setHorizontalScrollBarEnabled(false);
+        LinearLayout chips=new LinearLayout(this);
+        chips.setGravity(Gravity.CENTER_VERTICAL);
+        String[] quick={"sin","cos","tan","√","π","x²","log","ln","nCr","nPr","e"};
+        String[] extra={"asin","acos","atan","cbrt","abs","exp","sinh","cosh",
+            "tanh","root","gcd","lcm","floor","ceil","mod","1/x","10^x","τ",
+            "φ","rad","deg","max","min"};
+        for(String token:quick){
+            Button chip=compactChip(token);
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(
+                dp(token.length()>3?66:58),dp(43));
+            lp.setMargins(0,0,dp(6),0);
+            chips.addView(chip,lp);
+            chip.setOnClickListener(v->appendFunction(token));
+        }
+        chipsScroll.addView(chips);
+        add(screen,chipsScroll,0);
+        if(scientificOpen){
+            HorizontalScrollView extraScroll=new HorizontalScrollView(this);
+            extraScroll.setHorizontalScrollBarEnabled(false);
+            LinearLayout row=new LinearLayout(this);
+            for(String token:extra){
+                Button chip=compactChip(token);
+                LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(
+                    dp(token.length()>4?73:61),dp(43));
+                lp.setMargins(0,0,dp(6),0);
+                row.addView(chip,lp);
+                chip.setOnClickListener(v->appendFunction(token));
+            }
+            extraScroll.addView(row);
+            add(screen,extraScroll,5);
+        }
+
         LinearLayout memoryRow=new LinearLayout(this);
-        for(String token:memoryKeys){
-            Button b=button(token,0xff1b4068,0xff112b4a,0xff2d5a7e,CYAN);
-            b.setTextSize(12);
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(41),1f);
+        for(String token:new String[]{"MC","MR","M+","M−","MS","COPY"}){
+            Button b=compactChip(token);
+            b.setTextSize(11);
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(37),1);
             lp.setMargins(dp(2),0,dp(2),0);
             memoryRow.addView(b,lp);
             b.setOnClickListener(v->onMemory(token));
         }
-        add(screen,memoryRow,12);
-        add(screen,text("FUNCTIONS  •  swipe sideways for more",11,MUTED,true),13);
-        HorizontalScrollView functionsScroll=new HorizontalScrollView(this);
-        functionsScroll.setHorizontalScrollBarEnabled(false);
-        LinearLayout functions=new LinearLayout(this);
-        functions.setGravity(Gravity.CENTER_VERTICAL);
-        String[] funcTokens={"sin","cos","tan","asin","acos","atan",
-            "ln","log","sqrt","cbrt","abs","exp","sinh","cosh","tanh",
-            "nCr","nPr","root","gcd","lcm","floor","ceil",
-            "mod","1/x","10^x","x²","e","τ","φ","rad","deg"};
-        for(String token:funcTokens){
-            Button chip=button(token,0xff1e4673,0xff0b2b4c,0xff2c89a0,WHITE);
-            chip.setTextSize(13);
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(68),dp(42));
-            lp.setMargins(dp(2),dp(4),dp(3),dp(4));
-            functions.addView(chip,lp);
-            chip.setOnClickListener(v->appendFunction(token));
-        }
-        functionsScroll.addView(functions);
-        add(screen,functionsScroll,1);
+        add(screen,memoryRow,9);
+
+        // Fills additional vertical room on tall screens, while preserving
+        // a normal scrollable keypad on short or landscape screens.
+        View flexibleSpace=new View(this);
+        screen.addView(flexibleSpace,new LinearLayout.LayoutParams(-1,0,1f));
 
         String[][] rows={
-            {"AC","(",")","%","⌫"},
-            {"sin","cos","tan","√","x²"},
-            {"7","8","9","÷","^"},
-            {"4","5","6","×","!"},
-            {"1","2","3","−","π"},
-            {"0",".","Ans","+","="}
+            {"AC","()","%","÷"},
+            {"7","8","9","×"},
+            {"4","5","6","−"},
+            {"1","2","3","+"},
+            {"0",".","⌫","="}
         };
-        int h=dp(landscape()?45:55);
+        float heightDp=getResources().getDisplayMetrics().heightPixels/
+            getResources().getDisplayMetrics().density;
+        float sized=(heightDp-(compact?220:404))/5f;
+        int keyHeight=dp(Math.max(compact?48:55,Math.min(compact?67:83,sized)));
         for(String[] keys:rows){
             LinearLayout row=new LinearLayout(this);
             row.setGravity(Gravity.CENTER_VERTICAL);
             for(String key:keys){
-                boolean equal=key.equals("=");
-                boolean control=key.equals("AC")||key.equals("⌫");
-                boolean isDigit=key.matches("[0-9.]");
-                boolean action=!isDigit;
-                int top=equal?0xff69f6fc:(control?0xff9b4151:(action?0xff245f8a:0xff214a78));
-                int bottom=equal?0xff0bbddc:(control?0xff6a273d:(action?0xff0d325b:0xff0b2b51));
-                int border=equal?0xffbfffff:(control?0xffd58d9b:(action?0xff439bca:0xff3678a6));
-                Button button=button(key,top,bottom,border,equal?NAVY:WHITE);
-                button.setTextSize(key.length()>2?14:20);
-                LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,h,1);
+                Button b=numericKey(key,
+                    "÷×−+%".contains(key)&&key.length()==1,
+                    key.equals("AC"),key.equals("="));
+                LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,keyHeight,1f);
                 lp.setMargins(dp(2),dp(3),dp(2),dp(3));
-                row.addView(button,lp);
-                button.setOnClickListener(v->onKey(key));
+                row.addView(b,lp);
+                b.setOnClickListener(v->onKey(key));
             }
             add(screen,row,0);
         }
-        TextView examples=text(
-            "Try: sin(30) × 200  •  comb(5,2)  •  (2+3)^2  •  9!  •  log(100)",
-            11,MUTED,false);
-        examples.setGravity(Gravity.CENTER);
-        add(screen,examples,10);
+        TextView footer=text("CALCULATE SMART  •  LEARN BETTER",10,MUTED,true);
+        footer.setGravity(Gravity.CENTER);
+        add(screen,footer,9);
         updatePreview();
     }
     private void appendFunction(String f){
