@@ -518,7 +518,7 @@ public final class MainActivity extends Activity {
     }
 
     private void showThemes(){
-        int selected=Math.floorMod(prefs.getInt(PREF_THEME,0),
+        int selected=LauncherRules.themeIndex(prefs.getInt(PREF_THEME,0),
             ScienceWallpaperView.THEMES.length);
         new AlertDialog.Builder(this)
             .setTitle("🎨 Science & Maths Themes")
