@@ -60,7 +60,7 @@ jobs:
                        'history','memory','ClipboardManager','DEG','RAD'):
               assert item in source or item in engine, item
           assert 'UnitConverter.count()' in source or 'UnitConverter.names()' in source
-          assert 'versionName \'1.3.0\'' in (p/'app/build.gradle').read_text()
+          assert 'versionName \'1.4.0\'' in (p/'app/build.gradle').read_text()
           # The visual reference demands a four-column keypad with real maths.
           assert 'String[][] rows={' in source
           for row in ('{"AC","()","%","÷"}', '{"7","8","9","×"}',
@@ -101,6 +101,13 @@ jobs:
           assert 'android:roundIcon="@drawable/ic_s_calc"' in manifest
           assert 'icon.setImageResource(R.drawable.ic_s_calc);' in source
           assert 'TextView logoName=text("S VISION"' in source
+          assert "private boolean cacheMatches()" in source
+          assert "cachedFormatted=exact!=null?exact:ExpressionEngine.format(value);" in source
+          assert "String exact=DecimalArithmetic.tryFormat(expression);" in source
+          assert (p/'app/src/main/java/com/saurabhsvision/visioncalc/DecimalArithmetic.java').is_file()
+          assert "new MathContext(15,RoundingMode.HALF_UP)" in engine
+          assert "9007199254740991d" in engine
+          print('PASS: S CALC preview caching and precision protection; approved icon unchanged')
           assert 'monogram.setContentDescription("S Vision logo")' in source
           print('PASS: Premium S-CALC icon is used by launcher and S VISION branding appears inside calculator')
           print('PASS: VISION CALC native Android app and permission-free offline code')
@@ -119,6 +126,20 @@ jobs:
             "$src/UnitConverter.java" \
             "$p/tests/CalculatorCoreTest.java"
           java -ea -cp "$out" CalculatorCoreTest
+
+      - name: Verify decimal precision, speed and scientific compatibility
+        shell: bash
+        run: |
+          set -euo pipefail
+          p="vision-scientific-calculator"
+          src="$p/app/src/main/java/com/saurabhsvision/visioncalc"
+          out="$RUNNER_TEMP/s-calc-precision"
+          mkdir -p "$out"
+          javac -encoding UTF-8 -d "$out" \
+            "$src/ExpressionEngine.java" \
+            "$src/DecimalArithmetic.java" \
+            "$p/tests/CalculatorSpeedAccuracyTest.java"
+          java -ea -cp "$out" CalculatorSpeedAccuracyTest
 
       - name: Test responsive keypad sizing on tall and short screens
         shell: bash
@@ -150,13 +171,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.visioncalc'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q MainActivity
           mkdir -p calc-deliverables
-          cp "$apk" calc-deliverables/VISION_CALC_v1.3.0_S_CALC_ICON.apk
+          cp "$apk" calc-deliverables/S_CALC_v1.4.0_SPEED_ACCURACY.apk
           ( cd calc-deliverables && sha256sum *.apk > SHA256SUMS.txt )
 
       - name: Upload downloadable calculator APK
         uses: actions/upload-artifact@v4
         with:
-          name: VISION_CALC_v1_3_0_S_CALC_ICON_APK
+          name: S_CALC_v1_4_0_SPEED_ACCURACY_APK
           path: calc-deliverables/*
           retention-days: 90
 
@@ -166,13 +187,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="vision-calc-v1.3.0"
-          apk="calc-deliverables/VISION_CALC_v1.3.0_S_CALC_ICON.apk"
+          tag="vision-calc-v1.4.0"
+          apk="calc-deliverables/S_CALC_v1.4.0_SPEED_ACCURACY.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$apk" calc-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$apk" calc-deliverables/SHA256SUMS.txt \
-              --title "VISION CALC 1.3 • S CALC Neon App Icon + S VISION Logo" \
-              --notes "VISION CALC v1.3 by SAURABH'S VISION: updates both Android launcher icon and in-app header to the user-approved glossy S ribbon with CALC lettering and four bright operator keys, cropped to the requested motif. Adds a compact branded S VISION monogram inside the calculator result display; the rest of the premium scientific UI and all calculations are unchanged. Maintains both light/dark modes, 4-column numeric keypad, scientific tools, history and 12 converters. GitHub CI tests the new WebP icon, Android manifest branding, scientific accuracy, responsive layout, APK compilation and signing. This is a debug-signed test APK; physically confirm launcher crop on phone." \
+              --title "S CALC 1.4 • Faster Response + Higher Precision" \
+              --notes "S CALC 1.4 performance and accuracy update by SAURABH'S VISION. Keeps the approved 3D gold S CALC launcher icon, S VISION badge, light/dark design, large scientific buttons, adaptive numeric keypad, history, memory and twelve converters unchanged. Speeds response by reusing cached results and formatting between preview, Copy and Equals instead of repeating the same calculation. Improves arithmetic precision: exact BigDecimal display for ordinary decimal additions/subtractions/multiplications and bracketed expressions (0.1+0.2=0.3); decimal128 division display; safe whole integers retain their full digits; scientific double displays now use 15 significant digits instead of 12. Scientific functions, DEG/RAD, brackets, percentages and factorial still use the verified offline calculation engine. Accuracy and bounded computational performance regression tests run in GitHub Actions before Android compilation and signing. Limitations: scientific functions/Ans/memory are still IEEE-754 double; division and enormous values cannot have limitless exact decimal precision. No independent phone typing-latency or speed multiplier measured. Debug-signed TEST APK, not a Play Store release." \
               --latest=false
           fi
