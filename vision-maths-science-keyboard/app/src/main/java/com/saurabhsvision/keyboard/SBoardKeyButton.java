@@ -16,12 +16,15 @@ import android.widget.Button;
 public final class SBoardKeyButton extends Button {
     private boolean isSpaceKey=false;
     private boolean lightTheme=false;
+    private int indicatorColor=0xff2ef4ff;
     private final Paint neon=new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF line=new RectF();
 
     public SBoardKeyButton(Context context){super(context);setAllCaps(false);}
-    public void setSpaceIndicator(boolean show,boolean light){
-        isSpaceKey=show;lightTheme=light;invalidate();
+    public void setSpaceIndicator(boolean show,boolean light,int accent){
+        isSpaceKey=show;lightTheme=light;
+        indicatorColor=accent;
+        invalidate();
     }
     @Override protected void onDraw(Canvas canvas){
         super.onDraw(canvas);
@@ -32,9 +35,9 @@ public final class SBoardKeyButton extends Button {
         float y=getHeight()-Math.max(6*density,getHeight()*.14f);
         line.set(center-barHalf,y,center+barHalf,y+Math.max(2*density,getHeight()*.045f));
         neon.reset();neon.setAntiAlias(true);
-        int cyan=lightTheme?0xff2466d2:0xff2ef4ff;
+        int glow=indicatorColor;
         neon.setShader(new LinearGradient(line.left,line.top,line.right,line.top,
-            new int[]{cyan&0x00ffffff,cyan,cyan&0x00ffffff},null,Shader.TileMode.CLAMP));
+            new int[]{glow&0x00ffffff,glow,glow&0x00ffffff},null,Shader.TileMode.CLAMP));
         canvas.drawRoundRect(line,4*density,4*density,neon);
         neon.setShader(null);
     }
