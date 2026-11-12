@@ -1,8 +1,19 @@
-# VISION CALC — Scientific Calculator for Android
+# VISION CALC 1.1 — Premium Scientific Calculator for Android
 
 **By SAURABH'S VISION™ — Smart Maths, Simple Learning**
 
 A real, native **offline Android scientific calculator**, not a static mockup. Built with Java 17 and Android Gradle Plugin 8.7.3; no third-party SDKs, Internet, login, ads, analytics, or personal-data permissions.
+
+## Premium responsive interface (v1.1)
+
+The screenshot-inspired **Pearl Light** interface is the new default. A ☾/☀ control at the top switches between Pearl Light and the original Navy Dark palette; theme preference stays on the device.
+
+- **Extra-large 4 × 5 keypad:** AC, smart `( )` bracket toggle, %, ÷, 0–9, ×, −, +, backspace and =. Every button actually computes, unlike a decorative mockup.
+- **Responsive layout:** four large rounded pills per row, with adaptive height on smaller phones and scrollable content in landscape. Android navigation bar insets keep bottom buttons accessible.
+- **No unused blank panel:** a large live expression and result card, recent calculation, scientific function strip, memory row, and DEG/RAD switch make use of upper screen space.
+- **Scientific quick row:** sin/cos/tan/√/π/x²/log/ln/nCr/comma/nPr/e; **Show All** expands additional functions without shrinking the basic numeric buttons. Tap the comma chip to separate nCr, nPr, root, min, max arguments.
+- **Full-featured light and dark screens** for Calculator, Unit Converter and History; accessible dark text in light mode.
+- This is a design inspired by the user-provided photo, not an exact reproduction of another app's artwork.
 
 ## Functions
 
@@ -41,7 +52,7 @@ gradle --no-daemon :app:assembleDebug
 
 The Gradle build needs a configured Android SDK 35 and JDK 17. GitHub Actions installs dependencies, runs pure-Java tests (including 100,000 repeated expressions), builds the APK, validates the APK signature/manifest, and uploads the debug-signed package to GitHub Releases.
 
-**Release:** `vision-calc-v1.0.0`. The downloadable APK is a **debug-signed test app**, not Play Store production signing. Android may require opting in to installing trusted downloads from the browser. Review download source and do not bypass system warnings. This is separate from S Board and does not modify the keyboard.
+**Release:** `vision-calc-v1.1.0`. The downloadable APK is a **debug-signed test app**, not Play Store production signing. Android may require opting in to installing trusted downloads from the browser. Review download source and do not bypass system warnings. This is separate from S Board and does not modify the keyboard.
 
 ## Privacy
 
