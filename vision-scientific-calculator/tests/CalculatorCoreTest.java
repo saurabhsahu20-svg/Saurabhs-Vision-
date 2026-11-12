@@ -37,6 +37,12 @@ public final class CalculatorCoreTest {
         near(calc("sin(30)",true),.5,1e-13,"sine degrees");
         near(calc("cos(60)",true),.5,1e-13,"cosine degrees");
         near(calc("tan(45)",true),1,1e-13,"tangent degrees");
+        near(calc("cot(45)",true),1,1e-13,"cotangent degrees");
+        near(calc("sec(60)",true),2,1e-13,"secant degrees");
+        near(calc("csc(30)",true),2,1e-13,"cosecant degrees");
+        near(calc("cot(π/4)",false),1,1e-13,"cotangent radians");
+        near(calc("2E3+5",true),2005,1e-13,"EXP notation key result");
+        near(calc("5^3",true),125,1e-13,"x cubed key result");
         near(calc("sin(π/2)",false),1,1e-13,"sine radians");
         near(calc("asin(1)",true),90,1e-13,"inverse sine");
         near(calc("ln(e)",true),1,1e-13,"natural log");
@@ -65,6 +71,9 @@ public final class CalculatorCoreTest {
         error("ln(0)","Math domain");
         error("171!","Factorial");
         error("tan(90)","Tangent is undefined");
+        error("cot(0)","Cotangent is undefined");
+        error("sec(90)","Secant is undefined");
+        error("csc(180)","Cosecant is undefined");
         error("root(2,-9)","Even root");
         error("3+","Incomplete expression");
         error("(2+3","Missing closing bracket");
