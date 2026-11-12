@@ -119,6 +119,15 @@ jobs:
                           print('Added Study Sprint shortcut to hosted learning app')
                       else:
                           print('Study Sprint shortcut already present or incompatible HTML')
+          # Add a visible public CGBSE teacher guide entry to the hosted APK web assets.
+          # This modifies the GitHub Pages web copy only, not the downloadable Android APK.
+          app_landing = root / 'index.html'
+          if app_landing.exists():
+              html = app_landing.read_text(encoding='utf-8')
+              if '../cgbse-solutions/' not in html and '</body>' in html:
+                  teacher_link = '<a href="../cgbse-solutions/" aria-label="CGBSE Class 10 and 12 teacher guides" style="position:fixed;bottom:138px;right:12px;z-index:989;background:#ffe16a;color:#071b49;text-decoration:none;padding:10px 14px;border-radius:24px;box-shadow:0 4px 15px #071b4940;font:800 12px system-ui">📚 CGBSE 10 / 12 Solutions</a>'
+                  app_landing.write_text(html.replace('</body>', teacher_link + '</body>'), encoding='utf-8')
+                  print('Linked CGBSE reader from hosted learning web app')
           print('Imported', count, 'public website app files including',len(samples),'JSON assets')
           PY
           touch "$RUNNER_TEMP/saurabh-site/.nojekyll"
