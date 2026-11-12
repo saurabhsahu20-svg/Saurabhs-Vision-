@@ -221,8 +221,9 @@ public final class MainActivity extends Activity {
         LinearLayout row=new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
         ImageView icon=new ImageView(this);
-        icon.setImageResource(R.drawable.ic_vision_calc);
-        icon.setContentDescription("VISION CALC calculator logo");
+        icon.setImageResource(R.drawable.ic_s_calc);
+        icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        icon.setContentDescription("Premium S CALC calculator icon");
         row.addView(icon,new LinearLayout.LayoutParams(dp(39),dp(39)));
 
         LinearLayout titles=new LinearLayout(this);
@@ -364,15 +365,31 @@ public final class MainActivity extends Activity {
 
         LinearLayout displayHeading=new LinearLayout(this);
         displayHeading.setGravity(Gravity.CENTER_VERTICAL);
-        TextView title=text("YOUR CALCULATION",11,MUTED,true);
-        displayHeading.addView(title,new LinearLayout.LayoutParams(0,dp(29),1f));
+        // Compact S VISION logo is inside the calculator's result screen,
+        // separate from the S CALC launcher icon used at the top.
+        LinearLayout visionLogo=new LinearLayout(this);
+        visionLogo.setGravity(Gravity.CENTER_VERTICAL);
+        TextView monogram=text("S",17,0xffffd66d,true);
+        monogram.setGravity(Gravity.CENTER);
+        monogram.setBackground(gradient(0xff214f87,0xff091f48,9,0xffffd66d));
+        monogram.setContentDescription("S Vision logo");
+        visionLogo.addView(monogram,new LinearLayout.LayoutParams(dp(26),dp(26)));
+        LinearLayout visionText=new LinearLayout(this);
+        visionText.setOrientation(LinearLayout.VERTICAL);
+        visionText.setPadding(dp(6),0,0,0);
+        TextView logoName=text("S VISION",12,darkMode?0xffefc46d:0xff364c83,true);
+        visionText.addView(logoName);
+        TextView label=text("YOUR CALCULATION",9,MUTED,false);
+        visionText.addView(label);
+        visionLogo.addView(visionText,new LinearLayout.LayoutParams(-2,-2));
+        displayHeading.addView(visionLogo,new LinearLayout.LayoutParams(0,dp(32),1f));
         degreeButton=text(degrees?"DEG":"RAD",13,
             darkMode?NAVY:Color.WHITE,true);
         degreeButton.setGravity(Gravity.CENTER);
         degreeButton.setBackground(shape(CYAN,12,0));
         degreeButton.setContentDescription(
             "Angle mode: "+(degrees?"degrees":"radians")+". Tap to switch.");
-        displayHeading.addView(degreeButton,new LinearLayout.LayoutParams(dp(54),dp(29)));
+        displayHeading.addView(degreeButton,new LinearLayout.LayoutParams(dp(54),dp(32)));
         degreeButton.setOnClickListener(v->{
             degrees=!degrees;
             prefs.edit().putBoolean("degrees",degrees).apply();
