@@ -15,8 +15,9 @@ font-family:"Noto Sans Devanagari","DejaVu Sans",sans-serif!important;font-size:
 header{border-radius:0!important}article{break-inside:avoid;page-break-inside:avoid}
 .toolbar{display:none!important}
 .wm{position:fixed;top:43%;left:6%;width:88%;text-align:center;transform:rotate(-27deg);
-z-index:500;font-size:48px;font-weight:900;letter-spacing:1px;color:rgba(14,54,121,.052);
-pointer-events:none}footer{color:#526581}
+z-index:500;font-size:36px;font-weight:900;letter-spacing:1px;color:rgba(14,54,121,.052);
+pointer-events:none;opacity:.1}.wm img{display:block;width:96px;height:96px;object-fit:contain;margin:0 auto 8px}
+footer{color:#526581}
 </style>"""
 
 def render(entry):
@@ -27,7 +28,8 @@ def render(entry):
     target.parent.mkdir(parents=True, exist_ok=True)
     html = raw.decode("utf-8")
     html = html.replace("</head>", STYLE + "</head>", 1)
-    html = html.replace("<body>", '<body><div class="wm">SAURABH’S VISION™</div>', 1)
+    logo = (Path(__file__).resolve().parents[1] / "assets" / "vision-icon-192.png").as_uri()
+    html = html.replace("<body>", '<body><div class="wm"><img src="' + logo + '" alt="">SAURABH’S VISION™</div>', 1)
     HTML(string=html, base_url=str(DEST)).write_pdf(target)
     if target.stat().st_size < 5000:
         raise RuntimeError("Invalid PDF size: " + name)
