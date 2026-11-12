@@ -31,6 +31,18 @@ public final class PhoneticSmokeTest {
             "Roman bharat -> Hindi");
         eq(OfflinePhonetic.convert("shiksha",IndicLanguages.HINDI),"शिक्षा",
             "Roman shiksha -> Hindi");
+        eq(OfflinePhonetic.convert("aapne",IndicLanguages.HINDI),"आपने",
+            "Common Hindi: aapne");
+        eq(OfflinePhonetic.convert("banao",IndicLanguages.HINDI),"बनाओ",
+            "Common Hindi: banao");
+        eq(OfflinePhonetic.convert("neeche",IndicLanguages.HINDI),"नीचे",
+            "Common Hindi: neeche");
+        eq(OfflinePhonetic.convert("upar",IndicLanguages.HINDI),"ऊपर",
+            "Common Hindi: upar");
+        eq(OfflinePhonetic.convert("keyboard",IndicLanguages.HINDI),"कीबोर्ड",
+            "Common Hindi: keyboard");
+        eq(OfflinePhonetic.convert("spacebar",IndicLanguages.HINDI),"स्पेसबार",
+            "Common Hindi: spacebar");
         eq(OfflinePhonetic.convert("namaste",IndicLanguages.ENGLISH),"namaste",
             "English remains in Roman letters");
         eq(OfflinePhonetic.convert("namaste",IndicLanguages.HINGLISH),"namaste",
