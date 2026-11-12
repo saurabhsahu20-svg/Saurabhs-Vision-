@@ -50,6 +50,8 @@ public final class VisionKeyboardService extends InputMethodService {
     private TextView romanPreview;
     private TextView[] suggestionChips;
     private boolean updatingSuggestions=false;
+    // A cursor-change callback often repeats the same suggestion query after a keypress.
+    private String lastSuggestionKey=null;
     private boolean shifted=false,caps=false;
     private long lastShift=0L;
     private final Handler repeatHandler=new Handler(Looper.getMainLooper());
@@ -77,6 +79,7 @@ public final class VisionKeyboardService extends InputMethodService {
         finishRomanWord();
         super.onStartInput(info,restarting);
         sensitiveField=isPasswordField(info);
+        lastSuggestionKey=null; // Never reuse suggestions from a different editor.
         if(suggestionChips!=null)updateSuggestions();
         if(!restarting){
             int type=info==null?InputType.TYPE_CLASS_TEXT:(info.inputType&InputType.TYPE_MASK_CLASS);
@@ -132,6 +135,7 @@ public final class VisionKeyboardService extends InputMethodService {
         keyboardFrame.setCompact(settings().getBoolean("compact_height",true));
         keysContent=keyboardFrame;
         suggestionChips=null;
+        lastSuggestionKey=null;
         romanPreview=null;
         // The compat IME window sits ABOVE Android's navigation bar.
         // Avoid adding a second oversized bottom inset: it squeezed the
@@ -340,6 +344,11 @@ public final class VisionKeyboardService extends InputMethodService {
             }else if(conn!=null&&!sensitiveField){
                 typed=WordSuggestions.trailingWord(conn.getTextBeforeCursor(36,0));
             }
+            // The editor may fire onUpdateSelection for the same typed prefix
+            // after press() has already drawn these chips. Skip re-rendering it.
+            String lookupKey=selectedLanguage+":"+mode+":"+(sensitiveField?"private":typed);
+            if(lookupKey.equals(lastSuggestionKey))return;
+            lastSuggestionKey=lookupKey;
             String[] candidates=sensitiveField||mode!=ABC?
                 new String[0]:WordSuggestions.get(typed,
                     selectedLanguage!=IndicLanguages.ENGLISH,3);
@@ -707,17 +716,10 @@ public final class VisionKeyboardService extends InputMethodService {
                 }
             });
         }else{
-            b.setOnTouchListener((view,event)->{
-                if(event.getActionMasked()==MotionEvent.ACTION_DOWN){
-                    // Shorter/smaller visual movement reduces missed edge taps
-                    // during rapid typing while retaining native ripple feedback.
-                    view.animate().scaleX(.985f).scaleY(.985f).setDuration(35).start();
-                }else if(event.getActionMasked()==MotionEvent.ACTION_UP||
-                         event.getActionMasked()==MotionEvent.ACTION_CANCEL){
-                    view.animate().scaleX(1f).scaleY(1f).setDuration(45).start();
-                }
-                return false;
-            });
+            // RippleDrawable already provides pressed feedback. Creating
+            // ViewPropertyAnimator objects for every keystroke costs UI work
+            // and can leave a fast-tapped key scaled when touches overlap.
+            // Keep the same native key style and click semantics.
             b.setOnClickListener(v->{feedback(v);press(output);});
         }
     }
@@ -760,7 +762,6 @@ public final class VisionKeyboardService extends InputMethodService {
         updateSuggestions();
     }
     private void press(String code){
-        InputConnection conn=getCurrentInputConnection();
         if(code.equals("⇧")){
             long now=SystemClock.uptimeMillis();
             if(now-lastShift<350){caps=!caps;shifted=caps;}
@@ -788,6 +789,8 @@ public final class VisionKeyboardService extends InputMethodService {
             int n=(EmojiCatalog.items(emojiCategory).length+EMOJIS_PER_PAGE-1)/EMOJIS_PER_PAGE;
             emojiPage=(emojiPage+1)%Math.max(1,n);rebuild();return;
         }
+        // Toolbar actions do not need an editor IPC round-trip.
+        InputConnection conn=getCurrentInputConnection();
         if(conn==null)return;
         if(code.equals("←")){
             finishRomanWord();
