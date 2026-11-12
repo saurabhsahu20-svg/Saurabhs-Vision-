@@ -1,0 +1,138 @@
+name: Build S VISION Maths & Science Launcher APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'science-maths-launcher/**'
+      - '.github/workflows/build-s-vision-launcher.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: s-vision-launcher-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Test Launcher and Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Use Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Install Android SDK 35
+        shell: bash
+        run: |
+          set -e
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Check functional Android HOME, theme and privacy code
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('science-maths-launcher')
+          mf=(p/'app/src/main/AndroidManifest.xml').read_text()
+          activity=(p/'app/src/main/java/com/saurabhsvision/launcher/MainActivity.java').read_text()
+          wallpaper=(p/'app/src/main/java/com/saurabhsvision/launcher/ScienceWallpaperView.java').read_text()
+          assert 'android.intent.category.HOME' in mf
+          assert 'android.intent.category.DEFAULT' in mf
+          assert 'android.intent.category.LAUNCHER' in mf
+          assert 'android.intent.action.MAIN' in mf
+          assert 'android:exported="true"' in mf
+          assert '<queries>' in mf
+          for forbidden in ('QUERY_ALL_PACKAGES','android.permission.INTERNET',
+              'READ_CONTACTS','ACCESS_FINE_LOCATION','RECORD_AUDIO'):
+              assert forbidden not in mf, forbidden
+          assert 'android:allowBackup="false"' in mf
+          assert 'package com.saurabhsvision.launcher;' in activity
+          for method in ('queryIntentActivities(', 'startActivity(launch)',
+              'RoleManager.ROLE_HOME','Settings.ACTION_HOME_SETTINGS',
+              'renderAppGrid(', 'toggleFavorite(', 'showThemes(',
+              'showLearningLab(', 'onNewIntent(', 'setOnApplyWindowInsetsListener',
+              'Intent.ACTION_DIAL', 'Intent.ACTION_SENDTO'):
+              assert method in activity, method
+          assert 'Maths' in (p/'README.md').read_text()
+          assert len(wallpaper)>2000 and '"Cosmic Mathematics"' in wallpaper
+          assert '"Atomic Science"' in wallpaper
+          assert '"DNA Galaxy"' in wallpaper
+          assert '"Golden Equations"' in wallpaper
+          assert (p/'app/src/main/res/drawable/ic_launcher_sv.xml').is_file()
+          assert "versionName '1.0.0'" in (p/'app/build.gradle').read_text()
+          print('PASS: HOME intent, app drawer, scoped package discovery, search, pinned favorites')
+          print('PASS: 4 offline Maths/Science themes, science lab cards, home role chooser')
+          print('PASS: No sensitive permissions or Internet access')
+          PY
+
+      - name: Test offline theme selection and app search rules
+        shell: bash
+        run: |
+          set -euo pipefail
+          p="science-maths-launcher"
+          src="$p/app/src/main/java/com/saurabhsvision/launcher"
+          out="$RUNNER_TEMP/svision-launcher-test"
+          mkdir -p "$out"
+          javac -encoding UTF-8 -d "$out" "$src/LauncherRules.java" \
+            "$p/tests/LauncherRulesTest.java"
+          java -ea -cp "$out" LauncherRulesTest
+
+      - name: Compile real Android Launcher APK
+        shell: bash
+        run: |
+          cd science-maths-launcher
+          gradle --no-daemon --stacktrace :app:assembleDebug
+
+      - name: Verify package, HOME capability and signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk="science-maths-launcher/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$apk"
+          unzip -t "$apk" | tail -1
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" |
+            grep "package: name='com.saurabhsvision.launcher'"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml |
+            grep -q "android.intent.category.HOME"
+          mkdir -p launcher-deliverables
+          cp "$apk" launcher-deliverables/S_VISION_LAUNCHER_v1.0.0_MATHS_SCIENCE.apk
+          ( cd launcher-deliverables && sha256sum *.apk > SHA256SUMS.txt )
+
+      - name: Upload Launcher APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: S_VISION_Launcher_v1_0_0_Maths_Science_APK
+          path: launcher-deliverables/*
+          retention-days: 90
+
+      - name: Publish publicly downloadable GitHub test release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="s-vision-launcher-v1.0.0"
+          apk="launcher-deliverables/S_VISION_LAUNCHER_v1.0.0_MATHS_SCIENCE.apk"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$apk" launcher-deliverables/SHA256SUMS.txt --clobber
+          else
+            gh release create "$tag" "$apk" launcher-deliverables/SHA256SUMS.txt \
+              --title "S VISION Launcher 1.0 • Maths & Science Android HOME" \
+              --notes "Functional Android HOME launcher by SAURABH'S VISION. Four offline themed scientific wallpapers drawn with native Canvas (Cosmic Mathematics, Atomic Science, DNA Galaxy, Golden Equations), dynamic clock/date/battery, real installed-app drawer and case-insensitive search, tap to open apps, long-press to pin favorites, functional Phone/Messages/Browser quick links and Maths/Science learning cards. Choose Default Home with Android system role picker; Settings → Default Apps → Home can restore previous launcher. No login, ads, Internet permission, tracking or broad QUERY_ALL_PACKAGES. This is an initial debug-signed test APK, not a Google Play release. The promotional design concept is illustrative only; no third-party widgets, live wallpapers, app locking or other unimplemented features are claimed. Real-phone verification is recommended." \
+              --latest=false
+          fi
