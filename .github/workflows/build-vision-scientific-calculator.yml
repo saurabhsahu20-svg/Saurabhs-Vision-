@@ -60,7 +60,27 @@ jobs:
                        'history','memory','ClipboardManager','DEG','RAD'):
               assert item in source or item in engine, item
           assert 'UnitConverter.count()' in source or 'UnitConverter.names()' in source
-          assert 'versionName \'1.0.0\'' in (p/'app/build.gradle').read_text()
+          assert 'versionName \'1.1.0\'' in (p/'app/build.gradle').read_text()
+          # The visual reference demands a four-column keypad with real maths.
+          assert 'String[][] rows={' in source
+          for row in ('{"AC","()","%","÷"}', '{"7","8","9","×"}',
+                      '{"4","5","6","−"}', '{"1","2","3","+"}',
+                      '{"0",".","⌫","="}'):
+              assert row in source, row
+          for feature in ('numericKey(', 'scientificOpen','darkMode',
+                          'getDisplayMetrics().heightPixels','recentResult()',
+                          'ScrollView','setFillViewport(true)',
+                          'new LinearLayout.LayoutParams(-1,-2)',
+                          'CALCULATE SMART','SCIENTIFIC TOOLS',
+                          'Tap to switch','showTab();'):
+              assert feature in source, feature
+          assert 'View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR' in source
+          assert 'View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR' in source
+          assert 'case "()":' in source
+          assert 'case ",":' in source
+          assert 'case "π":case "e":' in source
+          assert 'new LinearLayout.LayoutParams(-1,0,1f)' not in source
+          print('PASS: screenshot-inspired four-column design and functioning controls')
           assert 'Math.pow' in engine and 'Math.sin' in engine
           assert 'Temperature' in converter and 'Frequency' in converter
           assert (p/'app/src/main/res/drawable/ic_vision_calc.xml').is_file()
@@ -98,13 +118,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.visioncalc'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q MainActivity
           mkdir -p calc-deliverables
-          cp "$apk" calc-deliverables/VISION_CALC_v1.0.0_SCIENTIFIC_APK.apk
+          cp "$apk" calc-deliverables/VISION_CALC_v1.1.0_PREMIUM_UI_APK.apk
           ( cd calc-deliverables && sha256sum *.apk > SHA256SUMS.txt )
 
       - name: Upload downloadable calculator APK
         uses: actions/upload-artifact@v4
         with:
-          name: VISION_CALC_v1_0_0_Scientific_APK
+          name: VISION_CALC_v1_1_0_Premium_UI_APK
           path: calc-deliverables/*
           retention-days: 90
 
@@ -114,13 +134,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="vision-calc-v1.0.0"
-          apk="calc-deliverables/VISION_CALC_v1.0.0_SCIENTIFIC_APK.apk"
+          tag="vision-calc-v1.1.0"
+          apk="calc-deliverables/VISION_CALC_v1.1.0_PREMIUM_UI_APK.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$apk" calc-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$apk" calc-deliverables/SHA256SUMS.txt \
-              --title "VISION CALC 1.0 • Scientific Calculator + 12 Unit Converters" \
-              --notes "VISION CALC by Saurabh's Vision: a genuine native Android scientific calculator. Offline arithmetic, brackets, powers, factorial, trig DEG/RAD, logarithms, combinatorics and permutations, constants, ANS and memory. A 12-category converter handles length, mass, temperature, area, volume, time, speed, pressure, energy, angle, data and frequency. Local-only history, copy result, accessible dark navy/cyan/gold keypad. No login, no ads, no Internet permissions or data collection. Java core math tests and Android signature validation run in CI. Debug-signed TEST APK, not Play Store production package. Smartphone manual UI checks remain recommended. IEEE-754 double precision limitations apply." \
+              --title "VISION CALC 1.1 • Premium Light Calculator + Scientific Tools" \
+              --notes "VISION CALC 1.1 by Saurabh's Vision updates the native Android interface using a premium light lavender/pearl design inspired by the user's screenshot. Bigger, fully functional FOUR-COLUMN rounded-pill numeric buttons (AC, parentheses, %, divide, digits, multiply, minus, plus, backspace, equals) are laid out responsively to use screen height effectively. The formerly empty upper space contains a large live calculation/result display, recent-result preview, angle toggle, quick scientific tools and memory controls. Expand scientific functions or switch Light/Dark appearance without losing calculations. Unit Converter and local History also receive coherent light-theme styling; earlier scientific calculations, offline privacy and all 12 converters are preserved. Fixed π/√ chip insertion and added comma for nCr/nPr inputs. CI tests expression accuracy, screen layout source, Android build and APK signature. This is a debug-signed TEST APK; please verify actual device layouts. IEEE-754 math precision limits apply." \
               --latest=false
           fi
