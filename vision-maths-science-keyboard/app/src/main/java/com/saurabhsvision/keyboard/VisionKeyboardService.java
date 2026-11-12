@@ -38,9 +38,7 @@ public final class VisionKeyboardService extends InputMethodService {
     private static final int ABC=0,NUMBER=1,MATH=2,SCIENCE=3,EMOJI=4,LANGUAGE=5;
     private static final int EMOJIS_PER_PAGE=32;
     private int emojiCategory=0,emojiPage=0;
-    private static final int[] ACCENTS={0xff65e9ff,0xffffd55c,0xff9affd4,0xffeea8ff,0xff2563eb};
-    private static final int[] DARK={0xff071537,0xff1c1641,0xff061e32,0xff1a1040,0xffffffff};
-    private static final int[] KEY_COLORS={0xd91b3561,0xdb45375e,0xdb21485b,0xdb3c2b67,0xfff8fbff};
+    private static final int[] ACCENTS=ThemePalette.ACCENTS;
     private KeyboardPanel keyboardFrame;
     private LinearLayout keysContent;
     private int mode=ABC,theme=0;
@@ -61,7 +59,7 @@ public final class VisionKeyboardService extends InputMethodService {
 
     @Override public void onCreate(){
         super.onCreate();
-        theme=Math.floorMod(getSharedPreferences(PREFS,MODE_PRIVATE).getInt(KEY_THEME,0),5);
+        theme=ThemePalette.norm(getSharedPreferences(PREFS,MODE_PRIVATE).getInt(KEY_THEME,0));
         selectedLanguage=IndicLanguages.norm(settings().getInt("language",IndicLanguages.ENGLISH));
     }
     private int dp(float value){
@@ -102,7 +100,7 @@ public final class VisionKeyboardService extends InputMethodService {
     }
     @Override public void onStartInputView(EditorInfo info,boolean restarting){
         super.onStartInputView(info,restarting);
-        theme=Math.floorMod(settings().getInt(KEY_THEME,0),5);
+        theme=ThemePalette.norm(settings().getInt(KEY_THEME,0));
         selectedLanguage=IndicLanguages.norm(settings().getInt("language",IndicLanguages.ENGLISH));
         sensitiveField=isPasswordField(info);
         if(keyboardFrame!=null)rebuild();
@@ -125,7 +123,7 @@ public final class VisionKeyboardService extends InputMethodService {
         repeatHandler.removeCallbacksAndMessages(null);
         super.onDestroy();
     }
-    private boolean light(){return theme==4;}
+    private boolean light(){return ThemePalette.isLight(theme);}
     private void rebuild(){
         if(keyboardFrame==null)return;
         keyboardFrame.removeAllViews();
@@ -242,18 +240,22 @@ public final class VisionKeyboardService extends InputMethodService {
             tab.setTextSize(i<2?15:((i==2||i==3)?13:20));
             tab.setTypeface(Typeface.create("sans-serif-medium",Typeface.BOLD));
             boolean chosen=index<5&&mode==index;
-            tab.setTextColor(chosen?(light()?Color.WHITE:0xff041b33):
+            tab.setTextColor(chosen?(theme>=5?ThemePalette.ON_ACCENT[theme]:
+                    (light()?Color.WHITE:0xff041b33)):
                 (light()?0xff193c69:Color.WHITE));
             GradientDrawable background=new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
                 chosen?
-                    (light()?new int[]{0xff387cfa,0xff235dd1}:
-                        new int[]{0xff7bffff,0xff0ed5ee}):
-                    (light()?new int[]{0xfff4f8fd,0xffdce7f4}:
-                        new int[]{0xff19476d,0xff061d3c}));
+                    (theme>=5?new int[]{ThemePalette.ENTER_TOP[theme],ThemePalette.ENTER_BOTTOM[theme]}:
+                        (light()?new int[]{0xff387cfa,0xff235dd1}:
+                            new int[]{0xff7bffff,0xff0ed5ee})):
+                    (theme>=5?
+                        new int[]{ThemePalette.FUNCTION_TOP[theme],ThemePalette.FUNCTION_BOTTOM[theme]}:
+                        (light()?new int[]{0xfff4f8fd,0xffdce7f4}:
+                            new int[]{0xff19476d,0xff061d3c})));
             background.setCornerRadius(dp(15));
             background.setStroke(dp(1),chosen?ACCENTS[theme]:
-                (light()?0xffbfd4ed:0xff29cfff));
+                (theme>=5?ThemePalette.STROKE[theme]:(light()?0xffbfd4ed:0xff29cfff)));
             tab.setBackground(new RippleDrawable(
                 ColorStateList.valueOf(light()?0x332b61c6:0x55b5ffff),
                 background,null));
@@ -274,7 +276,7 @@ public final class VisionKeyboardService extends InputMethodService {
                 }else if(index==5){
                     finishRomanWord();mode=LANGUAGE;rebuild();
                 }else if(index==6){
-                    theme=(theme+1)%5;
+                    theme=(theme+1)%ThemePalette.count();
                     settings().edit().putInt(KEY_THEME,theme).apply();rebuild();
                 }else{
                     finishRomanWord();
@@ -447,7 +449,7 @@ public final class VisionKeyboardService extends InputMethodService {
                 item.setTextSize(12);
                 item.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
                 boolean current=i==selectedLanguage;
-                item.setTextColor(current?DARK[theme]:(light()?0xff253955:Color.WHITE));
+                item.setTextColor(current?ThemePalette.ON_ACCENT[theme]:(light()?0xff253955:Color.WHITE));
                 GradientDrawable shape=new GradientDrawable();
                 shape.setColor(current?ACCENTS[theme]:(light()?0xffe6edf9:0xaa20395c));
                 shape.setCornerRadius(dp(11));
@@ -552,14 +554,14 @@ public final class VisionKeyboardService extends InputMethodService {
         LinearLayout categories=new LinearLayout(this);
         categories.setOrientation(LinearLayout.HORIZONTAL);
         categories.setGravity(Gravity.CENTER_VERTICAL);
-        String[] icons={"😀","🥰","😢","👋","🧑","🐼","🌿","🍕","🎉","💯","🧬"};
+        String[] icons={"😀","🥰","😢","👋","🧑","🐼","🌿","🍕","🎉","💯","🧬","🎭"};
         for(int i=0;i<EmojiCatalog.count();i++){
             final int category=i;
             TextView chip=new TextView(this);
             chip.setGravity(Gravity.CENTER);
             chip.setText(icons[i]+" "+EmojiCatalog.title(i));
             chip.setTextSize(12);
-            chip.setTextColor(category==emojiCategory?DARK[theme]:(light()?0xff263a56:Color.WHITE));
+            chip.setTextColor(category==emojiCategory?ThemePalette.ON_ACCENT[theme]:(light()?0xff263a56:Color.WHITE));
             chip.setContentDescription(EmojiCatalog.title(i)+" emojis");
             GradientDrawable shape=new GradientDrawable();
             shape.setColor(i==emojiCategory?ACCENTS[theme]:(light()?0xffe2eaf5:0x7a1a3560));
@@ -648,7 +650,7 @@ public final class VisionKeyboardService extends InputMethodService {
     }
     private void addKey(LinearLayout row,String display,String output,float weight,int height,boolean special){
         SBoardKeyButton b=new SBoardKeyButton(this);
-        b.setSpaceIndicator("SPACE".equals(output),light());
+        b.setSpaceIndicator("SPACE".equals(output),light(),ACCENTS[theme]);
         b.setAllCaps(false);
         b.setGravity(Gravity.CENTER);
         b.setText(display);
@@ -661,19 +663,28 @@ public final class VisionKeyboardService extends InputMethodService {
             special||isAction(output)?Typeface.BOLD:Typeface.NORMAL));
         final boolean enter="ENTER".equals(output);
         final boolean functionKey=special||isAction(output);
-        b.setTextColor(light()?
-            (enter?Color.WHITE:(functionKey?0xff2056bb:0xff162338)):
-            (enter?0xff082440:("SPACE".equals(output)?Color.WHITE:
-                (functionKey?0xffadf9ff:Color.WHITE))));
+        b.setTextColor(theme>=5?
+            (enter?ThemePalette.ON_ACCENT[theme]:ThemePalette.TEXT[theme]):
+            (light()? (enter?Color.WHITE:(functionKey?0xff2056bb:0xff162338)):
+             (enter?0xff082440:("SPACE".equals(output)?Color.WHITE:
+                (functionKey?0xffadf9ff:Color.WHITE)))));
         b.setPadding(0,0,0,0);b.setMinimumHeight(0);b.setMinHeight(0);
         b.setMinimumWidth(0);b.setMinWidth(0);
         int upper,lower,stroke;
-        if(light()){
+        if(theme>=5){
+            upper=enter?ThemePalette.ENTER_TOP[theme]:
+                ("SPACE".equals(output)?ThemePalette.SPACE_TOP[theme]:
+                    (functionKey?ThemePalette.FUNCTION_TOP[theme]:ThemePalette.KEY_TOP[theme]));
+            lower=enter?ThemePalette.ENTER_BOTTOM[theme]:
+                ("SPACE".equals(output)?ThemePalette.SPACE_BOTTOM[theme]:
+                    (functionKey?ThemePalette.FUNCTION_BOTTOM[theme]:ThemePalette.KEY_BOTTOM[theme]));
+            stroke=ThemePalette.STROKE[theme];
+        }else if(light()){
             upper=enter?0xff3c82f6:(functionKey?0xffe6eefb:0xffffffff);
             lower=enter?0xff1d55cf:(functionKey?0xffdbe7f8:0xfff7faff);
             stroke=enter?0xff245fd7:0xffcbd6e6;
         }else{
-            // Glossy neon navy keycaps like the supplied visual design.
+            // Preserve the already-approved original glossy neon-blue keycaps.
             upper=enter?0xff68ffff:("SPACE".equals(output)?0xff2865a4:
                 (functionKey?0xff1c4a80:0xff2d6397));
             lower=enter?0xff0bbce9:("SPACE".equals(output)?0xff082753:
