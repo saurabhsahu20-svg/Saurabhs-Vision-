@@ -236,6 +236,28 @@ public final class ExpressionEngine {
                         throw new CalcException("Tangent is undefined at this angle");
                     return finite(Math.tan(rad));
                 }
+                case "cot":{
+                    oneArg(args,name);
+                    double angle=degreesToRadians(n);
+                    double sin=Math.sin(angle);
+                    if(Math.abs(sin)<1e-13)
+                        throw new CalcException("Cotangent is undefined at this angle");
+                    return trigRounded(finite(Math.cos(angle)/sin));
+                }
+                case "sec":{
+                    oneArg(args,name);
+                    double cosine=Math.cos(degreesToRadians(n));
+                    if(Math.abs(cosine)<1e-13)
+                        throw new CalcException("Secant is undefined at this angle");
+                    return finite(1/cosine);
+                }
+                case "csc":{
+                    oneArg(args,name);
+                    double sine=Math.sin(degreesToRadians(n));
+                    if(Math.abs(sine)<1e-13)
+                        throw new CalcException("Cosecant is undefined at this angle");
+                    return finite(1/sine);
+                }
                 case "asin":oneArg(args,name);return finite(radiansToDegrees(Math.asin(n)));
                 case "acos":oneArg(args,name);return finite(radiansToDegrees(Math.acos(n)));
                 case "atan":oneArg(args,name);return finite(radiansToDegrees(Math.atan(n)));
