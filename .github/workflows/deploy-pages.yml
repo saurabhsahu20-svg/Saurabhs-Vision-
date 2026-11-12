@@ -6,6 +6,8 @@ on:
     paths:
       - 'website/**'
       - '.github/workflows/deploy-pages.yml'
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
@@ -52,6 +54,8 @@ jobs:
           node website/tests/browser_smoke.mjs
       - name: Create static publish directory
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/saurabh-site"
@@ -130,6 +134,49 @@ jobs:
                   print('Linked CGBSE reader from hosted learning web app')
           print('Imported', count, 'public website app files including',len(samples),'JSON assets')
           PY
+          # Publish all CGBSE question-and-answer PDFs from the public release asset.
+          # No visitor uploads or ZIP-picker UI: each set is a direct static PDF.
+          RELEASE_TAG="cgbse-2026-27"
+          PDF_ARCHIVE="CGBSE_2026_27_All_1050_PDF_Booklets.zip"
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+              --pattern "$PDF_ARCHIVE" --dir "$RUNNER_TEMP"
+            python3 - <<'PY'
+          import os
+          from pathlib import Path, PurePosixPath
+          from zipfile import ZipFile
+          archive = Path(os.environ['RUNNER_TEMP']) / "CGBSE_2026_27_All_1050_PDF_Booklets.zip"
+          dest = Path(os.environ['RUNNER_TEMP']) / 'saurabh-site' / 'cgbse-solutions' / 'pdfs'
+          if not archive.exists():
+              raise SystemExit('Missing full PDF archive release asset')
+          with ZipFile(archive) as z:
+              members = [m for m in z.infolist() if not m.is_dir()]
+              if len(members) != 1050:
+                  raise SystemExit(f'Expected 1050 complete PDF booklets, got {len(members)}')
+              size_total = 0
+              for m in members:
+                  posix = PurePosixPath(m.filename)
+                  if (posix.is_absolute() or '..' in posix.parts or len(posix.parts) != 2
+                      or not posix.parts[0].startswith(('10_', '12_'))
+                      or not posix.name.startswith('Set_') or not posix.name.endswith('.pdf')
+                      or '\\' in m.filename or m.file_size > 30_000_000):
+                      raise SystemExit(f'Unsafe or unexpected PDF path: {m.filename}')
+                  size_total += m.file_size
+                  if size_total > 1_000_000_000:
+                      raise SystemExit('PDF archive exceeds static hosting limit')
+                  target = dest.joinpath(*posix.parts)
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  with z.open(m) as src, target.open('wb') as out:
+                      from shutil import copyfileobj
+                      copyfileobj(src, out)
+                  with target.open('rb') as check:
+                      if check.read(5) != b'%PDF-':
+                          raise SystemExit(f'Invalid PDF header: {m.filename}')
+          print(f'Published all {len(members)} model-paper + solution PDF files', flush=True)
+          PY
+          else
+            echo "CGBSE full-PDF release asset not yet published. Public PDF buttons will correctly report unavailable instead of showing samples."
+          fi
           touch "$RUNNER_TEMP/saurabh-site/.nojekyll"
           test -f "$RUNNER_TEMP/saurabh-site/index.html"
           test -f "$RUNNER_TEMP/saurabh-site/app.js"
