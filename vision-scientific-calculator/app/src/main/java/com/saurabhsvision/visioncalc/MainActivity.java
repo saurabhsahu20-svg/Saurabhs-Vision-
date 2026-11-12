@@ -157,13 +157,13 @@ public final class MainActivity extends Activity {
         scroll.setBackgroundColor(NAVY);
         root=new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setPadding(dp(13),dp(9),dp(13),dp(16));
+        root.setPadding(dp(11),dp(6),dp(11),dp(10));
         // Android 15 enforces edge-to-edge content on modern target SDKs.
         // Keep the last equals key and converter actions clear of the navbar.
         scroll.setOnApplyWindowInsetsListener((view,insets)->{
             int navInset=insets.getSystemWindowInsetBottom();
-            root.setPadding(dp(13),dp(9),dp(13),
-                Math.max(dp(16),navInset+dp(13)));
+            root.setPadding(dp(11),dp(6),dp(11),
+                Math.max(dp(10),navInset+dp(5)));
             return insets;
         });
         scroll.addView(root);
@@ -173,7 +173,7 @@ public final class MainActivity extends Activity {
         screen=new LinearLayout(this);
         screen.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams fill=new LinearLayout.LayoutParams(-1,-2);
-        fill.topMargin=dp(10);
+        fill.topMargin=dp(6);
         root.addView(screen,fill);
         showTab();
     }
@@ -183,12 +183,12 @@ public final class MainActivity extends Activity {
         ImageView icon=new ImageView(this);
         icon.setImageResource(R.drawable.ic_vision_calc);
         icon.setContentDescription("VISION CALC calculator logo");
-        row.addView(icon,new LinearLayout.LayoutParams(dp(45),dp(45)));
+        row.addView(icon,new LinearLayout.LayoutParams(dp(39),dp(39)));
 
         LinearLayout titles=new LinearLayout(this);
         titles.setOrientation(LinearLayout.VERTICAL);
         titles.setPadding(dp(9),0,0,0);
-        TextView brand=text("VISION CALC",21,WHITE,true);
+        TextView brand=text("VISION CALC",19,WHITE,true);
         titles.addView(brand);
         TextView tag=text("SAURABH'S VISION™  •  Learn & Calculate",10,MUTED,false);
         titles.addView(tag);
@@ -198,7 +198,7 @@ public final class MainActivity extends Activity {
         historyIcon.setGravity(Gravity.CENTER);
         historyIcon.setBackground(shape(CARD,14,0));
         historyIcon.setContentDescription("Open calculation history");
-        LinearLayout.LayoutParams hLp=new LinearLayout.LayoutParams(dp(42),dp(42));
+        LinearLayout.LayoutParams hLp=new LinearLayout.LayoutParams(dp(38),dp(38));
         hLp.rightMargin=dp(7);row.addView(historyIcon,hLp);
         historyIcon.setOnClickListener(v->{tab=2;buildUi();});
 
@@ -206,14 +206,14 @@ public final class MainActivity extends Activity {
         themeToggle.setGravity(Gravity.CENTER);
         themeToggle.setBackground(shape(CARD,14,0));
         themeToggle.setContentDescription(darkMode?"Switch to light theme":"Switch to dark theme");
-        row.addView(themeToggle,new LinearLayout.LayoutParams(dp(42),dp(42)));
+        row.addView(themeToggle,new LinearLayout.LayoutParams(dp(38),dp(38)));
         themeToggle.setOnClickListener(v->{
             darkMode=!darkMode;
             prefs.edit().putBoolean("darkMode",darkMode).apply();
             applyPalette();
             buildUi();
         });
-        add(root,row,4);
+        add(root,row,2);
     }
     private void buildTabs(){
         LinearLayout tabs=new LinearLayout(this);
@@ -228,13 +228,13 @@ public final class MainActivity extends Activity {
             chip.setSingleLine(true);
             chip.setTextScaleX(.94f);
             chip.setBackground(shape(i==tab?CYAN:CARD,13,0));
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(40),1f);
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(35),1f);
             lp.setMargins(dp(2),0,dp(2),0);
             tabs.addView(chip,lp);
             chip.setContentDescription("Open "+TAB_NAMES[i]+" tab");
             chip.setOnClickListener(v->{tab=index;buildUi();});
         }
-        add(root,tabs,12);
+        add(root,tabs,9);
     }
     private void showTab(){
         screen.removeAllViews();
@@ -291,7 +291,7 @@ public final class MainActivity extends Activity {
         final boolean compact=landscape();
         LinearLayout display=new LinearLayout(this);
         display.setOrientation(LinearLayout.VERTICAL);
-        display.setPadding(dp(17),dp(compact?10:14),dp(17),dp(12));
+        display.setPadding(dp(16),dp(compact?7:8),dp(16),dp(8));
         display.setBackground(darkMode?
             gradient(0xff12355a,0xff081e3b,23,0xff235b80):
             gradient(0xffffffff,0xfff0eff8,23,0xffe5e3ee));
@@ -299,14 +299,14 @@ public final class MainActivity extends Activity {
         LinearLayout displayHeading=new LinearLayout(this);
         displayHeading.setGravity(Gravity.CENTER_VERTICAL);
         TextView title=text("YOUR CALCULATION",11,MUTED,true);
-        displayHeading.addView(title,new LinearLayout.LayoutParams(0,dp(36),1f));
+        displayHeading.addView(title,new LinearLayout.LayoutParams(0,dp(29),1f));
         degreeButton=text(degrees?"DEG":"RAD",13,
             darkMode?NAVY:Color.WHITE,true);
         degreeButton.setGravity(Gravity.CENTER);
         degreeButton.setBackground(shape(CYAN,12,0));
         degreeButton.setContentDescription(
             "Angle mode: "+(degrees?"degrees":"radians")+". Tap to switch.");
-        displayHeading.addView(degreeButton,new LinearLayout.LayoutParams(dp(58),dp(36)));
+        displayHeading.addView(degreeButton,new LinearLayout.LayoutParams(dp(54),dp(29)));
         degreeButton.setOnClickListener(v->{
             degrees=!degrees;
             prefs.edit().putBoolean("degrees",degrees).apply();
@@ -318,23 +318,23 @@ public final class MainActivity extends Activity {
         add(display,displayHeading,0);
 
         expressionView=text(expression.isEmpty()?"0":displayExpression(expression),
-            compact?24:30,WHITE,true);
+            compact?23:27,WHITE,true);
         expressionView.setGravity(Gravity.END|Gravity.CENTER_VERTICAL);
         expressionView.setSingleLine(true);
         expressionView.setEllipsize(TextUtils.TruncateAt.START);
-        expressionView.setMinHeight(dp(compact?32:44));
-        add(display,expressionView,4);
+        expressionView.setMinHeight(dp(compact?27:30));
+        add(display,expressionView,2);
 
-        answerView=text("0",compact?34:43,GOLD,true);
+        answerView=text("0",compact?32:40,GOLD,true);
         answerView.setGravity(Gravity.END|Gravity.CENTER_VERTICAL);
         answerView.setSingleLine(true);
         answerView.setEllipsize(TextUtils.TruncateAt.START);
-        answerView.setMinHeight(dp(compact?42:55));
-        add(display,answerView,2);
+        answerView.setMinHeight(dp(compact?38:43));
+        add(display,answerView,0);
 
         statusView=text("OFFLINE  •  INSTANT RESULT",11,MUTED,false);
         statusView.setGravity(Gravity.END|Gravity.CENTER_VERTICAL);
-        add(display,statusView,1);
+        add(display,statusView,0);
         add(screen,display,0);
 
         LinearLayout recall=new LinearLayout(this);
@@ -342,28 +342,28 @@ public final class MainActivity extends Activity {
         TextView historyLabel=text("↶  "+recentResult(),11,MUTED,false);
         historyLabel.setSingleLine(true);
         historyLabel.setEllipsize(TextUtils.TruncateAt.END);
-        recall.addView(historyLabel,new LinearLayout.LayoutParams(0,dp(34),1f));
+        recall.addView(historyLabel,new LinearLayout.LayoutParams(0,dp(27),1f));
         TextView recallAction=text("HISTORY ›",10,CYAN,true);
         recallAction.setGravity(Gravity.CENTER);
-        recall.addView(recallAction,new LinearLayout.LayoutParams(dp(72),dp(34)));
+        recall.addView(recallAction,new LinearLayout.LayoutParams(dp(72),dp(27)));
         recall.setContentDescription("Open recent calculations");
         recall.setOnClickListener(v->{tab=2;buildUi();});
-        add(screen,recall,3);
+        add(screen,recall,1);
 
         LinearLayout toolTitle=new LinearLayout(this);
         toolTitle.setGravity(Gravity.CENTER_VERTICAL);
         TextView scienceLabel=text("∑  SCIENTIFIC TOOLS",12,WHITE,true);
-        toolTitle.addView(scienceLabel,new LinearLayout.LayoutParams(0,dp(30),1f));
+        toolTitle.addView(scienceLabel,new LinearLayout.LayoutParams(0,dp(26),1f));
         TextView expand=text(scientificOpen?"SHOW LESS  ⌃":"SHOW ALL  ⌄",11,CYAN,true);
         expand.setGravity(Gravity.CENTER);
-        toolTitle.addView(expand,new LinearLayout.LayoutParams(dp(108),dp(34)));
+        toolTitle.addView(expand,new LinearLayout.LayoutParams(dp(108),dp(26)));
         toolTitle.setContentDescription("Expand or collapse scientific functions");
         toolTitle.setOnClickListener(v->{
             scientificOpen=!scientificOpen;
             prefs.edit().putBoolean("scientificOpen",scientificOpen).apply();
             buildUi();
         });
-        add(screen,toolTitle,5);
+        add(screen,toolTitle,1);
 
         HorizontalScrollView chipsScroll=new HorizontalScrollView(this);
         chipsScroll.setHorizontalScrollBarEnabled(false);
@@ -376,7 +376,7 @@ public final class MainActivity extends Activity {
         for(String token:quick){
             Button chip=compactChip(token);
             LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(
-                dp(token.length()>3?66:58),dp(43));
+                dp(token.length()>3?65:57),dp(38));
             lp.setMargins(0,0,dp(6),0);
             chips.addView(chip,lp);
             chip.setOnClickListener(v->appendFunction(token));
@@ -390,7 +390,7 @@ public final class MainActivity extends Activity {
             for(String token:extra){
                 Button chip=compactChip(token);
                 LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(
-                    dp(token.length()>4?73:61),dp(43));
+                    dp(token.length()>4?72:60),dp(38));
                 lp.setMargins(0,0,dp(6),0);
                 row.addView(chip,lp);
                 chip.setOnClickListener(v->appendFunction(token));
@@ -403,19 +403,19 @@ public final class MainActivity extends Activity {
         for(String token:new String[]{"MC","MR","M+","M−","MS","COPY"}){
             Button b=compactChip(token);
             b.setTextSize(11);
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(37),1);
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(31),1);
             lp.setMargins(dp(2),0,dp(2),0);
             memoryRow.addView(b,lp);
             b.setOnClickListener(v->onMemory(token));
         }
-        add(screen,memoryRow,9);
+        add(screen,memoryRow,6);
 
         // Keyboard remains part of the scrollable content. Avoid clipping the
         // final '=' row when an OEM reports less vertical space than expected.
         // A small adaptive gap is used on tall screens, never forced overflow.
         float availableDp=getResources().getDisplayMetrics().heightPixels/
             getResources().getDisplayMetrics().density;
-        int gapDp=landscape()?3:Math.max(4,(int)Math.min(33,(availableDp-740)/4));
+        int gapDp=landscape()?2:Math.max(2,(int)Math.min(10,(availableDp-760)/6));
         View flexibleSpace=new View(this);
         screen.addView(flexibleSpace,new LinearLayout.LayoutParams(-1,dp(gapDp)));
 
@@ -428,8 +428,8 @@ public final class MainActivity extends Activity {
         };
         float heightDp=getResources().getDisplayMetrics().heightPixels/
             getResources().getDisplayMetrics().density;
-        float sized=(heightDp-(compact?220:404))/5f;
-        int keyHeight=dp(Math.max(compact?48:55,Math.min(compact?67:83,sized)));
+        float sized=(heightDp-(compact?235:425))/5f;
+        int keyHeight=dp(Math.max(compact?48:53,Math.min(compact?65:81,sized)));
         for(String[] keys:rows){
             LinearLayout row=new LinearLayout(this);
             row.setGravity(Gravity.CENTER_VERTICAL);
@@ -438,15 +438,15 @@ public final class MainActivity extends Activity {
                     (key.equals("()")||("÷×−+%".contains(key)&&key.length()==1)),
                     key.equals("AC"),key.equals("="));
                 LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,keyHeight,1f);
-                lp.setMargins(dp(2),dp(3),dp(2),dp(3));
+                lp.setMargins(dp(2),dp(2),dp(2),dp(2));
                 row.addView(b,lp);
                 b.setOnClickListener(v->onKey(key));
             }
             add(screen,row,0);
         }
-        TextView footer=text("CALCULATE SMART  •  LEARN BETTER",10,MUTED,true);
+        TextView footer=text("CALCULATE SMART  •  LEARN BETTER",9,MUTED,true);
         footer.setGravity(Gravity.CENTER);
-        add(screen,footer,9);
+        add(screen,footer,4);
         updatePreview();
     }
     private void appendFunction(String f){
