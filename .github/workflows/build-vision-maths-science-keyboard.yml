@@ -91,7 +91,11 @@ jobs:
           assert 'Math.floorMod(theme,5)' in bg
           assert 'theme=(theme+1)%5' in ime
           assert 'theme==4' in ime
-          assert 'scaleX(.96f)' in ime
+          assert 'scaleX(.985f)' in ime
+          assert 'setDuration(35).start()' in ime
+          assert 'lp.setMargins(dp(1.5f),dp(1.0f),dp(1.5f),dp(2.0f));' in ime
+          assert 'conn.beginBatchEdit()' in ime and 'conn.endBatchEdit()' in ime
+          assert 'Do not duplicate the same expensive InputConnection lookup' in ime
           assert 'setCornerRadius(dp(14))' in ime
           assert 'Pure White' in activity and 'keyPreview' in activity
           assert 'addKey(row,"Space","SPACE",4.35f' in ime
@@ -214,6 +218,19 @@ jobs:
           javac -encoding UTF-8 -d "$out" "$src/WordSuggestions.java" "$base/WordSuggestionsSmokeTest.java"
           java -ea -cp "$out" WordSuggestionsSmokeTest
 
+      - name: Benchmark offline suggestion and Hindi typing accuracy
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="vision-maths-science-keyboard"
+          src="$base/app/src/main/java/com/saurabhsvision/keyboard"
+          out="$RUNNER_TEMP/s-board-typing-speed"
+          mkdir -p "$out"
+          javac -encoding UTF-8 -d "$out" \
+            "$src/IndicLanguages.java" "$src/OfflinePhonetic.java" \
+            "$src/WordSuggestions.java" "$base/TypingSpeedAccuracySmokeTest.java"
+          java -ea -cp "$out" TypingSpeedAccuracySmokeTest
+
       - name: Compile APK
         shell: bash
         run: |
@@ -232,13 +249,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.5_REAL_IME_FIX.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.6_FAST_ACCURATE_TYPING.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_5_REAL_IME_FIX_APK
+          name: S_Board_v1_9_6_FAST_ACCURATE_TYPING_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -248,14 +265,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.5"
-          file="keyboard-deliverables/S_Board_v1.9.5_REAL_IME_FIX.apk"
+          tag="s-board-v1.9.6"
+          file="keyboard-deliverables/S_Board_v1.9.6_FAST_ACCURATE_TYPING.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.9.5 • Full Spacebar & Android Navigation Fix" \
-              --notes "S Board 1.9.5 fixes the cropped bottom Space/Enter row using Android 15 IME navigation-bar compatibility rather than another padding-only adjustment. The debug sideload build temporarily targets SDK 34 to avoid Android 15's enforced edge-to-edge navigation overlay, while still compiling with SDK 35. The keyboard reads the physical display dimensions and requests its true safe landscape height, with only 8dp internal bottom spacing. QWERTY's three complete rows plus a fourth row with Space, emoji, Hindi-English, punctuation and Enter remain intact. Maths, Science, offline phonetic languages and the neon theme are unchanged. Automated tests verify layout, Hindi typing, signing and an Android 15 emulator Space-key visibility probe. Please verify on the actual phone before treating the OEM-specific issue as resolved; target SDK must be modernized again with proper insets for Play Store submission." \
+              --title "S Board 1.9.6 • Speed & Accuracy Update" \
+              --notes "S Board 1.9.6 performance and accuracy release. Preserves the working 1.9.5 neon layout, QWERTY rows and fully visible Spacebar. Removes duplicate phonetic suggestion refresh, batches suggestion replacement into one editor operation, increases key tap area slightly without changing row order, and shortens keypress animations to 35/45ms. Adds common Hindi Roman spellings such as aapne, banao, neeche, upar, keyboard and spacebar to the offline transliteration lexicon. No Internet, keystroke logging or data collection. GitHub CI checks Hindi/English output, offline core throughput, Android build and signature. Benchmark measures a JVM algorithm core—not real phone typing speed or accuracy; physical handset testing is recommended. This remains a debug-signed test APK targeting SDK34 for Android navigation compatibility." \
               --latest=false
           fi
 
