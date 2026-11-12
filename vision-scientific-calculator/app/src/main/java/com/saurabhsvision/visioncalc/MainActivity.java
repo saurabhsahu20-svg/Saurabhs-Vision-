@@ -417,6 +417,210 @@ public final class MainActivity extends Activity {
         }catch(Exception ignored){}
         return "Try sin(30) × 200  or  (2+3)²";
     }
+
+    /**
+     * S CALC Pro: designed from the user's neon scientific keypad reference.
+     * All visible keys have real operations. Unsupported symbolic integration
+     * or matrix solvers are NOT represented as functional controls.
+     */
+    private Button proScientificKey(String label,boolean selected){
+        boolean yellow=label.equals("DEG")||label.equals("RAD");
+        int top=selected?0xffffd95a:darkMode?0xff24518b:0xffd9e8ff;
+        int bottom=selected?0xffffa400:darkMode?0xff071c3f:0xffc4d5f5;
+        int outline=yellow?0xffffc53f:darkMode?0xff35c6ff:0xff659fd2;
+        int fg=selected?0xff182746:darkMode?0xffffffff:0xff16355d;
+        Button b=button(label,top,bottom,outline,fg);
+        b.setBackground(gradient(top,bottom,12,outline));
+        b.setTextSize(label.length()>=4?12:label.length()>=3?14:17);
+        b.setElevation(0);
+        b.setContentDescription("Scientific "+label);
+        return b;
+    }
+    private Button proNumberKey(String label){
+        boolean digit=label.matches("[0-9.]")||label.equals("EXP");
+        boolean equals=label.equals("=");
+        boolean clear=label.equals("AC")||label.equals("⌫");
+        int top,bottom,border,ink;
+        if(equals){
+            top=0xffffc33c;bottom=0xffe75b07;border=0xffffd771;ink=0xffffffff;
+        }else if(clear){
+            top=0xffb121d3;bottom=0xff5714a4;border=0xffff79f4;ink=0xffffffff;
+        }else if(digit){
+            top=0xfffcfeff;bottom=0xffc4d7f5;border=0xff8abaff;ink=0xff081c39;
+        }else{
+            top=0xff1767b3;bottom=0xff052250;border=0xff3bcbff;ink=0xffffffff;
+        }
+        Button b=button(label,top,bottom,border,ink);
+        b.setTextSize(label.length()>2?17:25);
+        b.setBackground(gradient(top,bottom,13,border));
+        b.setContentDescription(label.equals("=")?"Calculate result":
+            label.equals("⌫")?"Delete last character":
+            label.equals("AC")?"Clear all":
+            label.equals("EXP")?"Scientific exponent notation":label);
+        return b;
+    }
+    private void pressProScience(String label){
+        switch(label){
+            case "DEG":
+                degrees=true;
+                prefs.edit().putBoolean("degrees",true).apply();
+                buildUi();return;
+            case "RAD":
+                degrees=false;
+                prefs.edit().putBoolean("degrees",false).apply();
+                buildUi();return;
+            case "10ˣ":appendFunction("10^x");return;
+            case "eˣ":appendFunction("exp");return;
+            case "x²":appendFunction("x²");return;
+            case "x³":appendFunction("x³");return;
+            case "√x":appendFunction("sqrt");return;
+            case "∛x":appendFunction("cbrt");return;
+            case "|x|":appendFunction("abs");return;
+            case "x!":onKey("!");return;
+            case "%":onKey("%");return;
+            case "(":case ")":onKey(label);return;
+            default:appendFunction(label);return;
+        }
+    }
+    private void buildProCalculator(){
+        boolean small=landscape()||
+            getResources().getDisplayMetrics().heightPixels/
+                getResources().getDisplayMetrics().density<710;
+        // Icy display face — text is LIVE, never a hard-coded integral answer.
+        LinearLayout display=new LinearLayout(this);
+        display.setOrientation(LinearLayout.VERTICAL);
+        display.setPadding(dp(14),dp(9),dp(14),dp(9));
+        display.setBackground(gradient(
+            darkMode?0xffd7efff:0xffeef8ff,
+            darkMode?0xff8bc3ef:0xffc3e5ff,17,0xff46caff));
+        LinearLayout headline=new LinearLayout(this);
+        headline.setGravity(Gravity.CENTER_VERTICAL);
+        TextView title=text("S VISION  •  LIVE CALCULATION",12,0xff19416e,true);
+        headline.addView(title,new LinearLayout.LayoutParams(0,dp(30),1));
+        degreeButton=text(degrees?"DEG":"RAD",13,0xff0a315b,true);
+        degreeButton.setGravity(Gravity.CENTER);
+        degreeButton.setBackground(shape(0xffffd45a,9,0xffdeaa35));
+        headline.addView(degreeButton,
+            new LinearLayout.LayoutParams(dp(57),dp(30)));
+        degreeButton.setOnClickListener(v->{
+            degrees=!degrees;
+            prefs.edit().putBoolean("degrees",degrees).apply();
+            buildUi();
+        });
+        add(display,headline,0);
+
+        expressionView=text(expression.isEmpty()?"0":displayExpression(expression),
+            small?20:26,0xff0a2245,true);
+        expressionView.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        expressionView.setSingleLine(true);
+        expressionView.setEllipsize(TextUtils.TruncateAt.START);
+        expressionView.setMinHeight(dp(small?29:37));
+        add(display,expressionView,2);
+        answerView=text("0",small?27:38,0xff0b386d,true);
+        answerView.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        answerView.setSingleLine(true);
+        answerView.setEllipsize(TextUtils.TruncateAt.START);
+        answerView.setMinHeight(dp(small?34:47));
+        add(display,answerView,0);
+        statusView=text("Scientific • Offline • DEG / RAD",10,0xff345c85,false);
+        statusView.setGravity(Gravity.RIGHT);
+        add(display,statusView,2);
+        add(screen,display,0);
+
+        String[][] sciences={
+            {"sin","cos","tan","cot","sec","csc"},
+            {"log","ln","10ˣ","eˣ","x²","x³"},
+            {"√x","∛x","|x|","π","nCr","nPr"},
+            {"(",")","x!","%","DEG","RAD"}
+        };
+        LinearLayout sciPanel=new LinearLayout(this);
+        sciPanel.setOrientation(LinearLayout.VERTICAL);
+        int sciHeight=dp(small?37:47);
+        for(String[] line:sciences){
+            LinearLayout row=new LinearLayout(this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            for(String key:line){
+                boolean selected=(key.equals("DEG")&&degrees)||
+                    (key.equals("RAD")&&!degrees);
+                Button b=proScientificKey(key,selected);
+                LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,sciHeight,1);
+                lp.setMargins(dp(2),dp(2),dp(2),dp(2));
+                row.addView(b,lp);
+                b.setOnClickListener(v->pressProScience(key));
+            }
+            sciPanel.addView(row,new LinearLayout.LayoutParams(-1,-2));
+        }
+        add(screen,sciPanel,8);
+
+        // Additional maths are real functions, not placeholders.
+        if(tab==1||scientificOpen){
+            HorizontalScrollView advanced=new HorizontalScrollView(this);
+            advanced.setHorizontalScrollBarEnabled(false);
+            LinearLayout options=new LinearLayout(this);
+            for(String label:new String[]{"asin","acos","atan","sinh","cosh",
+                    "tanh","abs","floor","ceil","mod","gcd","lcm","root",
+                    "1/x","nCr",",","nPr","min","max","pow","φ","τ","e"}){
+                Button b=proScientificKey(label,false);
+                LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(69),dp(43));
+                lp.setMargins(dp(2),0,dp(4),0);
+                options.addView(b,lp);
+                b.setOnClickListener(v->appendFunction(label));
+            }
+            advanced.addView(options);
+            add(screen,advanced,4);
+        }
+
+        String[][] numeric={
+            {"7","8","9","AC","⌫"},
+            {"4","5","6","×","÷"},
+            {"1","2","3","+","−"},
+            {"0",".","EXP","Ans","="}
+        };
+        int numberHeight=dp(small?48:65);
+        for(String[] line:numeric){
+            LinearLayout row=new LinearLayout(this);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            keypadRows.add(row);
+            for(String key:line){
+                Button b=proNumberKey(key);
+                LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,numberHeight,1);
+                lp.setMargins(dp(2),dp(3),dp(2),dp(3));
+                row.addView(b,lp);
+                b.setOnClickListener(v->onKey(key));
+            }
+            add(screen,row,0);
+        }
+
+        // Functional shortcuts styled after the reference's bottom tool rail.
+        LinearLayout shortcuts=new LinearLayout(this);
+        String[] actions={"ƒ(x) FUNCTIONS","⇄ CONVERTER","◷ HISTORY","▣ COPY"};
+        for(int i=0;i<actions.length;i++){
+            final int id=i;
+            TextView link=text(actions[i],9,0xffffdf7d,true);
+            link.setGravity(Gravity.CENTER);
+            link.setSingleLine(true);
+            link.setBackground(gradient(0xff1b3e73,0xff081d43,10,0xff458fd8));
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(40),1);
+            lp.setMargins(dp(2),0,dp(2),0);
+            shortcuts.addView(link,lp);
+            link.setContentDescription(actions[i]);
+            link.setOnClickListener(v->{
+                switch(id){
+                    case 0:tab=1;buildUi();break;
+                    case 1:tab=2;buildUi();break;
+                    case 2:tab=3;buildUi();break;
+                    case 3:onMemory("COPY");break;
+                    default:break;
+                }
+            });
+        }
+        add(screen,shortcuts,9);
+        TextView footer=text("S CALC  •  SAURABH'S VISION™",10,MUTED,true);
+        footer.setGravity(Gravity.CENTER);
+        add(screen,footer,7);
+        keypadFooter=footer;
+        updatePreview();
+    }
     private void buildCalculator(){
         final boolean compact=landscape();
         LinearLayout display=new LinearLayout(this);
