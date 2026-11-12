@@ -197,14 +197,14 @@ public final class MainActivity extends Activity {
         if(tab!=0||keypadRows.size()!=5||keypadFooter==null||
             scroll.getHeight()<=0||screen.getParent()!=root)return;
         int footerBottom=screen.getTop()+keypadFooter.getBottom();
-        int unused=scroll.getHeight()-footerBottom-root.getPaddingBottom()-dp(10);
-        // On small screens there is no unused space: keep existing key sizes
-        // and allow the ScrollView to scroll the complete numeric keypad.
-        if(unused<=dp(8))return;
         int currentKeyHeight=((LinearLayout.LayoutParams)
             keypadRows.get(0).getChildAt(0).getLayoutParams()).height;
         int maxHeight=dp(landscape()?96:155);
-        int extraPerRow=Math.min(unused/5,Math.max(0,maxHeight-currentKeyHeight));
+        // On short screens the policy returns zero; the ScrollView retains
+        // its full keypad, whereas tall screens expand each of the five rows.
+        int extraPerRow=CalculatorLayoutPolicy.extraPerKeyRow(
+            scroll.getHeight(),footerBottom,root.getPaddingBottom(),dp(10),
+            currentKeyHeight,maxHeight,keypadRows.size());
         if(extraPerRow<=0)return;
         keyExpansionPx+=extraPerRow;
         for(LinearLayout row:keypadRows){
