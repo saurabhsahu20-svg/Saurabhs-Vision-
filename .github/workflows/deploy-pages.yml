@@ -139,9 +139,10 @@ jobs:
           RELEASE_TAG="cgbse-2026-27"
           PDF_ARCHIVE="CGBSE_2026_27_All_1050_PDF_Booklets.zip"
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
-              --pattern "$PDF_ARCHIVE" --dir "$RUNNER_TEMP"
-            python3 - <<'PY'
+            if gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+              --pattern "$PDF_ARCHIVE" --dir "$RUNNER_TEMP"; then
+              echo "Using the existing 1050 finished PDF booklets"
+              python3 - <<'PY'
           import os
           from pathlib import Path, PurePosixPath
           from zipfile import ZipFile
@@ -174,8 +175,23 @@ jobs:
                           raise SystemExit(f'Invalid PDF header: {m.filename}')
           print(f'Published all {len(members)} model-paper + solution PDF files', flush=True)
           PY
+            elif gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+              --pattern "CGBSE_2026_27_Teacher_Papers_And_Answer_Guides.zip" --dir "$RUNNER_TEMP"; then
+              echo "Converting compact teacher question-and-answer archive to all 1050 PDF booklets"
+              sudo apt-get update -qq
+              sudo apt-get install -y -qq fonts-noto-core
+              python3 -m venv "$RUNNER_TEMP/cgbse-pdf-venv"
+              "$RUNNER_TEMP/cgbse-pdf-venv/bin/pip" install -q "weasyprint>=63,<70"
+              "$RUNNER_TEMP/cgbse-pdf-venv/bin/python" \
+                website/cgbse-solutions/build_pdfs_from_html.py \
+                "$RUNNER_TEMP/CGBSE_2026_27_Teacher_Papers_And_Answer_Guides.zip" \
+                "$RUNNER_TEMP/saurabh-site/cgbse-solutions/pdfs"
+            else
+              echo "The release exists but does not contain a supported full question-and-answer archive."
+              exit 1
+            fi
           else
-            echo "CGBSE full-PDF release asset not yet published. Public PDF buttons will correctly report unavailable instead of showing samples."
+            echo "CGBSE release not yet published. Buttons will correctly show that full PDFs are unavailable rather than fake samples."
           fi
           touch "$RUNNER_TEMP/saurabh-site/.nojekyll"
           test -f "$RUNNER_TEMP/saurabh-site/index.html"
