@@ -31,8 +31,8 @@ public final class MainActivity extends Activity {
     private static final String PREFS="vision_keyboard_settings";
     private static final int NAVY=0xff061631;
     private static final int GOLD=0xffffd45c;
-    private static final int[] ACCENTS={0xff65e9ff,0xffffd55c,0xff9affd4,0xffeea8ff,0xff2563eb};
-    private static final String[] NAMES={"Cosmic Blue","Golden Mathematics","Science Lab","Purple Quantum","Pure White"};
+    private static final int[] ACCENTS=ThemePalette.ACCENTS;
+    private static final String[] NAMES=ThemePalette.NAMES;
     private LinearLayout root;
     private TextView themeStatus;
     private TextView setupStatus;
@@ -203,7 +203,7 @@ public final class MainActivity extends Activity {
         refreshSuggestions.run();
 
         add(root,text("🎨 Premium Keyboard Themes",21,NAVY,true),29);
-        add(root,text("5 professional themes • 4 Neon + 1 Pure White / Light",13,0xff54708e,false),5);
+        add(root,text("11 designer themes • Blue, Maroon, Silver, Green, Gold, Purple, Rose & more",13,0xff54708e,false),5);
         themeStatus=text("",15,0xff16519a,true);
         add(root,themeStatus,10);
         LinearLayout themeColumn=new LinearLayout(this);
@@ -213,17 +213,19 @@ public final class MainActivity extends Activity {
             final int index=i;
             LinearLayout card=new LinearLayout(this);
             card.setGravity(Gravity.CENTER_VERTICAL);
-            GradientDrawable cardBg=box(i==4?0xfffcfdff:(i%2==0?Color.WHITE:0xffe5ebff),16);
+            GradientDrawable cardBg=box(ThemePalette.isLight(i)?0xfff9fbfe:
+                (i%2==0?Color.WHITE:0xffe5ebff),16);
             cardBg.setStroke(dp(index==getSharedPreferences(PREFS,MODE_PRIVATE).getInt("theme",0)?2:1),
-                index==getSharedPreferences(PREFS,MODE_PRIVATE).getInt("theme",0)?0xff285cba:0xffd7dfed);
+                index==getSharedPreferences(PREFS,MODE_PRIVATE).getInt("theme",0)?ACCENTS[index]:0xffd7dfed);
             card.setBackground(cardBg);
             card.setElevation(dp(1.5f));
             LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(68));
             p.topMargin=dp(7);
             themeColumn.addView(card,p);
-            TextView circle=text(i==0?"π":i==1?"∑":i==2?"⚛":i==3?"Ω":"☀",27,i==4?0xff2563eb:ACCENTS[i],true);
+            TextView circle=text(ThemePalette.SYMBOLS[i],27,
+                ThemePalette.isLight(i)?0xff26456a:ACCENTS[i],true);
             circle.setGravity(Gravity.CENTER);
-            circle.setBackground(box(0xff11234b,13));
+            circle.setBackground(box(ThemePalette.BASE[i],13));
             LinearLayout.LayoutParams ilp=new LinearLayout.LayoutParams(dp(55),dp(55));
             ilp.leftMargin=dp(6);card.addView(circle,ilp);
             TextView label=text(NAMES[i],16,NAVY,true);
@@ -246,8 +248,9 @@ public final class MainActivity extends Activity {
         add(root,keyPreview,7);
         showTheme();
 
-        add(root,text("😊 New Emoji Keyboard",21,NAVY,true),27);
-        add(root,text("Emoji tab खोलें, Faces, Love, Feelings, Hands, People, Animals, Nature, Food, Fun, Symbols और Science चुनें। ◀ ▶ से नए emoji pages देखें। कुल 923 entries हैं; कुछ emojis Android version के अनुसार अलग दिख सकते हैं।",14,0xff496284,false),8);
+        add(root,text("🎭 Cartoon Friends + Emoji Keyboard",21,NAVY,true),27);
+        add(root,text("Emoji tab → 🎭 Cartoon Friends: playful cartoon-style kids, robots, superheroes, animals and expressions. Faces, Love, Science and other categories still work. These are original combinations of Unicode emoji (not official copyrighted character stickers). Rendering depends on your Android version. Total: "+EmojiCatalog.total()+" entries.",14,0xff496284,false),8);
+        add(root,text("👦🎒  👧📚  🤖⚡  🦸‍♀️  🐼🎩  🧚‍♀️  🐱🦸",23,NAVY,true),7);
         add(root,text("🧪 Test Your Keyboard",21,NAVY,true),30);
         add(root,text("नीचे बॉक्स पर टैप करें और Maths/Science keyboard से लिखकर देखें:",14,0xff496284,false),8);
         EditText test=new EditText(this);
@@ -301,16 +304,19 @@ public final class MainActivity extends Activity {
             (selected?"✅ S Board selected":"② Choose S Board as your keyboard"));
     }
     private void showTheme(){
-        int current=Math.max(0,Math.min(4,getSharedPreferences(PREFS,MODE_PRIVATE).getInt("theme",0)));
-        if(themeStatus!=null)themeStatus.setText("Selected: "+NAMES[current]+(current==4?"  •  LIGHT MODE":""));
+        int current=ThemePalette.norm(getSharedPreferences(PREFS,MODE_PRIVATE).getInt("theme",0));
+        if(themeStatus!=null)themeStatus.setText("Selected: "+NAMES[current]+
+            (ThemePalette.isLight(current)?"  •  LIGHT FINISH":""));
         if(keyPreview==null)return;
         keyPreview.removeAllViews();
-        keyPreview.setBackground(box(current==4?0xffe8effa:0xff0b2248,16));
+        keyPreview.setBackground(box(ThemePalette.MID[current],16));
         for(String key:previewKeys){
-            TextView item=text(key,key.length()>1?14:17,current==4?0xff14243b:Color.WHITE,true);
+            TextView item=text(key,key.length()>1?14:17,ThemePalette.TEXT[current],true);
             item.setGravity(Gravity.CENTER);
-            GradientDrawable bg=box(current==4?Color.WHITE:0xff1b385f,10);
-            bg.setStroke(dp(1),current==4?0xffc8d7e9:ACCENTS[current]);
+            GradientDrawable bg=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{ThemePalette.KEY_TOP[current],ThemePalette.KEY_BOTTOM[current]});
+            bg.setCornerRadius(dp(10));
+            bg.setStroke(dp(1),ThemePalette.STROKE[current]);
             item.setBackground(bg);
             LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(39),1f);
             lp.setMargins(dp(2),0,dp(2),0);
