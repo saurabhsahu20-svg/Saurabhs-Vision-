@@ -39,8 +39,13 @@ public final class ExpressionEngine {
         if(!Double.isFinite(value))return "Math error";
         // Never hide scientifically meaningful tiny results (e.g. 1 electron-volt).
         if(value==0)return "0";
+        // Preserve EVERY digit of a safely representable whole number.
+        // The old 12-significant-digit rounding changed 1234567890123
+        // into 1234567890120 even though the double contained it exactly.
+        if(value==Math.rint(value) && Math.abs(value)<=9007199254740991d)
+            return BigDecimal.valueOf(value).toBigIntegerExact().toString();
         BigDecimal decimal=BigDecimal.valueOf(value)
-            .round(new MathContext(12,RoundingMode.HALF_UP)).stripTrailingZeros();
+            .round(new MathContext(15,RoundingMode.HALF_UP)).stripTrailingZeros();
         String plain=decimal.toPlainString();
         if(plain.length()<=20 && !plain.contains("E"))return plain;
         return decimal.toString().replace("E+","E");
