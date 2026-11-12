@@ -29,7 +29,7 @@ public final class ScienceWallpaperView extends View {
     private int theme=0;
     public ScienceWallpaperView(Context context){super(context);setLayerType(View.LAYER_TYPE_SOFTWARE,null);}
     public void setThemeIndex(int number){
-        theme=Math.floorMod(number,THEMES.length);invalidate();
+        theme=LauncherRules.themeIndex(number,THEMES.length);invalidate();
     }
     public int getThemeIndex(){return theme;}
     private void color(int color,float stroke){
