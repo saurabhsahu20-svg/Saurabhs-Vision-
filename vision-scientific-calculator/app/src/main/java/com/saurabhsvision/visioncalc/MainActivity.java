@@ -594,12 +594,12 @@ public final class MainActivity extends Activity {
         LinearLayout box=new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(14),dp(14),dp(14),dp(16));
-        box.setBackground(shape(PANEL,17,0xff245b7b));
+        box.setBackground(shape(PANEL,19,darkMode?0xff245b7b:0xffe0dfeb));
         TextView title=text("RECENT CALCULATIONS",19,CYAN,true);
         add(box,title,0);
         TextView explanation=text("Saved only on this device • tap one to reuse • last 60 results",12,MUTED,false);
         add(box,explanation,5);
-        Button clear=button("🗑 Clear history",0xff5b2e46,0xff361c32,0xff99677b,WHITE);
+        Button clear=button("🗑 Clear history",0xff7c4a6d,0xff573451,0,Color.WHITE);
         LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(45));
         lp.topMargin=dp(12);box.addView(clear,lp);
         clear.setOnClickListener(v->new AlertDialog.Builder(this)
@@ -628,7 +628,7 @@ public final class MainActivity extends Activity {
             LinearLayout card=new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
             card.setPadding(dp(15),dp(9),dp(15),dp(9));
-            card.setBackground(shape(CARD,13,0xff2a668a));
+            card.setBackground(shape(CARD,17,darkMode?0xff2a668a:0xffd8dae7));
             TextView expr=text(exp,15,WHITE,false);
             expr.setSingleLine(true);expr.setEllipsize(TextUtils.TruncateAt.END);
             add(card,expr,0);
@@ -647,7 +647,9 @@ public final class MainActivity extends Activity {
         LinearLayout box=new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(15),dp(15),dp(15),dp(18));
-        box.setBackground(gradient(0xff103558,0xff0a2342,17,0xff27678e));
+        box.setBackground(darkMode?
+            gradient(0xff103558,0xff0a2342,20,0xff27678e):
+            gradient(0xffffffff,0xfff1f0f8,20,0xffe2e0ec));
         add(box,text("UNIT CONVERTER",19,CYAN,true),0);
         add(box,text("12 offline categories • select units • instant result",12,MUTED,false),4);
         add(box,text("CATEGORY",12,WHITE,true),18);
@@ -663,7 +665,8 @@ public final class MainActivity extends Activity {
         converterValue.setTextColor(WHITE);
         converterValue.setHintTextColor(MUTED);
         converterValue.setPadding(dp(14),dp(9),dp(14),dp(9));
-        converterValue.setBackground(shape(0xff061a32,12,0xff34678a));
+        converterValue.setBackground(shape(darkMode?0xff061a32:0xffe6e7ef,
+            14,darkMode?0xff34678a:0xffdbdbe8));
         add(box,converterValue,6);
         add(box,text("FROM",12,WHITE,true),15);
         fromSpinner=spinner(new String[]{"m"});
@@ -674,15 +677,20 @@ public final class MainActivity extends Activity {
 
         converterResult=text("—",29,GOLD,true);
         converterResult.setGravity(Gravity.CENTER);
-        converterResult.setBackground(shape(0xff061a32,13,0xff29547e));
+        converterResult.setBackground(shape(darkMode?0xff061a32:0xffe8e8f1,
+            15,darkMode?0xff29547e:0xffd3d1df));
         converterResult.setPadding(dp(10),dp(16),dp(10),dp(16));
         add(box,converterResult,19);
         converterDetails=text("",13,MUTED,false);
         converterDetails.setGravity(Gravity.CENTER);
         add(box,converterDetails,6);
         LinearLayout actions=new LinearLayout(this);
-        Button swap=button("⇄ Swap",0xff19486e,0xff102d4d,CYAN,WHITE);
-        Button clipboard=button("COPY RESULT",0xff1c83a3,0xff0c4b7a,CYAN,WHITE);
+        Button swap=button("⇄ Swap",
+            darkMode?0xff19486e:0xff737d97,
+            darkMode?0xff102d4d:0xff5e6886,0,Color.WHITE);
+        Button clipboard=button("COPY RESULT",
+            darkMode?0xff1c83a3:0xff694967,
+            darkMode?0xff0c4b7a:0xff51364f,0,Color.WHITE);
         for(Button b:new Button[]{swap,clipboard}){
             LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(49),1);
             lp.setMargins(dp(3),0,dp(3),0);
@@ -733,14 +741,30 @@ public final class MainActivity extends Activity {
     private Spinner spinner(String[] labels){
         Spinner spinner=new Spinner(this);
         updateSpinner(spinner,labels);
-        spinner.setBackground(shape(0xff163b63,11,0xff2e8fbb));
+        spinner.setBackground(shape(CARD,13,darkMode?0xff2e8fbb:0xffd7dae8));
         spinner.setPadding(dp(11),dp(7),dp(7),dp(7));
         spinner.setMinimumHeight(dp(49));
         return spinner;
     }
     private void updateSpinner(Spinner spinner,String[] values){
-        ArrayAdapter<String> adapter=new ArrayAdapter<>(this,
-            android.R.layout.simple_spinner_item,values);
+        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,
+            android.R.layout.simple_spinner_item,values){
+            @Override public View getView(int position,View reuse,ViewGroup parent){
+                TextView view=(TextView)super.getView(position,reuse,parent);
+                view.setTextColor(WHITE);
+                view.setTextSize(16);
+                view.setPadding(dp(10),dp(8),dp(10),dp(8));
+                return view;
+            }
+            @Override public View getDropDownView(int position,View reuse,ViewGroup parent){
+                TextView view=(TextView)super.getDropDownView(position,reuse,parent);
+                view.setTextColor(0xff262b3a);
+                view.setBackgroundColor(0xfffaf9fe);
+                view.setTextSize(16);
+                view.setPadding(dp(16),dp(11),dp(12),dp(11));
+                return view;
+            }
+        };
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
     }
