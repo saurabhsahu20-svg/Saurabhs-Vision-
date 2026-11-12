@@ -1,8 +1,17 @@
-# VISION CALC 1.1 — Premium Scientific Calculator for Android
+# S CALC 1.4 — Premium Scientific Calculator for Android
 
 **By SAURABH'S VISION™ — Smart Maths, Simple Learning**
 
 A real, native **offline Android scientific calculator**, not a static mockup. Built with Java 17 and Android Gradle Plugin 8.7.3; no third-party SDKs, Internet, login, ads, analytics, or personal-data permissions.
+
+## S CALC 1.4 — speed and precision update
+
+- Reuses the most recent calculated result across live preview, Equals and Copy instead of re-evaluating the identical expression repeatedly.
+- Ordinary decimal arithmetic (with +, −, ×, ÷ and parentheses) has an offline `BigDecimal` display helper. For example, `0.1+0.2` displays `0.3` and `9007199254740993+1` displays `9007199254740994`; division is rounded to Java DECIMAL128 precision.
+- Scientific functions and the stored Ans/M memory continue to use Java double (IEEE-754) values; **not unlimited precision**. Displaying a precise decimal result does not change the precision of the Ans/M stored values.
+- Safely representable integers retain their full digits instead of the old 12-significant-digit truncation, while other scientific double values are presented using 15 significant digits.
+- Pure JVM correctness and bounded core-throughput tests cover 80,000 decimal operations, numeric edge cases and scientific backward compatibility; these do **not** measure an actual phone's touch latency or justify claims such as "3× faster" or "99.9999% accurate."
+- Approved gold **S CALC** launcher icon, **S VISION** in-app logo, large numeric buttons, scientific UI, Light/Dark themes, 12 converter categories and offline privacy are unchanged.
 
 ## Premium responsive interface (v1.1)
 
