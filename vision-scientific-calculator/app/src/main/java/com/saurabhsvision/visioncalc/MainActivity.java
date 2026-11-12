@@ -164,7 +164,7 @@ public final class MainActivity extends Activity {
         buildTabs();
         screen=new LinearLayout(this);
         screen.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams fill=new LinearLayout.LayoutParams(-1,0,1f);
+        LinearLayout.LayoutParams fill=new LinearLayout.LayoutParams(-1,-2);
         fill.topMargin=dp(10);
         root.addView(screen,fill);
         showTab();
@@ -361,7 +361,7 @@ public final class MainActivity extends Activity {
         chipsScroll.setHorizontalScrollBarEnabled(false);
         LinearLayout chips=new LinearLayout(this);
         chips.setGravity(Gravity.CENTER_VERTICAL);
-        String[] quick={"sin","cos","tan","√","π","x²","log","ln","nCr","nPr","e"};
+        String[] quick={"sin","cos","tan","√","π","x²","log","ln","nCr",",","nPr","e"};
         String[] extra={"asin","acos","atan","cbrt","abs","exp","sinh","cosh",
             "tanh","root","gcd","lcm","floor","ceil","mod","1/x","10^x","τ",
             "φ","rad","deg","max","min"};
@@ -402,10 +402,14 @@ public final class MainActivity extends Activity {
         }
         add(screen,memoryRow,9);
 
-        // Fills additional vertical room on tall screens, while preserving
-        // a normal scrollable keypad on short or landscape screens.
+        // Keyboard remains part of the scrollable content. Avoid clipping the
+        // final '=' row when an OEM reports less vertical space than expected.
+        // A small adaptive gap is used on tall screens, never forced overflow.
+        float availableDp=getResources().getDisplayMetrics().heightPixels/
+            getResources().getDisplayMetrics().density;
+        int gapDp=landscape()?3:Math.max(4,(int)Math.min(33,(availableDp-740)/4));
         View flexibleSpace=new View(this);
-        screen.addView(flexibleSpace,new LinearLayout.LayoutParams(-1,0,1f));
+        screen.addView(flexibleSpace,new LinearLayout.LayoutParams(-1,dp(gapDp)));
 
         String[][] rows={
             {"AC","()","%","÷"},
@@ -447,7 +451,9 @@ public final class MainActivity extends Activity {
             case "nCr":expression+="comb(";break;
             case "nPr":expression+="perm(";break;
             case "mod":expression+="mod";break;
-            case "e":case "τ":case "φ":expression+=f;break;
+            case ",":expression+=",";break;
+            case "π":case "e":case "τ":case "φ":expression+=f;break;
+            case "√":expression+="√(";break;
             default:expression+=f+"(";break;
         }
         updatePreview();
@@ -461,6 +467,17 @@ public final class MainActivity extends Activity {
                         expression.offsetByCodePoints(expression.length(),-1));
                 updatePreview();return;
             case "=":calculateNow();return;
+            case "()":
+                int depth=0;
+                for(int i=0;i<expression.length();i++){
+                    if(expression.charAt(i)=='(')depth++;
+                    else if(expression.charAt(i)==')')depth--;
+                }
+                char last=expression.isEmpty()?' ':expression.charAt(expression.length()-1);
+                boolean close=depth>0&&(Character.isDigit(last)||last==')'||
+                    last=='π'||last=='e'||last=='!'||last=='%');
+                expression+=close?")":"(";
+                break;
             case "sin":case "cos":case "tan":appendFunction(key);return;
             case "√":expression+="√(";break;
             case "x²":appendFunction(key);return;
