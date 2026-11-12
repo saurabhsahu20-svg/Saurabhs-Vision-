@@ -101,6 +101,23 @@ public final class OfflinePhonetic {
         addWord("karna","करना");addWord("karte","करते");
         addWord("achhe","अच्छे");addWord("bohot","बहुत");
         addWord("acche","अच्छे");
+        // High-frequency everyday words typed in Indian Roman/Hinglish chats.
+        // Exact lexical forms avoid approximate consonant/matra decomposition.
+        addWord("aapne","आपने"); addWord("aapko","आपको");
+        addWord("banao","बनाओ"); addWord("banaye","बनाए");
+        addWord("banaiye","बनाइए"); addWord("bana","बना");
+        addWord("kripya","कृपया"); addWord("please","प्लीज़");
+        addWord("kijiye","कीजिए"); addWord("kiye","किए");
+        addWord("karo","करो"); addWord("karna","करना");
+        addWord("upar","ऊपर"); addWord("neeche","नीचे");
+        addWord("poora","पूरा"); addWord("pura","पूरा");
+        addWord("puri","पूरी"); addWord("puraani","पुरानी");
+        addWord("dikhaiye","दिखाइए"); addWord("dikhao","दिखाओ");
+        addWord("sahi","सही"); addWord("galat","गलत");
+        addWord("jaldi","जल्दी"); addWord("dhyan","ध्यान");
+        addWord("keyboard","कीबोर्ड"); addWord("spacebar","स्पेसबार");
+        addWord("typing","टाइपिंग"); addWord("speed","स्पीड");
+        addWord("shabd","शब्द"); addWord("safal","सफल");
     }
     private static void addWord(String a,String b){WORDS.put(a,b);}
 
