@@ -87,10 +87,16 @@ jobs:
           assert 'getCurrentInputConnection' in ime
           assert 'CATEGORIES' in emojis and 'Love' in emojis and 'Feelings' in emojis
           assert 'drawArtwork' in bg
-          assert '0xfff5f8ff' in bg and 'if(theme==4)' in bg
-          assert 'Math.floorMod(theme,5)' in bg
-          assert 'theme=(theme+1)%5' in ime
-          assert 'theme==4' in ime
+          palette=(root/'java/com/saurabhsvision/keyboard/ThemePalette.java').read_text()
+          assert 'ThemePalette.BASE' in bg and 'ThemePalette.isLight(theme)' in bg
+          assert 'ThemePalette.norm(theme)' in bg
+          assert 'theme=(theme+1)%ThemePalette.count()' in ime
+          assert 'private boolean light(){return ThemePalette.isLight(theme);}' in ime
+          assert 'Maroon Velvet' in palette and 'Metallic Silver' in palette
+          assert 'Emerald Neon' in palette and 'Sapphire Blue' in palette
+          assert 'Rose Gold' in palette and 'Midnight Black' in palette
+          assert 'Cartoon Friends' in emojis
+          assert 'String[] icons={"😀","🥰","😢","👋","🧑","🐼","🌿","🍕","🎉","💯","🧬","🎭"}' in ime
           assert 'view.animate().scaleX' not in ime
           assert 'new RippleDrawable(' in ime
           assert 'lastSuggestionKey=null' in ime
@@ -100,7 +106,9 @@ jobs:
           assert 'conn.beginBatchEdit()' in ime and 'conn.endBatchEdit()' in ime
           assert 'Do not duplicate the same expensive InputConnection lookup' in ime
           assert 'setCornerRadius(dp(14))' in ime
-          assert 'Pure White' in activity and 'keyPreview' in activity
+          assert 'ThemePalette.NAMES' in activity and 'keyPreview' in activity
+          assert 'ThemePalette.STROKE[current]' in activity
+          assert 'EmojiCatalog.total()' in activity
           assert 'addKey(row,"Space","SPACE",4.35f' in ime
           assert 'SBoardKeyButton b=new SBoardKeyButton(this)' in ime
           assert 'Spacebar - insert space' in ime
@@ -137,12 +145,12 @@ jobs:
           assert 'new Intent(this,MainActivity.class)' in splash
           assert 'animatedLogoBadge.setImageResource(R.drawable.s_board_logo)' in activity
           assert 'refreshSetupStatus()' in activity
-          assert 'index==6){' in ime and 'theme=(theme+1)%5' in ime
+          assert 'index==6){' in ime and 'theme=(theme+1)%ThemePalette.count()' in ime
           assert 'index==7?' in ime and 'Keyboard settings' in ime
           assert 'String[] ids={"ABC","123","∑ Math","⚛ Sci","😊","🌐","🎨","⚙"}' in ime
           assert 'by Saurabh' in ime
           assert 'SBoardKeyButton b=new SBoardKeyButton(this);' in ime
-          assert 'setSpaceIndicator("SPACE".equals(output),light())' in ime
+          assert 'setSpaceIndicator("SPACE".equals(output),light(),ACCENTS[theme])' in ime
           assert 'getBoolean("show_suggestions",false)' in ime
           assert (root/'java/com/saurabhsvision/keyboard/SBoardKeyButton.java').is_file()
           assert 'Toggle Smart Suggestions' in activity
@@ -180,11 +188,24 @@ jobs:
 
           print('24 language choices, phonetic composition, secure-password fallback verified')
           print('Space/Enter bottom row priority, adaptive fit, compact settings verified')
-          print('Verified five themes, Pure White contrast, professional button skins and preview.')
+          print('Verified 11 premium themes, Metallic Silver contrast, and full keyboard palette preview.')
           print('Verified compact IME panel + paginated emoji picker source contracts.')
           assert 'extends View' in bg
           print('Keyboard functional/input/privacy contracts checked.')
           PY
+
+      - name: Test all theme palettes and Cartoon Friends emoji data
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="vision-maths-science-keyboard"
+          src="$base/app/src/main/java/com/saurabhsvision/keyboard"
+          out="$RUNNER_TEMP/s-board-cartoon-theme-test"
+          mkdir -p "$out"
+          javac -encoding UTF-8 -d "$out" \
+            "$src/ThemePalette.java" "$src/EmojiCatalog.java" \
+            "$base/ThemeEmojiSmokeTest.java"
+          java -ea -cp "$out" ThemeEmojiSmokeTest
 
       - name: Verify all 22 scheduled language modes and phonetic Hindi examples
         shell: bash
@@ -252,13 +273,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.7_SMOOTH_RESPONSE.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.8_PREMIUM_THEMES_CARTOON_EMOJI.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_7_SMOOTH_RESPONSE_APK
+          name: S_Board_v1_9_8_PREMIUM_THEMES_CARTOON_EMOJI_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -268,14 +289,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.7"
-          file="keyboard-deliverables/S_Board_v1.9.7_SMOOTH_RESPONSE.apk"
+          tag="s-board-v1.9.8"
+          file="keyboard-deliverables/S_Board_v1.9.8_PREMIUM_THEMES_CARTOON_EMOJI.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.9.7 • Smooth Response Update" \
-              --notes "S Board 1.9.7 smooth typing response: keeps the proven 1.9.5–1.9.6 four-row neon S Board, logo, full visible Spacebar, key sizes, Hindi/Hinglish, Maths, Science and all language features unchanged. Reduces UI work per keypress by using the native ripple feedback without scheduling extra key-scale animations, and skips duplicate suggestion rendering when a host app repeats the same cursor update. Toolbar actions no longer request editor InputConnection unnecessarily. No new permissions, network calls, tracking, or typed-text history. Automated phonetic, suggestion, benchmark, Spacebar layout, APK build and signing checks passed before release. Real typing latency on specific phones requires on-device testing. Debug-signed testing APK, not a Play Store binary." \
+              --title "S Board 1.9.8 • Premium Themes & Cartoon Friends" \
+              --notes "S Board 1.9.8 adds SIX premium keyboard themes: Maroon Velvet, Metallic Silver, Emerald Neon, Sapphire Blue, Rose Gold and Midnight Black, alongside the original five themes (including Cosmic Blue, Green, Gold, Purple and White). Real keyboard keys, toolbar, background, text contrast and wide Spacebar underline now follow the selected color; no change to QWERTY row order or height. Emoji keyboard adds a twelfth category called Cartoon Friends with 90+ expressive original Unicode cartoon-style characters and character combinations that can be inserted as text in messaging apps. These are not official stickers of copyrighted cartoon franchises; Unicode rendering varies with Android font. Keeps offline typing, language modes, Maths, Science and speed improvements. GitHub CI validates the palette and Unicode emoji inventory, Hindi typing, layout, APK compilation and signature. This is a debug-signed test APK; users should verify design on their own phones." \
               --latest=false
           fi
 
