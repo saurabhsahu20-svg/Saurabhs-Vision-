@@ -34,6 +34,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * VISION CALC — scientific, offline, no advertising or login.
@@ -53,6 +55,10 @@ public final class MainActivity extends Activity {
     private LinearLayout root, screen;
     private TextView expressionView,answerView,statusView,degreeButton;
     private ScrollView scroll;
+    // Rows are resized from the ACTUAL visible viewport, not display metrics.
+    private final List<LinearLayout> keypadRows=new ArrayList<>();
+    private TextView keypadFooter;
+    private int keyExpansionPx=0;
     private String expression="";
     private double ans=0,memory=0;
     private boolean degrees=true;
@@ -158,12 +164,12 @@ public final class MainActivity extends Activity {
         root=new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(dp(11),dp(6),dp(11),dp(10));
-        // Android 15 enforces edge-to-edge content on modern target SDKs.
-        // Keep the last equals key and converter actions clear of the navbar.
+        // Android 15 edge-to-edge: protect the title AND final equals key.
         scroll.setOnApplyWindowInsetsListener((view,insets)->{
             int navInset=insets.getSystemWindowInsetBottom();
-            root.setPadding(dp(11),dp(6),dp(11),
-                Math.max(dp(10),navInset+dp(5)));
+            int statusInset=insets.getSystemWindowInsetTop();
+            root.setPadding(dp(11),Math.max(dp(6),statusInset+dp(4)),
+                dp(11),Math.max(dp(10),navInset+dp(5)));
             return insets;
         });
         scroll.addView(root);
@@ -172,10 +178,44 @@ public final class MainActivity extends Activity {
         buildTabs();
         screen=new LinearLayout(this);
         screen.setOrientation(LinearLayout.VERTICAL);
+        keypadRows.clear();
+        keypadFooter=null;
+        keyExpansionPx=0;
         LinearLayout.LayoutParams fill=new LinearLayout.LayoutParams(-1,-2);
         fill.topMargin=dp(6);
         root.addView(screen,fill);
         showTab();
+        if(tab==0) scroll.post(this::expandKeypadToViewport);
+    }
+
+    /** Expand all five numeric rows equally into the viewport's unused bottom
+     * area. This is calculated after real Android window insets and layout,
+     * so it works on tall phones and tablets without obscuring '=' or
+     * forcing a fixed-key-height layout on short/landscape displays.
+     */
+    private void expandKeypadToViewport(){
+        if(tab!=0||keypadRows.size()!=5||keypadFooter==null||
+            scroll.getHeight()<=0||screen.getParent()!=root)return;
+        int footerBottom=screen.getTop()+keypadFooter.getBottom();
+        int unused=scroll.getHeight()-footerBottom-root.getPaddingBottom()-dp(10);
+        // On small screens there is no unused space: keep existing key sizes
+        // and allow the ScrollView to scroll the complete numeric keypad.
+        if(unused<=dp(8))return;
+        int currentKeyHeight=((LinearLayout.LayoutParams)
+            keypadRows.get(0).getChildAt(0).getLayoutParams()).height;
+        int maxHeight=dp(landscape()?96:155);
+        int extraPerRow=Math.min(unused/5,Math.max(0,maxHeight-currentKeyHeight));
+        if(extraPerRow<=0)return;
+        keyExpansionPx+=extraPerRow;
+        for(LinearLayout row:keypadRows){
+            for(int i=0;i<row.getChildCount();i++){
+                View key=row.getChildAt(i);
+                LinearLayout.LayoutParams keyParams=
+                    (LinearLayout.LayoutParams)key.getLayoutParams();
+                keyParams.height+=extraPerRow;
+                key.setLayoutParams(keyParams);
+            }
+        }
     }
     private void buildHeader(){
         LinearLayout row=new LinearLayout(this);
