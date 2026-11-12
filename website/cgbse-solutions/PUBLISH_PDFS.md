@@ -1,24 +1,32 @@
-# CGBSE 2026–27 — Publish all 1,050 complete PDFs
+# CGBSE 2026–27 | 1,050 complete question + teacher-guide PDFs
 
-This SAURABH’S VISION™ feature is separate from the existing courses, quizzes and app. It adds **direct PDF reading and downloading** without asking site visitors to upload ZIP files.
+**No ZIP uploads are required by students, visitors, or the repository owner.**
 
-## The easiest release asset: ~8 MB
+The repository now includes the complete compressed original question-and-answer
+HTML source in `source/CGBSE_1050_Teacher_Library_Base64.txt` (622,732 Base64 characters).
+It reconstructs 1,050 teacher guides (21 subjects × 50 sets).
 
-The GitHub Pages workflow can generate **all 1,050 question + answer PDFs** from the compact, previously prepared archive:
+On each push affecting `website/**`, the existing
+`.github/workflows/deploy-pages.yml` workflow:
 
-- File to attach: `CGBSE_2026_27_Teacher_Papers_And_Answer_Guides.zip`
-- Exact SHA-256: `a495301d5cdf761ef0294b01b5a072cd64e075d1213ead80db1ada83491337ec`
-- Contains the full existing original teacher guide HTML question and answer content for 21 subjects, 50 sets each.
+1. Verifies the checked-in archive using SHA-256.
+2. Reconstructs all 1,050 source teacher-guide pages safely.
+3. Uses `build_pdfs_from_html.py` and WeasyPrint to render each as an A4 PDF
+   with the existing SAURABH'S VISION transparent watermark.
+4. Verifies there are **exactly 1,050 valid PDF files** before deploying.
+5. Publishes them at paths such as
+   `/cgbse-solutions/pdfs/10_Mathematics/Set_01.pdf`.
+6. Keeps the compressed sources and build tools out of GitHub Pages output.
 
-1. Download the ZIP supplied in ChatGPT to the repository owner.
-2. In this GitHub repository, open **Releases → Draft a new release**.
-3. Create tag **`cgbse-2026-27`** on branch `main`.
-4. Attach the archive keeping its exact filename, then **Publish release**.
-5. The workflow automatically renders 1,050 A4 PDFs with transparent SAURABH’S VISION™ branding and publishes them at paths like `/cgbse-solutions/pdfs/10_Mathematics/Set_01.pdf`.
-6. Students can choose Class → Subject → Set 01–50 and open, print or download the PDF directly. No sample substitution and no ZIP-picker.
+Students select **Class → Subject → Set → PDF View / Download**. There is no
+ZIP upload, release-creation, or custom account requirement.
 
-### Alternative: upload PDFs already generated locally
+If PDFs are still missing, check **Actions → Publish Saurabh Vision Website**
+for the latest build result. A failed workflow does not mean the PDFs are live;
+only successful published files count. A final build failure should be fixed,
+not replaced with samples.
 
-The workflow also accepts `CGBSE_2026_27_All_1050_PDF_Booklets.zip` (90,207,175 bytes; SHA-256 `e8b1d14266e355ca3f1bdb8a5263580ae959072d372e1d6a5a51544076f2f836`) as the same release asset instead of the smaller HTML archive. Finished PDF ZIP takes precedence when both exist.
-
-**Accuracy caution:** These are independently assembled teaching practice papers, not CGBSE official model papers. The non-mathematics descriptive answers include teacher-review drafts and require review before teaching. PDFs must not contain student personal data.
+**Scope:** Original independent practice papers and their assembled answer
+guides; not official CGBSE publications. For non-mathematics subjects, several
+descriptive answers are *teacher-review drafts* and must be checked before
+teaching. No student private data is included.
