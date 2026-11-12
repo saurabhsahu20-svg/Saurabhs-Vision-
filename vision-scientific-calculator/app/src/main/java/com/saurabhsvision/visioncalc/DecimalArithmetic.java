@@ -47,7 +47,7 @@ public final class DecimalArithmetic {
                         .stripTrailingZeros().toString().replace("E+","E");
             }
             return text.equals("-0")?"0":text;
-        }catch(IllegalArgumentException ex){
+        }catch(ArithmeticException|IllegalArgumentException ex){
             return null; // Real parser still handles errors and unsupported input.
         }
     }
