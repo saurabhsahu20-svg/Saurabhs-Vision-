@@ -6,7 +6,7 @@ package com.saurabhsvision.keyboard;
  */
 public final class EmojiCatalog {
     private EmojiCatalog(){}
-    public static final String[] CATEGORIES={"Faces","Love","Feelings","Hands","People","Animals","Nature","Food","Fun","Symbols","Science"};
+    public static final String[] CATEGORIES={"Faces","Love","Feelings","Hands","People","Animals","Nature","Food","Fun","Symbols","Science","Cartoon Friends"};
     private static final String[] RAW={
         "😀 😃 😄 😁 😆 😅 🤣 😂 🙂 🙃 🫠 😉 😊 😇 🥰 😍 🤩 😘 😗 ☺️ 😚 😙 🥲 😋 😛 😜 🤪 😝 🤑 🤗 🤭 🫢 🫣 🤫 🤔 🫡 🤐 🤨 😐 😑 😶 🫥 😶‍🌫️ 😏 😒 🙄 😬 😮‍💨 🤥 🫨 😌 😔 😪 🤤 😴 🥱 😷 🤒 🤕 🤢 🤮 🤧 🥵 🥶 🥴 😵 😵‍💫 🤯 🤠 🥳 🥸 😎 🤓 🧐 😕 🫤 🙁 ☹️ 😮 😯 😲 😳 🥺 🥹 😦 😧 😨 😰 😥 😢 😭 😱 😖 😣 😞 😓 😩 😫 😤 😡 😠 🤬 😈 👿 💀 ☠️ 💩 🤡 👹 👺 👻 👽 👾 🤖 😺 😸 😹 😻 😼 😽 🙀 😿 😾",
         "❤️ 🩷 🧡 💛 💚 💙 🩵 💜 🤎 🖤 🩶 🤍 💖 💗 💓 💞 💕 💟 ❣️ 💔 ❤️‍🔥 ❤️‍🩹 💘 💝 💌 🫶 🥰 😍 😘 😚 😙 😗 🥲 😊 😇 🤗 🤭 💋 👩‍❤️‍👨 👨‍❤️‍👨 👩‍❤️‍👩 👩‍❤️‍💋‍👨 👨‍❤️‍💋‍👨 👩‍❤️‍💋‍👩 💑 💏 💍 💎 🌹 🥀 🌷 🌺 🌸 💐 🧸 🎁 💒 💫 ✨ 🎀 🍫 🕊️ 🤝 🫂 🫰",
@@ -18,7 +18,17 @@ public final class EmojiCatalog {
         "🍎 🍏 🍐 🍊 🍋 🍋‍🟩 🍌 🍉 🍇 🍓 🫐 🍈 🍒 🍑 🥭 🍍 🥥 🥝 🍅 🍆 🥑 🥦 🥬 🥒 🌶️ 🫑 🌽 🥕 🫒 🧄 🧅 🥔 🍠 🫘 🥜 🌰 🥐 🍞 🥖 🥨 🥯 🥞 🧇 🧀 🍖 🍗 🥩 🥓 🍔 🍟 🍕 🌭 🥪 🌮 🌯 🥙 🧆 🥚 🍳 🥘 🍲 🥣 🥗 🍿 🧈 🧂 🍱 🍚 🍛 🍜 🍝 🍣 🍤 🍩 🍪 🎂 🍰 🧁 🍫 🍬 🍭 🍮 🍯 🍼 🥛 ☕ 🫖 🍵 🧃 🥤 🧋 🍹",
         "⚽ 🏀 🏈 ⚾ 🥎 🎾 🏐 🏉 🥏 🎱 🪀 🏓 🏸 🏒 🏑 🥍 🏏 🪃 🥅 ⛳ 🪁 🏹 🎣 🤿 🥊 🥋 🎽 🛹 🛼 🛷 ⛸️ 🥌 🎿 ⛷️ 🏂 🪂 🏋️ 🤸 ⛹️ 🤾 🏌️ 🏇 🚴 🏊 🤽 🚣 🧗 🎮 🕹️ 🎲 ♟️ 🎯 🎳 🪄 🎸 🎹 🎺 🎷 🥁 🪕 🎻 🎤 🎧 🎼 🎵 🎶 🎨 🎬 🎭 🎪 🎟️ 🎫 🏆 🥇 🥈 🥉 🎖️ 🎊 🎉 🪅 🎈 🎁 🎀",
         "✅ ☑️ ✔️ ❌ ❎ ➕ ➖ ✖️ ➗ 🟰 ⁉️ ❗ ❕ ❓ ❔ 💯 🔥 💫 ✨ 🌟 ⭐ 💥 ❤️ 💔 💕 ☮️ ☯️ ☪️ ✝️ ☸️ ✡️ 🕉️ 🔯 🪯 ♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓ 🆗 🆒 🆕 🆙 🆓 🆘 🆚 🔜 🔝 🔛 🔚 🔙 ➡️ ⬅️ ⬆️ ⬇️ ↗️ ↘️ ↙️ ↖️ ↔️ ↕️ 🔄 🔃 ♻️ 🔁 🔂 ▶️ ⏸️ ⏹️ 🔊 🔉 🔈 🔇 🔔 🔕 💬 💭 🗯️ 💤 💢 💝",
-        "🧮 📐 📏 📊 📈 📉 🔢 🔣 🧪 ⚗️ 🧫 🧬 🔬 🔭 ⚛️ 🧲 💡 🧠 🫀 🫁 🦴 🦷 🩸 💉 🩺 🩻 💊 🧯 🪐 🌌 🚀 🛰️ ☄️ 🌍 🌎 🌏 🔋 ⚡ 💻 🖥️ 🖨️ ⌨️ 🖱️ 💾 💿 📀 🕹️ 📡 🤖 📱 📲 🧑‍🔬 👩‍🔬 👨‍🔬 🧑‍🚀 👩‍🚀 👨‍🚀 📚 📖 📝 ✏️ 📒 📔 🧾 🎓 🏫 🏅"
+        "🧮 📐 📏 📊 📈 📉 🔢 🔣 🧪 ⚗️ 🧫 🧬 🔬 🔭 ⚛️ 🧲 💡 🧠 🫀 🫁 🦴 🦷 🩸 💉 🩺 🩻 💊 🧯 🪐 🌌 🚀 🛰️ ☄️ 🌍 🌎 🌏 🔋 ⚡ 💻 🖥️ 🖨️ ⌨️ 🖱️ 💾 💿 📀 🕹️ 📡 🤖 📱 📲 🧑‍🔬 👩‍🔬 👨‍🔬 🧑‍🚀 👩‍🚀 👨‍🚀 📚 📖 📝 ✏️ 📒 📔 🧾 🎓 🏫 🏅",
+        // Original cartoon-style Unicode character combos, instantly pasteable
+        // in any app that accepts text (not licensed character stickers).
+        // A combo may render as two neighboring glyphs on some devices.
+        "👦🎒 👧📚 🧒🚀 👦⚡ 👧✨ 🧒🎨 👦🧢 👧🎀 👶🍼 🧑🎓 " +
+        "👦🏏 👧🎸 🧒🎮 🧑🍕 🧒🛴 🦸‍♂️ 🦸‍♀️ 🦸 🦹‍♂️ 🦹‍♀️ 🦹 🧙‍♂️ 🧙‍♀️ 🧚‍♂️ 🧚‍♀️ 🧞‍♂️ 🧞‍♀️ 🧝‍♂️ 🧝‍♀️ 🥷 " +
+        "🤖💙 🤖⚡ 🤖🚀 🤖🎓 👾✨ 👽🛸 👻🎩 💀🎸 🤡🎪 🧸🎀 🐼🎩 🐻🍯 🐱🦸 🐶🚀 🦊🧢 🐰🎀 🐸🎸 🐯👑 " +
+        "🐭🧀 🐹🎈 🐵🍌 🐧❄️ 🦁👑 🐨💤 🐮🎓 🐷🌸 🦄🌈 🐲🔥 🦖🦕 🐉✨ 🐢⚡ 🦋✨ 🐣🎂 🐥🎶 " +
+        "😺 😸 😹 😻 😼 😽 🙀 😿 😾 🥳 🤠 🥸 😎 🤩 😈 👿 👹 👺 👻 👽 👾 🤖 " +
+        "🎭 🎪 🎨 🎬 🎥 🪄 🎮 🕹️ 🎲 🎠 🎡 🎢 🎤 🎵 🎶 🎉 ✨ 🌟 💥 🌈 🎀 🎁 🎈 🪅 🏆 " +
+        "🧑‍🚀🚀 👩‍🔬🧪 👨‍🍳🍔 🧑‍🎨🎨 👩‍🎓📘 👨‍🏫📐 🧑‍💻💻 🦸‍♀️⚡ 🧚‍♀️🌸 🧙‍♂️✨"
     };
     private static final String[][] CACHE=new String[RAW.length][];
     public static int count(){return CATEGORIES.length;}
