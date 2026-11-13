@@ -240,59 +240,35 @@ public final class MainActivity extends Activity {
     private void buildHeader(){
         LinearLayout row=new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
-        TextView menu=text("☰",23,WHITE,true);
-        menu.setGravity(Gravity.CENTER);
-        menu.setBackground(gradient(0xff234878,0xff0c234a,11,0xff528dff));
-        menu.setContentDescription("Menu and settings");
-        row.addView(menu,new LinearLayout.LayoutParams(dp(40),dp(40)));
-        menu.setOnClickListener(v->showProMenu());
-
         ImageView icon=new ImageView(this);
-        icon.setImageResource(R.drawable.ic_s_calc);
+        icon.setImageResource(R.drawable.ic_s_calc_comfort);
         icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        icon.setContentDescription("S CALC app icon");
-        LinearLayout.LayoutParams iLp=new LinearLayout.LayoutParams(dp(40),dp(40));
-        iLp.leftMargin=dp(9);
-        row.addView(icon,iLp);
+        icon.setContentDescription("S CALC glossy 3D red S calculator app icon");
+        row.addView(icon,new LinearLayout.LayoutParams(dp(46),dp(46)));
 
-        LinearLayout titles=new LinearLayout(this);
-        titles.setOrientation(LinearLayout.VERTICAL);
-        titles.setPadding(dp(6),0,0,0);
-        TextView brand=text("SAURABH'S VISION™",13,
-            darkMode?0xffffd767:0xff35558a,true);
-        titles.addView(brand);
-        TextView sub=text("S CALC  •  Scientific Calculator",11,MUTED,false);
-        titles.addView(sub);
-        row.addView(titles,new LinearLayout.LayoutParams(0,-2,1f));
+        LinearLayout labels=new LinearLayout(this);
+        labels.setPadding(dp(9),0,0,0);
+        labels.setOrientation(LinearLayout.VERTICAL);
+        labels.addView(text("S CALC",20,WHITE,true));
+        labels.addView(text("SAURABH'S VISION™",11,MUTED,false));
+        row.addView(labels,new LinearLayout.LayoutParams(0,-2,1f));
 
-        TextView recent=text("◷",24,WHITE,true);
-        recent.setGravity(Gravity.CENTER);
-        recent.setBackground(gradient(0xff194a78,0xff0d2448,11,0xff328bd9));
-        recent.setContentDescription("Open calculation history");
-        LinearLayout.LayoutParams rLp=new LinearLayout.LayoutParams(dp(40),dp(40));
-        rLp.rightMargin=dp(6);
-        row.addView(recent,rLp);
-        recent.setOnClickListener(v->{tab=3;buildUi();});
+        TextView theme=text("◉",24,CYAN,true);
+        theme.setGravity(Gravity.CENTER);
+        theme.setBackground(shape(SOFT,15,0));
+        theme.setContentDescription("Choose soft calculator colour theme");
+        LinearLayout.LayoutParams t=new LinearLayout.LayoutParams(dp(45),dp(45));
+        t.rightMargin=dp(5);
+        row.addView(theme,t);
+        theme.setOnClickListener(v->chooseComfortTheme());
 
-        themeToggle=text("⚙",24,WHITE,true);
+        themeToggle=text("⋮",27,WHITE,true);
         themeToggle.setGravity(Gravity.CENTER);
-        themeToggle.setBackground(gradient(0xff194a78,0xff0d2448,11,0xff328bd9));
-        themeToggle.setContentDescription("Calculator settings");
-        row.addView(themeToggle,new LinearLayout.LayoutParams(dp(40),dp(40)));
+        themeToggle.setBackground(shape(SOFT,15,0));
+        themeToggle.setContentDescription("Calculator settings and tools");
+        row.addView(themeToggle,new LinearLayout.LayoutParams(dp(45),dp(45)));
         themeToggle.setOnClickListener(v->showProMenu());
-        add(root,row,2);
-
-        TextView ribbon=text("S CALC",25,Color.WHITE,true);
-        ribbon.setGravity(Gravity.CENTER);
-        ribbon.setLetterSpacing(.085f);
-        ribbon.setBackground(gradient(
-            darkMode?0xffd43c2c:0xffb35273,
-            darkMode?0xff8c181d:0xff773459,17,0xffffc85b));
-        ribbon.setContentDescription("S CALC by Saurabh's Vision");
-        LinearLayout.LayoutParams ribbonParams=new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,dp(43));
-        ribbonParams.setMargins(dp(48),dp(9),dp(48),0);
-        root.addView(ribbon,ribbonParams);
+        add(root,row,3);
     }
     private void showProMenu(){
         String[] choices={
@@ -321,30 +297,32 @@ public final class MainActivity extends Activity {
         LinearLayout tabs=new LinearLayout(this);
         tabs.setGravity(Gravity.CENTER_VERTICAL);
         tabs.setPadding(dp(2),dp(3),dp(2),dp(3));
-        tabs.setBackground(shape(PANEL,12,0xff245782));
-        String[] symbols={"⚗","∑","⇄","◷"};
+        tabs.setBackground(shape(PANEL,18,0));
+        String[] symbols={"⊞","∑","⇄","◷"};
         for(int i=0;i<TAB_NAMES.length;i++){
             final int idx=i;
+            boolean selected=idx==tab;
             LinearLayout column=new LinearLayout(this);
             column.setGravity(Gravity.CENTER);
             column.setOrientation(LinearLayout.VERTICAL);
-            int top=idx==tab?0xff9c22c8:0xff153d6b;
-            int bottom=idx==tab?0xff53139a:0xff071b39;
-            int outline=idx==tab?0xffee99ff:0xff2ea4ed;
-            column.setBackground(gradient(top,bottom,12,outline));
-            TextView mark=text(symbols[i],17,Color.WHITE,true);
+            int top=selected?CYAN:SOFT;
+            int bottom=selected?CYAN:PANEL;
+            int outline=selected?0:0;
+            column.setBackground(gradient(top,bottom,14,outline));
+            int color=selected?(darkMode?0xff032135:Color.WHITE):WHITE;
+            TextView mark=text(symbols[i],18,color,true);
             mark.setGravity(Gravity.CENTER);
             column.addView(mark);
-            TextView name=text(TAB_NAMES[i],9,Color.WHITE,true);
+            TextView name=text(TAB_NAMES[i],9,color,true);
             name.setGravity(Gravity.CENTER);
             column.addView(name);
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(54),1);
-            lp.setMargins(dp(2),dp(2),dp(2),dp(2));
-            tabs.addView(column,lp);
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(52),1);
+            p.setMargins(dp(2),dp(2),dp(2),dp(2));
+            tabs.addView(column,p);
             column.setContentDescription("Open "+TAB_NAMES[i]+" tab");
             column.setOnClickListener(v->{tab=idx;buildUi();});
         }
-        add(root,tabs,9);
+        add(root,tabs,8);
     }
     private void showTab(){
         screen.removeAllViews();
