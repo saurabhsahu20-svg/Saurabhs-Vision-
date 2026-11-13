@@ -56,9 +56,22 @@ import java.util.Set;
  * Favorites and theme are saved only on the user's device.
  */
 public final class MainActivity extends Activity {
-    private static final int BACKGROUND=0xff061432,WHITE=0xfff2faff;
-    private static final int CYAN=0xff57ecff,GOLD=0xffffd673;
-    private static final int MUTED=0xffafd3e9;
+    // The default Pearl Light palette is deliberately high contrast.
+    // Original four neon-dark themes remain available as presets 0–3.
+    private int BACKGROUND=0xfff5fbff,WHITE=0xff112f63;
+    private int CYAN=0xff076dbb,GOLD=0xffc88a12,MUTED=0xff537394;
+    private boolean lightTheme(){return prefs!=null&&
+        LauncherRules.themeIndex(prefs.getInt(PREF_THEME,4),
+            ScienceWallpaperView.THEMES.length)==4;}
+    private void applyPalette(){
+        if(lightTheme()){
+            BACKGROUND=0xfff5fbff;WHITE=0xff112f63;
+            CYAN=0xff086db6;GOLD=0xffad7005;MUTED=0xff537394;
+        }else{
+            BACKGROUND=0xff061432;WHITE=0xfff2faff;
+            CYAN=0xff57ecff;GOLD=0xffffd673;MUTED=0xffafd3e9;
+        }
+    }
     private static final String PREFS="sv_launcher_settings",PREF_THEME="theme";
     private static final String PREF_FAVORITES="favorite_components";
     private final Handler handler=new Handler(Looper.getMainLooper());
@@ -115,10 +128,12 @@ public final class MainActivity extends Activity {
         column.addView(child,p);
     }
     private TextView control(String label){
-        TextView t=text(label,13,WHITE,true);
+        TextView t=text(label,13,lightTheme()?0xff0b4276:WHITE,true);
         t.setGravity(Gravity.CENTER);
         t.setPadding(dp(11),dp(6),dp(11),dp(6));
-        t.setBackground(panel(0xff1c477c,0xff0b2a58,13,0xff367fba));
+        t.setBackground(lightTheme()?
+            panel(0xffffffff,0xffdfedff,13,0xff93bbdd):
+            panel(0xff1c477c,0xff0b2a58,13,0xff367fba));
         return t;
     }
     private void toast(String message){
@@ -128,9 +143,8 @@ public final class MainActivity extends Activity {
     @Override public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         prefs=getSharedPreferences(PREFS,MODE_PRIVATE);
-        getWindow().setStatusBarColor(BACKGROUND);
-        getWindow().setNavigationBarColor(BACKGROUND);
-        getWindow().getDecorView().setSystemUiVisibility(0);
+        applyPalette();
+        applySystemBars();
         buildUi();
         refreshApps();
     }
@@ -157,11 +171,20 @@ public final class MainActivity extends Activity {
         // A default home screen stays open on the system Back key.
     }
 
+    private void applySystemBars(){
+        getWindow().setStatusBarColor(lightTheme()?0xffd9edff:BACKGROUND);
+        getWindow().setNavigationBarColor(lightTheme()?0xffe8f5ff:BACKGROUND);
+        getWindow().getDecorView().setSystemUiVisibility(
+            lightTheme()?View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR|
+                View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR:0);
+    }
     private void buildUi(){
+        applyPalette();
+        applySystemBars();
         frame=new FrameLayout(this);
         frame.setBackgroundColor(BACKGROUND);
         wallpaper=new ScienceWallpaperView(this);
-        wallpaper.setThemeIndex(prefs.getInt(PREF_THEME,0));
+        wallpaper.setThemeIndex(prefs.getInt(PREF_THEME,4));
         frame.addView(wallpaper,new FrameLayout.LayoutParams(-1,-1));
         final ScrollView content=new ScrollView(this);
         content.setFillViewport(true);
@@ -180,6 +203,7 @@ public final class MainActivity extends Activity {
         column.setPadding(dp(14),dp(10),dp(14),dp(15));
         content.addView(column);
         if(drawerOpen)buildDrawer(column);
+        else if(lightTheme())buildLightHome(column);
         else buildHome(column);
         updateClock();
     }
@@ -518,13 +542,13 @@ public final class MainActivity extends Activity {
     }
 
     private void showThemes(){
-        int selected=LauncherRules.themeIndex(prefs.getInt(PREF_THEME,0),
+        int selected=LauncherRules.themeIndex(prefs.getInt(PREF_THEME,4),
             ScienceWallpaperView.THEMES.length);
         new AlertDialog.Builder(this)
             .setTitle("🎨 Science & Maths Themes")
             .setSingleChoiceItems(ScienceWallpaperView.THEMES,selected,(dialog,which)->{
                 prefs.edit().putInt(PREF_THEME,which).apply();
-                wallpaper.setThemeIndex(which);
+                buildUi();
                 toast(ScienceWallpaperView.THEMES[which]+" selected");
                 dialog.dismiss();
             }).setNegativeButton("Close",null).show();
@@ -567,7 +591,7 @@ public final class MainActivity extends Activity {
                         .setTitle("About S VISION Launcher")
                         .setMessage("Maths & Science Launcher by SAURABH'S VISION™.\n"+
                             "Functional Home and App Drawer, app search, pinned favorites, "+
-                            "four offline science themes, clock, and Maths/Science cards.\n\n"+
+                            "five offline science themes including Pearl Light, clock, and Maths/Science cards.\n\n"+
                             "No Internet permission, no ads, no login or data collection. "+
                             "Favorite shortcuts and the selected theme remain only on your phone.\n\n"+
                             "This is an initial launcher release, not a promise of "+
