@@ -60,7 +60,7 @@ jobs:
                        'history','memory','ClipboardManager','DEG','RAD'):
               assert item in source or item in engine, item
           assert 'UnitConverter.count()' in source or 'UnitConverter.names()' in source
-          assert 'versionName \'1.5.0\'' in (p/'app/build.gradle').read_text()
+          assert 'versionName \'1.6.0\'' in (p/'app/build.gradle').read_text()
           # The visual reference demands a four-column keypad with real maths.
           assert 'String[][] rows={' in source
           for row in ('{"AC","()","%","÷"}', '{"7","8","9","×"}',
@@ -81,7 +81,7 @@ jobs:
           assert 'case "π":case "e":' in source
           assert 'new LinearLayout.LayoutParams(-1,0,1f)' not in source
           # S CALC Pro must wire the screenshot-inspired design to real actions.
-          assert 'if(tab<=1)buildProCalculator()' in source
+          assert 'if(tab==0)buildComfortCalculator()' in source and 'else if(tab==1)buildProCalculator()' in source
           assert 'String[][] sciences={' in source and 'String[][] numeric={' in source
           for row in ('{"sin","cos","tan","cot","sec","csc"}',
                       '{"log","ln","10ˣ","eˣ","x²","x³"}',
@@ -98,8 +98,14 @@ jobs:
           assert 'case "EXP":' in source and 'expression+="E"' in source
           assert 'case "x³":' in source and 'case "cot":' in engine
           assert 'case "sec":' in engine and 'case "csc":' in engine
-          assert 'android:icon="@drawable/ic_s_calc"' in manifest
-          assert 'proV15ThemeApplied' in source
+          assert 'android:icon="@drawable/ic_s_calc_comfort"' in manifest
+          assert 'comfortTheme' in source
+          assert 'chooseComfortTheme()' in source
+          assert 'String[][] rows={' in source
+          assert 'private void buildComfortCalculator()' in source
+          assert 'private Button comfortKey(String label)' in source
+          assert 'themeIndex=ComfortTheme.clamp(prefs.getInt("comfortTheme",0));' in source
+          assert (p/'app/src/main/java/com/saurabhsvision/visioncalc/ComfortTheme.java').is_file()
           assert 'getSystemWindowInsetBottom()' in source
           print('PASS: Real S CALC Pro screenshot-inspired UI, 24 science controls and keypad actions')
 
@@ -113,16 +119,16 @@ jobs:
           assert 'getSystemWindowInsetTop()' in source
           assert 'getSystemWindowInsetBottom()' in source
           assert (p/'app/src/main/java/com/saurabhsvision/visioncalc/CalculatorLayoutPolicy.java').is_file()
-          print('PASS: colorful science grid and adaptive numeric keypad consume unused height')
+          print('PASS: scientific keypad and new 4-column pastel keys use adaptive height')
           print('PASS: screenshot-inspired four-column design and functioning controls')
           assert 'Math.pow' in engine and 'Math.sin' in engine
           assert 'Temperature' in converter and 'Frequency' in converter
-          assert (p/'app/src/main/res/drawable-nodpi/ic_s_calc.webp').is_file()
-          icon=(p/'app/src/main/res/drawable-nodpi/ic_s_calc.webp').read_bytes()
+          assert (p/'app/src/main/res/drawable-nodpi/ic_s_calc_comfort.webp').is_file()
+          icon=(p/'app/src/main/res/drawable-nodpi/ic_s_calc_comfort.webp').read_bytes()
           assert icon[:4]==b'RIFF' and icon[8:12]==b'WEBP' and len(icon)>4000
-          assert 'android:icon="@drawable/ic_s_calc"' in manifest
-          assert 'android:roundIcon="@drawable/ic_s_calc"' in manifest
-          assert 'icon.setImageResource(R.drawable.ic_s_calc);' in source
+          assert 'android:icon="@drawable/ic_s_calc_comfort"' in manifest
+          assert 'android:roundIcon="@drawable/ic_s_calc_comfort"' in manifest
+          assert 'icon.setImageResource(R.drawable.ic_s_calc_comfort);' in source
           assert 'TextView logoName=text("S VISION"' in source
           assert "private boolean cacheMatches()" in source
           assert "cachedFormatted=exact!=null?exact:ExpressionEngine.format(value);" in source
@@ -164,6 +170,19 @@ jobs:
             "$p/tests/CalculatorSpeedAccuracyTest.java"
           java -ea -cp "$out" CalculatorSpeedAccuracyTest
 
+      - name: Verify 4 soft themes readability and persistence bounds
+        shell: bash
+        run: |
+          set -euo pipefail
+          p="vision-scientific-calculator"
+          src="$p/app/src/main/java/com/saurabhsvision/visioncalc"
+          out="$RUNNER_TEMP/s-calc-comfort"
+          mkdir -p "$out"
+          javac -encoding UTF-8 -d "$out" \
+            "$src/ComfortTheme.java" \
+            "$p/tests/ComfortThemeTest.java"
+          java -ea -cp "$out" ComfortThemeTest
+
       - name: Test responsive keypad sizing on tall and short screens
         shell: bash
         run: |
@@ -194,13 +213,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.visioncalc'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q MainActivity
           mkdir -p calc-deliverables
-          cp "$apk" calc-deliverables/S_CALC_Pro_v1.5.0_NEON_SCIENTIFIC.apk
+          cp "$apk" calc-deliverables/S_CALC_Pro_v1.6.0_SOFT_THEMES_NEW_ICON.apk
           ( cd calc-deliverables && sha256sum *.apk > SHA256SUMS.txt )
 
       - name: Upload downloadable calculator APK
         uses: actions/upload-artifact@v4
         with:
-          name: S_CALC_Pro_v1_5_0_NEON_SCIENTIFIC_APK
+          name: S_CALC_Pro_v1_6_0_SOFT_THEMES_NEW_ICON_APK
           path: calc-deliverables/*
           retention-days: 90
 
@@ -210,13 +229,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-calc-pro-v1.5.0"
-          apk="calc-deliverables/S_CALC_Pro_v1.5.0_NEON_SCIENTIFIC.apk"
+          tag="s-calc-pro-v1.6.0"
+          apk="calc-deliverables/S_CALC_Pro_v1.6.0_SOFT_THEMES_NEW_ICON.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$apk" calc-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$apk" calc-deliverables/SHA256SUMS.txt \
-              --title "S CALC Pro 1.5 • Neon Scientific 6-Column Calculator" \
-              --notes "S CALC Pro v1.5 by SAURABH'S VISION follows the supplied neon scientific calculator UI reference: vibrant navy/blue/gold design, original S CALC launcher icon, branded S VISION live result card, actual Scientific/Advanced/Converter/History tabs, 6-column x 4-row scientific buttons, 5-column x 4-row numeric keyboard with orange Equals, purple AC/Backspace, white numbers, DEG/RAD and a functional quick-tool bar. All keypad buttons perform real math: added cot/sec/csc, cube power, cube root, 10-to-the-x, e-to-the-x, factorial, combinations and permutations, scientific EXP, trigonometry and logarithms. More advanced real functions available under Advanced. Offline history, 12 unit converters, memory, full precision fixes and preferred golden icon preserved. The symbolic integration equation in the user's inspirational screenshot is NOT implemented or presented as a fake result. GitHub CI checks trig/domain accuracy, existing decimal accuracy, functional button mappings, Android APK compilation and signature. Debug-signed test APK; physical-phone visual check still recommended." \
+              --title "S CALC Pro 1.6 • 4 Comfort Colors + Glossy S Icon" \
+              --notes "S CALC Pro v1.6 by SAURABH'S VISION: Adds the user's selected 3D metallic red S calculator launcher image (and round icon) as native WebP; the same icon appears in the calculator header. The default basic calculator now matches the supplied ergonomic Android reference: five rows of large rounded four-column keys (AC, parentheses, percent, division, numeric, operator, delete, equals), live expression/result, scientific/history shortcuts and adaptive full-height layout without clipping the Equals key. Four muted low-glare palettes are available: Soft Sky Blue, Gentle Mint Green, Calm Lavender and Warm Cream, all with dark-text keypad contrast tested to WCAG 4.5+:1 minimum for the Equals key, plus the preserved original Neon Dark theme. Theme selection persists locally; new/upgraded installs default to Soft Sky Blue. Existing offline Scientific tab, calculator history, memory, converter, accuracy cache and decimal improvements are retained. CI builds and signs debug Android APK and tests maths, keypad sizing, theme contrast, offline permissions and icon image signature. This is a developer-signed TEST release; on-device display and accessibility confirmation are recommended." \
               --latest=false
           fi
