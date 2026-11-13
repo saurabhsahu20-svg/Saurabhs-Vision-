@@ -608,6 +608,9 @@ public final class MainActivity extends Activity {
 
         drawerGrid=new GridLayout(this);
         drawerGrid.setColumnCount(4);
+        drawerGrid.setPadding(dp(3),dp(8),dp(3),dp(8));
+        if(lightTheme())drawerGrid.setBackground(
+            panel(0xf9ffffff,0xebf6fffe,18,0xffbedcf3));
         add(column,drawerGrid,15);
         if(appsLoaded)renderAppGrid("");
         else drawerTitle.setText("LOADING APPS…");
@@ -649,6 +652,8 @@ public final class MainActivity extends Activity {
         tile.setGravity(Gravity.CENTER);
         tile.setOrientation(LinearLayout.VERTICAL);
         tile.setPadding(dp(3),dp(9),dp(3),dp(9));
+        if(lightTheme())tile.setBackground(
+            panel(0xfff4faff,0xffe5f1fb,14,0xffd7e7f5));
         ImageView icon=new ImageView(this);
         icon.setImageDrawable(item.icon);
         icon.setContentDescription(item.label+" app icon");
