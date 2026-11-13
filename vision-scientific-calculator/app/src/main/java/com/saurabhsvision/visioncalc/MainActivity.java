@@ -305,11 +305,11 @@ public final class MainActivity extends Activity {
             LinearLayout column=new LinearLayout(this);
             column.setGravity(Gravity.CENTER);
             column.setOrientation(LinearLayout.VERTICAL);
-            int top=selected?CYAN:SOFT;
-            int bottom=selected?CYAN:PANEL;
-            int outline=selected?0:0;
+            int top=selected?(darkMode?CYAN:palette.operator):SOFT;
+            int bottom=selected?(darkMode?CYAN:palette.operator):PANEL;
+            int outline=selected?CYAN:0;
             column.setBackground(gradient(top,bottom,14,outline));
-            int color=selected?(darkMode?0xff032135:Color.WHITE):WHITE;
+            int color=selected&&darkMode?0xff032135:WHITE;
             TextView mark=text(symbols[i],18,color,true);
             mark.setGravity(Gravity.CENTER);
             column.addView(mark);
@@ -466,7 +466,7 @@ public final class MainActivity extends Activity {
         expressionView.setSingleLine(true);
         expressionView.setEllipsize(TextUtils.TruncateAt.START);
         expressionView.setMinHeight(dp(compact?48:62));
-        add(display,expressionView,dp(4));
+        add(display,expressionView,4);
 
         answerView=text("0",compact?35:46,darkMode?0xff91F1F3:palette.accent,true);
         answerView.setGravity(Gravity.END|Gravity.CENTER_VERTICAL);
@@ -498,7 +498,7 @@ public final class MainActivity extends Activity {
         his.leftMargin=dp(4);
         tools.addView(history,his);
         history.setOnClickListener(v->{tab=3;buildUi();});
-        add(screen,tools,dp(10));
+        add(screen,tools,10);
 
         String[][] rows={
             {"AC","()","%","÷"},
@@ -1029,17 +1029,17 @@ public final class MainActivity extends Activity {
         if(expression.isEmpty()){
             answerView.setText("0");
             statusView.setText("Offline • Scientific • Accurate");
-            statusView.setTextColor(tab<=1?0xff325577:MUTED);
+            statusView.setTextColor(MUTED);
             return;
         }
         try{
             answerView.setText(formattedResult());
             statusView.setText("PREVIEW  •  tap = to save");
-            statusView.setTextColor(tab<=1?0xff325577:MUTED);
+            statusView.setTextColor(MUTED);
         }catch(ExpressionEngine.CalcException ex){
             answerView.setText("—");
             statusView.setText("Complete expression, then tap =");
-            statusView.setTextColor(tab<=1?0xff325577:MUTED);
+            statusView.setTextColor(MUTED);
         }
     }
     private String displayExpression(String value){
@@ -1060,10 +1060,10 @@ public final class MainActivity extends Activity {
             expressionView.setText(displayExpression(readable));
             answerView.setText(readable);
             statusView.setText("SAVED TO HISTORY  ✓");
-            statusView.setTextColor(tab<=1?0xff135b64:CYAN);
+            statusView.setTextColor(CYAN);
         }catch(ExpressionEngine.CalcException ex){
             statusView.setText(ex.getMessage());
-            statusView.setTextColor(tab<=1?0xffa72337:RED);
+            statusView.setTextColor(RED);
             answerView.setText("Error");
         }
     }
