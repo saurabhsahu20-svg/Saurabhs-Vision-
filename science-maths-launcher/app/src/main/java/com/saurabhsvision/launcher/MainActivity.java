@@ -208,6 +208,229 @@ public final class MainActivity extends Activity {
         updateClock();
     }
 
+    /** Screenshot-inspired light-mode Home.
+     * Functional app shortcuts are separate from decorative Canvas graphics.
+     */
+    private void buildLightHome(LinearLayout column){
+        column.setPadding(dp(14),dp(4),dp(14),dp(13));
+
+        LinearLayout brand=new LinearLayout(this);
+        brand.setGravity(Gravity.CENTER);
+        brand.setOrientation(LinearLayout.VERTICAL);
+        TextView cap=text("🎓",31,0xffcf970f,true);
+        cap.setGravity(Gravity.CENTER);
+        brand.addView(cap,new LinearLayout.LayoutParams(-1,dp(36)));
+        TextView name=text("SAURABH'S",25,0xff103a79,true);
+        name.setGravity(Gravity.CENTER);
+        name.setLetterSpacing(.03f);
+        brand.addView(name);
+        TextView vision=text("— VISION™ —",19,0xffbe830b,true);
+        vision.setGravity(Gravity.CENTER);
+        brand.addView(vision);
+        add(column,brand,5);
+
+        // The search pill searches ACTUAL installed apps, not fake Google data.
+        LinearLayout search=new LinearLayout(this);
+        search.setGravity(Gravity.CENTER_VERTICAL);
+        search.setPadding(dp(18),0,dp(12),0);
+        search.setBackground(panel(0xffffffff,0xffe8f7ff,28,0xff80c4f5));
+        search.setElevation(dp(3));
+        TextView g=text("G",23,0xff2186df,true);
+        g.setGravity(Gravity.CENTER);
+        search.addView(g,new LinearLayout.LayoutParams(dp(28),dp(54)));
+        TextView label=text("  Search apps & learning",15,0xff54748f,false);
+        search.addView(label,new LinearLayout.LayoutParams(0,dp(54),1));
+        TextView arrow=text("⌕",25,0xff116cb2,true);
+        arrow.setGravity(Gravity.CENTER);
+        search.addView(arrow,new LinearLayout.LayoutParams(dp(34),dp(54)));
+        search.setContentDescription("Search installed apps");
+        search.setOnClickListener(v->openDrawer(""));
+        add(column,search,11);
+
+        LinearLayout timeRow=new LinearLayout(this);
+        timeRow.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout times=new LinearLayout(this);
+        times.setOrientation(LinearLayout.VERTICAL);
+        clock=text("10:24",48,0xff0a326f,true);
+        clock.setGravity(Gravity.CENTER_VERTICAL);
+        times.addView(clock);
+        date=text("",14,0xff204a7b,false);
+        times.addView(date);
+        timeRow.addView(times,new LinearLayout.LayoutParams(0,-2,1f));
+        View vertical=new View(this);
+        vertical.setBackgroundColor(0xffa2c8e7);
+        LinearLayout.LayoutParams separator=new LinearLayout.LayoutParams(dp(1),dp(58));
+        separator.setMargins(dp(11),0,dp(15),0);
+        timeRow.addView(vertical,separator);
+        LinearLayout info=new LinearLayout(this);
+        info.setOrientation(LinearLayout.VERTICAL);
+        TextView symbol=text("☀  SCIENCE TODAY",14,0xffb9810a,true);
+        info.addView(symbol);
+        battery=text("⚡ Battery",13,0xff204d7d,true);
+        info.addView(battery);
+        TextView line=text("Maths • Science • Discovery",10,0xff6483a6,false);
+        info.addView(line);
+        timeRow.addView(info,new LinearLayout.LayoutParams(0,-2,1f));
+        add(column,timeRow,15);
+
+        // Main science identity matches the supplied composition. Decorative
+        // atom, DNA, molecular model, flask and book are drawn by the wallpaper.
+        LinearLayout hero=new LinearLayout(this);
+        hero.setOrientation(LinearLayout.VERTICAL);
+        hero.setGravity(Gravity.CENTER);
+        hero.setPadding(dp(5),dp(3),dp(5),dp(3));
+        TextView title=text("Maths &",30,0xff0e3b88,true);
+        title.setGravity(Gravity.CENTER);
+        title.setShadowLayer(1.5f,0,dp(1),0x33ffffff);
+        hero.addView(title);
+        TextView science=text("Science",34,0xff1053a0,true);
+        science.setGravity(Gravity.CENTER);
+        hero.addView(science);
+        TextView ribbon=text("LAUNCHER",14,0xffffffff,true);
+        ribbon.setGravity(Gravity.CENTER);
+        ribbon.setLetterSpacing(.14f);
+        ribbon.setBackground(panel(0xff157edc,0xff093c8e,14,0xfff9c342));
+        LinearLayout.LayoutParams ribbonP=new LinearLayout.LayoutParams(dp(174),dp(31));
+        ribbonP.topMargin=dp(4);
+        hero.addView(ribbon,ribbonP);
+        add(column,hero,13);
+
+        // Freely use the area occupied by artistic book/helix, but avoid
+        // buttons in that region. On short phones the content can scroll.
+        View artSpace=new View(this);
+        int heightDp=(int)(getResources().getDisplayMetrics().heightPixels/
+            getResources().getDisplayMetrics().density);
+        int artHeight=Math.max(84,Math.min(185,(heightDp-650)/2+85));
+        column.addView(artSpace,new LinearLayout.LayoutParams(-1,dp(artHeight)));
+
+        LinearLayout tools=new LinearLayout(this);
+        tools.setOrientation(LinearLayout.HORIZONTAL);
+        tools.setGravity(Gravity.CENTER);
+        String[] symbols={"＋","✎","⚛","π"};
+        String[] labels={"Calculator","Notes","Science","Maths"};
+        int[] top={0xff237eec,0xffffc64b,0xff8c55ed,0xff1176db};
+        int[] bottom={0xff063c9f,0xffe9870e,0xff5428aa,0xff173db0};
+        for(int i=0;i<4;i++){
+            final int idx=i;
+            LinearLayout tile=new LinearLayout(this);
+            tile.setGravity(Gravity.CENTER);
+            tile.setOrientation(LinearLayout.VERTICAL);
+            TextView graphic=text(symbols[i],29,Color.WHITE,true);
+            graphic.setGravity(Gravity.CENTER);
+            graphic.setBackground(panel(top[i],bottom[i],18,0xfff4ce6a));
+            graphic.setElevation(dp(3));
+            tile.addView(graphic,new LinearLayout.LayoutParams(dp(60),dp(60)));
+            TextView caption=text(labels[i],12,0xff10336d,true);
+            caption.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(27));
+            cp.topMargin=dp(5);
+            tile.addView(caption,cp);
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(101),1);
+            tools.addView(tile,lp);
+            tile.setContentDescription("Open "+labels[i]);
+            tile.setOnClickListener(v->{
+                if(idx==0){
+                    if(!tryOpenInstalled("s calc","calculator","calc")){
+                        toast("Calculator not installed. Choose an app from All Apps.");
+                        openDrawer("");
+                    }
+                }else if(idx==1){
+                    if(!tryOpenInstalled("notes","keep","notepad"))showQuickNotes();
+                }else showLearningLab(idx==2?1:0);
+            });
+        }
+        add(column,tools,7);
+
+        // Accessible All Apps and favorites. On-device clock and buttons
+        // remain real, unlike the static reference illustration.
+        LinearLayout lower=new LinearLayout(this);
+        lower.setGravity(Gravity.CENTER);
+        TextView dots=text("●  ○  ○",13,0xff337fd0,true);
+        dots.setGravity(Gravity.CENTER);
+        lower.addView(dots,new LinearLayout.LayoutParams(0,dp(27),1f));
+        TextView all=control("ALL APPS  ›");
+        lower.addView(all,new LinearLayout.LayoutParams(dp(111),dp(33)));
+        all.setOnClickListener(v->openDrawer(""));
+        add(column,lower,0);
+
+        View spacer=new View(this);
+        column.addView(spacer,new LinearLayout.LayoutParams(-1,0,1f));
+        buildLightDock(column);
+    }
+
+    /** Local, no-cloud notepad fallback when a note app is not installed. */
+    private void showQuickNotes(){
+        final EditText entry=new EditText(this);
+        entry.setText(prefs.getString("quick_notes",""));
+        entry.setHint("Write a short note, formula or reminder…");
+        entry.setTextSize(16);
+        entry.setMinLines(5);
+        entry.setGravity(Gravity.TOP);
+        new AlertDialog.Builder(this)
+            .setTitle("✎ S VISION Quick Notes")
+            .setView(entry)
+            .setPositiveButton("Save on device",(dialog,which)->{
+                prefs.edit().putString("quick_notes",entry.getText().toString()).apply();
+                toast("Your note is saved locally");
+            })
+            .setNegativeButton("Cancel",null).show();
+    }
+    private boolean tryOpenInstalled(String... names){
+        if(!appsLoaded)return false;
+        for(String target:names){
+            for(AppItem item:apps){
+                if(item.label.toLowerCase(Locale.ROOT).contains(target)){
+                    openApp(item);return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void buildLightDock(LinearLayout column){
+        LinearLayout dock=new LinearLayout(this);
+        dock.setGravity(Gravity.CENTER);
+        dock.setPadding(dp(5),dp(10),dp(5),dp(8));
+        dock.setBackground(panel(0xf9ffffff,0xdde5f5ff,25,0xffc6e5ff));
+        dock.setElevation(dp(6));
+        String[] symbols={"☎","●●●","🌐","▧","◉"};
+        String[] labels={"Phone","Messages","Browser","Gallery","Camera"};
+        int[] tops={0xff40e86a,0xff36adff,0xff31bbff,0xffba80fa,0xff4d86bf};
+        int[] bottoms={0xff0ba730,0xff0755ca,0xff0e69d7,0xff5b28bf,0xff133b76};
+        for(int i=0;i<5;i++){
+            final int idx=i;
+            LinearLayout item=new LinearLayout(this);
+            item.setGravity(Gravity.CENTER);
+            TextView icon=text(symbols[i],i==1?17:26,0xffffffff,true);
+            icon.setGravity(Gravity.CENTER);
+            icon.setBackground(panel(tops[i],bottoms[i],17,0xffffffff));
+            icon.setElevation(dp(2));
+            item.addView(icon,new LinearLayout.LayoutParams(dp(55),dp(55)));
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(66),1f);
+            dock.addView(item,lp);
+            item.setContentDescription("Open "+labels[i]);
+            item.setOnClickListener(v->{
+                switch(idx){
+                    case 0:external(new Intent(Intent.ACTION_DIAL));break;
+                    case 1:external(new Intent(Intent.ACTION_SENDTO,
+                        Uri.parse("smsto:")));break;
+                    case 2:external(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://www.google.com")));break;
+                    case 3:
+                        if(!tryOpenInstalled("gallery","photos","files")){
+                            Intent picker=new Intent(Intent.ACTION_GET_CONTENT);
+                            picker.setType("image/*");
+                            external(picker);
+                        }
+                        break;
+                    case 4:external(new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA));break;
+                    default:break;
+                }
+            });
+        }
+        add(column,dock,9);
+    }
+
     private void buildHome(LinearLayout column){
         LinearLayout heading=new LinearLayout(this);
         heading.setGravity(Gravity.CENTER_VERTICAL);
