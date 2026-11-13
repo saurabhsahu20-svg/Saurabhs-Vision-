@@ -217,16 +217,18 @@ public final class MainActivity extends Activity {
         LinearLayout brand=new LinearLayout(this);
         brand.setGravity(Gravity.CENTER);
         brand.setOrientation(LinearLayout.VERTICAL);
-        TextView cap=text("🎓",31,0xffcf970f,true);
-        cap.setGravity(Gravity.CENTER);
-        brand.addView(cap,new LinearLayout.LayoutParams(-1,dp(36)));
-        TextView name=text("SAURABH'S",25,0xff103a79,true);
-        name.setGravity(Gravity.CENTER);
-        name.setLetterSpacing(.03f);
-        brand.addView(name);
-        TextView vision=text("— VISION™ —",19,0xffbe830b,true);
-        vision.setGravity(Gravity.CENTER);
-        brand.addView(vision);
+        // The user's genuine red 3D S logo includes the brand name;
+        // display the uploaded artwork itself, not a new text approximation.
+        ImageView brandImage=new ImageView(this);
+        brandImage.setImageResource(R.drawable.svision_red_brand);
+        brandImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        brandImage.setContentDescription("SAURABH'S VISION red 3D S brand logo");
+        brand.addView(brandImage,new LinearLayout.LayoutParams(dp(112),dp(112)));
+        TextView caption=text("SMART HOME • SCIENTIFIC VISION",10,0xff225ca0,true);
+        caption.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams captionParams=new LinearLayout.LayoutParams(-1,-2);
+        captionParams.topMargin=dp(1);
+        brand.addView(caption,captionParams);
         add(column,brand,5);
 
         // The search pill searches ACTUAL installed apps, not fake Google data.
@@ -434,9 +436,10 @@ public final class MainActivity extends Activity {
     private void buildHome(LinearLayout column){
         LinearLayout heading=new LinearLayout(this);
         heading.setGravity(Gravity.CENTER_VERTICAL);
-        TextView emblem=text("S",30,GOLD,true);
-        emblem.setGravity(Gravity.CENTER);
-        emblem.setBackground(panel(0xff184b95,0xff071e48,15,0xff55dbff));
+        ImageView emblem=new ImageView(this);
+        emblem.setImageResource(R.drawable.svision_red_brand);
+        emblem.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        emblem.setContentDescription("SAURABH'S VISION genuine red S logo");
         heading.addView(emblem,new LinearLayout.LayoutParams(dp(52),dp(52)));
         LinearLayout labels=new LinearLayout(this);
         labels.setOrientation(LinearLayout.VERTICAL);
