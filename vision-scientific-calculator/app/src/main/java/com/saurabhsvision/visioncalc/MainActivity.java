@@ -49,8 +49,11 @@ public final class MainActivity extends Activity {
     // the original dark neon navy look remains available with one tap.
     private int NAVY, PANEL, CARD, CYAN, GOLD, WHITE, MUTED, SOFT, RED;
     private boolean darkMode=false, scientificOpen=false;
+    private int themeIndex=0;
+    private ComfortTheme palette;
+    private static final int THEME_DARK=4;
     private TextView themeToggle;
-    private static final String[] TAB_NAMES={"SCIENTIFIC","ADVANCED","CONVERTER","HISTORY"};
+    private static final String[] TAB_NAMES={"CALCULATOR","SCIENTIFIC","CONVERTER","HISTORY"};
     private SharedPreferences prefs;
     private LinearLayout root, screen;
     private TextView expressionView,answerView,statusView,degreeButton;
@@ -81,13 +84,10 @@ public final class MainActivity extends Activity {
     @Override public void onCreate(Bundle saved){
         super.onCreate(saved);
         prefs=getSharedPreferences(PREFS,MODE_PRIVATE);
-        // Introduce the reference-inspired dark neon design once. Users can
-        // freely switch theme afterwards; preference is never forced again.
-        if(!prefs.getBoolean("proV15ThemeApplied",false)){
-            prefs.edit().putBoolean("darkMode",true)
-                .putBoolean("proV15ThemeApplied",true).apply();
-        }
-        darkMode=prefs.getBoolean("darkMode",true);
+        // New comfort theme defaults to Soft Sky Blue for fresh and upgraded
+        // installs. The user's explicit v1.6 theme selection is retained.
+        themeIndex=ComfortTheme.clamp(prefs.getInt("comfortTheme",0));
+        darkMode=(themeIndex==THEME_DARK);
         scientificOpen=prefs.getBoolean("scientificOpen",false);
         applyPalette();
         degrees=prefs.getBoolean("degrees",true);
@@ -108,15 +108,22 @@ public final class MainActivity extends Activity {
         state.putInt("tab",tab);
     }
     private void applyPalette(){
-        if(darkMode){
-            NAVY=0xff06162d; PANEL=0xff0d2545; CARD=0xff14335a;
-            CYAN=0xff23dbf0; GOLD=0xffffd16b; WHITE=0xfff7fbff;
-            MUTED=0xffa8c7dd; SOFT=0xff173b65; RED=0xffff9b9b;
-        }else{
-            NAVY=0xfff8f7fc; PANEL=0xfff1f0f8; CARD=0xffe4e5ee;
-            CYAN=0xff4a6da8; GOLD=0xff634366; WHITE=0xff1c2330;
-            MUTED=0xff697187; SOFT=0xffdee0ea; RED=0xffa23a54;
-        }
+        palette=ComfortTheme.choose(themeIndex);
+        darkMode=palette.dark();
+        NAVY=palette.background; PANEL=palette.panel; CARD=palette.card;
+        CYAN=palette.accent; GOLD=palette.detail; WHITE=palette.ink;
+        MUTED=palette.muted; SOFT=palette.soft; RED=palette.error;
+    }
+    private void chooseComfortTheme(){
+        new AlertDialog.Builder(this).setTitle("S CALC • Comfortable Colors")
+            .setSingleChoiceItems(ComfortTheme.NAMES,themeIndex,
+                (dialog,selected)->{
+                    themeIndex=ComfortTheme.clamp(selected);
+                    prefs.edit().putInt("comfortTheme",themeIndex).apply();
+                    applyPalette();buildUi();
+                    dialog.dismiss();
+                })
+            .setNegativeButton("Cancel",null).show();
     }
     private void applySystemBars(){
         getWindow().setStatusBarColor(NAVY);
@@ -206,7 +213,8 @@ public final class MainActivity extends Activity {
      * forcing a fixed-key-height layout on short/landscape displays.
      */
     private void expandKeypadToViewport(){
-        if(tab>1||keypadRows.size()!=4||keypadFooter==null||
+        if(tab>1||(keypadRows.size()!=4&&keypadRows.size()!=5)||
+            keypadFooter==null||
             scroll.getHeight()<=0||screen.getParent()!=root)return;
         int footerBottom=screen.getTop()+keypadFooter.getBottom();
         int currentKeyHeight=((LinearLayout.LayoutParams)
@@ -288,18 +296,15 @@ public final class MainActivity extends Activity {
     }
     private void showProMenu(){
         String[] choices={
-            darkMode?"Switch to Light Theme":"Switch to Neon Dark Theme",
+            "🎨 Color theme • "+ComfortTheme.NAMES[themeIndex],
             degrees?"Angle: Degrees (switch to RAD)":"Angle: Radians (switch to DEG)",
             "Open Calculation History", "Open Unit Converter",
-            "Advanced Functions"
+            "Scientific Calculator", "Basic Calculator"
         };
         new AlertDialog.Builder(this).setTitle("S CALC • Settings")
             .setItems(choices,(dialog,which)->{
                 switch(which){
-                    case 0:
-                        darkMode=!darkMode;
-                        prefs.edit().putBoolean("darkMode",darkMode).apply();
-                        applyPalette();buildUi();break;
+                    case 0:chooseComfortTheme();break;
                     case 1:
                         degrees=!degrees;
                         prefs.edit().putBoolean("degrees",degrees).apply();
@@ -307,6 +312,7 @@ public final class MainActivity extends Activity {
                     case 2:tab=3;buildUi();break;
                     case 3:tab=2;buildUi();break;
                     case 4:tab=1;buildUi();break;
+                    case 5:tab=0;buildUi();break;
                     default:break;
                 }
             }).show();
@@ -342,7 +348,8 @@ public final class MainActivity extends Activity {
     }
     private void showTab(){
         screen.removeAllViews();
-        if(tab<=1)buildProCalculator();
+        if(tab==0)buildComfortCalculator();
+        else if(tab==1)buildProCalculator();
         else if(tab==2)buildConverter();
         else buildHistory();
     }
