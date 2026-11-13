@@ -121,7 +121,16 @@ public final class InCallActivity extends Activity {
     }
     private void build(){
         frame=new FrameLayout(this);
-        frame.setBackgroundColor(0xff071229);
+        int[][] palettes={
+            {0xff0e2656,0xff09172e,0xff230949},
+            {0xff382070,0xff0b194a,0xff25073e},
+            {0xff82404c,0xff311a37,0xff120d2d},
+            {0xff065d57,0xff0a3447,0xff0a172b}
+        };
+        int choice=Math.max(0,Math.min(3,
+            getSharedPreferences("caller_settings",MODE_PRIVATE).getInt("theme",0)));
+        frame.setBackground(new GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,palettes[choice]));
         photoView=new ImageView(this);
         photoView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         photoView.setContentDescription("Full-screen caller photo wallpaper");
@@ -131,7 +140,7 @@ public final class InCallActivity extends Activity {
         View wallpaperTint=new View(this);
         wallpaperTint.setBackground(new GradientDrawable(
             GradientDrawable.Orientation.TL_BR,
-            new int[]{0x77341267,0xaa06112c,0xbb08122e,0xee050d1c}));
+            new int[]{0x66341267,0x9906112c,0xaa08122e,0xea050d1c}));
         frame.addView(wallpaperTint,new FrameLayout.LayoutParams(-1,-1));
         ScrollView scroll=new ScrollView(this);
         scroll.setFillViewport(true);
