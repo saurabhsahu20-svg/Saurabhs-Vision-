@@ -532,11 +532,15 @@ public final class MainActivity extends Activity {
     }
 
     private Button proScientificKey(String label,boolean selected){
-        boolean yellow=label.equals("DEG")||label.equals("RAD");
-        int top=selected?0xffffd95a:darkMode?0xff24518b:0xffd9e8ff;
-        int bottom=selected?0xffffa400:darkMode?0xff071c3f:0xffc4d5f5;
-        int outline=yellow?0xffffc53f:darkMode?0xff35c6ff:0xff659fd2;
-        int fg=selected?0xff182746:darkMode?0xffffffff:0xff16355d;
+        boolean angle=label.equals("DEG")||label.equals("RAD");
+        int top=darkMode?(selected?0xffffd95a:0xff24518b):
+            (selected?palette.accent:palette.card);
+        int bottom=darkMode?(selected?0xffffa400:0xff071c3f):
+            (selected?palette.accent:palette.soft);
+        int outline=darkMode?(angle?0xffffc53f:0xff35c6ff):
+            palette.soft;
+        int fg=darkMode?(selected?0xff182746:Color.WHITE):
+            (selected?Color.WHITE:palette.ink);
         Button b=button(label,top,bottom,outline,fg);
         b.setBackground(gradient(top,bottom,12,outline));
         b.setTextSize(label.length()>=4?12:label.length()>=3?14:17);
@@ -549,14 +553,22 @@ public final class MainActivity extends Activity {
         boolean equals=label.equals("=");
         boolean clear=label.equals("AC")||label.equals("⌫");
         int top,bottom,border,ink;
-        if(equals){
-            top=0xffffc33c;bottom=0xffe75b07;border=0xffffd771;ink=0xffffffff;
-        }else if(clear){
-            top=0xffb121d3;bottom=0xff5714a4;border=0xffff79f4;ink=0xffffffff;
-        }else if(digit){
-            top=0xfffcfeff;bottom=0xffc4d7f5;border=0xff8abaff;ink=0xff081c39;
+        if(darkMode){
+            if(equals){
+                top=0xffffc33c;bottom=0xffe75b07;border=0xffffd771;ink=0xffffffff;
+            }else if(clear){
+                top=0xffb121d3;bottom=0xff5714a4;border=0xffff79f4;ink=0xffffffff;
+            }else if(digit){
+                top=0xfffcfeff;bottom=0xffc4d7f5;border=0xff8abaff;ink=0xff081c39;
+            }else{
+                top=0xff1767b3;bottom=0xff052250;border=0xff3bcbff;ink=0xffffffff;
+            }
         }else{
-            top=0xff1767b3;bottom=0xff052250;border=0xff3bcbff;ink=0xffffffff;
+            top=equals?palette.equals:clear?palette.clear:
+                digit?palette.digit:palette.operator;
+            bottom=top;
+            border=palette.soft;
+            ink=palette.ink;
         }
         Button b=button(label,top,bottom,border,ink);
         b.setTextSize(label.length()>2?17:25);
@@ -599,15 +611,14 @@ public final class MainActivity extends Activity {
         display.setOrientation(LinearLayout.VERTICAL);
         display.setPadding(dp(14),dp(9),dp(14),dp(9));
         display.setBackground(gradient(
-            darkMode?0xffd7efff:0xffeef8ff,
-            darkMode?0xff8bc3ef:0xffc3e5ff,17,0xff46caff));
+            palette.displayTop,palette.displayBottom,19,SOFT));
         LinearLayout headline=new LinearLayout(this);
         headline.setGravity(Gravity.CENTER_VERTICAL);
-        TextView title=text("S VISION  •  LIVE CALCULATION",12,0xff19416e,true);
+        TextView title=text("S VISION  •  LIVE CALCULATION",12,WHITE,true);
         headline.addView(title,new LinearLayout.LayoutParams(0,dp(30),1));
-        degreeButton=text(degrees?"DEG":"RAD",13,0xff0a315b,true);
+        degreeButton=text(degrees?"DEG":"RAD",13,WHITE,true);
         degreeButton.setGravity(Gravity.CENTER);
-        degreeButton.setBackground(shape(0xffffd45a,9,0xffdeaa35));
+        degreeButton.setBackground(shape(SOFT,12,0));
         headline.addView(degreeButton,
             new LinearLayout.LayoutParams(dp(57),dp(30)));
         degreeButton.setOnClickListener(v->{
@@ -618,19 +629,19 @@ public final class MainActivity extends Activity {
         add(display,headline,0);
 
         expressionView=text(expression.isEmpty()?"0":displayExpression(expression),
-            small?20:26,0xff0a2245,true);
+            small?20:26,WHITE,true);
         expressionView.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
         expressionView.setSingleLine(true);
         expressionView.setEllipsize(TextUtils.TruncateAt.START);
         expressionView.setMinHeight(dp(small?29:37));
         add(display,expressionView,2);
-        answerView=text("0",small?27:38,0xff0b386d,true);
+        answerView=text("0",small?27:38,darkMode?0xff91F1F3:CYAN,true);
         answerView.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
         answerView.setSingleLine(true);
         answerView.setEllipsize(TextUtils.TruncateAt.START);
         answerView.setMinHeight(dp(small?34:47));
         add(display,answerView,0);
-        statusView=text("Scientific • Offline • DEG / RAD",10,0xff345c85,false);
+        statusView=text("Scientific • Offline • DEG / RAD",10,MUTED,false);
         statusView.setGravity(Gravity.RIGHT);
         add(display,statusView,2);
         add(screen,display,0);
@@ -704,10 +715,11 @@ public final class MainActivity extends Activity {
         String[] actions={"ƒ(x) FUNCTIONS","⇄ CONVERTER","◷ HISTORY","▣ COPY"};
         for(int i=0;i<actions.length;i++){
             final int id=i;
-            TextView link=text(actions[i],9,0xffffdf7d,true);
+            TextView link=text(actions[i],9,WHITE,true);
             link.setGravity(Gravity.CENTER);
             link.setSingleLine(true);
-            link.setBackground(gradient(0xff1b3e73,0xff081d43,10,0xff458fd8));
+            link.setBackground(gradient(darkMode?0xff1b3e73:SOFT,
+                darkMode?0xff081d43:PANEL,12,0));
             LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(40),1);
             lp.setMargins(dp(2),0,dp(2),0);
             shortcuts.addView(link,lp);
