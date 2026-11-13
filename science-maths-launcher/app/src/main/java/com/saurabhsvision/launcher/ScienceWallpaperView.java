@@ -17,7 +17,8 @@ import java.util.Random;
  */
 public final class ScienceWallpaperView extends View {
     public static final String[] THEMES={
-        "Cosmic Mathematics","Atomic Science","DNA Galaxy","Golden Equations"
+        "Cosmic Mathematics","Atomic Science","DNA Galaxy","Golden Equations",
+        "Pearl Light • Maths & Science"
     };
     private static final int[][] PALETTE={
         {0xff06142e,0xff0b3477,0xff061528,0xff3edfff,0xffffd36a},
@@ -38,10 +39,147 @@ public final class ScienceWallpaperView extends View {
         paint.setStyle(stroke>0?Paint.Style.STROKE:Paint.Style.FILL);
         if(stroke>0)paint.setStrokeWidth(stroke);
     }
+    /** Clean white/sky-blue/gold science wallpaper behind REAL UI controls.
+     * Intentionally no mock status bar, fake Google UI or fake weather.
+     */
+    private void drawPearlLight(Canvas canvas,int w,int h){
+        float scale=Math.min(w/410f,h/830f);
+        color(0xfff7fcff,0);
+        paint.setShader(new LinearGradient(0,0,w,h,
+            new int[]{0xffd8edff,0xffffffff,0xffe9f6ff,0xffd9f1ff},
+            null,Shader.TileMode.CLAMP));
+        canvas.drawRect(0,0,w,h,paint);
+        paint.setShader(null);
+
+        // Premium gold and royal-blue swooshes at top and footer.
+        Path top=new Path();
+        top.moveTo(0,0);top.lineTo(w,0);top.lineTo(w,h*.075f);
+        top.cubicTo(w*.64f,h*.005f,w*.34f,h*.16f,0,h*.09f);top.close();
+        color(0xff1166bf,0);canvas.drawPath(top,paint);
+        Path band=new Path();
+        band.moveTo(0,h*.045f);band.cubicTo(w*.35f,h*.13f,w*.65f,h*.015f,
+            w,h*.09f);
+        band.lineTo(w,h*.12f);
+        band.cubicTo(w*.63f,h*.04f,w*.36f,h*.15f,0,h*.075f);band.close();
+        color(0xfffbc942,0);canvas.drawPath(band,paint);
+        Path bottom=new Path();
+        bottom.moveTo(0,h*.92f);
+        bottom.cubicTo(w*.35f,h*.99f,w*.7f,h*.89f,w,h*.94f);
+        bottom.lineTo(w,h);bottom.lineTo(0,h);bottom.close();
+        color(0xff2088db,0);canvas.drawPath(bottom,paint);
+        Path bottomGold=new Path();
+        bottomGold.moveTo(0,h*.975f);
+        bottomGold.cubicTo(w*.32f,h*.93f,w*.75f,h*.99f,w,h*.95f);
+        bottomGold.lineTo(w,h*.974f);
+        bottomGold.cubicTo(w*.72f,h,w*.3f,h*.96f,0,h);bottomGold.close();
+        color(0xffffc944,0);canvas.drawPath(bottomGold,paint);
+
+        // Subtle sparkles and science formulae.
+        Random rand=new Random(27044);
+        for(int i=0;i<55;i++){
+            float x=rand.nextFloat()*w,y=h*.18f+rand.nextFloat()*h*.65f;
+            color(i%6==0?0x55ffca5b:0x3463b9fc,0);
+            canvas.drawCircle(x,y,scale*(i%6==0?1.9f:.8f),paint);
+        }
+        color(0x663268b6,0);
+        paint.setTextSize(scale*23);paint.setTypeface(
+            android.graphics.Typeface.create("serif",
+                android.graphics.Typeface.ITALIC));
+        canvas.drawText("E = mc²",w*.63f,h*.46f,paint);
+        canvas.drawText("π",w*.08f,h*.74f,paint);
+        paint.setTextSize(scale*16);
+        canvas.drawText("∑ n²",w*.78f,h*.72f,paint);
+
+        // Atom on left. Use strokes and central nucleus.
+        float ax=w*.21f,ay=h*.47f;
+        for(int i=0;i<3;i++){
+            canvas.save();canvas.rotate(i*60,ax,ay);
+            color(0xff1387dc,scale*2.35f);
+            canvas.drawOval(new RectF(ax-scale*47,ay-scale*19,
+                ax+scale*47,ay+scale*19),paint);
+            canvas.restore();
+        }
+        color(0xffffb53c,0);canvas.drawCircle(ax,ay,scale*9,paint);
+        color(0xff21b6e1,0);canvas.drawCircle(ax+scale*29,ay-scale*17,scale*4,paint);
+
+        // DNA helix on right, away from launcher action buttons.
+        float cx=w*.83f,yStart=h*.30f,yEnd=h*.60f;
+        for(int i=0;i<=36;i++){
+            float t=i/36f,y=yStart+t*(yEnd-yStart);
+            float offset=(float)Math.sin(t*Math.PI*4)*scale*28;
+            float x1=cx+offset,x2=cx-offset;
+            color(0xb91b8bd9,scale*2.1f);canvas.drawLine(x1,y,x2,y,paint);
+            color(0xff0467bc,0);canvas.drawCircle(x1,y,scale*2.6f,paint);
+            color(0xff2bc2e2,0);canvas.drawCircle(x2,y,scale*2.6f,paint);
+        }
+
+        // Scientific open book at lower center, with glowing golden spine.
+        float bookY=h*.695f;
+        Path leftPage=new Path();
+        leftPage.moveTo(w*.5f,bookY+scale*58);
+        leftPage.cubicTo(w*.34f,bookY+scale*28,w*.21f,bookY+scale*29,
+            w*.11f,bookY+scale*51);
+        leftPage.lineTo(w*.13f,bookY+scale*14);
+        leftPage.cubicTo(w*.30f,bookY-scale*4,w*.44f,bookY+scale*4,
+            w*.5f,bookY+scale*47);
+        leftPage.close();
+        color(0xfffdfdfd,0);canvas.drawPath(leftPage,paint);
+        color(0xff2569b2,scale*1.5f);canvas.drawPath(leftPage,paint);
+        Path rightPage=new Path();
+        rightPage.moveTo(w*.5f,bookY+scale*58);
+        rightPage.cubicTo(w*.66f,bookY+scale*28,w*.79f,bookY+scale*29,
+            w*.89f,bookY+scale*51);
+        rightPage.lineTo(w*.87f,bookY+scale*14);
+        rightPage.cubicTo(w*.70f,bookY-scale*4,w*.56f,bookY+scale*4,
+            w*.5f,bookY+scale*47);
+        rightPage.close();
+        color(0xfffdfdfd,0);canvas.drawPath(rightPage,paint);
+        color(0xff2569b2,scale*1.5f);canvas.drawPath(rightPage,paint);
+        color(0xffffc63f,0);
+        canvas.drawCircle(w*.5f,bookY+scale*52,scale*5,paint);
+        color(0xffd8a12d,scale*2.3f);
+        canvas.drawLine(w*.5f,bookY+scale*10,w*.5f,bookY+scale*54,paint);
+
+        // Blue flask on the left of the book, with small bubbles.
+        float fx=w*.27f,fy=bookY-scale*35;
+        Path flask=new Path();
+        flask.moveTo(fx-scale*8,fy-scale*25);
+        flask.lineTo(fx+scale*8,fy-scale*25);
+        flask.lineTo(fx+scale*8,fy-scale*5);
+        flask.lineTo(fx+scale*27,fy+scale*30);
+        flask.quadTo(fx+scale*28,fy+scale*37,fx+scale*18,fy+scale*37);
+        flask.lineTo(fx-scale*18,fy+scale*37);
+        flask.quadTo(fx-scale*28,fy+scale*37,fx-scale*27,fy+scale*30);
+        flask.lineTo(fx-scale*8,fy-scale*5);flask.close();
+        color(0x8036ccf4,0);canvas.drawPath(flask,paint);
+        color(0xff0078d4,scale*2f);canvas.drawPath(flask,paint);
+        color(0xff16ace3,0);
+        for(int i=0;i<5;i++){
+            float x=fx+scale*(-14+i*6);
+            canvas.drawCircle(x,fy+scale*(17+i%2*5),scale*2,paint);
+        }
+
+        // Light molecule on the right of book.
+        float mx=w*.72f,my=bookY-scale*22;
+        float[][] pts={{-26,-5},{0,-25},{21,-1},{2,25},{38,20}};
+        int[][] links={{0,1},{1,2},{0,3},{3,4},{2,4}};
+        for(int[] link:links){
+            color(0xff349bd8,scale*2);
+            canvas.drawLine(mx+pts[link[0]][0]*scale,my+pts[link[0]][1]*scale,
+                mx+pts[link[1]][0]*scale,my+pts[link[1]][1]*scale,paint);
+        }
+        for(int i=0;i<pts.length;i++){
+            color(i%2==0?0xffee72b5:0xff177bdc,0);
+            canvas.drawCircle(mx+pts[i][0]*scale,my+pts[i][1]*scale,
+                scale*5.2f,paint);
+        }
+    }
+
     @Override protected void onDraw(Canvas canvas){
         super.onDraw(canvas);
         int w=getWidth(),h=getHeight();
         if(w<=0||h<=0)return;
+        if(theme==4){drawPearlLight(canvas,w,h);return;}
         int[] colors=PALETTE[theme];
         color(colors[0],0);
         paint.setShader(new LinearGradient(0,0,w,h,
