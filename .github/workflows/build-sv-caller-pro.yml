@@ -86,9 +86,9 @@ jobs:
           assert 'android:exported="false"' in mf
           for key in ('ImageView.ScaleType.CENTER_CROP','PhotoStore.resolve(',
                       'PhotoStore.loadScaled(', 'setShowWhenLocked(true)',
-                      'SVInCallService.answer()', 'SVInCallService.decline()',
+                      'SVInCallService::answer', 'SVInCallService::decline',
                       'SVInCallService.sendDtmf(', 'svc.setMuted(', 'svc.setAudioRoute(',
-                      'call.hold()', 'call.unhold()', 'SVInCallService.end()'):
+                      'call.hold()', 'call.unhold()', 'SVInCallService::end'):
               assert key in activity, key
           for tab in ('"DIALPAD"','"CONTACTS"','"RECENTS"','"FAVORITES"'):
               assert tab in main, tab
