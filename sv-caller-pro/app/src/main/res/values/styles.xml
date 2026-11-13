@@ -1,0 +1,12 @@
+<resources>
+  <style name="SVCallerTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+    <item name="android:fontFamily">sans</item>
+    <item name="android:colorAccent">#28E2EF</item>
+    <item name="android:statusBarColor">#07172F</item>
+    <item name="android:navigationBarColor">#07172F</item>
+    <item name="android:windowLightStatusBar">false</item>
+    <item name="android:windowLightNavigationBar">false</item>
+    <item name="android:windowBackground">#07172F</item>
+    <item name="android:windowActionModeOverlay">true</item>
+  </style>
+</resources>
