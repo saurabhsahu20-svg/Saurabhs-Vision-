@@ -68,6 +68,7 @@ public final class MainActivity extends Activity {
     private ArrayList<Recent> recentCalls=new ArrayList<>();
     private boolean contactsLoading=false,recentsLoading=false;
     private boolean contactDataLoaded=false,recentDataLoaded=false;
+    private String permissionSnapshot="";
 
     private static final class Person {
         final String name,number;
@@ -124,6 +125,22 @@ public final class MainActivity extends Activity {
         readDialIntent(getIntent());
         buildUi();
     }
+    @Override protected void onResume(){
+        super.onResume();
+        // Refresh role/permission badges after Android system approval or settings.
+        String snapshot=permissionsSnapshot();
+        if(!snapshot.equals(permissionSnapshot)){
+            permissionSnapshot=snapshot;
+            if(root!=null)buildUi();
+        }
+    }
+    private String permissionsSnapshot(){
+        return defaultDialer()+"|"+
+            granted(Manifest.permission.CALL_PHONE)+"|"+
+            granted(Manifest.permission.READ_CONTACTS)+"|"+
+            granted(Manifest.permission.READ_CALL_LOG)+"|"+
+            (Build.VERSION.SDK_INT<33 || granted(Manifest.permission.POST_NOTIFICATIONS));
+    }
     @Override protected void onNewIntent(Intent intent){
         super.onNewIntent(intent);
         setIntent(intent);
@@ -179,6 +196,7 @@ public final class MainActivity extends Activity {
             case 2:buildRecents();break;
             case 3:buildFavorites();break;
         }
+        permissionSnapshot=permissionsSnapshot();
     }
     private void buildHeader(){
         LinearLayout row=new LinearLayout(this);
@@ -213,10 +231,88 @@ public final class MainActivity extends Activity {
             defaultDialer()?0xff0b292e:0xff332711,13,
             defaultDialer()?0xff3acbac:0xff9c7746));
         add(root,roleIndicator,13);
-        roleIndicator.setOnClickListener(v->{
-            if(!defaultDialer())requestDialerRole();
-            else toast("SV Caller Pro is your default Phone app");
-        });
+        roleIndicator.setOnClickListener(v->showPermissionSetup());
+    }
+
+    /** A real, user-controlled permission guide. No automatic grants, no
+     * misleading check marks, and every request has a Settings fallback. */
+    private void showPermissionSetup(){
+        String[] names={
+            (defaultDialer()?"✓ ":"○ ")+"Default Phone App",
+            (granted(Manifest.permission.CALL_PHONE)?"✓ ":"○ ")+"Phone Calls",
+            (granted(Manifest.permission.READ_CONTACTS)?"✓ ":"○ ")+"Contacts",
+            ((defaultDialer()&&granted(Manifest.permission.READ_CALL_LOG))?
+                "✓ ":"○ ")+"Call History",
+            ((Build.VERSION.SDK_INT<33||granted(
+                Manifest.permission.POST_NOTIFICATIONS))?"✓ ":"○ ")+"Call Notifications",
+            "⚙ Open Default Apps Settings",
+            "⚙ Open SV Caller App Permissions",
+            "◉ Full-Screen Call Alerts"
+        };
+        new AlertDialog.Builder(this).setTitle("SV CALLER • PERMISSION SETUP")
+            .setMessage("Tap any item to open its real Android permission screen. "+
+                "For a full-screen incoming call, this app must first be selected "+
+                "as the Default Phone App. Your existing phone app is not changed "+
+                "without your approval.")
+            .setItems(names,(dialog,which)->{
+                switch(which){
+                    case 0:
+                        if(!defaultDialer())requestDialerRole();
+                        else toast("Already the default Phone app");
+                        break;
+                    case 1:requestPermissionOrExplain(
+                        Manifest.permission.CALL_PHONE,REQUEST_PHONE,
+                        "Phone Calls");break;
+                    case 2:requestPermissionOrExplain(
+                        Manifest.permission.READ_CONTACTS,REQUEST_CONTACTS,
+                        "Contacts");break;
+                    case 3:
+                        if(!defaultDialer()){
+                            new AlertDialog.Builder(this).setTitle("Call History")
+                                .setMessage("Choose SV Caller Pro as your default "+
+                                    "Phone app first, then allow local Call History.")
+                                .setPositiveButton("Choose Phone App",(d,w)->requestDialerRole())
+                                .setNegativeButton("Cancel",null).show();
+                        }else requestPermissionOrExplain(
+                            Manifest.permission.READ_CALL_LOG,REQUEST_LOG,
+                            "Call History");
+                        break;
+                    case 4:requestNotificationPermission();break;
+                    case 5:openDefaultPhoneSettings();break;
+                    case 6:openAppPermissionSettings();break;
+                    case 7:openFullScreenSettings();break;
+                    default:break;
+                }
+            }).setPositiveButton("DONE",null).show();
+    }
+    private void requestPermissionOrExplain(String permission,int request,String label){
+        if(granted(permission)){toast(label+" permission already allowed");return;}
+        if(shouldShowRequestPermissionRationale(permission)){
+            new AlertDialog.Builder(this).setTitle("Allow "+label)
+                .setMessage("SV Caller uses this permission only for its "+
+                    "phone features. You can change it in Android Settings.")
+                .setPositiveButton("Continue",(d,w)->requestPermissions(
+                    new String[]{permission},request))
+                .setNeutralButton("Settings",(d,w)->openAppPermissionSettings())
+                .setNegativeButton("Cancel",null).show();
+        }else requestPermissions(new String[]{permission},request);
+    }
+    private void openAppPermissionSettings(){
+        try{
+            Intent intent=new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.setData(Uri.parse("package:"+getPackageName()));
+            startActivity(intent);
+        }catch(Exception ex){
+            toast("Go to Android Settings → Apps → SV Caller Pro → Permissions");
+        }
+    }
+    private void openDefaultPhoneSettings(){
+        try{
+            startActivity(new Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS));
+        }catch(Exception e){
+            try{startActivity(new Intent(Settings.ACTION_SETTINGS));}
+            catch(Exception ignored){toast("Open Settings → Default Apps → Phone");}
+        }
     }
     private void buildTabs(){
         LinearLayout row=new LinearLayout(this);
