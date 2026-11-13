@@ -1,13 +1,26 @@
-# S VISION Launcher 1.0 — Maths & Science Android Home
+# S VISION Launcher 1.1 — Pearl Light Maths & Science Android Home
 
 **By SAURABH'S VISION™**
 
 A real, minimal, privacy-first Android **home screen launcher**, with offline educational space/math/science themes and functional installed-app navigation. Built in native Java 17 and Android SDK 35. No Kotlin, external libraries, login, network code, or ads.
 
+## New in 1.1 — Pearl Light Maths & Science Home
+
+The default look for new installs is a **Pearl White + Sky Blue + Royal Blue + Gold** theme inspired by the provided screenshot. Existing manually selected themes are preserved. The original four dark modes remain selectable, giving **five offline wallpapers**.
+
+- Science artwork is drawn natively: atom, DNA double helix, chemical flask, molecular model, π and equations, open book, blue/gold ribbons.
+- Centered SAURABH'S VISION™ branding, real **time/date**, and real **battery level**. We do not invent weather readings or pretend to fetch current conditions without a weather data source.
+- Functional white Search pill opens the **real app drawer**.
+- Home shortcuts: Calculator opens installed S CALC or another calculator; Notes opens installed notes app or a built-in on-device note editor; Science and Maths open learning cards.
+- Rounded five-slot bottom dock: **Phone, Messages, Browser, Gallery, Camera** launch appropriate installed apps or standard Android intents.
+- All Apps retains installed app icons, search and long-press favorites. Drawer/tile colors now fit the light appearance.
+- All controls are tappable Android views rather than a screenshot; the original decorative image is just a styling reference, not a claimed exact UI reproduction.
+- No location, microphone, weather, network or dangerous permissions requested. Your favorite shortcuts and quick note are stored on-device.
+
 ## What works in v1.0
 
 - A real Android HOME application (manifest handles `ACTION_MAIN`, `CATEGORY_HOME` and `CATEGORY_DEFAULT`). Also has a normal icon so users can try it before setting it as their default.
-- First-party **Science & Maths Canvas wallpaper** with 4 user-selectable offline styles: Cosmic Mathematics, Atomic Science, DNA Galaxy, Golden Equations.
+- First-party **Science & Maths Canvas wallpaper** with 5 user-selectable offline styles: Cosmic Mathematics, Atomic Science, DNA Galaxy, Golden Equations and Pearl Light (default).
 - Dynamic clock/date and battery percentage (real system values, no invented weather).
 - Discovers installed **launchable** apps via Android's scoped `<queries>` intent; `QUERY_ALL_PACKAGES` is deliberately not requested.
 - Working 4-column app drawer and case-insensitive search by app name/package.
@@ -30,7 +43,7 @@ cd science-maths-launcher
 gradle --no-daemon :app:assembleDebug
 ```
 
-The debug-signed APK appears at `app/build/outputs/apk/debug/app-debug.apk`. GitHub Actions also produces a downloadable public **GitHub Release** tagged `s-vision-launcher-v1.0.0`, validates launcher HOME manifest filters and APK signature, and runs pure Java tests.
+The debug-signed APK appears at `app/build/outputs/apk/debug/app-debug.apk`. GitHub Actions also produces a downloadable public **GitHub Release** tagged `s-vision-launcher-v1.1.0`, validates launcher HOME manifest filters and APK signature, and runs pure Java tests.
 
 ## Set as Default Launcher
 
