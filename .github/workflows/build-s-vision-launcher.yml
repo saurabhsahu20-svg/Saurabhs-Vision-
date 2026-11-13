@@ -88,12 +88,17 @@ jobs:
                'MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA',
                'if(lightTheme())tile.setBackground('):
               assert functional in activity, functional
-          for visual in ('"SAURABH\'S"', '"— VISION™ —"',
-               '"Maths &"', '"Science"', '"LAUNCHER"',
-               '"Calculator","Notes","Science","Maths"'):
+          for visual in ('"Maths &"', '"Science"', '"LAUNCHER"',
+               '"Calculator","Notes","Science","Maths"',
+               'brandImage.setImageResource(R.drawable.svision_red_brand)',
+               'emblem.setImageResource(R.drawable.svision_red_brand)'):
               assert visual in activity, visual
-          assert (p/'app/src/main/res/drawable/ic_launcher_sv.xml').is_file()
-          assert "versionName '1.1.0'" in (p/'app/build.gradle').read_text()
+          logo=(p/'app/src/main/res/drawable-nodpi/svision_red_brand.webp').read_bytes()
+          assert logo[:4]==b'RIFF' and logo[8:12]==b'WEBP' and len(logo)>3000
+          assert 'android:icon="@drawable/svision_red_brand"' in mf
+          assert 'android:roundIcon="@drawable/svision_red_brand"' in mf
+          assert "versionName '1.2.0'" in (p/'app/build.gradle').read_text()
+          print('PASS: exact user-supplied red 3D S Vision logo packaged and wired as HOME icon')
           print('PASS: HOME intent, app drawer, scoped package discovery, search, pinned favorites')
           print('PASS: 5 offline Maths/Science themes including Pearl Light and functional shortcuts')
           print('PASS: No sensitive permissions or Internet access')
@@ -130,13 +135,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml |
             grep -q "android.intent.category.HOME"
           mkdir -p launcher-deliverables
-          cp "$apk" launcher-deliverables/S_VISION_LAUNCHER_v1.1.0_PEARL_LIGHT.apk
+          cp "$apk" launcher-deliverables/S_VISION_LAUNCHER_v1.2.0_RED_S_VISION_LOGO.apk
           ( cd launcher-deliverables && sha256sum *.apk > SHA256SUMS.txt )
 
       - name: Upload Launcher APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_VISION_Launcher_v1_1_0_Pearl_Light_APK
+          name: S_VISION_Launcher_v1_2_0_Red_S_Logo_APK
           path: launcher-deliverables/*
           retention-days: 90
 
@@ -146,13 +151,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          tag="s-vision-launcher-v1.1.0"
-          apk="launcher-deliverables/S_VISION_LAUNCHER_v1.1.0_PEARL_LIGHT.apk"
+          tag="s-vision-launcher-v1.2.0"
+          apk="launcher-deliverables/S_VISION_LAUNCHER_v1.2.0_RED_S_VISION_LOGO.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$apk" launcher-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$apk" launcher-deliverables/SHA256SUMS.txt \
-              --title "S VISION Launcher 1.1 • Premium Pearl Light & Science HOME" \
-              --notes "S VISION Launcher 1.1 by SAURABH'S VISION adds the requested Premium PEARL LIGHT Home style based on the supplied picture: royal blue/gold brand, sky-white search, real date/clock and battery, Maths & Science title, DNA molecule/atom/flask/open-book science Canvas wallpaper and 5-app glossy bottom dock. Four interactive educational shortcuts now launch an installed Calculator, installed Notes app (or on-device Quick Notes), Science Lab and Maths Lab. Phone, Messages, Browser, Gallery, Camera dock icons invoke installed Android handlers. App Drawer, real installed app search and favorites, 4 pre-existing dark scientific themes and Android default HOME role chooser are preserved; light is the default for new users, old selected themes are retained. This is a native working launcher, not a static screenshot. Fake weather numbers are deliberately omitted: current battery and local time are real. No Internet, location, microphone, login, ads or tracking permissions. APK is debug-signed for testing. The screenshot is a design reference, not an exact claim about app hardware or weather. Manual device check still recommended." \
+              --title "S VISION Launcher 1.2 • Official Red S Brand + Pearl Light HOME" \
+              --notes "S VISION Launcher 1.2: Uses the user's actual uploaded red metallic 3D S SAURABH'S VISION logo both as the Android launcher icon (including round icon) and the header logo on the Pearl Light Maths & Science Home. Retains original scientific wallpaper, live local clock/date/battery, functional app search, four educational shortcuts, five dock actions, app drawer, favorites, and four existing dark themes. Uses locally embedded small WebP of the user-provided image: no network requests, permissions or ads. Tests verify actual binary image signature, Android manifest icon references, both home screen usages and normal launcher functions before compiling and signing the APK. This is a public debug-signed testing APK; phone launcher icon appearance can vary by OEM masking. No fake weather information is displayed." \
               --latest=false
           fi
