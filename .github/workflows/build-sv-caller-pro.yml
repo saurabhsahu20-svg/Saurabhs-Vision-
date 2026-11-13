@@ -1,0 +1,168 @@
+name: Build SV Caller Pro Full Screen Phone APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'sv-caller-pro/**'
+      - '.github/workflows/build-sv-caller-pro.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sv-caller-pro-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Validate Full-Screen Phone Role and Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Install Android SDK 35
+        shell: bash
+        run: |
+          set -e
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Verify real telecom services and full-screen caller photo integration
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('sv-caller-pro')
+          src=p/'app/src/main/java/com/saurabhsvision/caller'
+          mf=(p/'app/src/main/AndroidManifest.xml').read_text()
+          main=(src/'MainActivity.java').read_text()
+          svc=(src/'SVInCallService.java').read_text()
+          activity=(src/'InCallActivity.java').read_text()
+          photos=(src/'PhotoStore.java').read_text()
+          receiver=(src/'CallActionReceiver.java').read_text()
+          gradle=(p/'app/build.gradle').read_text()
+          assert 'android.intent.action.DIAL' in mf
+          assert 'android.telecom.InCallService' in mf
+          assert 'android.permission.BIND_INCALL_SERVICE' in mf
+          assert 'android.telecom.IN_CALL_SERVICE_UI' in mf
+          assert 'android.telecom.IN_CALL_SERVICE_RINGING' in mf
+          assert 'android:showWhenLocked="true"' in mf
+          assert 'android:turnScreenOn="true"' in mf
+          assert 'android.permission.USE_FULL_SCREEN_INTENT' in mf
+          assert 'android.permission.READ_CONTACTS' in mf
+          assert 'android.permission.READ_CALL_LOG' in mf
+          assert 'android.permission.CALL_PHONE' in mf
+          assert 'android.permission.POST_NOTIFICATIONS' in mf
+          assert 'android:allowBackup="false"' in mf
+          for forbidden in ('android.permission.INTERNET',
+                            'QUERY_ALL_PACKAGES', 'READ_SMS', 'RECORD_AUDIO',
+                            'ACCESS_FINE_LOCATION', 'READ_MEDIA_IMAGES'):
+              assert forbidden not in mf, forbidden
+          assert 'RoleManager.ROLE_DIALER' in main
+          assert 'TelecomManager.placeCall(' not in main or 'manager.placeCall(' in main
+          assert 'TelecomManager.ACTION_CHANGE_DEFAULT_DIALER' in main
+          assert 'android.telecom.Call' in svc
+          assert 'extends InCallService' in svc
+          for key in ('onCallAdded(', 'onCallRemoved(', 'onCallAudioStateChanged(',
+                      'setFullScreenIntent(full,true)', 'Notification.CATEGORY_CALL',
+                      'call.answer(', 'call.reject(', 'call.disconnect(',
+                      'call.playDtmfTone(', 'PendingIntent.FLAG_IMMUTABLE'):
+              assert key in svc, key
+          assert 'extends BroadcastReceiver' in receiver
+          assert 'android:exported="false"' in mf
+          for key in ('ImageView.ScaleType.CENTER_CROP','PhotoStore.resolve(',
+                      'PhotoStore.loadScaled(', 'setShowWhenLocked(true)',
+                      'SVInCallService.answer()', 'SVInCallService.decline()',
+                      'SVInCallService.sendDtmf(', 'svc.setMuted(', 'svc.setAudioRoute(',
+                      'call.hold()', 'call.unhold()', 'SVInCallService.end()'):
+              assert key in activity, key
+          for tab in ('"DIALPAD"','"CONTACTS"','"RECENTS"','"FAVORITES"'):
+              assert tab in main, tab
+          assert 'ContactsContract.CommonDataKinds.Phone.CONTENT_URI' in main
+          assert 'CallLog.Calls.CONTENT_URI' in main
+          assert 'Intent.ACTION_OPEN_DOCUMENT' in main
+          assert 'takePersistableUriPermission(' in main
+          assert 'PhotoStore.savePhoto(' in main
+          assert 'requestDialerRole()' in main
+          assert 'PhoneLookup.CONTENT_FILTER_URI' in photos
+          assert 'MessageDigest.getInstance("SHA-256")' in photos
+          assert "versionName '1.0.0'" in gradle
+          assert (p/'app/src/main/res/drawable-nodpi/ic_sv_brand.webp').is_file()
+          icon=(p/'app/src/main/res/drawable-nodpi/ic_sv_brand.webp').read_bytes()
+          assert icon[0:4]==b'RIFF' and icon[8:12]==b'WEBP'
+          print('PASS: real default Phone role, full screen in-call photo and controls')
+          print('PASS: contact photo picker, permissions, dialpad, recents and local privacy')
+          print('PASS: original S VISION red 3D logo, no Internet/recording permission')
+          PY
+
+      - name: Run safe phone dialpad and theme regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          p="sv-caller-pro"
+          src="$p/app/src/main/java/com/saurabhsvision/caller"
+          out="$RUNNER_TEMP/sv-caller-unit-tests"
+          mkdir -p "$out"
+          javac -encoding UTF-8 -d "$out" "$src/DialerRules.java" \
+             "$p/tests/DialerRulesTest.java"
+          java -ea -cp "$out" DialerRulesTest
+
+      - name: Compile real Android default-dialer APK
+        shell: bash
+        run: |
+          cd sv-caller-pro
+          gradle --no-daemon --stacktrace :app:assembleDebug
+
+      - name: Verify APK package, telecom service and app signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk="sv-caller-pro/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$apk"
+          unzip -t "$apk" | tail -1
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" |
+            grep "package: name='com.saurabhsvision.caller'"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml |
+            grep -q "android.telecom.InCallService"
+          mkdir -p caller-deliverables
+          cp "$apk" caller-deliverables/SV_CALLER_PRO_v1.0.0_FULLSCREEN_PHOTO.apk
+          ( cd caller-deliverables && sha256sum *.apk > SHA256SUMS.txt )
+
+      - name: Upload debug APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SV_CALLER_PRO_v1_0_0_FULLSCREEN_PHOTO_APK
+          path: caller-deliverables/*
+          retention-days: 90
+
+      - name: Publish public SV Caller test release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="sv-caller-pro-v1.0.0"
+          apk="caller-deliverables/SV_CALLER_PRO_v1.0.0_FULLSCREEN_PHOTO.apk"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$apk" caller-deliverables/SHA256SUMS.txt --clobber
+          else
+            gh release create "$tag" "$apk" caller-deliverables/SHA256SUMS.txt \
+              --title "SV Caller Pro 1.0 • Full-Screen Caller Photo Phone App" \
+              --notes "SV Caller Pro by SAURABH'S VISION: native Android experimental Phone/Dialer with real ACTION_DIAL and user-approved default ROLE_DIALER, InCallService, real Answer/Decline/End and Mute/Speaker/Hold/DTMF controls. Contact photos fill the incoming/ongoing call background wallpaper; user can select a separate full-screen photo per number through Android system image picker. Four gradient fallbacks. App includes dialpad, local contacts search, local call history, favorites, original red S Vision icon and premium dark neon UI. No network, ads, recording or data transfer. Requires Default Phone role and runtime permissions. Android 14+ can restrict full-screen call notifications; user can permit them in system settings, otherwise call notification remains available. Debug-signed test app, NOT Play Store release. DO NOT replace the stock phone app for emergency use without testing on a real device. Multi-call, video calls, call recording, spam blocking, lock/app protection, and automatic SIM selection are not included. An illustrative promo image elsewhere may show those future concepts; they are not in this APK." \
+              --latest=false
+          fi
