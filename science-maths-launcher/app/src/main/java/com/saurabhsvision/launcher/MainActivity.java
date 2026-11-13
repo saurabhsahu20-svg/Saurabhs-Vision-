@@ -224,11 +224,11 @@ public final class MainActivity extends Activity {
         brandImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
         brandImage.setContentDescription("SAURABH'S VISION red 3D S brand logo");
         brand.addView(brandImage,new LinearLayout.LayoutParams(dp(112),dp(112)));
-        TextView caption=text("SMART HOME • SCIENTIFIC VISION",10,0xff225ca0,true);
-        caption.setGravity(Gravity.CENTER);
+        TextView brandCaption=text("SMART HOME • SCIENTIFIC VISION",10,0xff225ca0,true);
+        brandCaption.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams captionParams=new LinearLayout.LayoutParams(-1,-2);
         captionParams.topMargin=dp(1);
-        brand.addView(caption,captionParams);
+        brand.addView(brandCaption,captionParams);
         add(column,brand,5);
 
         // The search pill searches ACTUAL installed apps, not fake Google data.
