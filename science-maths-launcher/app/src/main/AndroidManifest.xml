@@ -11,8 +11,8 @@
     </queries>
     <application
         android:label="@string/app_name"
-        android:icon="@drawable/ic_launcher_sv"
-        android:roundIcon="@drawable/ic_launcher_sv"
+        android:icon="@drawable/svision_red_brand"
+        android:roundIcon="@drawable/svision_red_brand"
         android:theme="@style/LauncherTheme"
         android:allowBackup="false"
         android:usesCleartextTraffic="false"
