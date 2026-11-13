@@ -4,8 +4,8 @@
     <application
         android:label="@string/app_name"
         android:theme="@style/VisionCalcTheme"
-        android:icon="@drawable/ic_s_calc"
-        android:roundIcon="@drawable/ic_s_calc"
+        android:icon="@drawable/ic_s_calc_comfort"
+        android:roundIcon="@drawable/ic_s_calc_comfort"
         android:allowBackup="false"
         android:usesCleartextTraffic="false"
         android:supportsRtl="true">
