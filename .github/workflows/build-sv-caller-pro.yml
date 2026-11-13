@@ -113,13 +113,16 @@ jobs:
           print('PASS: Permission wizard, default-app fallback and eight actual quick tools')
           assert 'PhoneLookup.CONTENT_FILTER_URI' in photos
           assert 'MessageDigest.getInstance("SHA-256")' in photos
-          assert "versionName '1.1.0'" in gradle
-          assert (p/'app/src/main/res/drawable-nodpi/ic_sv_brand.webp').is_file()
-          icon=(p/'app/src/main/res/drawable-nodpi/ic_sv_brand.webp').read_bytes()
-          assert icon[0:4]==b'RIFF' and icon[8:12]==b'WEBP'
+          assert "versionName '1.2.0'" in gradle
+          assert (p/'app/src/main/res/drawable-nodpi/ic_sv_caller_pro.webp').is_file()
+          icon=(p/'app/src/main/res/drawable-nodpi/ic_sv_caller_pro.webp').read_bytes()
+          assert icon[0:4]==b'RIFF' and icon[8:12]==b'WEBP' and len(icon)>5000
+          assert 'android:icon="@drawable/ic_sv_caller_pro"' in mf
+          assert 'android:roundIcon="@drawable/ic_sv_caller_pro"' in mf
+          assert 'emblem.setImageResource(R.drawable.ic_sv_caller_pro)' in main
           print('PASS: real default Phone role, full screen in-call photo and controls')
           print('PASS: contact photo picker, permissions, dialpad, recents and local privacy')
-          print('PASS: original S VISION red 3D logo, no Internet/recording permission')
+          print('PASS: user-approved neon S Caller icon in launcher, header and no Internet/recording permission')
           PY
 
       - name: Run safe phone dialpad and theme regression tests
@@ -153,13 +156,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml |
             grep -q "android.telecom.InCallService"
           mkdir -p caller-deliverables
-          cp "$apk" caller-deliverables/SV_CALLER_PRO_v1.1.0_PERMISSION_FIX.apk
+          cp "$apk" caller-deliverables/SV_CALLER_PRO_v1.2.0_NEW_ICON.apk
           ( cd caller-deliverables && sha256sum *.apk > SHA256SUMS.txt )
 
       - name: Upload debug APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SV_CALLER_PRO_v1_1_0_PERMISSION_FIX_APK
+          name: SV_CALLER_PRO_v1_2_0_NEW_ICON_APK
           path: caller-deliverables/*
           retention-days: 90
 
@@ -169,13 +172,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="sv-caller-pro-v1.1.0"
-          apk="caller-deliverables/SV_CALLER_PRO_v1.1.0_PERMISSION_FIX.apk"
+          tag="sv-caller-pro-v1.2.0"
+          apk="caller-deliverables/SV_CALLER_PRO_v1.2.0_NEW_ICON.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$apk" caller-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$apk" caller-deliverables/SHA256SUMS.txt \
-              --title "SV Caller Pro 1.1 • Permission Setup & Full-Height Dialpad" \
-              --notes "SV Caller Pro v1.1 by SAURABH'S VISION fixes the permissions setup UX and makes better use of unused space under the dialpad. A live permissions dashboard and user-initiated wizard now show Default Phone role, Phone Calls, Contacts, Call History, Notifications and Full-Screen Call permission states, with Android role picker and Default Apps/App Info Settings fallbacks on OEM devices. The previously empty lower screen contains eight REAL shortcuts: Contacts, Recents, Favorites, Caller Photo, Themes, Permissions, Phone App Settings and Help. Native dialpad, local contacts, full-screen caller photo wallpapers, InCallService, incoming Answer/Decline, ongoing Mute/Speaker/Keypad/Hold and locally saved favorites remain. No Internet permission, login, recording, video calling or fake spam blocking features. CI checks permission flow source, Android compilation, signing and DIAL/IN_CALL_SERVICE manifest metadata. This is a debug-signed TEST APK; Android OEM devices can refuse third-party default dialers, and an actual handset call-screen test is still necessary. Until then, keep the stock Phone app as the default for reliable emergency and regular calling." \
+              --title "SV Caller Pro 1.2 • New Glossy Neon S Calling Icon" \
+              --notes "SV Caller Pro v1.2 by SAURABH'S VISION updates the Android Home icon and round icon to the new user-approved glossy neon blue/red/gold S Calling artwork, and uses the same logo in the dialer header. All earlier calling UI, local Contacts/Recents/Favorites, selected full-screen caller photos, permission setup, 8 quick tools, in-call Telecom controls and privacy behavior are preserved. CI verifies actual WebP binary, icon references in Android manifest, existing permissions/phone role and debug APK signature. This is a debug-signed TEST APK; Android OEM default Phone role may not be available or fully functional. Use the built-in Phone app until calling is fully verified on the device." \
               --latest=false
           fi
