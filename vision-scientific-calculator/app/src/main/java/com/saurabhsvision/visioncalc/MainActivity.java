@@ -430,6 +430,129 @@ public final class MainActivity extends Activity {
      * All visible keys have real operations. Unsupported symbolic integration
      * or matrix solvers are NOT represented as functional controls.
      */
+    /**
+     * Comfortable basic calculator based on the user's supplied 4-column
+     * circular keypad reference. Uses real ExpressionEngine operations.
+     * Only S CALC branding is new; no fake display values or functionality.
+     */
+    private Button comfortKey(String label){
+        boolean number=label.matches("[0-9.]");
+        boolean equals=label.equals("=");
+        boolean clear=label.equals("AC");
+        boolean delete=label.equals("⌫");
+        int top=number?palette.digit:equals?palette.equals:
+            clear||delete?palette.clear:palette.operator;
+        int bottom=top;
+        int fg=darkMode?0xffF7FBFF:palette.ink;
+        if(darkMode && equals)fg=0xff052031;
+        int stroke=darkMode?0xff4D89AD:0xffCCDDE8;
+        Button button=button(label,top,bottom,stroke,fg);
+        button.setBackground(gradient(top,bottom,36,stroke));
+        button.setTextSize(label.equals("()")?24:label.equals("⌫")?25:
+            label.length()>2?22:31);
+        button.setElevation(dp(darkMode?1.8f:0.8f));
+        button.setContentDescription(label.equals("⌫")?
+            "Delete last character":label.equals("AC")?
+            "Clear calculation":label.equals("=")?"Calculate result":label);
+        return button;
+    }
+    private void buildComfortCalculator(){
+        final boolean compact=landscape()||
+            getResources().getDisplayMetrics().heightPixels/
+                getResources().getDisplayMetrics().density<705;
+
+        LinearLayout display=new LinearLayout(this);
+        display.setOrientation(LinearLayout.VERTICAL);
+        display.setPadding(dp(17),dp(compact?10:18),dp(17),dp(compact?11:16));
+        display.setBackground(gradient(palette.displayTop,palette.displayBottom,
+            24,darkMode?0xff2E7A9F:palette.soft));
+
+        LinearLayout labelRow=new LinearLayout(this);
+        labelRow.setGravity(Gravity.CENTER_VERTICAL);
+        TextView label=text("S VISION  •  LIVE RESULT",12,palette.muted,true);
+        labelRow.addView(label,new LinearLayout.LayoutParams(0,dp(32),1));
+        degreeButton=text(degrees?"DEG":"RAD",12,WHITE,true);
+        degreeButton.setGravity(Gravity.CENTER);
+        degreeButton.setBackground(shape(palette.soft,12,0));
+        labelRow.addView(degreeButton,new LinearLayout.LayoutParams(dp(57),dp(32)));
+        degreeButton.setOnClickListener(v->{
+            degrees=!degrees;
+            prefs.edit().putBoolean("degrees",degrees).apply();
+            buildUi();
+        });
+        add(display,labelRow,0);
+
+        expressionView=text(expression.isEmpty()?"0":displayExpression(expression),
+            compact?25:30,palette.ink,true);
+        expressionView.setGravity(Gravity.END|Gravity.CENTER_VERTICAL);
+        expressionView.setSingleLine(true);
+        expressionView.setEllipsize(TextUtils.TruncateAt.START);
+        expressionView.setMinHeight(dp(compact?48:62));
+        add(display,expressionView,dp(4));
+
+        answerView=text("0",compact?35:46,darkMode?0xff91F1F3:palette.accent,true);
+        answerView.setGravity(Gravity.END|Gravity.CENTER_VERTICAL);
+        answerView.setSingleLine(true);
+        answerView.setEllipsize(TextUtils.TruncateAt.START);
+        answerView.setMinHeight(dp(compact?49:67));
+        add(display,answerView,0);
+
+        statusView=text("OFFLINE • ACCURATE • PRIVATE",11,palette.muted,false);
+        statusView.setGravity(Gravity.END);
+        add(display,statusView,dp(6));
+        add(screen,display,0);
+
+        LinearLayout tools=new LinearLayout(this);
+        tools.setGravity(Gravity.CENTER_VERTICAL);
+        TextView science=text("∑  SCIENTIFIC ›",12,palette.accent,true);
+        science.setGravity(Gravity.CENTER);
+        science.setContentDescription("Open full scientific calculator");
+        science.setBackground(shape(palette.soft,14,0));
+        LinearLayout.LayoutParams sci=new LinearLayout.LayoutParams(0,dp(43),1);
+        sci.rightMargin=dp(4);
+        tools.addView(science,sci);
+        science.setOnClickListener(v->{tab=1;buildUi();});
+        TextView history=text("◷  HISTORY",12,palette.accent,true);
+        history.setGravity(Gravity.CENTER);
+        history.setContentDescription("Open calculation history");
+        history.setBackground(shape(palette.soft,14,0));
+        LinearLayout.LayoutParams his=new LinearLayout.LayoutParams(0,dp(43),1);
+        his.leftMargin=dp(4);
+        tools.addView(history,his);
+        history.setOnClickListener(v->{tab=3;buildUi();});
+        add(screen,tools,dp(10));
+
+        String[][] rows={
+            {"AC","()","%","÷"},
+            {"7","8","9","×"},
+            {"4","5","6","−"},
+            {"1","2","3","+"},
+            {"0",".","⌫","="}
+        };
+        int height=dp(compact?57:73);
+        for(String[] items:rows){
+            LinearLayout row=new LinearLayout(this);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            keypadRows.add(row);
+            for(String key:items){
+                Button b=comfortKey(key);
+                LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(
+                    0,height,1f);
+                p.setMargins(dp(3),dp(4),dp(3),dp(4));
+                row.addView(b,p);
+                b.setOnClickListener(v->onKey(key));
+            }
+            add(screen,row,0);
+        }
+
+        // Keep last row and equals fully visible above Android navigation.
+        TextView footer=text("S CALC  •  SAURABH'S VISION™",10,palette.muted,true);
+        footer.setGravity(Gravity.CENTER);
+        add(screen,footer,8);
+        keypadFooter=footer;
+        updatePreview();
+    }
+
     private Button proScientificKey(String label,boolean selected){
         boolean yellow=label.equals("DEG")||label.equals("RAD");
         int top=selected?0xffffd95a:darkMode?0xff24518b:0xffd9e8ff;
