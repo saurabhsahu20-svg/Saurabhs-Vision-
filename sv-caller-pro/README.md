@@ -1,6 +1,18 @@
-# SV Caller Pro 1.0 — Full-Screen Caller Wallpaper Phone App
+# SV Caller Pro 1.1 — Full-Screen Caller Wallpaper Phone App
 
 **By SAURABH'S VISION™** — a privacy-conscious, native Android dialer with immersive incoming and ongoing call wallpaper. This is a genuine experimental Android default Phone app, not a static mockup.
+
+## v1.1 — Permission fix and fill unused dialpad space
+
+- The gold **Set as Default Phone App** banner now opens a real **Permission Setup** wizard rather than only attempting the default role silently. Each item shows its live Android permission state (✓/○).
+- Default Phone role: requests `RoleManager.ROLE_DIALER` on Android 10+ and legacy Telecom chooser on older devices. If Android cannot offer the role, shows clear guidance and a **Default Apps Settings** fallback; no automatic permission grants or special-access bypass.
+- Runtime permissions: user-tappable Phone Calls, Contacts, Call History (only after default dialer), and Notifications; permission denial offers an **App Permissions** settings shortcut. The setup also links to Android 14+ full-screen alert permissions.
+- `onResume` refreshes permission badges when returning from system Settings, without requiring a restart.
+- The formerly blank space beneath **CALL NOW** is now filled by a dynamic **Permissions & Call Setup** card and eight functioning Quick Tools: Contacts, Recents, Favorites, Caller Photo, Themes, Permissions, Phone App Settings and Help. Compact devices scroll naturally.
+- Preserves 3D red S VISION icon, dialpad, incoming photo wallpaper, contact data privacy and real InCallService.
+- **No video calling, recording, spam blocking, voice changing, or other decorative fake features are included**, even if an illustration portrays future ideas.
+
+**Important:** A successful APK build proves compilation and API wiring, not that an OEM will expose this prototype as a default Phone app. Phone manufacturers and Android policy can restrict the role; if it isn't listed in Default Apps → Phone, the system restriction cannot be circumvented through this app. Continue using the built-in Phone app until this app is validated on a real device.
 
 ## Working components included
 
@@ -44,7 +56,7 @@ This is version 1.0 of a real Android dialer; its compatibility with every phone
 
 ## How to install and test safely
 
-1. Download the APK from the GitHub Release `sv-caller-pro-v1.0.0`, install, open **SV Caller Pro**.
+1. Download the APK from the GitHub Release `sv-caller-pro-v1.1.0`, install, open **SV Caller Pro**.
 2. Explore its dialpad and theme screens before changing your default Phone app.
 3. Select **Set as Default Phone App**, and confirm via **Android's system chooser**. Request Phone, Contacts and Notification access only when the feature needs it.
 4. Grant **Full-screen notifications** permission in the app's Settings if Android requires it.
