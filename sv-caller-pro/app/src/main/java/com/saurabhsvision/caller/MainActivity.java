@@ -429,7 +429,94 @@ public final class MainActivity extends Activity {
         TextView foot=text("✦  CONTACT PHOTO WILL FILL THE ENTIRE SCREEN  ✦",
             11,GOLD,true);
         foot.setGravity(Gravity.CENTER);
-        add(panel,foot,17);
+        add(panel,foot,9);
+        buildDialpadExtras();
+    }
+
+    /** Fills the formerly empty lower screen with ACTUAL working features.
+     * The user may scroll on compact displays instead of cutting off keys.
+     * No mock video calling, recording or spam-blocking icons.
+     */
+    private void buildDialpadExtras(){
+        LinearLayout access=new LinearLayout(this);
+        access.setOrientation(LinearLayout.VERTICAL);
+        access.setPadding(dp(12),dp(11),dp(12),dp(11));
+        access.setBackground(gradient(0xff1b4572,0xff0a274c,18,0xff3a9ece));
+        TextView title=text("✓  PERMISSIONS & CALL SETUP",14,GOLD,true);
+        add(access,title,0);
+        int allowed=0;
+        if(defaultDialer())allowed++;
+        if(granted(Manifest.permission.CALL_PHONE))allowed++;
+        if(granted(Manifest.permission.READ_CONTACTS))allowed++;
+        if(Build.VERSION.SDK_INT<33||
+            granted(Manifest.permission.POST_NOTIFICATIONS))allowed++;
+        TextView details=text(allowed+"/4 READY  •  Phone App, Calls, Contacts, Alerts",
+            12,allowed==4?0xff98f3c8:0xfff5dba7,false);
+        add(access,details,5);
+        TextView grant=text(allowed==4?
+            "✓  REVIEW PERMISSIONS":"⚙  FIX PERMISSIONS / OPEN SETTINGS",
+            13,0xff082a4b,true);
+        grant.setGravity(Gravity.CENTER);
+        grant.setBackground(gradient(0xff7ef7ee,0xff2bb8e3,13,0xffc5ffff));
+        LinearLayout.LayoutParams gp=new LinearLayout.LayoutParams(-1,dp(45));
+        gp.topMargin=dp(9);
+        access.addView(grant,gp);
+        grant.setOnClickListener(v->showPermissionSetup());
+        add(panel,access,15);
+
+        TextView toolsTitle=text("✦  QUICK CALLING TOOLS",14,WHITE,true);
+        toolsTitle.setGravity(Gravity.CENTER);
+        add(panel,toolsTitle,15);
+
+        String[][] names={
+            {"👥  CONTACTS","◷  RECENTS","★  FAVORITES","▧  PHOTO"},
+            {"🎨  THEMES","⚙  PERMISSIONS","☎  PHONE APP","ⓘ  HELP"}
+        };
+        for(int row=0;row<names.length;row++){
+            LinearLayout strip=new LinearLayout(this);
+            strip.setGravity(Gravity.CENTER);
+            for(int col=0;col<names[row].length;col++){
+                final int id=row*4+col;
+                TextView tile=text(names[row][col],11,WHITE,true);
+                tile.setGravity(Gravity.CENTER);
+                tile.setMaxLines(2);
+                tile.setPadding(dp(2),dp(5),dp(2),dp(5));
+                int first=id%2==0?0xff1f5186:0xff514488;
+                tile.setBackground(gradient(first,0xff0b284d,15,
+                    id==3?0xfff5ca6f:0xff389bd3));
+                tile.setContentDescription(names[row][col]);
+                LinearLayout.LayoutParams tp=new LinearLayout.LayoutParams(
+                    0,dp(68),1);
+                tp.setMargins(dp(3),dp(3),dp(3),dp(3));
+                strip.addView(tile,tp);
+                tile.setOnClickListener(v->runQuickTool(id));
+            }
+            add(panel,strip,row==0?5:0);
+        }
+        TextView footer=text("SV CALLER PRO  •  YOUR CALL, YOUR PHOTO",11,CYAN,true);
+        footer.setGravity(Gravity.CENTER);
+        add(panel,footer,11);
+    }
+    private void runQuickTool(int action){
+        switch(action){
+            case 0:tab=1;buildUi();break;
+            case 1:tab=2;buildUi();break;
+            case 2:tab=3;buildUi();break;
+            case 3:choosePhoto(dialText);break;
+            case 4:showThemes();break;
+            case 5:showPermissionSetup();break;
+            case 6:openDefaultPhoneSettings();break;
+            case 7:new AlertDialog.Builder(this)
+                .setTitle("SV CALLER PRO • HELP")
+                .setMessage("Tap FIX PERMISSIONS to select SV Caller Pro "+
+                    "as your Default Phone app and allow needed permissions. "+
+                    "You can set a separate caller photo with PHOTO. "+
+                    "Incoming full-screen alerts may require permission "+
+                    "from your Android device. Other Phone apps can be "+
+                    "restored in Android Default Apps settings.")
+                .setPositiveButton("OK",null).show();break;
+            default:break;
+        }
     }
     private TextView smallButton(String title){
         TextView t=text(title,12,WHITE,true);
