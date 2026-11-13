@@ -183,9 +183,10 @@ public final class MainActivity extends Activity {
     private void buildHeader(){
         LinearLayout row=new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
-        TextView emblem=text("S",37,GOLD,true);
-        emblem.setGravity(Gravity.CENTER);
-        emblem.setBackground(gradient(0xff234c91,0xff0a244c,17,CYAN));
+        ImageView emblem=new ImageView(this);
+        emblem.setImageResource(R.drawable.ic_sv_brand);
+        emblem.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        emblem.setContentDescription("SAURABH'S VISION original red 3D S logo");
         row.addView(emblem,new LinearLayout.LayoutParams(dp(52),dp(52)));
         LinearLayout names=new LinearLayout(this);
         names.setPadding(dp(10),0,0,0);
