@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- Permission use is limited to user-requested phone, contacts & local call history. -->
+  <uses-permission android:name="android.permission.CALL_PHONE"/>
+  <uses-permission android:name="android.permission.READ_CONTACTS"/>
+  <uses-permission android:name="android.permission.READ_CALL_LOG"/>
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+  <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"/>
+  <uses-permission android:name="android.permission.VIBRATE"/>
+  <queries>
+      <intent>
+          <action android:name="android.intent.action.DIAL"/>
+          <data android:scheme="tel"/>
+      </intent>
+  </queries>
+  <application android:theme="@style/SVCallerTheme"
+      android:label="@string/app_name"
+      android:icon="@drawable/ic_caller"
+      android:roundIcon="@drawable/ic_caller"
+      android:allowBackup="false"
+      android:usesCleartextTraffic="false"
+      android:supportsRtl="true">
+    <activity android:name=".InCallActivity"
+        android:exported="false"
+        android:excludeFromRecents="true"
+        android:launchMode="singleTop"
+        android:showWhenLocked="true"
+        android:turnScreenOn="true"
+        android:configChanges="orientation|screenSize|uiMode"/>
+    <activity android:name=".MainActivity"
+        android:exported="true"
+        android:windowSoftInputMode="adjustResize"
+        android:launchMode="singleTop">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN"/>
+        <category android:name="android.intent.category.LAUNCHER"/>
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.DIAL"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.DIAL"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+        <data android:scheme="tel"/>
+      </intent-filter>
+    </activity>
+    <service android:name=".SVInCallService"
+        android:exported="true"
+        android:permission="android.permission.BIND_INCALL_SERVICE">
+      <intent-filter>
+        <action android:name="android.telecom.InCallService"/>
+      </intent-filter>
+      <meta-data android:name="android.telecom.IN_CALL_SERVICE_UI"
+          android:value="true"/>
+      <meta-data android:name="android.telecom.IN_CALL_SERVICE_RINGING"
+          android:value="true"/>
+      <meta-data android:name="android.telecom.IN_CALL_SERVICE_CAR_MODE_UI"
+          android:value="false"/>
+    </service>
+    <receiver android:name=".CallActionReceiver"
+        android:exported="false"/>
+  </application>
+</manifest>
