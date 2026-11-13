@@ -72,10 +72,30 @@ jobs:
           assert '"Atomic Science"' in wallpaper
           assert '"DNA Galaxy"' in wallpaper
           assert '"Golden Equations"' in wallpaper
+          assert '"Pearl Light • Maths & Science"' in wallpaper
+          assert 'theme==4){drawPearlLight(canvas,w,h);return;}' in wallpaper
+          assert 'private void drawPearlLight(Canvas canvas,int w,int h)' in wallpaper
+          assert 'private void buildLightHome(LinearLayout column)' in activity
+          assert 'private void buildLightDock(LinearLayout column)' in activity
+          assert 'if(lightTheme())buildLightHome(column)' in activity
+          assert 'prefs.getInt(PREF_THEME,4)' in activity
+          assert 'getSystemWindowInsetBottom()' in activity
+          assert 'View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR' in activity
+          assert 'View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR' in activity
+          for functional in ('tryOpenInstalled("s calc","calculator","calc")',
+               'showQuickNotes()', 'showLearningLab(idx==2?1:0)',
+               'Intent.ACTION_DIAL', 'Uri.parse("smsto:")',
+               'MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA',
+               'if(lightTheme())tile.setBackground('):
+              assert functional in activity, functional
+          for visual in ('"SAURABH\'S"', '"— VISION™ —"',
+               '"Maths &"', '"Science"', '"LAUNCHER"',
+               '"Calculator","Notes","Science","Maths"'):
+              assert visual in activity, visual
           assert (p/'app/src/main/res/drawable/ic_launcher_sv.xml').is_file()
-          assert "versionName '1.0.0'" in (p/'app/build.gradle').read_text()
+          assert "versionName '1.1.0'" in (p/'app/build.gradle').read_text()
           print('PASS: HOME intent, app drawer, scoped package discovery, search, pinned favorites')
-          print('PASS: 4 offline Maths/Science themes, science lab cards, home role chooser')
+          print('PASS: 5 offline Maths/Science themes including Pearl Light and functional shortcuts')
           print('PASS: No sensitive permissions or Internet access')
           PY
 
@@ -110,13 +130,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml |
             grep -q "android.intent.category.HOME"
           mkdir -p launcher-deliverables
-          cp "$apk" launcher-deliverables/S_VISION_LAUNCHER_v1.0.0_MATHS_SCIENCE.apk
+          cp "$apk" launcher-deliverables/S_VISION_LAUNCHER_v1.1.0_PEARL_LIGHT.apk
           ( cd launcher-deliverables && sha256sum *.apk > SHA256SUMS.txt )
 
       - name: Upload Launcher APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_VISION_Launcher_v1_0_0_Maths_Science_APK
+          name: S_VISION_Launcher_v1_1_0_Pearl_Light_APK
           path: launcher-deliverables/*
           retention-days: 90
 
@@ -126,13 +146,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          tag="s-vision-launcher-v1.0.0"
-          apk="launcher-deliverables/S_VISION_LAUNCHER_v1.0.0_MATHS_SCIENCE.apk"
+          tag="s-vision-launcher-v1.1.0"
+          apk="launcher-deliverables/S_VISION_LAUNCHER_v1.1.0_PEARL_LIGHT.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$apk" launcher-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$apk" launcher-deliverables/SHA256SUMS.txt \
-              --title "S VISION Launcher 1.0 • Maths & Science Android HOME" \
-              --notes "Functional Android HOME launcher by SAURABH'S VISION. Four offline themed scientific wallpapers drawn with native Canvas (Cosmic Mathematics, Atomic Science, DNA Galaxy, Golden Equations), dynamic clock/date/battery, real installed-app drawer and case-insensitive search, tap to open apps, long-press to pin favorites, functional Phone/Messages/Browser quick links and Maths/Science learning cards. Choose Default Home with Android system role picker; Settings → Default Apps → Home can restore previous launcher. No login, ads, Internet permission, tracking or broad QUERY_ALL_PACKAGES. This is an initial debug-signed test APK, not a Google Play release. The promotional design concept is illustrative only; no third-party widgets, live wallpapers, app locking or other unimplemented features are claimed. Real-phone verification is recommended." \
+              --title "S VISION Launcher 1.1 • Premium Pearl Light & Science HOME" \
+              --notes "S VISION Launcher 1.1 by SAURABH'S VISION adds the requested Premium PEARL LIGHT Home style based on the supplied picture: royal blue/gold brand, sky-white search, real date/clock and battery, Maths & Science title, DNA molecule/atom/flask/open-book science Canvas wallpaper and 5-app glossy bottom dock. Four interactive educational shortcuts now launch an installed Calculator, installed Notes app (or on-device Quick Notes), Science Lab and Maths Lab. Phone, Messages, Browser, Gallery, Camera dock icons invoke installed Android handlers. App Drawer, real installed app search and favorites, 4 pre-existing dark scientific themes and Android default HOME role chooser are preserved; light is the default for new users, old selected themes are retained. This is a native working launcher, not a static screenshot. Fake weather numbers are deliberately omitted: current battery and local time are real. No Internet, location, microphone, login, ads or tracking permissions. APK is debug-signed for testing. The screenshot is a design reference, not an exact claim about app hardware or weather. Manual device check still recommended." \
               --latest=false
           fi
