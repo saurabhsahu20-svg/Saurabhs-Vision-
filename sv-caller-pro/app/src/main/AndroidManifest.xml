@@ -15,8 +15,8 @@
   </queries>
   <application android:theme="@style/SVCallerTheme"
       android:label="@string/app_name"
-      android:icon="@drawable/ic_sv_brand"
-      android:roundIcon="@drawable/ic_sv_brand"
+      android:icon="@drawable/ic_sv_caller_pro"
+      android:roundIcon="@drawable/ic_sv_caller_pro"
       android:allowBackup="false"
       android:usesCleartextTraffic="false"
       android:supportsRtl="true">
