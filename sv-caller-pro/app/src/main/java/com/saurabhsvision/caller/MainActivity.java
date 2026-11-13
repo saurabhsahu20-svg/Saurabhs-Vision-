@@ -608,7 +608,7 @@ public final class MainActivity extends Activity {
     private void callNumber(String raw){
         String number=raw==null?"":raw.trim();
         if(number.isEmpty()){toast("Enter a phone number");return;}
-        if(!number.matches("[+0-9*#(). -]{1,80}")){
+        if(!DialerRules.validNumber(number)){
             toast("Use a valid phone number");return;
         }
         pendingDial=number;
