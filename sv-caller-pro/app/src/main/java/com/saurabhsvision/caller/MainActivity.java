@@ -202,9 +202,9 @@ public final class MainActivity extends Activity {
         LinearLayout row=new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
         ImageView emblem=new ImageView(this);
-        emblem.setImageResource(R.drawable.ic_sv_brand);
+        emblem.setImageResource(R.drawable.ic_sv_caller_pro);
         emblem.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        emblem.setContentDescription("SAURABH'S VISION original red 3D S logo");
+        emblem.setContentDescription("SV Caller Pro glossy neon S and phone logo");
         row.addView(emblem,new LinearLayout.LayoutParams(dp(52),dp(52)));
         LinearLayout names=new LinearLayout(this);
         names.setPadding(dp(10),0,0,0);
