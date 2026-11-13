@@ -731,22 +731,43 @@ public final class MainActivity extends Activity {
         }
     }
     private void requestDialerRole(){
+        if(defaultDialer()){
+            toast("SV Caller Pro is already your default Phone app");
+            buildUi();return;
+        }
         try{
             if(Build.VERSION.SDK_INT>=29){
                 RoleManager role=(RoleManager)getSystemService(Context.ROLE_SERVICE);
-                if(role!=null&&role.isRoleAvailable(RoleManager.ROLE_DIALER)){
-                    startActivityForResult(role.createRequestRoleIntent(
-                        RoleManager.ROLE_DIALER),REQUEST_ROLE);
+                if(role!=null && role.isRoleAvailable(RoleManager.ROLE_DIALER)){
+                    startActivityForResult(
+                        role.createRequestRoleIntent(RoleManager.ROLE_DIALER),
+                        REQUEST_ROLE);
                     return;
                 }
             }
-            Intent legacy=new Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER);
-            legacy.putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME,
-                getPackageName());
-            startActivityForResult(legacy,REQUEST_ROLE);
-        }catch(Exception e){
-            toast("Open Android Settings → Default apps → Phone app");
-        }
+            if(Build.VERSION.SDK_INT<29){
+                Intent legacy=new Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER);
+                legacy.putExtra(
+                    TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME,
+                    getPackageName());
+                startActivityForResult(legacy,REQUEST_ROLE);
+                return;
+            }
+        }catch(Exception ignored){}
+        showManualDialerChoice();
+    }
+    private void showManualDialerChoice(){
+        new AlertDialog.Builder(this).setTitle("Select your Phone app")
+            .setMessage("Android did not open the Phone-role chooser. "+
+                "Open Default Apps, select Phone App, and choose SV Caller Pro "+
+                "if your device lists it. If it does not appear, your "+
+                "Android version or phone manufacturer may not support this "+
+                "prototype as a default calling app.")
+            .setPositiveButton("OPEN DEFAULT APPS",
+                (d,w)->openDefaultPhoneSettings())
+            .setNeutralButton("APP PERMISSIONS",
+                (d,w)->openAppPermissionSettings())
+            .setNegativeButton("Cancel",null).show();
     }
     private void showSettings(){
         String[] choices={"Set as Default Phone App",
@@ -823,7 +844,7 @@ public final class MainActivity extends Activity {
             if(defaultDialer()){
                 toast("SV Caller Pro is now your default Phone app");
                 requestNotificationPermission();
-            }else toast("Default Phone app was not changed");
+            }else showManualDialerChoice();
             buildUi();
         }else if(request==REQUEST_IMAGE&&result==RESULT_OK&&data!=null){
             Uri uri=data.getData();
@@ -852,5 +873,16 @@ public final class MainActivity extends Activity {
             toast(approved?"Call notifications enabled":
                 "Incoming call alerts may be limited without permission");
         }
+        if(!approved&&(req==REQUEST_PHONE||req==REQUEST_CONTACTS||
+                req==REQUEST_LOG||req==REQUEST_NOTIFICATIONS)){
+            new AlertDialog.Builder(this).setTitle("Permission not granted")
+                .setMessage("Android has not allowed this permission. "+
+                    "You can try again from Permission Setup or review "+
+                    "the permission in Android App Settings.")
+                .setPositiveButton("OPEN APP SETTINGS",
+                    (d,w)->openAppPermissionSettings())
+                .setNegativeButton("Cancel",null).show();
+        }
+        buildUi();
     }
 }
