@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import java.io.InputStream;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /** Phone number lookup and optional full-screen caller photo are local-only. */
 public final class PhotoStore {
@@ -17,6 +19,24 @@ public final class PhotoStore {
         public final String name;
         public final Uri photo;
         Match(String name,Uri photo){this.name=name;this.photo=photo;}
+    }
+    // Short-lived, bounded in-memory cache avoids repeated Contacts Provider
+    // lookups on every Telecom call-state notification. No network/storage.
+    private static final long CACHE_TTL_MS=30000L;
+    private static final class CacheItem {
+        final Match match;
+        final long time;
+        CacheItem(Match match,long time){this.match=match;this.time=time;}
+    }
+    private static final LinkedHashMap<String,CacheItem> CACHE=
+        new LinkedHashMap<String,CacheItem>(64,.75f,true){
+            @Override protected boolean removeEldestEntry(
+                Map.Entry<String,CacheItem> eldest){return size()>48;}
+        };
+    private static Match cache(String key,Match result){
+        synchronized(CACHE){CACHE.put(key,new CacheItem(result,
+            android.os.SystemClock.elapsedRealtime()));}
+        return result;
     }
     private PhotoStore(){}
 
@@ -33,33 +53,44 @@ public final class PhotoStore {
         if(TextUtils.isEmpty(phone)||uri==null)return;
         context.getSharedPreferences("caller_photos",Context.MODE_PRIVATE).edit()
             .putString(CallerNumberKey.key(phone),uri.toString()).apply();
+        synchronized(CACHE){CACHE.clear();}
     }
     public static void removePhoto(Context context,String phone){
         if(TextUtils.isEmpty(phone))return;
         context.getSharedPreferences("caller_photos",Context.MODE_PRIVATE).edit()
             .remove(CallerNumberKey.key(phone))
             .remove(CallerNumberKey.legacyKey(phone)).apply();
+        synchronized(CACHE){CACHE.clear();}
     }
     public static Match resolve(Context context,String phone){
-        Uri custom=chosenPhoto(context,phone);
-        String fallback=TextUtils.isEmpty(phone)?"Unknown Caller":phone;
-        if(context.checkSelfPermission(Manifest.permission.READ_CONTACTS)
-                !=PackageManager.PERMISSION_GRANTED)
-            return new Match(fallback,custom);
+        final String raw=phone==null?"":phone;
+        final boolean canRead=context.checkSelfPermission(Manifest.permission.READ_CONTACTS)
+            ==PackageManager.PERMISSION_GRANTED;
+        final String key=(canRead?"c:":"n:")+CallerNumberKey.normalized(raw);
+        long now=android.os.SystemClock.elapsedRealtime();
+        synchronized(CACHE){
+            CacheItem item=CACHE.get(key);
+            if(item!=null&&now-item.time<CACHE_TTL_MS)return item.match;
+            if(item!=null)CACHE.remove(key);
+        }
+        Uri custom=chosenPhoto(context,raw);
+        String fallback=TextUtils.isEmpty(raw)?"Unknown Caller":raw;
+        if(!canRead||TextUtils.isEmpty(raw))
+            return cache(key,new Match(fallback,custom));
         Uri lookup=Uri.withAppendedPath(
-            ContactsContract.PhoneLookup.CONTENT_FILTER_URI,Uri.encode(phone==null?"":phone));
+            ContactsContract.PhoneLookup.CONTENT_FILTER_URI,Uri.encode(raw));
         String[] columns={ContactsContract.PhoneLookup.DISPLAY_NAME,
             ContactsContract.PhoneLookup.PHOTO_URI};
-        try(Cursor cursor=context.getContentResolver().query(lookup,columns,
-                null,null,null)){
+        try(Cursor cursor=context.getContentResolver().query(
+                lookup,columns,null,null,null)){
             if(cursor!=null&&cursor.moveToFirst()){
                 String name=cursor.getString(0);
                 String picture=cursor.getString(1);
                 Uri photo=custom!=null?custom:(picture==null?null:Uri.parse(picture));
-                return new Match(TextUtils.isEmpty(name)?fallback:name,photo);
+                return cache(key,new Match(TextUtils.isEmpty(name)?fallback:name,photo));
             }
         }catch(Exception ignored){}
-        return new Match(fallback,custom);
+        return cache(key,new Match(fallback,custom));
     }
     public static Bitmap loadScaled(Context context,Uri uri,int maxDimension){
         if(uri==null)return null;

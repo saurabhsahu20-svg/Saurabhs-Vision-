@@ -16,6 +16,8 @@ import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
 import android.provider.Settings;
@@ -61,6 +63,11 @@ public final class MainActivity extends Activity {
     private static final String[] TABS={"DIALPAD","CONTACTS","RECENTS","FAVORITES"};
     private SharedPreferences prefs;
     private int tab=0,theme=0;
+    private boolean homeOpen=true;
+    private final Handler searchHandler=new Handler(Looper.getMainLooper());
+    private Runnable pendingSearch;
+    private long lastHistoryLoadAt=0;
+    private int recentFilter=0;
     private String dialText="", photoTarget="",pendingDial="";
     private LinearLayout root,panel;
     private ScrollView scroll;
@@ -73,8 +80,13 @@ public final class MainActivity extends Activity {
     private String permissionSnapshot="";
 
     private static final class Person {
-        final String name,number;
-        Person(String name,String number){this.name=name;this.number=number;}
+        final String name,number,searchName,searchDigits;
+        Person(String name,String number){
+            this.name=name;
+            this.number=number;
+            this.searchName=name==null?"":name.toLowerCase(Locale.ROOT);
+            this.searchDigits=CallerNumberKey.normalized(number).replaceAll("[^0-9]","");
+        }
     }
     private static final class Recent {
         final String number,name;
@@ -123,6 +135,8 @@ public final class MainActivity extends Activity {
         if(state!=null){
             dialText=state.getString("dialText","");
             tab=state.getInt("tab",0);
+            homeOpen=state.getBoolean("homeOpen",true);
+            recentFilter=state.getInt("recentFilter",0);
         }
         readDialIntent(getIntent());
         buildUi();
@@ -133,6 +147,10 @@ public final class MainActivity extends Activity {
         String snapshot=permissionsSnapshot();
         if(!snapshot.equals(permissionSnapshot)){
             permissionSnapshot=snapshot;
+            if(root!=null)buildUi();
+        }else if(tab==2&&!homeOpen&&recentDataLoaded
+            &&System.currentTimeMillis()-lastHistoryLoadAt>15000){
+            recentDataLoaded=false;
             if(root!=null)buildUi();
         }
     }
@@ -147,25 +165,34 @@ public final class MainActivity extends Activity {
         super.onNewIntent(intent);
         setIntent(intent);
         readDialIntent(intent);
-        tab=0;buildUi();
+        tab=0;homeOpen=false;buildUi();
     }
     private void readDialIntent(Intent intent){
         if(intent==null)return;
         Uri uri=intent.getData();
         if(Intent.ACTION_DIAL.equals(intent.getAction())&&uri!=null){
             String number=uri.getSchemeSpecificPart();
-            if(number!=null&&number.length()<=80)dialText=number;
+            if(number!=null&&number.length()<=80){
+                dialText=number;
+                homeOpen=false;
+            }
         }
     }
     @Override protected void onSaveInstanceState(Bundle state){
         if(numberInput!=null)dialText=numberInput.getText().toString();
         state.putString("dialText",dialText);
         state.putInt("tab",tab);
+        state.putBoolean("homeOpen",homeOpen);
+        state.putInt("recentFilter",recentFilter);
         super.onSaveInstanceState(state);
     }
     @Override public void onBackPressed(){
-        if(tab!=0){tab=0;buildUi();}
+        if(!homeOpen){homeOpen=true;buildUi();}
         else super.onBackPressed();
+    }
+    @Override protected void onDestroy(){
+        if(pendingSearch!=null)searchHandler.removeCallbacks(pendingSearch);
+        super.onDestroy();
     }
     private void buildUi(){
         if(numberInput!=null)dialText=numberInput.getText().toString();
@@ -176,14 +203,14 @@ public final class MainActivity extends Activity {
         LinearLayout screen=new LinearLayout(this);
         screen.setOrientation(LinearLayout.VERTICAL);
         screen.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
-            new int[]{0xff050a1c,0xff14113a,0xff07182c}));
+            new int[]{0xff05091b,0xff141038,0xff050d23}));
         scroll=new ScrollView(this);
         scroll.setFillViewport(true);
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setBackgroundColor(Color.TRANSPARENT);
         root=new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setPadding(dp(18),dp(11),dp(18),dp(30));
+        root.setPadding(dp(16),dp(11),dp(16),dp(25));
         scroll.addView(root);
         screen.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         setContentView(screen);
@@ -196,13 +223,17 @@ public final class MainActivity extends Activity {
         panel=new LinearLayout(this);
         panel.setOrientation(LinearLayout.VERTICAL);
         add(root,panel,13);
-        switch(tab){
-            case 0:buildDialpad();break;
-            case 1:buildContacts();break;
-            case 2:buildRecents();break;
-            case 3:buildFavorites();break;
+        if(homeOpen){
+            buildHomeDashboard();
+        }else{
+            switch(tab){
+                case 0:buildDialpad();break;
+                case 1:buildContacts();break;
+                case 2:buildRecents();break;
+                case 3:buildFavorites();break;
+            }
+            buildBottomNav(screen);
         }
-        buildBottomNav(screen);
         permissionSnapshot=permissionsSnapshot();
     }
     private void buildHeader(){
@@ -211,17 +242,18 @@ public final class MainActivity extends Activity {
         ImageView emblem=new ImageView(this);
         emblem.setImageResource(R.drawable.ic_sv_caller_pro);
         emblem.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        emblem.setContentDescription("SV Caller Pro blue phone gold border app icon");
+        emblem.setContentDescription("SV Caller Pro blue-gold icon. Open home.");
+        emblem.setOnClickListener(v->{homeOpen=true;buildUi();});
         row.addView(emblem,new LinearLayout.LayoutParams(dp(52),dp(52)));
         LinearLayout names=new LinearLayout(this);
         names.setPadding(dp(10),0,0,0);
         names.setOrientation(LinearLayout.VERTICAL);
-        names.addView(text("SV Caller Pro",23,WHITE,true));
-        names.addView(text("SAURABH'S VISION™    •    PREMIUM 2.2",10,CYAN,true));
+        names.addView(text("SV Caller Pro 3.0",21,WHITE,true));
+        names.addView(text("SAURABH'S VISION™   •   PREMIUM 3.0",10,CYAN,true));
         row.addView(names,new LinearLayout.LayoutParams(0,-2,1));
         TextView settings=text("⚙",24,WHITE,true);
         settings.setGravity(Gravity.CENTER);
-        settings.setBackground(gradient(0xff50358d,0xff172445,19,0xff9476ec));
+        settings.setBackground(gradient(0xff7344bc,0xff152953,19,0xffb997f7));
         settings.setElevation(dp(5));
         settings.setContentDescription("Call and theme settings");
         row.addView(settings,new LinearLayout.LayoutParams(dp(45),dp(45)));
@@ -322,12 +354,88 @@ public final class MainActivity extends Activity {
             catch(Exception ignored){toast("Open Settings → Default Apps → Phone");}
         }
     }
+    /** Opens a real app tab. Home tiles never simulate unsupported features. */
+    private void openTab(int target){homeOpen=false;tab=target;buildUi();}
+    private void dashboardTile(LinearLayout row,String icon,String label,
+        String subtitle,Runnable action,boolean purple){
+        LinearLayout tile=new LinearLayout(this);
+        tile.setOrientation(LinearLayout.VERTICAL);
+        tile.setGravity(Gravity.CENTER);
+        tile.setPadding(dp(6),dp(10),dp(6),dp(10));
+        tile.setBackground(gradient(purple?0xff47207d:0xff0b4777,
+            purple?0xff15163a:0xff0c1937,24,purple?0xffbb66f3:0xff43b9fa));
+        tile.setElevation(dp(4));
+        TextView symbol=text(icon,27,purple?0xffe2acff:0xff9cecff,true);
+        symbol.setGravity(Gravity.CENTER);
+        tile.addView(symbol);
+        TextView title=text(label,15,WHITE,true);
+        title.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams tp=new LinearLayout.LayoutParams(-1,-2);
+        tp.topMargin=dp(5);tile.addView(title,tp);
+        TextView detail=text(subtitle,10,MUTED,false);
+        detail.setGravity(Gravity.CENTER);tile.addView(detail);
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(108),1);
+        p.setMargins(dp(4),dp(5),dp(4),dp(5));
+        row.addView(tile,p);
+        tile.setContentDescription(label+" - "+subtitle);
+        tile.setOnClickListener(v->action.run());
+    }
+    /** Premium home screen; features link only to functions actually implemented. */
+    private void buildHomeDashboard(){
+        LinearLayout hero=new LinearLayout(this);
+        hero.setOrientation(LinearLayout.VERTICAL);
+        hero.setPadding(dp(20),dp(23),dp(20),dp(21));
+        hero.setBackground(gradient(0xff005d9c,0xff7a169c,28,0xff96a4ff));
+        hero.setElevation(dp(6));
+        add(hero,text("✦  PREMIUM PHONE EXPERIENCE",11,0xffe6f7ff,true),0);
+        add(hero,text("Your calls. Your style.",25,WHITE,true),9);
+        add(hero,text("Full-screen caller photos  •  Fast dialpad  •  Offline privacy",
+            13,0xffecedff,false),8);
+        TextView action=text("☎   OPEN DIALPAD    ›",15,WHITE,true);
+        action.setGravity(Gravity.CENTER);
+        action.setBackground(gradient(0xff264fcb,0xffa424c5,24,0xffaba2ff));
+        LinearLayout.LayoutParams actionLp=new LinearLayout.LayoutParams(-1,dp(51));
+        actionLp.topMargin=dp(18);hero.addView(action,actionLp);
+        action.setOnClickListener(v->openTab(0));
+        add(panel,hero,9);
+        add(panel,text("✦  QUICK ACCESS",13,0xffd7bfff,true),19);
+        String[][] labels={{"▦","Dialpad","Make a call"},
+            {"♙","Contacts","Find a person"},
+            {"◷","Recents","Local call history"},
+            {"★","Favorites","Saved numbers"},
+            {"▧","Caller Photos","HD wallpapers"},
+            {"◈","Themes","Six color styles"},
+            {"⚙","Settings","Customize app"},
+            {"✓","Permissions","Phone setup"}};
+        Runnable[] actions={
+            ()->openTab(0),()->openTab(1),()->openTab(2),()->openTab(3),
+            ()->{if(dialText.trim().isEmpty()){
+                openTab(0);toast("Enter a number then tap HD Photo");
+            }else showPhotoOptions(dialText);},
+            this::showThemes,this::showSettings,this::showPermissionSetup
+        };
+        for(int i=0;i<labels.length;i+=2){
+            LinearLayout row=new LinearLayout(this);
+            for(int col=0;col<2;col++){
+                int index=i+col;
+                dashboardTile(row,labels[index][0],labels[index][1],
+                    labels[index][2],actions[index],(index%2)==1);
+            }
+            add(panel,row,3);
+        }
+        TextView footer=text(
+            "3.0  •  CONTACTS STAY ON YOUR PHONE  •  NO ADS OR CLOUD TRACKING",
+            10,CYAN,true);
+        footer.setGravity(Gravity.CENTER);
+        add(panel,footer,18);
+    }
+
     /** Thumb-friendly fixed dock; the contacts and dialpad remain scrollable. */
     private void buildBottomNav(LinearLayout screen){
         LinearLayout dock=new LinearLayout(this);
         dock.setGravity(Gravity.CENTER);
         dock.setPadding(dp(6),dp(6),dp(6),dp(6));
-        dock.setBackground(gradient(0xff1b2448,0xff0a1430,29,0xff475c91));
+        dock.setBackground(gradient(0xff242451,0xff07132d,29,0xff5e68ae));
         dock.setElevation(dp(10));
         String[] icons={"▦","♙","◷","★"};
         String[] names={"Keypad","Contacts","Recents","Favorites"};
@@ -336,7 +444,7 @@ public final class MainActivity extends Activity {
             LinearLayout item=new LinearLayout(this);
             item.setOrientation(LinearLayout.VERTICAL);
             item.setGravity(Gravity.CENTER);
-            if(i==tab)item.setBackground(gradient(0xff8747ef,0xff383bb0,24,0xffbd8afa));
+            if(i==tab)item.setBackground(gradient(0xffaa28eb,0xff353ad8,24,0xffc698ff));
             TextView icon=text(icons[i],22,i==tab?WHITE:MUTED,true);
             icon.setGravity(Gravity.CENTER);
             item.addView(icon,new LinearLayout.LayoutParams(-1,dp(28)));
@@ -347,7 +455,7 @@ public final class MainActivity extends Activity {
             size.setMargins(dp(2),0,dp(2),0);
             dock.addView(item,size);
             item.setContentDescription("Open "+names[i]);
-            item.setOnClickListener(v->{if(tab!=index){tab=index;buildUi();}});
+            item.setOnClickListener(v->{if(tab!=index){tab=index;homeOpen=false;buildUi();}});
         }
         LinearLayout.LayoutParams dockP=new LinearLayout.LayoutParams(-1,dp(74));
         dockP.setMargins(dp(8),dp(2),dp(8),dp(8));
@@ -357,9 +465,9 @@ public final class MainActivity extends Activity {
         LinearLayout face=new LinearLayout(this);
         face.setOrientation(LinearLayout.VERTICAL);
         face.setPadding(dp(18),dp(15),dp(18),dp(16));
-        face.setBackground(gradient(0xff21295a,0xff101b3b,29,0xff6373bb));
+        face.setBackground(gradient(0xff20366d,0xff111b40,29,0xff5983d9));
         face.setElevation(dp(3));
-        TextView label=text("✦  SMART DIALER    •    FULL-SCREEN CALLER ID",11,CYAN,true);
+        TextView label=text("✦  HD CALLER ID   •   SMART KEYPAD",11,CYAN,true);
         add(face,label,0);
         numberInput=new EditText(this);
         numberInput.setSingleLine(true);
@@ -382,7 +490,7 @@ public final class MainActivity extends Activity {
         });
         LinearLayout small=new LinearLayout(this);
         TextView clear=smallButton("⌫  Delete");
-        TextView photo=smallButton("▧  HD Photo");
+        TextView photo=smallButton("▧  FULL PHOTO");
         small.addView(clear,new LinearLayout.LayoutParams(0,dp(40),1));
         LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(0,dp(40),1);
         pp.leftMargin=dp(8);
@@ -402,9 +510,9 @@ public final class MainActivity extends Activity {
         LinearLayout hero=new LinearLayout(this);
         hero.setOrientation(LinearLayout.VERTICAL);
         hero.setPadding(dp(18),dp(15),dp(18),dp(15));
-        hero.setBackground(gradient(0xff222d77,0xff651b92,26,0xff7c82e5));
+        hero.setBackground(gradient(0xff072f83,0xff7e159a,26,0xff8d77fa));
         hero.setElevation(dp(5));
-        TextView heroTitle=text("✦  YOUR CALL, YOUR STYLE",15,WHITE,true);
+        TextView heroTitle=text("✦  FULL SCREEN. FULL PERSONALITY.",15,WHITE,true);
         add(hero,heroTitle,0);
         TextView heroDesc=text("Personal caller wallpapers • Six themes • Private on your phone",
             12,0xffe0e9ff,false);
@@ -433,7 +541,8 @@ public final class MainActivity extends Activity {
                 LinearLayout circle=new LinearLayout(this);
                 circle.setGravity(Gravity.CENTER);
                 circle.setOrientation(LinearLayout.VERTICAL);
-                circle.setBackground(gradient(0xff28375d,0xff0c1634,50,0xff667db9));
+                circle.setBackground(gradient(0xff313064,0xff071637,50,
+                    (r+c)%2==0?0xff9e61e9:0xff498fec));
                 circle.setElevation(dp(4));
                 TextView digit=text(key,30,WHITE,true);
                 digit.setGravity(Gravity.CENTER);
@@ -464,10 +573,10 @@ public final class MainActivity extends Activity {
         callStack.setGravity(Gravity.CENTER);
         TextView call=text("☎",32,Color.WHITE,true);
         call.setGravity(Gravity.CENTER);
-        call.setBackground(gradient(0xff25f095,0xff079e76,48,0xffb6ffda));
+        call.setBackground(gradient(0xff18f55a,0xff0ba94c,48,0xffa3ffbb));
         call.setElevation(dp(7));
         callStack.addView(call,new LinearLayout.LayoutParams(dp(83),dp(83)));
-        TextView callLabel=text("TAP TO CALL",12,0xff8df9c9,true);
+        TextView callLabel=text("CALL NOW",13,0xff95ffd4,true);
         callLabel.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams labelP=new LinearLayout.LayoutParams(-1,dp(27));
         labelP.topMargin=dp(5);
@@ -509,7 +618,7 @@ public final class MainActivity extends Activity {
             setup.setOnClickListener(v->showPermissionSetup());
             add(panel,box,10);
         }
-        TextView head=text("✦   MAKE EVERY CALL YOURS   ✦",12,0xffd6c4ff,true);
+        TextView head=text("✦   CUSTOMIZE YOUR CALLS   ✦",12,0xffd6c4ff,true);
         head.setGravity(Gravity.CENTER);
         add(panel,head,18);
         String[] names={"▧  Caller photos","◈  Themes",
@@ -531,7 +640,7 @@ public final class MainActivity extends Activity {
             }
             add(panel,strip,4);
         }
-        TextView footer=text("SV CALLER PRO 2.2   •   SAURABH'S VISION™",11,CYAN,true);
+        TextView footer=text("SV CALLER PRO 3.0   •   SAURABH'S VISION™",11,CYAN,true);
         footer.setGravity(Gravity.CENTER);
         add(panel,footer,14);
     }
@@ -559,7 +668,7 @@ public final class MainActivity extends Activity {
     private TextView smallButton(String title){
         TextView t=text(title,12,WHITE,true);
         t.setGravity(Gravity.CENTER);
-        t.setBackground(gradient(0xff323c75,0xff152344,20,0xff6c81c2));
+        t.setBackground(gradient(0xff353a7e,0xff0c1e46,22,0xff8587d5));
         return t;
     }
     private EditText addSearch(LinearLayout target,String hint,Runnable rerender){
@@ -570,13 +679,17 @@ public final class MainActivity extends Activity {
         search.setTextColor(WHITE);
         search.setHintTextColor(MUTED);
         search.setPadding(dp(17),dp(6),dp(15),dp(6));
-        search.setBackground(gradient(0xff263a65,0xff121c3e,25,0xff647bbb));
+        search.setBackground(gradient(0xff293463,0xff0c1738,25,0xff8775cb));
         LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(54));
         p.bottomMargin=dp(14);
         target.addView(search,p);
         search.addTextChangedListener(new TextWatcher(){
             public void beforeTextChanged(CharSequence s,int st,int c,int a){}
-            public void onTextChanged(CharSequence s,int st,int before,int count){rerender.run();}
+            public void onTextChanged(CharSequence s,int st,int before,int count){
+                if(pendingSearch!=null)searchHandler.removeCallbacks(pendingSearch);
+                pendingSearch=()->{if(!isFinishing()&&!homeOpen)rerender.run();};
+                searchHandler.postDelayed(pendingSearch,125);
+            }
             public void afterTextChanged(Editable s){}
         });
         searchInput=search;
@@ -660,7 +773,7 @@ public final class MainActivity extends Activity {
                     while(c.moveToNext()&&items.size()<750){
                         String name=c.getString(0),number=c.getString(1);
                         if(TextUtils.isEmpty(number))continue;
-                        String key=number.replaceAll("[^+0-9]","");
+                        String key=CallerNumberKey.normalized(number);
                         if(key.length()<2||!seen.add(key))continue;
                         items.add(new Person(TextUtils.isEmpty(name)?number:name,number));
                     }
@@ -696,19 +809,24 @@ public final class MainActivity extends Activity {
             runOnUiThread(()->{
                 recentsLoading=false;recentCalls.clear();recentCalls.addAll(items);
                 recentDataLoaded=true;
-                if(tab==2)buildUi();
+                lastHistoryLoadAt=System.currentTimeMillis();
+                if(tab==2&&!homeOpen)buildUi();
             });
         },"SVCaller-CallHistory").start();
+    }
+    private boolean matchesPerson(Person p,String q,String digits){
+        return q.isEmpty() || p.searchName.contains(q) || p.number.contains(q)
+            || (!digits.isEmpty() && p.searchDigits.contains(digits));
     }
     private void renderContacts(){
         if(panel==null||tab!=1||searchInput==null||!contactDataLoaded)return;
         String q=searchInput.getText().toString().trim().toLowerCase(Locale.ROOT);
+        String digits=q.replaceAll("[^0-9]","");
         // Keep search field in place, rerender only result cards.
         while(panel.getChildCount()>1)panel.removeViewAt(1);
         int count=0;
         for(Person p:contacts){
-            if(!q.isEmpty()&&!p.name.toLowerCase(Locale.ROOT).contains(q)&&
-                !p.number.toLowerCase(Locale.ROOT).contains(q))continue;
+            if(!matchesPerson(p,q,digits))continue;
             showPerson(p,false);
             if(++count>=140)break;
         }
@@ -717,13 +835,13 @@ public final class MainActivity extends Activity {
     private void renderFavorites(){
         if(panel==null||tab!=3||searchInput==null||!contactDataLoaded)return;
         String q=searchInput.getText().toString().trim().toLowerCase(Locale.ROOT);
+        String digits=q.replaceAll("[^0-9]","");
         while(panel.getChildCount()>1)panel.removeViewAt(1);
         Set<String> favorites=prefs.getStringSet("favorite_numbers",new HashSet<String>());
         int count=0;
         for(Person p:contacts){
             if(!favorites.contains(p.number))continue;
-            if(!q.isEmpty()&&!p.name.toLowerCase(Locale.ROOT).contains(q)&&
-                !p.number.toLowerCase(Locale.ROOT).contains(q))continue;
+            if(!matchesPerson(p,q,digits))continue;
             showPerson(p,true);
             if(++count>=140)break;
         }
@@ -733,12 +851,12 @@ public final class MainActivity extends Activity {
         LinearLayout card=new LinearLayout(this);
         card.setGravity(Gravity.CENTER_VERTICAL);
         card.setPadding(dp(12),dp(10),dp(10),dp(10));
-        card.setBackground(gradient(0xff232a50,0xff101a39,24,0xff4a5388));
+        card.setBackground(gradient(0xff242c60,0xff0c1537,24,0xff705db0));
         TextView badge=text(person.name.isEmpty()?"?":
             person.name.substring(0,1).toUpperCase(Locale.ROOT),
             23,GOLD,true);
         badge.setGravity(Gravity.CENTER);
-        badge.setBackground(gradient(0xff6c45c5,0xff2b3185,44,0xffb4a0f4));
+        badge.setBackground(gradient(0xff9c2de8,0xff174bad,44,0xffca93ff));
         card.addView(badge,new LinearLayout.LayoutParams(dp(45),dp(45)));
         LinearLayout info=new LinearLayout(this);
         info.setPadding(dp(11),0,dp(5),0);
@@ -780,32 +898,65 @@ public final class MainActivity extends Activity {
     private void renderRecents(){
         if(panel==null||tab!=2||!recentDataLoaded)return;
         panel.removeAllViews();
+        LinearLayout filters=new LinearLayout(this);
+        filters.setGravity(Gravity.CENTER);
+        String[] categories={"ALL","MISSED","INCOMING","OUTGOING"};
+        for(int i=0;i<categories.length;i++){
+            final int selected=i;
+            TextView pill=text(categories[i],11,recentFilter==i?WHITE:MUTED,true);
+            pill.setGravity(Gravity.CENTER);
+            pill.setBackground(gradient(
+                recentFilter==i?0xff9326d8:0xff1b2a4e,
+                recentFilter==i?0xff3a4ab9:0xff101831,22,
+                recentFilter==i?0xffbf87ff:0xff4c5687));
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(44),1);
+            p.setMargins(dp(2),dp(2),dp(2),dp(2));
+            filters.addView(pill,p);
+            pill.setOnClickListener(v->{recentFilter=selected;renderRecents();});
+        }
+        add(panel,filters,2);
         if(recentCalls.isEmpty()){
-            add(panel,text("No call history available on this device.",15,MUTED,false),10);
+            add(panel,text("No call history available on this device.",15,MUTED,false),12);
             return;
         }
+        SimpleDateFormat format=new SimpleDateFormat("d MMM, h:mm a",Locale.getDefault());
+        int visible=0;
         for(Recent item:recentCalls){
+            if(recentFilter==1&&item.type!=CallLog.Calls.MISSED_TYPE)continue;
+            if(recentFilter==2&&item.type!=CallLog.Calls.INCOMING_TYPE)continue;
+            if(recentFilter==3&&item.type!=CallLog.Calls.OUTGOING_TYPE)continue;
             String type=item.type==CallLog.Calls.MISSED_TYPE?"MISSED":
-                item.type==CallLog.Calls.OUTGOING_TYPE?"OUTGOING":"INCOMING";
+                item.type==CallLog.Calls.OUTGOING_TYPE?"OUTGOING":
+                item.type==CallLog.Calls.INCOMING_TYPE?"INCOMING":
+                item.type==CallLog.Calls.REJECTED_TYPE?"REJECTED":
+                item.type==CallLog.Calls.BLOCKED_TYPE?"BLOCKED":"OTHER";
+            int callColor=item.type==CallLog.Calls.MISSED_TYPE?0xffff9bb0:
+                item.type==CallLog.Calls.OUTGOING_TYPE?0xff65eab3:0xffabcbff;
             LinearLayout line=new LinearLayout(this);
             line.setGravity(Gravity.CENTER_VERTICAL);
-            line.setPadding(dp(16),dp(10),dp(11),dp(10));
-            line.setBackground(gradient(0xff232a50,0xff101a39,24,0xff4a5388));
+            line.setPadding(dp(14),dp(10),dp(11),dp(10));
+            line.setBackground(gradient(0xff292e64,0xff0e1839,25,0xff686bb6));
+            TextView glyph=text(item.type==CallLog.Calls.MISSED_TYPE?"↙":
+                item.type==CallLog.Calls.OUTGOING_TYPE?"↗":"↘",25,callColor,true);
+            glyph.setGravity(Gravity.CENTER);
+            glyph.setBackground(gradient(0xff1b305c,0xff151b3d,22,0xff5b79b3));
+            line.addView(glyph,new LinearLayout.LayoutParams(dp(46),dp(46)));
             LinearLayout names=new LinearLayout(this);
             names.setOrientation(LinearLayout.VERTICAL);
+            names.setPadding(dp(11),0,0,0);
             names.addView(text(item.name,16,WHITE,true));
-            names.addView(text(type+"  •  "+new SimpleDateFormat(
-                "d MMM, h:mm a",Locale.getDefault()).format(new Date(item.date))+
-                "  •  "+item.duration+"s",11,
-                item.type==CallLog.Calls.MISSED_TYPE?0xffffa7aa:MUTED,false));
+            names.addView(text(type+"  •  "+format.format(new Date(item.date))+
+                "  •  "+item.duration+"s",11,callColor,false));
             line.addView(names,new LinearLayout.LayoutParams(0,-2,1));
             TextView dial=smallButton("☎");
             dial.setGravity(Gravity.CENTER);
-            line.addView(dial,new LinearLayout.LayoutParams(dp(51),dp(45)));
+            line.addView(dial,new LinearLayout.LayoutParams(dp(49),dp(43)));
             dial.setOnClickListener(v->callNumber(item.number));
             line.setOnClickListener(v->{dialText=item.number;tab=0;buildUi();});
             add(panel,line,7);
+            visible++;
         }
+        if(visible==0)add(panel,text("No calls in this category.",14,MUTED,false),14);
     }
     private void toggleFavorite(String number){
         Set<String> items=new HashSet<>(prefs.getStringSet(
@@ -883,6 +1034,7 @@ public final class MainActivity extends Activity {
         try{
             // Telecom correctly routes emergency calls to the preloaded dialer.
             manager.placeCall(Uri.fromParts("tel",number,null),new Bundle());
+            recentDataLoaded=false;
             Intent call=new Intent(this,InCallActivity.class);
             call.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(call);

@@ -46,6 +46,7 @@ public final class InCallActivity extends Activity {
     private LinearLayout actionPanel,dtmfPanel;
     private String displayedNumber="",loadedPhoto="";
     private int previousState=-123;
+    private int previousAudioSignature=Integer.MIN_VALUE;
     private int missedTicks=0;
     private boolean keypadVisible=false;
     private BroadcastReceiver receiver;
@@ -83,13 +84,18 @@ public final class InCallActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON|
             WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
-        getWindow().setNavigationBarColor(0xff071225);
+        getWindow().setNavigationBarColor(0xff080e24);
         previewOnly=getIntent()!=null&&getIntent().getBooleanExtra("previewOnly",false);
         build();
     }
     @Override protected void onStart(){
         super.onStart();
         active=true;
+        if(loadedPhoto.isEmpty()&&photoView!=null){
+            String number=previewOnly?getIntent().getStringExtra("previewNumber"):
+                displayedNumber;
+            if(number!=null&&!number.isEmpty())updatePhoto(number);
+        }
         receiver=new BroadcastReceiver(){
             @Override public void onReceive(Context ctx,Intent intent){refresh();}
         };
@@ -103,6 +109,7 @@ public final class InCallActivity extends Activity {
     }
     @Override protected void onStop(){
         active=false;
+        loadedPhoto="";
         handler.removeCallbacks(everySecond);
         if(receiverAttached&&receiver!=null){
             unregisterReceiver(receiver);
@@ -149,8 +156,8 @@ public final class InCallActivity extends Activity {
         // Fallback gradient and dark scrim keep both photos and text legible.
         View wallpaperTint=new View(this);
         wallpaperTint.setBackground(new GradientDrawable(
-            GradientDrawable.Orientation.TL_BR,
-            new int[]{0x663c217f,0x7720103f,0xb0081029,0xf205091a}));
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            new int[]{0xbb071124,0x2808112b,0x440b0729,0xf9050920}));
         frame.addView(wallpaperTint,new FrameLayout.LayoutParams(-1,-1));
         ScrollView scroll=new ScrollView(this);
         scroll.setFillViewport(true);
@@ -162,23 +169,23 @@ public final class InCallActivity extends Activity {
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(21),dp(21),dp(21),dp(26));
         scroll.addView(content);
-        TextView logo=text("✦  SV CALLER PRO   •   PRIVATE & PREMIUM",12,
-            0xffebd4ff,true);
+        TextView logo=text("✦   SV CALLER PRO 3.0   •   HD CALLER PHOTO",12,
+            0xffe8d7ff,true);
         logo.setLetterSpacing(.06f);
         logo.setPadding(dp(8),dp(9),dp(8),dp(9));
-        logo.setBackground(fill(0x9933215e,0x88201940,25,0x99aa89e9));
+        logo.setBackground(fill(0x99532e9d,0x88201848,25,0x99d1a4ff));
         content.addView(logo,new LinearLayout.LayoutParams(-1,dp(49)));
-        stateView=text("Connecting…",15,0xffb8f8fc,true);
+        stateView=text("Connecting…",16,0xffa3f7fc,true);
         LinearLayout.LayoutParams stateLp=new LinearLayout.LayoutParams(-1,dp(39));
         stateLp.topMargin=dp(21);
         content.addView(stateView,stateLp);
 
-        nameView=text("Unknown caller",35,WHITE,true);
+        nameView=text("Unknown caller",38,WHITE,true);
         nameView.setShadowLayer(dp(3),0,dp(2),Color.BLACK);
         nameView.setMaxLines(2);
         nameView.setEllipsize(android.text.TextUtils.TruncateAt.END);
         content.addView(nameView,new LinearLayout.LayoutParams(-1,dp(81)));
-        numberView=text("",15,MUTED,false);
+        numberView=text("",17,MUTED,false);
         content.addView(numberView,new LinearLayout.LayoutParams(-1,dp(29)));
         timeView=text("",15,0xff9cf8da,true);
         content.addView(timeView,new LinearLayout.LayoutParams(-1,dp(31)));
@@ -186,7 +193,7 @@ public final class InCallActivity extends Activity {
         // Wallpaper is always visible beyond this subtle central monogram.
         View centerSpace=new View(this);
         content.addView(centerSpace,new LinearLayout.LayoutParams(-1,0,1));
-        avatarView=text("✦",80,0x55ffffff,true);
+        avatarView=text("☎",72,0x55ffffff,true);
         avatarView.setContentDescription("Placeholder when caller has no image");
         content.addView(avatarView,new LinearLayout.LayoutParams(-1,dp(95)));
         View spacer=new View(this);
@@ -195,7 +202,7 @@ public final class InCallActivity extends Activity {
         dtmfPanel=new LinearLayout(this);
         dtmfPanel.setOrientation(LinearLayout.VERTICAL);
         dtmfPanel.setPadding(dp(6),dp(7),dp(6),dp(6));
-        dtmfPanel.setBackground(fill(0xdd252653,0xdd0d1230,25,0xff6b61ae));
+        dtmfPanel.setBackground(fill(0xe529225b,0xe5151039,25,0xff9776f2));
         content.addView(dtmfPanel,new LinearLayout.LayoutParams(-1,-2));
         dtmfPanel.setVisibility(View.GONE);
         buildDtmf();
@@ -203,17 +210,18 @@ public final class InCallActivity extends Activity {
         actionPanel=new LinearLayout(this);
         actionPanel.setOrientation(LinearLayout.VERTICAL);
         actionPanel.setPadding(dp(8),dp(10),dp(8),dp(10));
-        actionPanel.setBackground(fill(0x992a2756,0xcc101733,31,0x996a64a9));
+        actionPanel.setBackground(fill(0xb5221b52,0xdb0c1437,31,0xa58b8ff5));
         LinearLayout.LayoutParams actionP=new LinearLayout.LayoutParams(-1,-2);
         actionP.topMargin=dp(12);
         content.addView(actionPanel,actionP);
 
-        TextView footer=text("YOUR CALL   •   YOUR PHOTO   •   YOUR PRIVACY",11,
+        TextView footer=text("SAURABH'S VISION™   •   PREMIUM CALLING",11,
             0xffd7dceb,false);
         LinearLayout.LayoutParams footerP=new LinearLayout.LayoutParams(-1,dp(35));
         footerP.topMargin=dp(8);
         content.addView(footer,footerP);
         previousState=-123;
+        previousAudioSignature=Integer.MIN_VALUE;
         displayedNumber="";
         loadedPhoto="";
         if(previewOnly){
@@ -254,9 +262,7 @@ public final class InCallActivity extends Activity {
         actionPanel.removeAllViews();
         int state=call.getState();
         if(state==Call.STATE_RINGING){
-            buttonRow(new String[]{"✕  DECLINE","✓  ANSWER"},
-                new Runnable[]{SVInCallService::decline,SVInCallService::answer},
-                new int[]{0xffe32943,0xff16bd71});
+            buildIncomingButtons();
             return;
         }
         SVInCallService service=SVInCallService.activeService();
@@ -290,6 +296,38 @@ public final class InCallActivity extends Activity {
                 new Runnable[]{SVInCallService::end},new int[]{0xffe32943});
         }
     }
+    /** Large, clearly labelled answer/decline controls over the caller photo. */
+    private void buildIncomingButtons(){
+        LinearLayout row=new LinearLayout(this);
+        row.setGravity(Gravity.CENTER);
+        String[] icons={"✕","☎"};
+        String[] labels={"DECLINE","ANSWER"};
+        int[][] colors={{0xfffb3155,0xffad1237},{0xff00e56d,0xff069a55}};
+        Runnable[] actions={SVInCallService::decline,SVInCallService::answer};
+        for(int i=0;i<2;i++){
+            final int index=i;
+            LinearLayout stack=new LinearLayout(this);
+            stack.setGravity(Gravity.CENTER);
+            stack.setOrientation(LinearLayout.VERTICAL);
+            TextView orb=action(icons[i],colors[i][0],colors[i][1],0xffe7f5ff);
+            orb.setTextSize(32);
+            orb.setElevation(dp(7));
+            stack.addView(orb,new LinearLayout.LayoutParams(dp(82),dp(82)));
+            TextView label=text(labels[i],14,WHITE,true);
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(29));
+            lp.topMargin=dp(8);stack.addView(label,lp);
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(124),1);
+            p.setMargins(dp(5),0,dp(5),0);
+            row.addView(stack,p);
+            stack.setContentDescription(labels[i]+" phone call");
+            orb.setOnClickListener(v->actions[index].run());
+            stack.setOnClickListener(v->actions[index].run());
+        }
+        actionPanel.addView(row,new LinearLayout.LayoutParams(-1,-2));
+        TextView hint=text("TAP GREEN TO ANSWER  •  RED TO DECLINE",11,
+            0xffdaebff,false);
+        actionPanel.addView(hint,new LinearLayout.LayoutParams(-1,dp(28)));
+    }
     /** Show only audio routes that Android Telecom reports as available. */
     private void showAudioRoutes(){
         SVInCallService service=SVInCallService.activeService();
@@ -320,9 +358,18 @@ public final class InCallActivity extends Activity {
                 if(svc!=null){svc.setAudioRoute(routes.get(which));refreshControls();}
             }).setNegativeButton("Cancel",null).show();
     }
+    private int currentAudioSignature(){
+        SVInCallService svc=SVInCallService.activeService();
+        CallAudioState audio=svc==null?null:svc.getCallAudioState();
+        return audio==null?0:audio.getRoute()|(audio.isMuted()?65536:0);
+    }
     private void refreshControls(){
         Call call=SVInCallService.activeCall();
-        if(call!=null){buildActions(call);previousState=call.getState();}
+        if(call!=null){
+            buildActions(call);
+            previousState=call.getState();
+            previousAudioSignature=currentAudioSignature();
+        }
     }
     private void buildDtmf(){
         TextView caption=text("In-call keypad • Sends real DTMF tones",12,MUTED,true);
@@ -352,28 +399,33 @@ public final class InCallActivity extends Activity {
             default:return "PHONE CALL";
         }
     }
+    /**
+     * Read contacts AND decode photos off the UI thread. Resolving a provider
+     * synchronously can otherwise freeze the call screen on slower phones.
+     */
     private void updatePhoto(String number){
-        PhotoStore.Match contact=PhotoStore.resolve(this,number);
-        nameView.setText(contact.name);
-        numberView.setText(contact.name.equals(number)?"":number);
-        Uri photo=contact.photo;
-        String key=photo==null?"":photo.toString();
-        if(loadedPhoto.equals(key))return;
-        loadedPhoto=key;
+        final String target=number==null?"":number;
+        if(target.equals(loadedPhoto))return;
+        loadedPhoto=target;
         photoView.setImageDrawable(null);
         avatarView.setVisibility(View.VISIBLE);
-        if(photo==null)return;
+        nameView.setText(target.isEmpty()?"Unknown caller":target);
+        numberView.setText("");
+        final Context application=getApplicationContext();
         new Thread(()->{
-            android.graphics.Bitmap bitmap=PhotoStore.loadScaled(
-                getApplicationContext(),photo,1600);
+            PhotoStore.Match contact=PhotoStore.resolve(application,target);
+            android.graphics.Bitmap image=PhotoStore.loadScaled(
+                application,contact.photo,1440);
             runOnUiThread(()->{
-                if(!active||!key.equals(loadedPhoto)||photoView==null)return;
-                if(bitmap!=null){
-                    photoView.setImageBitmap(bitmap);
+                if(!active||!target.equals(loadedPhoto)||photoView==null)return;
+                nameView.setText(contact.name);
+                numberView.setText(contact.name.equals(target)?"":target);
+                if(image!=null){
+                    photoView.setImageBitmap(image);
                     avatarView.setVisibility(View.GONE);
                 }
             });
-        },"SVCaller-ContactPhoto").start();
+        },"SVCaller-AsyncPhoto").start();
     }
     private void refresh(){
         if(previewOnly||actionPanel==null)return;
@@ -393,8 +445,10 @@ public final class InCallActivity extends Activity {
             handler.postDelayed(this::finish,1000);
             return;
         }
-        if(previousState!=state){
+        int audioSignature=currentAudioSignature();
+        if(previousState!=state||previousAudioSignature!=audioSignature){
             previousState=state;
+            previousAudioSignature=audioSignature;
             buildActions(call);
         }
         stateView.setText(callLabel(state));
