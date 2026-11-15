@@ -115,7 +115,7 @@ jobs:
           assert 'CallerNumberKey.key(phone)' in photos
           assert 'previewCallScreen(' in main
           assert 'showAudioRoutes()' in activity
-          assert 'MessageDigest.getInstance("SHA-256")' in photos
+          assert 'MessageDigest.getInstance("SHA-256")' in (src/'CallerNumberKey.java').read_text()
           assert "versionName '2.0.0'" in gradle
           assert (p/'app/src/main/res/drawable-nodpi/ic_sv_caller_pro.webp').is_file()
           icon=(p/'app/src/main/res/drawable-nodpi/ic_sv_caller_pro.webp').read_bytes()
