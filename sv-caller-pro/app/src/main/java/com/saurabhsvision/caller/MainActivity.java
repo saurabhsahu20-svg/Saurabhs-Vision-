@@ -195,14 +195,14 @@ public final class MainActivity extends Activity {
         LinearLayout screen=new LinearLayout(this);
         screen.setOrientation(LinearLayout.VERTICAL);
         screen.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
-            new int[]{0xff050a1c,0xff14113a,0xff07182c}));
+            new int[]{0xff05091b,0xff141038,0xff050d23}));
         scroll=new ScrollView(this);
         scroll.setFillViewport(true);
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setBackgroundColor(Color.TRANSPARENT);
         root=new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setPadding(dp(18),dp(11),dp(18),dp(30));
+        root.setPadding(dp(16),dp(11),dp(16),dp(25));
         scroll.addView(root);
         screen.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         setContentView(screen);
@@ -245,7 +245,7 @@ public final class MainActivity extends Activity {
         row.addView(names,new LinearLayout.LayoutParams(0,-2,1));
         TextView settings=text("⚙",24,WHITE,true);
         settings.setGravity(Gravity.CENTER);
-        settings.setBackground(gradient(0xff50358d,0xff172445,19,0xff9476ec));
+        settings.setBackground(gradient(0xff7344bc,0xff152953,19,0xffb997f7));
         settings.setElevation(dp(5));
         settings.setContentDescription("Call and theme settings");
         row.addView(settings,new LinearLayout.LayoutParams(dp(45),dp(45)));
@@ -427,7 +427,7 @@ public final class MainActivity extends Activity {
         LinearLayout dock=new LinearLayout(this);
         dock.setGravity(Gravity.CENTER);
         dock.setPadding(dp(6),dp(6),dp(6),dp(6));
-        dock.setBackground(gradient(0xff1b2448,0xff0a1430,29,0xff475c91));
+        dock.setBackground(gradient(0xff242451,0xff07132d,29,0xff5e68ae));
         dock.setElevation(dp(10));
         String[] icons={"▦","♙","◷","★"};
         String[] names={"Keypad","Contacts","Recents","Favorites"};
@@ -436,7 +436,7 @@ public final class MainActivity extends Activity {
             LinearLayout item=new LinearLayout(this);
             item.setOrientation(LinearLayout.VERTICAL);
             item.setGravity(Gravity.CENTER);
-            if(i==tab)item.setBackground(gradient(0xff8747ef,0xff383bb0,24,0xffbd8afa));
+            if(i==tab)item.setBackground(gradient(0xffaa28eb,0xff353ad8,24,0xffc698ff));
             TextView icon=text(icons[i],22,i==tab?WHITE:MUTED,true);
             icon.setGravity(Gravity.CENTER);
             item.addView(icon,new LinearLayout.LayoutParams(-1,dp(28)));
@@ -457,9 +457,9 @@ public final class MainActivity extends Activity {
         LinearLayout face=new LinearLayout(this);
         face.setOrientation(LinearLayout.VERTICAL);
         face.setPadding(dp(18),dp(15),dp(18),dp(16));
-        face.setBackground(gradient(0xff21295a,0xff101b3b,29,0xff6373bb));
+        face.setBackground(gradient(0xff20366d,0xff111b40,29,0xff5983d9));
         face.setElevation(dp(3));
-        TextView label=text("✦  SMART DIALER    •    FULL-SCREEN CALLER ID",11,CYAN,true);
+        TextView label=text("✦  HD CALLER ID   •   SMART KEYPAD",11,CYAN,true);
         add(face,label,0);
         numberInput=new EditText(this);
         numberInput.setSingleLine(true);
@@ -482,7 +482,7 @@ public final class MainActivity extends Activity {
         });
         LinearLayout small=new LinearLayout(this);
         TextView clear=smallButton("⌫  Delete");
-        TextView photo=smallButton("▧  HD Photo");
+        TextView photo=smallButton("▧  FULL PHOTO");
         small.addView(clear,new LinearLayout.LayoutParams(0,dp(40),1));
         LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(0,dp(40),1);
         pp.leftMargin=dp(8);
@@ -502,9 +502,9 @@ public final class MainActivity extends Activity {
         LinearLayout hero=new LinearLayout(this);
         hero.setOrientation(LinearLayout.VERTICAL);
         hero.setPadding(dp(18),dp(15),dp(18),dp(15));
-        hero.setBackground(gradient(0xff222d77,0xff651b92,26,0xff7c82e5));
+        hero.setBackground(gradient(0xff072f83,0xff7e159a,26,0xff8d77fa));
         hero.setElevation(dp(5));
-        TextView heroTitle=text("✦  YOUR CALL, YOUR STYLE",15,WHITE,true);
+        TextView heroTitle=text("✦  FULL SCREEN. FULL PERSONALITY.",15,WHITE,true);
         add(hero,heroTitle,0);
         TextView heroDesc=text("Personal caller wallpapers • Six themes • Private on your phone",
             12,0xffe0e9ff,false);
@@ -533,7 +533,8 @@ public final class MainActivity extends Activity {
                 LinearLayout circle=new LinearLayout(this);
                 circle.setGravity(Gravity.CENTER);
                 circle.setOrientation(LinearLayout.VERTICAL);
-                circle.setBackground(gradient(0xff28375d,0xff0c1634,50,0xff667db9));
+                circle.setBackground(gradient(0xff313064,0xff071637,50,
+                    (r+c)%2==0?0xff9e61e9:0xff498fec));
                 circle.setElevation(dp(4));
                 TextView digit=text(key,30,WHITE,true);
                 digit.setGravity(Gravity.CENTER);
@@ -564,10 +565,10 @@ public final class MainActivity extends Activity {
         callStack.setGravity(Gravity.CENTER);
         TextView call=text("☎",32,Color.WHITE,true);
         call.setGravity(Gravity.CENTER);
-        call.setBackground(gradient(0xff25f095,0xff079e76,48,0xffb6ffda));
+        call.setBackground(gradient(0xff18f55a,0xff0ba94c,48,0xffa3ffbb));
         call.setElevation(dp(7));
         callStack.addView(call,new LinearLayout.LayoutParams(dp(83),dp(83)));
-        TextView callLabel=text("TAP TO CALL",12,0xff8df9c9,true);
+        TextView callLabel=text("CALL NOW",13,0xff95ffd4,true);
         callLabel.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams labelP=new LinearLayout.LayoutParams(-1,dp(27));
         labelP.topMargin=dp(5);
@@ -609,7 +610,7 @@ public final class MainActivity extends Activity {
             setup.setOnClickListener(v->showPermissionSetup());
             add(panel,box,10);
         }
-        TextView head=text("✦   MAKE EVERY CALL YOURS   ✦",12,0xffd6c4ff,true);
+        TextView head=text("✦   CUSTOMIZE YOUR CALLS   ✦",12,0xffd6c4ff,true);
         head.setGravity(Gravity.CENTER);
         add(panel,head,18);
         String[] names={"▧  Caller photos","◈  Themes",
@@ -631,7 +632,7 @@ public final class MainActivity extends Activity {
             }
             add(panel,strip,4);
         }
-        TextView footer=text("SV CALLER PRO 2.2   •   SAURABH'S VISION™",11,CYAN,true);
+        TextView footer=text("SV CALLER PRO 3.0   •   SAURABH'S VISION™",11,CYAN,true);
         footer.setGravity(Gravity.CENTER);
         add(panel,footer,14);
     }
@@ -659,7 +660,7 @@ public final class MainActivity extends Activity {
     private TextView smallButton(String title){
         TextView t=text(title,12,WHITE,true);
         t.setGravity(Gravity.CENTER);
-        t.setBackground(gradient(0xff323c75,0xff152344,20,0xff6c81c2));
+        t.setBackground(gradient(0xff353a7e,0xff0c1e46,22,0xff8587d5));
         return t;
     }
     private EditText addSearch(LinearLayout target,String hint,Runnable rerender){
@@ -670,7 +671,7 @@ public final class MainActivity extends Activity {
         search.setTextColor(WHITE);
         search.setHintTextColor(MUTED);
         search.setPadding(dp(17),dp(6),dp(15),dp(6));
-        search.setBackground(gradient(0xff263a65,0xff121c3e,25,0xff647bbb));
+        search.setBackground(gradient(0xff293463,0xff0c1738,25,0xff8775cb));
         LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(54));
         p.bottomMargin=dp(14);
         target.addView(search,p);
@@ -895,7 +896,7 @@ public final class MainActivity extends Activity {
             LinearLayout line=new LinearLayout(this);
             line.setGravity(Gravity.CENTER_VERTICAL);
             line.setPadding(dp(16),dp(10),dp(11),dp(10));
-            line.setBackground(gradient(0xff232a50,0xff101a39,24,0xff4a5388));
+            line.setBackground(gradient(0xff252d5a,0xff0e1839,25,0xff6378af));
             LinearLayout names=new LinearLayout(this);
             names.setOrientation(LinearLayout.VERTICAL);
             names.addView(text(item.name,16,WHITE,true));
