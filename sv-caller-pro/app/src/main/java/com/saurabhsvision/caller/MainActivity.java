@@ -16,6 +16,8 @@ import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
 import android.provider.Settings;
@@ -61,6 +63,10 @@ public final class MainActivity extends Activity {
     private static final String[] TABS={"DIALPAD","CONTACTS","RECENTS","FAVORITES"};
     private SharedPreferences prefs;
     private int tab=0,theme=0;
+    private boolean homeOpen=true;
+    private final Handler searchHandler=new Handler(Looper.getMainLooper());
+    private Runnable pendingSearch;
+    private long lastHistoryLoadAt=0;
     private String dialText="", photoTarget="",pendingDial="";
     private LinearLayout root,panel;
     private ScrollView scroll;
@@ -123,6 +129,7 @@ public final class MainActivity extends Activity {
         if(state!=null){
             dialText=state.getString("dialText","");
             tab=state.getInt("tab",0);
+            homeOpen=state.getBoolean("homeOpen",true);
         }
         readDialIntent(getIntent());
         buildUi();
@@ -133,6 +140,10 @@ public final class MainActivity extends Activity {
         String snapshot=permissionsSnapshot();
         if(!snapshot.equals(permissionSnapshot)){
             permissionSnapshot=snapshot;
+            if(root!=null)buildUi();
+        }else if(tab==2&&!homeOpen&&recentDataLoaded
+            &&System.currentTimeMillis()-lastHistoryLoadAt>15000){
+            recentDataLoaded=false;
             if(root!=null)buildUi();
         }
     }
@@ -147,25 +158,33 @@ public final class MainActivity extends Activity {
         super.onNewIntent(intent);
         setIntent(intent);
         readDialIntent(intent);
-        tab=0;buildUi();
+        tab=0;homeOpen=false;buildUi();
     }
     private void readDialIntent(Intent intent){
         if(intent==null)return;
         Uri uri=intent.getData();
         if(Intent.ACTION_DIAL.equals(intent.getAction())&&uri!=null){
             String number=uri.getSchemeSpecificPart();
-            if(number!=null&&number.length()<=80)dialText=number;
+            if(number!=null&&number.length()<=80){
+                dialText=number;
+                homeOpen=false;
+            }
         }
     }
     @Override protected void onSaveInstanceState(Bundle state){
         if(numberInput!=null)dialText=numberInput.getText().toString();
         state.putString("dialText",dialText);
         state.putInt("tab",tab);
+        state.putBoolean("homeOpen",homeOpen);
         super.onSaveInstanceState(state);
     }
     @Override public void onBackPressed(){
-        if(tab!=0){tab=0;buildUi();}
+        if(!homeOpen){homeOpen=true;buildUi();}
         else super.onBackPressed();
+    }
+    @Override protected void onDestroy(){
+        if(pendingSearch!=null)searchHandler.removeCallbacks(pendingSearch);
+        super.onDestroy();
     }
     private void buildUi(){
         if(numberInput!=null)dialText=numberInput.getText().toString();
@@ -196,13 +215,17 @@ public final class MainActivity extends Activity {
         panel=new LinearLayout(this);
         panel.setOrientation(LinearLayout.VERTICAL);
         add(root,panel,13);
-        switch(tab){
-            case 0:buildDialpad();break;
-            case 1:buildContacts();break;
-            case 2:buildRecents();break;
-            case 3:buildFavorites();break;
+        if(homeOpen){
+            buildHomeDashboard();
+        }else{
+            switch(tab){
+                case 0:buildDialpad();break;
+                case 1:buildContacts();break;
+                case 2:buildRecents();break;
+                case 3:buildFavorites();break;
+            }
+            buildBottomNav(screen);
         }
-        buildBottomNav(screen);
         permissionSnapshot=permissionsSnapshot();
     }
     private void buildHeader(){
@@ -211,13 +234,14 @@ public final class MainActivity extends Activity {
         ImageView emblem=new ImageView(this);
         emblem.setImageResource(R.drawable.ic_sv_caller_pro);
         emblem.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        emblem.setContentDescription("SV Caller Pro blue phone gold border app icon");
+        emblem.setContentDescription("SV Caller Pro blue-gold icon. Open home.");
+        emblem.setOnClickListener(v->{homeOpen=true;buildUi();});
         row.addView(emblem,new LinearLayout.LayoutParams(dp(52),dp(52)));
         LinearLayout names=new LinearLayout(this);
         names.setPadding(dp(10),0,0,0);
         names.setOrientation(LinearLayout.VERTICAL);
-        names.addView(text("SV Caller Pro",23,WHITE,true));
-        names.addView(text("SAURABH'S VISION™    •    PREMIUM 2.2",10,CYAN,true));
+        names.addView(text("SV Caller Pro 3.0",21,WHITE,true));
+        names.addView(text("SAURABH'S VISION™   •   PREMIUM 3.0",10,CYAN,true));
         row.addView(names,new LinearLayout.LayoutParams(0,-2,1));
         TextView settings=text("⚙",24,WHITE,true);
         settings.setGravity(Gravity.CENTER);
@@ -347,7 +371,7 @@ public final class MainActivity extends Activity {
             size.setMargins(dp(2),0,dp(2),0);
             dock.addView(item,size);
             item.setContentDescription("Open "+names[i]);
-            item.setOnClickListener(v->{if(tab!=index){tab=index;buildUi();}});
+            item.setOnClickListener(v->{if(tab!=index){tab=index;homeOpen=false;buildUi();}});
         }
         LinearLayout.LayoutParams dockP=new LinearLayout.LayoutParams(-1,dp(74));
         dockP.setMargins(dp(8),dp(2),dp(8),dp(8));
@@ -576,7 +600,11 @@ public final class MainActivity extends Activity {
         target.addView(search,p);
         search.addTextChangedListener(new TextWatcher(){
             public void beforeTextChanged(CharSequence s,int st,int c,int a){}
-            public void onTextChanged(CharSequence s,int st,int before,int count){rerender.run();}
+            public void onTextChanged(CharSequence s,int st,int before,int count){
+                if(pendingSearch!=null)searchHandler.removeCallbacks(pendingSearch);
+                pendingSearch=()->{if(!isFinishing()&&!homeOpen)rerender.run();};
+                searchHandler.postDelayed(pendingSearch,125);
+            }
             public void afterTextChanged(Editable s){}
         });
         searchInput=search;
@@ -660,7 +688,7 @@ public final class MainActivity extends Activity {
                     while(c.moveToNext()&&items.size()<750){
                         String name=c.getString(0),number=c.getString(1);
                         if(TextUtils.isEmpty(number))continue;
-                        String key=number.replaceAll("[^+0-9]","");
+                        String key=CallerNumberKey.normalized(number);
                         if(key.length()<2||!seen.add(key))continue;
                         items.add(new Person(TextUtils.isEmpty(name)?number:name,number));
                     }
@@ -696,7 +724,8 @@ public final class MainActivity extends Activity {
             runOnUiThread(()->{
                 recentsLoading=false;recentCalls.clear();recentCalls.addAll(items);
                 recentDataLoaded=true;
-                if(tab==2)buildUi();
+                lastHistoryLoadAt=System.currentTimeMillis();
+                if(tab==2&&!homeOpen)buildUi();
             });
         },"SVCaller-CallHistory").start();
     }
@@ -883,6 +912,7 @@ public final class MainActivity extends Activity {
         try{
             // Telecom correctly routes emergency calls to the preloaded dialer.
             manager.placeCall(Uri.fromParts("tel",number,null),new Bundle());
+            recentDataLoaded=false;
             Intent call=new Intent(this,InCallActivity.class);
             call.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(call);
