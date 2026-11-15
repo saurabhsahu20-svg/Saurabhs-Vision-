@@ -64,6 +64,9 @@ public final class MainActivity extends Activity {
     private SharedPreferences prefs;
     private int tab=0,theme=0;
     private boolean homeOpen=true;
+    private boolean settingsOpen=false;
+    private boolean contactDetailOpen=false;
+    private String detailName="",detailNumber="";
     private final Handler searchHandler=new Handler(Looper.getMainLooper());
     private Runnable pendingSearch;
     private long lastHistoryLoadAt=0;
@@ -136,6 +139,10 @@ public final class MainActivity extends Activity {
             dialText=state.getString("dialText","");
             tab=state.getInt("tab",0);
             homeOpen=state.getBoolean("homeOpen",true);
+            settingsOpen=state.getBoolean("settingsOpen",false);
+            contactDetailOpen=state.getBoolean("contactDetailOpen",false);
+            detailName=state.getString("detailName","");
+            detailNumber=state.getString("detailNumber","");
             recentFilter=state.getInt("recentFilter",0);
         }
         readDialIntent(getIntent());
@@ -183,11 +190,17 @@ public final class MainActivity extends Activity {
         state.putString("dialText",dialText);
         state.putInt("tab",tab);
         state.putBoolean("homeOpen",homeOpen);
+        state.putBoolean("settingsOpen",settingsOpen);
+        state.putBoolean("contactDetailOpen",contactDetailOpen);
+        state.putString("detailName",detailName);
+        state.putString("detailNumber",detailNumber);
         state.putInt("recentFilter",recentFilter);
         super.onSaveInstanceState(state);
     }
     @Override public void onBackPressed(){
-        if(!homeOpen){homeOpen=true;buildUi();}
+        if(settingsOpen||contactDetailOpen){
+            settingsOpen=false;contactDetailOpen=false;buildUi();
+        }else if(!homeOpen){homeOpen=true;buildUi();}
         else super.onBackPressed();
     }
     @Override protected void onDestroy(){
@@ -223,7 +236,11 @@ public final class MainActivity extends Activity {
         panel=new LinearLayout(this);
         panel.setOrientation(LinearLayout.VERTICAL);
         add(root,panel,13);
-        if(homeOpen){
+        if(settingsOpen){
+            buildSettingsScreen();
+        }else if(contactDetailOpen){
+            buildContactDetails();
+        }else if(homeOpen){
             buildHomeDashboard();
         }else{
             switch(tab){
@@ -248,8 +265,8 @@ public final class MainActivity extends Activity {
         LinearLayout names=new LinearLayout(this);
         names.setPadding(dp(10),0,0,0);
         names.setOrientation(LinearLayout.VERTICAL);
-        names.addView(text("SV Caller Pro 3.0",21,WHITE,true));
-        names.addView(text("SAURABH'S VISION™   •   PREMIUM 3.0",10,CYAN,true));
+        names.addView(text("SV Caller Pro 3.2",21,WHITE,true));
+        names.addView(text("SAURABH'S VISION™   •   PREMIUM PHONE",10,CYAN,true));
         row.addView(names,new LinearLayout.LayoutParams(0,-2,1));
         TextView settings=text("⚙",24,WHITE,true);
         settings.setGravity(Gravity.CENTER);
@@ -355,7 +372,7 @@ public final class MainActivity extends Activity {
         }
     }
     /** Opens a real app tab. Home tiles never simulate unsupported features. */
-    private void openTab(int target){homeOpen=false;tab=target;buildUi();}
+    private void openTab(int target){homeOpen=false;settingsOpen=false;contactDetailOpen=false;tab=target;buildUi();}
     private void dashboardTile(LinearLayout row,String icon,String label,
         String subtitle,Runnable action,boolean purple){
         LinearLayout tile=new LinearLayout(this);
@@ -424,7 +441,7 @@ public final class MainActivity extends Activity {
             add(panel,row,3);
         }
         TextView footer=text(
-            "3.0  •  CONTACTS STAY ON YOUR PHONE  •  NO ADS OR CLOUD TRACKING",
+            "PRIVATE PHONE  •  LOCAL CONTACTS  •  NO ADS",
             10,CYAN,true);
         footer.setGravity(Gravity.CENTER);
         add(panel,footer,18);
@@ -640,7 +657,7 @@ public final class MainActivity extends Activity {
             }
             add(panel,strip,4);
         }
-        TextView footer=text("SV CALLER PRO 3.0   •   SAURABH'S VISION™",11,CYAN,true);
+        TextView footer=text("SV CALLER PRO 3.2   •   SAURABH'S VISION™",11,CYAN,true);
         footer.setGravity(Gravity.CENTER);
         add(panel,footer,14);
     }
@@ -870,7 +887,9 @@ public final class MainActivity extends Activity {
         call.setOnClickListener(v->callNumber(person.number));
         card.setContentDescription("Contact "+person.name+" "+person.number);
         card.setOnClickListener(v->{
-            dialText=person.number;tab=0;buildUi();
+            detailName=person.name;detailNumber=person.number;
+            contactDetailOpen=true;settingsOpen=false;homeOpen=false;
+            buildUi();
         });
         card.setOnLongClickListener(v->{
             String[] options={
