@@ -312,6 +312,37 @@ public final class InCallActivity extends Activity {
         }
         actionPanel.addView(row,new LinearLayout.LayoutParams(-1,-2));
     }
+    /** Accessible in-call controls. Only actions backed by Telecom are shown. */
+    private void controlRow(String[] icons,String[] labels,Runnable[] actions,
+        boolean[] highlighted){
+        LinearLayout row=new LinearLayout(this);
+        row.setGravity(Gravity.CENTER);
+        for(int i=0;i<labels.length;i++){
+            final int index=i;
+            LinearLayout stack=new LinearLayout(this);
+            stack.setOrientation(LinearLayout.VERTICAL);
+            stack.setGravity(Gravity.CENTER);
+            TextView orb=action(icons[i],
+                highlighted[i]?0xff7136e7:0xff2b305e,
+                highlighted[i]?0xff4b1aab:0xff111831,
+                highlighted[i]?0xffdf9cff:0xff6b83b8);
+            orb.setTextSize(26);
+            orb.setGravity(Gravity.CENTER);
+            orb.setElevation(dp(3));
+            stack.addView(orb,new LinearLayout.LayoutParams(dp(67),dp(67)));
+            TextView label=text(labels[i],12,WHITE,true);
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(29));
+            p.topMargin=dp(6);
+            stack.addView(label,p);
+            LinearLayout.LayoutParams item=new LinearLayout.LayoutParams(0,dp(108),1);
+            item.setMargins(dp(2),0,dp(2),0);
+            row.addView(stack,item);
+            stack.setContentDescription(labels[i]);
+            stack.setOnClickListener(v->actions[index].run());
+            orb.setOnClickListener(v->actions[index].run());
+        }
+        actionPanel.addView(row,new LinearLayout.LayoutParams(-1,-2));
+    }
     private void buildActions(Call call){
         actionPanel.removeAllViews();
         int state=call.getState();
@@ -324,31 +355,62 @@ public final class InCallActivity extends Activity {
         boolean muted=audio!=null&&audio.isMuted();
         boolean speaker=audio!=null&&audio.getRoute()==CallAudioState.ROUTE_SPEAKER;
         boolean held=state==Call.STATE_HOLDING;
-        buttonRow(new String[]{muted?"MIC ON":"MUTE",speaker?"EARPIECE":"SPEAKER","KEYPAD"},
+        controlRow(new String[]{"♩","▦","◖"},
+            new String[]{muted?"Unmute":"Mute","Keypad",speaker?"Earpiece":"Speaker"},
             new Runnable[]{
-                ()->{SVInCallService svc=SVInCallService.activeService();
-                    if(svc!=null)svc.setMuted(!muted);refreshControls();},
-                ()->{SVInCallService svc=SVInCallService.activeService();
-                    if(svc!=null)svc.setAudioRoute(speaker?
-                        CallAudioState.ROUTE_EARPIECE:CallAudioState.ROUTE_SPEAKER);
-                    refreshControls();},
-                ()->{keypadVisible=!keypadVisible;
-                    dtmfPanel.setVisibility(keypadVisible?View.VISIBLE:View.GONE);}
-            },new int[]{0xff2a315d,0xff2a315d,0xff2a315d});
+                ()->{
+                    SVInCallService svc=SVInCallService.activeService();
+                    if(svc!=null)svc.setMuted(!muted);
+                    refreshControls();
+                },
+                ()->{
+                    keypadVisible=!keypadVisible;
+                    dtmfPanel.setVisibility(keypadVisible?View.VISIBLE:View.GONE);
+                },
+                ()->{
+                    SVInCallService svc=SVInCallService.activeService();
+                    CallAudioState route=svc==null?null:svc.getCallAudioState();
+                    if(route==null){showAudioRoutes();return;}
+                    int target=speaker?CallAudioState.ROUTE_EARPIECE:
+                        CallAudioState.ROUTE_SPEAKER;
+                    if((route.getSupportedRouteMask()&target)!=0)
+                        svc.setAudioRoute(target);
+                    else showAudioRoutes();
+                    refreshControls();
+                }
+            },new boolean[]{muted,keypadVisible,speaker});
         boolean canHold=call.getDetails()!=null && call.getDetails().can(
             Details.CAPABILITY_HOLD);
-        buttonRow(new String[]{"◉  CHOOSE AUDIO OUTPUT"},
-            new Runnable[]{this::showAudioRoutes},new int[]{0xff2a315d});
         if(canHold||held){
-            buttonRow(new String[]{held?"RESUME":"HOLD","✕  END CALL"},
+            controlRow(new String[]{"Ⅱ","◉"},
+                new String[]{held?"Resume":"Hold","Audio output"},
                 new Runnable[]{
-                    ()->{if(call.getState()==Call.STATE_HOLDING)call.unhold();else call.hold();},
-                    SVInCallService::end
-                },new int[]{0xff2a315d,0xffe32943});
+                    ()->{
+                        if(call.getState()==Call.STATE_HOLDING)call.unhold();
+                        else if(call.getState()==Call.STATE_ACTIVE)call.hold();
+                    },
+                    this::showAudioRoutes
+                },new boolean[]{held,false});
         }else{
-            buttonRow(new String[]{"✕  END CALL"},
-                new Runnable[]{SVInCallService::end},new int[]{0xffe32943});
+            controlRow(new String[]{"◉"},new String[]{"Audio output"},
+                new Runnable[]{this::showAudioRoutes},new boolean[]{false});
         }
+        LinearLayout endStack=new LinearLayout(this);
+        endStack.setOrientation(LinearLayout.VERTICAL);
+        endStack.setGravity(Gravity.CENTER);
+        TextView end=action("☎",0xffff3b54,0xffbc102f,0xffff9aaa);
+        end.setTextSize(32);
+        end.setElevation(dp(7));
+        end.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams endSize=new LinearLayout.LayoutParams(dp(80),dp(80));
+        endSize.topMargin=dp(11);
+        endStack.addView(end,endSize);
+        TextView endLabel=text("END CALL",13,WHITE,true);
+        endStack.addView(endLabel,new LinearLayout.LayoutParams(-1,dp(30)));
+        endStack.setContentDescription("End the current phone call");
+        endStack.setOnClickListener(v->SVInCallService.end());
+        end.setOnClickListener(v->SVInCallService.end());
+        actionPanel.addView(endStack,new LinearLayout.LayoutParams(-1,-2));
     }
     /** Large, clearly labelled answer/decline controls over the caller photo. */
     private void buildIncomingButtons(){
@@ -457,14 +519,19 @@ public final class InCallActivity extends Activity {
      * Read contacts AND decode photos off the UI thread. Resolving a provider
      * synchronously can otherwise freeze the call screen on slower phones.
      */
+    /** Resolve and decode once on a worker thread; both views share the result. */
     private void updatePhoto(String number){
         final String target=number==null?"":number;
         if(target.equals(loadedPhoto))return;
         loadedPhoto=target;
+        currentBitmap=null;
         photoView.setImageDrawable(null);
-        avatarView.setVisibility(View.VISIBLE);
+        profileImage.setImageDrawable(null);
         nameView.setText(target.isEmpty()?"Unknown caller":target);
         numberView.setText("");
+        applyPhotoPresentation(previewOnly ||
+            (SVInCallService.activeCall()!=null &&
+             SVInCallService.activeCall().getState()==Call.STATE_RINGING));
         final Context application=getApplicationContext();
         new Thread(()->{
             PhotoStore.Match contact=PhotoStore.resolve(application,target);
@@ -474,10 +541,14 @@ public final class InCallActivity extends Activity {
                 if(!active||!target.equals(loadedPhoto)||photoView==null)return;
                 nameView.setText(contact.name);
                 numberView.setText(contact.name.equals(target)?"":target);
+                currentBitmap=image;
                 if(image!=null){
                     photoView.setImageBitmap(image);
-                    avatarView.setVisibility(View.GONE);
+                    profileImage.setImageBitmap(image);
                 }
+                applyPhotoPresentation(previewOnly ||
+                    (SVInCallService.activeCall()!=null &&
+                      SVInCallService.activeCall().getState()==Call.STATE_RINGING));
             });
         },"SVCaller-AsyncPhoto").start();
     }
@@ -504,6 +575,7 @@ public final class InCallActivity extends Activity {
             previousState=state;
             previousAudioSignature=audioSignature;
             buildActions(call);
+            applyPhotoPresentation(state==Call.STATE_RINGING);
         }
         stateView.setText(callLabel(state));
         String number=SVInCallService.number(call);
