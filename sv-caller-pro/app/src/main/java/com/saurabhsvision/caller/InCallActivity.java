@@ -471,10 +471,11 @@ public final class InCallActivity extends Activity {
                 if(action==MotionEvent.ACTION_UP){
                     boolean ringing=SVInCallService.activeCall()!=null &&
                         SVInCallService.activeCall().getState()==Call.STATE_RINGING;
-                    if(ringing&&Math.abs(progress[0])>=.75f){
+                    int decision=SlideRule.decision(offset,maxDistance);
+                    if(ringing&&decision!=SlideRule.NONE){
                         slideActionSent=true;
                         track.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                        if(progress[0]>0f)SVInCallService.answer();
+                        if(decision==SlideRule.ANSWER)SVInCallService.answer();
                         else SVInCallService.decline();
                     }else{
                         thumb.animate().translationX(0f).setDuration(170).start();
