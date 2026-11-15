@@ -42,6 +42,8 @@ jobs:
           javac -encoding UTF-8 -d "$dir"             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/AddressResolver.java             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/DictionaryEntry.java             s-browser/tests/AddressResolverTest.java             s-browser/tests/DictionaryEntryTest.java
           java -ea -cp "$dir" AddressResolverTest
           java -ea -cp "$dir" DictionaryEntryTest
+          javac -encoding UTF-8 -d "$dir"             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/GovtSources.java             s-browser/tests/GovtSourcesTest.java
+          java -ea -cp "$dir" GovtSourcesTest
           python3 - <<'PY'
           from pathlib import Path
           dictionary=Path('s-browser/app/src/main/assets/dictionary.tsv')
@@ -73,13 +75,13 @@ jobs:
           test -s "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
           mkdir -p dist
-          cp "$APK" dist/S_Browser_v1.1.0_Student_Dictionary_Beta.apk
+          cp "$APK" dist/S_Browser_v1.2.0_CG_Jobs_Exams_Beta.apk
 
       - name: Upload installable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S-Browser-1.1.0-APK
-          path: dist/S_Browser_v1.1.0_Student_Dictionary_Beta.apk
+          name: S-Browser-1.2.0-APK
+          path: dist/S_Browser_v1.2.0_CG_Jobs_Exams_Beta.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -91,10 +93,10 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          TAG="s-browser-v1.1.0-beta"
-          FILE="dist/S_Browser_v1.1.0_Student_Dictionary_Beta.apk"
+          TAG="s-browser-v1.2.0-beta"
+          FILE="dist/S_Browser_v1.2.0_CG_Jobs_Exams_Beta.apk"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$FILE" --clobber
           else
-            gh release create "$TAG" "$FILE"               --title "S Browser 1.1 Beta — Student Dictionary"               --notes "S Browser beta by SAURABH'S VISION. Native Android WebView, up to 8 tabs, bookmarks, history, downloads, focus mode, reading mode, per-page study notes and 304 curated offline English–Hindi dictionary entries. Uses the approved neon S Browser launcher icon. Debug-signed beta APK. Not a fully audited browser; does not provide strict incognito isolation, full content blocking or an AI tutor. Test sites and downloads on your phone before daily use."               --prerelease
+            gh release create "$TAG" "$FILE"               --title "S Browser 1.2 Beta — CG Jobs & Exams"               --notes "S Browser 1.2 Beta by SAURABHS VISION adds a Chhattisgarh Jobs and Exams Hub with 20 official recruitment and admission portals, filters for Raipur, Bhilai/Durg, Rajnandgaon, Bilaspur, Dhamtari, Mahasamund/Saraipali, Raigarh and all 33 districts, plus Railway, CGPSC, Vyapam, JEE Main and Advanced, Navodaya, Sainik School and NTSE links. Includes government-domain-focused search and opt-in best-effort Android notifications when an official webpage changes. Changes do NOT confirm a new vacancy, eligibility, application status or deadline; verify publisher PDFs and dates. Browser, 304-word offline English-Hindi dictionary, tabs, notes and existing S icon preserved. Android WebView beta, not a certified vacancy alert aggregator. Test real devices, screen locks and portal access.""               --prerelease
           fi
