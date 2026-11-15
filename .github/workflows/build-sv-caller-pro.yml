@@ -101,13 +101,14 @@ jobs:
           for feature in ('showPermissionSetup()', 'openDefaultPhoneSettings()',
               'openAppPermissionSettings()', 'permissionsSnapshot()',
               'shouldShowRequestPermissionRationale(', 'buildDialpadExtras()',
-              'runQuickTool(tools[index])', 'showManualDialerChoice()',
+              'buildSettingsScreen()', 'buildContactDetails()', 'showManualDialerChoice()',
               'Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS',
               'Settings.ACTION_APPLICATION_DETAILS_SETTINGS'):
               assert feature in main, feature
-          for action in ('"▧  Caller photos"', '"◈  Themes"',
-              '"⚙  Permissions"', '"☎  Phone app"', 'buildBottomNav(screen)',
-              'FrameLayout holder=', 'callStack', 'circle.animate()'):
+          for action in ('"▧  Caller photos"',
+              '"▧  Caller Photos"', 'buildBottomNav(screen)',
+              'FrameLayout holder=', 'callStack', 'circle.animate()',
+              'search.setOnClickListener(', 'buildHomeDashboard()'):
               assert action in main, action
           assert 'RoleManager.ROLE_DIALER' in main
           print('PASS: Permission wizard, default-app fallback and premium bottom navigation and caller photo tools')
@@ -121,13 +122,18 @@ jobs:
           assert 'CallerNumberKey.normalized(number)' in main
           assert 'recentFilter==1' in main
           assert 'buildIncomingButtons()' in activity
+          assert 'SlideRule.decision(' in activity
+          assert 'track.setOnTouchListener(sliderListener)' in activity
+          assert 'settingsOpen' in main and 'contactDetailOpen' in main
+          assert 'buildSettingsScreen()' in main
+          assert 'buildContactDetails()' in main
           assert 'applyPhotoPresentation(' in activity
           assert 'private void controlRow(' in activity
           assert 'profileImage.setImageBitmap(image)' in activity
           assert 'profileRing.setVisibility(' in activity
           assert 'SVCaller-AsyncPhoto' in activity
           assert 'CACHE_TTL_MS' in photos
-          assert "versionName '3.1.0'" in gradle
+          assert "versionName '3.2.0'" in gradle
           assert (p/'app/src/main/res/drawable-nodpi/ic_sv_caller_pro.webp').is_file()
           icon=(p/'app/src/main/res/drawable-nodpi/ic_sv_caller_pro.webp').read_bytes()
           assert icon[0:4]==b'RIFF' and icon[8:12]==b'WEBP' and len(icon)>2500
@@ -155,6 +161,9 @@ jobs:
           javac -encoding UTF-8 -d "$out" "$src/CallerNumberKey.java" \
              "$p/tests/CallerNumberKeyTest.java"
           java -ea -cp "$out" CallerNumberKeyTest
+          javac -encoding UTF-8 -d "$out" "$src/SlideRule.java" \
+             "$p/tests/SlideRuleTest.java"
+          java -ea -cp "$out" SlideRuleTest
 
       - name: Compile real Android default-dialer APK
         shell: bash
@@ -175,13 +184,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml |
             grep -q "android.telecom.InCallService"
           mkdir -p caller-deliverables
-          cp "$apk" caller-deliverables/SV_CALLER_PRO_v3.1.0_PROFESSIONAL_CALL_UI.apk
+          cp "$apk" caller-deliverables/SV_CALLER_PRO_v3.2.0_SLIDE_CALLING.apk
           ( cd caller-deliverables && sha256sum *.apk > SHA256SUMS.txt )
 
       - name: Upload debug APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SV_CALLER_PRO_v3_1_0_CALL_SCREEN_APK
+          name: SV_CALLER_PRO_v3_2_0_SLIDE_CALLING_APK
           path: caller-deliverables/*
           retention-days: 90
 
@@ -191,13 +200,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="sv-caller-pro-v3.1.0"
-          apk="caller-deliverables/SV_CALLER_PRO_v3.1.0_PROFESSIONAL_CALL_UI.apk"
+          tag="sv-caller-pro-v3.2.0"
+          apk="caller-deliverables/SV_CALLER_PRO_v3.2.0_SLIDE_CALLING.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$apk" caller-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$apk" caller-deliverables/SHA256SUMS.txt \
-              --title "SV Caller Pro 3.1 • Professional Calling Screen" \
-              --notes "SV Caller Pro v3.1 professional calling interface by SAURABH'S VISION, with the original blue-gold icon, full-bleed incoming contact photo, vivid large Answer/Decline controls, elegant circular portrait during active calls, readable live call status/timer and accessible working Mute/Keypad/Speaker/Hold/Audio Output/End Call controls. Native default Phone role, local call history, contacts and privacy preserved. No fabricated verified badges, recorded calls, video calling, AI spam filtering or automatic dual-SIM selection. GitHub checks compile/signature; real-device calling, lock-screen and OEM behavior must still be tested. Keep the original system Phone app installed." \
+              --title "SV Caller Pro 3.2 • Slide Calling & Professional Phone UI" \
+              --notes "SV Caller Pro 3.2 by SAURABH'S VISION. Original midnight-indigo phone UI, full-screen contact photo, tested bidirectional swipe: right to Answer and left to Decline (75% threshold), accessible Answer/Decline tap controls, on-device contact card with SMS handoff, full Settings page, compact dialpad and real recent-call shortcuts. Original blue-gold app icon preserved. No AI spam filtering, call recording or video calling. GitHub CI builds, verifies and signs a debug beta APK; test incoming/outgoing, locked-screen and emergency call behavior on your own phone before treating it as default. Keep original Phone app installed."" \
               --latest=false
           fi
