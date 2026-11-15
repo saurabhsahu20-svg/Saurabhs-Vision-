@@ -103,18 +103,23 @@ public final class GovtSources {
         String place=normalizedArea(area);
         String type=category==null?"All":category;
         String q=query==null?"":query.trim().toLowerCase(Locale.ROOT);
-        ArrayList<Source> items=new ArrayList<>();
+        ArrayList<Source> matching=new ArrayList<>();
+        ArrayList<Source> otherPortals=new ArrayList<>();
         for(Source source:OFFICIAL){
             boolean fitsType=type.equals("All")||source.category.equals(type);
             boolean isGlobal=source.area.equals("Chhattisgarh")||source.area.equals("India");
             boolean fitsCity=place==null||place.isEmpty()||place.equals("All Chhattisgarh")||
                 isGlobal||source.area.equalsIgnoreCase(place);
-            boolean fitsQuery=q.isEmpty()||
+            if(!fitsType||!fitsCity)continue;
+            // A user's job keyword is NOT a source name. Keep eligible official
+            // portals visible; rank matching directory labels first.
+            boolean fitsName=q.isEmpty()||
                 (source.title+" "+source.authority+" "+source.note+" "+
                 source.area+" "+source.category).toLowerCase(Locale.ROOT).contains(q);
-            if(fitsType&&fitsCity&&fitsQuery)items.add(source);
+            (fitsName?matching:otherPortals).add(source);
         }
-        return items;
+        matching.addAll(otherPortals);
+        return matching;
     }
 
     /** Restricts web queries to official hosts, not unverified job-ad sites. */
