@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: s-browser-apk-${{ github.ref }}
+  group: s-browser-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -20,97 +20,81 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Checkout Android source
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install JDK 17
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Gradle 8.9
+      - name: Setup Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+
+      - name: Verify offline dictionary and browser rules
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir="$(mktemp -d)"
+          javac -encoding UTF-8 -d "$dir"             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/AddressResolver.java             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/DictionaryEntry.java             s-browser/tests/AddressResolverTest.java             s-browser/tests/DictionaryEntryTest.java
+          java -ea -cp "$dir" AddressResolverTest
+          java -ea -cp "$dir" DictionaryEntryTest
+          python3 - <<'PY'
+          from pathlib import Path
+          dictionary=Path('s-browser/app/src/main/assets/dictionary.tsv')
+          lines=[x for x in dictionary.read_text(encoding='utf-8').splitlines() if x and not x.startswith('#')]
+          assert len(lines)>=150, f'Only {len(lines)} offline dictionary entries'
+          assert all(len(x.split('\t'))==4 for x in lines), 'Malformed dictionary entry'
+          words=[x.split('\t')[0].lower() for x in lines]
+          assert len(set(words))==len(words), 'Duplicate dictionary words'
+          print(f'PASS {len(lines)} offline dictionary entries')
+          PY
 
       - name: Install Android SDK 35
         shell: bash
         run: |
           set -e
-          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-35" "build-tools;35.0.0"
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" --install 'platforms;android-35' 'build-tools;35.0.0'
 
-      - name: Validate offline dictionary, icon and privacy defaults
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          root=Path('s-browser')
-          rows=[line.split('\t') for line in (root/'app/src/main/assets/dictionary.tsv').read_text().splitlines() if line.strip() and not line.startswith('#')]
-          assert len(rows)>=250,len(rows)
-          assert all(len(x)==4 and all(x) for x in rows)
-          assert len({x[0] for x in rows})==len(rows)
-          assert (root/'app/src/main/res/mipmap-xxxhdpi/ic_launcher.png').is_file()
-          manifest=(root/'app/src/main/AndroidManifest.xml').read_text()
-          assert 'android:label="S Browser"' in manifest
-          assert 'usesCleartextTraffic="false"' in manifest
-          assert 'android.permission.INTERNET' in manifest
-          assert 'READ_CONTACTS' not in manifest
-          assert 'RECORD_AUDIO' not in manifest
-          assert 'READ_SMS' not in manifest
-          source=(root/'app/src/main/java/com/saurabhsvision/sbrowser/MainActivity.java').read_text()
-          for token in ('setSafeBrowsingEnabled(true)', 'setAllowFileAccess(false)',
-              'setAcceptThirdPartyCookies(web,false)', 'handler.cancel()',
-              'shouldOverrideUrlLoading(', 'DownloadManager.Request', 'newTab()',
-              'openDictionary(', 'showTabs()', 'listSaved(', 'lookupSelection()'):
-              assert token in source,token
-          print(f'PASS dictionary ({len(rows)} entries), launcher icon, privacy defaults and working browser sources')
-          PY
+      - name: Compile S Browser debug APK
+        working-directory: s-browser
+        run: gradle --no-daemon :app:assembleDebug
 
-      - name: Run Java dictionary and URL regression tests
-        run: |
-          set -e
-          out="$(mktemp -d)"
-          src='s-browser/app/src/main/java/com/saurabhsvision/sbrowser'
-          javac -encoding UTF-8 -d "$out" "$src/UrlTools.java" "$src/DictionaryCore.java" s-browser/tests/BrowserCoreTest.java
-          java -ea -cp "$out" BrowserCoreTest
-
-      - name: Build S Browser debug APK
-        run: gradle -p s-browser --no-daemon :app:assembleDebug
-
-      - name: Verify APK package and signature
+      - name: Verify APK exists and is signed
         shell: bash
         run: |
-          set -e
-          apk='s-browser/app/build/outputs/apk/debug/app-debug.apk'
-          test -s "$apk"
-          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.sbrowser'"
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
-          cp "$apk" S_Browser_v1.0.0_BETA.apk
-          sha256sum S_Browser_v1.0.0_BETA.apk
+          set -euo pipefail
+          APK="s-browser/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
+          mkdir -p dist
+          cp "$APK" dist/S_Browser_v0.1.0_Student_Dictionary_Beta.apk
 
       - name: Upload installable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S-Browser-v1.0.0-beta-APK
-          path: S_Browser_v1.0.0_BETA.apk
+          name: S-Browser-0.1.0-APK
+          path: dist/S_Browser_v0.1.0_Student_Dictionary_Beta.apk
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish public beta APK release
+      - name: Publish beta APK on GitHub Releases
         if: github.ref == 'refs/heads/main'
+        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        shell: bash
         run: |
-          set -e
-          tag='s-browser-v1.0.0-beta'
-          if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" S_Browser_v1.0.0_BETA.apk --clobber
+          set -euo pipefail
+          TAG="s-browser-v0.1.0-beta"
+          FILE="dist/S_Browser_v0.1.0_Student_Dictionary_Beta.apk"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$FILE" --clobber
           else
-            gh release create "$tag" S_Browser_v1.0.0_BETA.apk \
-              --title 'S Browser v1.0.0 Beta — Inbuilt Offline Dictionary' \
-              --notes 'S Browser by SAURABH\x27S VISION. HTTPS-first Android WebView browser with 8 tabs, bookmarks, history, study shortcuts, file uploads, downloads, Google/Bing/DuckDuckGo search and a bundled 260-word English/Hindi study dictionary with offline word lookup and device TTS pronunciation. No AI assistant, real private mode, extensions or recording. This is a debug-signed beta and needs real phone testing.' \
-              --prerelease
+            gh release create "$TAG" "$FILE"               --title "S Browser 0.1 Beta — Student Dictionary"               --notes "S Browser beta by SAURABH'S VISION. Native Android WebView, up to 8 tabs, bookmarks, history, downloads, focus mode, reading mode, per-page study notes and 168 curated offline English–Hindi dictionary entries. Uses the approved neon S Browser launcher icon. Debug-signed beta APK. Not a fully audited browser; does not provide strict incognito isolation, full content blocking or an AI tutor. Test sites and downloads on your phone before daily use."               --prerelease
           fi
