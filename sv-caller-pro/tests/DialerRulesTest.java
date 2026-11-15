@@ -39,7 +39,9 @@ public final class DialerRulesTest {
         eq(DialerRules.theme(-1),0,"lower theme bound");
         eq(DialerRules.theme(0),0,"cosmic theme");
         eq(DialerRules.theme(3),3,"emerald theme");
-        eq(DialerRules.theme(4),3,"upper theme bound");
+        eq(DialerRules.theme(4),4,"midnight gold theme");
+        eq(DialerRules.theme(5),5,"aurora blue theme");
+        eq(DialerRules.theme(6),5,"upper theme bound");
         System.out.println("PASS "+checks+" dialer input validation and theme assertions");
     }
 }

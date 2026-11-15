@@ -209,7 +209,7 @@ public final class MainActivity extends Activity {
         LinearLayout names=new LinearLayout(this);
         names.setPadding(dp(10),0,0,0);
         names.setOrientation(LinearLayout.VERTICAL);
-        names.addView(text("SV CALLER PRO",22,WHITE,true));
+        names.addView(text("SV CALLER PRO  2.0",21,WHITE,true));
         names.addView(text("by SAURABH'S VISION™",11,CYAN,true));
         row.addView(names,new LinearLayout.LayoutParams(0,-2,1));
         TextView settings=text("⚙",25,WHITE,true);
@@ -373,7 +373,7 @@ public final class MainActivity extends Activity {
             }
         });
         clear.setOnLongClickListener(v->{numberInput.setText("");return true;});
-        photo.setOnClickListener(v->choosePhoto(numberInput.getText().toString()));
+        photo.setOnClickListener(v->showPhotoOptions(numberInput.getText().toString()));
         add(face,small,8);
         add(panel,face,0);
 
@@ -493,7 +493,7 @@ public final class MainActivity extends Activity {
             }
             add(panel,strip,row==0?5:0);
         }
-        TextView footer=text("SV CALLER PRO  •  YOUR CALL, YOUR PHOTO",11,CYAN,true);
+        TextView footer=text("SV CALLER PRO 2.0  •  YOUR CALL, YOUR PHOTO",11,CYAN,true);
         footer.setGravity(Gravity.CENTER);
         add(panel,footer,11);
     }
@@ -502,7 +502,7 @@ public final class MainActivity extends Activity {
             case 0:tab=1;buildUi();break;
             case 1:tab=2;buildUi();break;
             case 2:tab=3;buildUi();break;
-            case 3:choosePhoto(dialText);break;
+            case 3:showPhotoOptions(dialText);break;
             case 4:showThemes();break;
             case 5:showPermissionSetup();break;
             case 6:openDefaultPhoneSettings();break;
@@ -719,6 +719,7 @@ public final class MainActivity extends Activity {
         card.setOnLongClickListener(v->{
             String[] options={
                 "Choose full-screen call photo",
+                "Preview full-screen photo",
                 "Remove custom photo",
                 favorite?"Unpin from favorites":"Add to favorites",
                 "Call "+person.name
@@ -727,10 +728,10 @@ public final class MainActivity extends Activity {
                 .setItems(options,(dialog,choice)->{
                     switch(choice){
                         case 0:choosePhoto(person.number);break;
-                        case 1:PhotoStore.removePhoto(this,person.number);
-                            toast("Custom photo removed");break;
-                        case 2:toggleFavorite(person.number);break;
-                        case 3:callNumber(person.number);break;
+                        case 1:previewCallScreen(person.number);break;
+                        case 2:removeCustomPhoto(person.number);break;
+                        case 3:toggleFavorite(person.number);break;
+                        case 4:callNumber(person.number);break;
                         default:break;
                     }
                 }).show();
@@ -777,6 +778,42 @@ public final class MainActivity extends Activity {
         if(tab==3)buildUi();
     }
 
+    /** Preview the actual caller wallpaper UI without placing a phone call. */
+    private void previewCallScreen(String number){
+        Intent preview=new Intent(this,InCallActivity.class);
+        preview.putExtra("previewOnly",true);
+        preview.putExtra("previewNumber",number==null?"":number.trim());
+        startActivity(preview);
+    }
+    private void removeCustomPhoto(String number){
+        if(PhotoStore.chosenPhoto(this,number)==null){
+            toast("No custom photo to remove");return;
+        }
+        new AlertDialog.Builder(this).setTitle("Remove custom wallpaper?")
+            .setMessage("The original contact photo will still be available. " +
+                "Only the wallpaper chosen in SV Caller will be removed.")
+            .setPositiveButton("REMOVE",(d,w)->{
+                PhotoStore.removePhoto(this,number);
+                toast("Custom caller wallpaper removed");
+            }).setNegativeButton("Cancel",null).show();
+    }
+    private void showPhotoOptions(String number){
+        if(number==null||number.trim().isEmpty()){
+            toast("Enter or select a number first");return;
+        }
+        String target=number.trim();
+        new AlertDialog.Builder(this).setTitle("Full-screen caller photo")
+            .setItems(new String[]{"Choose / replace wallpaper",
+                "Preview full-screen caller screen","Remove custom wallpaper"},
+                (dialog,which)->{
+                    switch(which){
+                        case 0:choosePhoto(target);break;
+                        case 1:previewCallScreen(target);break;
+                        case 2:removeCustomPhoto(target);break;
+                        default:break;
+                    }
+                }).setNegativeButton("Cancel",null).show();
+    }
     private void choosePhoto(String number){
         if(TextUtils.isEmpty(number.trim())){toast("Enter a number first");return;}
         photoTarget=number.trim();
@@ -858,7 +895,8 @@ public final class MainActivity extends Activity {
     }
     private void showSettings(){
         String[] choices={"Set as Default Phone App",
-            "Choose Call Screen Theme","Choose Photo for Typed Number",
+            "Choose Call Screen Theme","Manage Caller Photo for Typed Number",
+            "Preview Full-Screen Caller Screen",
             "Allow Contact Photos","Allow Call History",
             "Allow Call Notifications",
             "Full-Screen Call Permission","Privacy & About"};
@@ -867,17 +905,18 @@ public final class MainActivity extends Activity {
                 switch(which){
                     case 0:requestDialerRole();break;
                     case 1:showThemes();break;
-                    case 2:choosePhoto(dialText);break;
-                    case 3:requestContactsPermission();break;
-                    case 4:
+                    case 2:showPhotoOptions(dialText);break;
+                    case 3:previewCallScreen(dialText);break;
+                    case 4:requestContactsPermission();break;
+                    case 5:
                         if(!defaultDialer())requestDialerRole();
                         else if(!granted(Manifest.permission.READ_CALL_LOG))
                             requestPermissions(new String[]{Manifest.permission.READ_CALL_LOG},REQUEST_LOG);
                         else toast("Call history access enabled");
                         break;
-                    case 5:requestNotificationPermission();break;
-                    case 6:openFullScreenSettings();break;
-                    case 7:
+                    case 6:requestNotificationPermission();break;
+                    case 7:openFullScreenSettings();break;
+                    case 8:
                         new AlertDialog.Builder(this).setTitle("Privacy & Features")
                             .setMessage("SV Caller Pro is an offline, user-selected default Phone app.\n\n"+
                                 "Full-screen caller photos use your local contact image or "+
@@ -895,7 +934,7 @@ public final class MainActivity extends Activity {
     }
     private void showThemes(){
         String[] choices={"Cosmic Navy & Cyan","Purple Galaxy",
-            "Rose Gold","Emerald Science"};
+            "Rose Gold","Emerald Science","Midnight Gold","Aurora Blue"};
         int initial=Math.max(0,Math.min(prefs.getInt("theme",0),choices.length-1));
         new AlertDialog.Builder(this).setTitle("Call Screen Wallpaper Theme")
             .setSingleChoiceItems(choices,initial,(dialog,which)->{

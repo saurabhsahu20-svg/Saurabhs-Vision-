@@ -20,6 +20,6 @@ public final class DialerRules {
         return raw==null?"":raw.trim();
     }
     public static int theme(int index){
-        return Math.max(0,Math.min(3,index));
+        return Math.max(0,Math.min(5,index));
     }
 }
