@@ -1,261 +1,169 @@
-# word	definition	hindi	category
-ability	The power or skill to do something.	क्षमता	General
-absorb	To take in a liquid, energy, or information.	अवशोषित करना	Science
-abstract	Existing as an idea rather than a physical object.	अमूर्त	General
-academic	Connected with education or study.	शैक्षणिक	Study
-accelerate	To increase speed or rate.	तेज़ करना	Physics
-accuracy	How close a result is to the correct value.	सटीकता	Science
-acid	A substance that can donate hydrogen ions in solution.	अम्ल	Chemistry
-adapt	To change to suit new conditions.	अनुकूल होना	Biology
-addition	The process of combining numbers to find a total.	जोड़	Maths
-adjective	A word that describes a noun.	विशेषण	English
-air	The mixture of gases surrounding Earth.	वायु	Science
-algorithm	A sequence of steps for solving a problem.	कलनविधि	Computer
-alkali	A base that dissolves in water.	क्षार	Chemistry
-alloy	A mixture of metals or a metal with another element.	मिश्रधातु	Chemistry
-altitude	Height above sea level or a reference point.	ऊँचाई	Geography
-amplitude	The maximum distance from a wave's resting position.	आयाम	Physics
-analyse	To examine something carefully in parts.	विश्लेषण करना	Study
-angle	The figure formed by two rays sharing an endpoint.	कोण	Maths
-antonym	A word having the opposite meaning of another word.	विलोम शब्द	English
-application	A computer program made to perform tasks.	अनुप्रयोग	Computer
-area	The amount of surface inside a shape.	क्षेत्रफल	Maths
-argument	A reason given to support a statement or conclusion.	तर्क	English
-arithmetic	The branch of mathematics using numbers and operations.	अंकगणित	Maths
-article	A written text about a subject or a word such as a or the.	लेख / आर्टिकल	English
-atom	The smallest unit of a chemical element.	परमाणु	Chemistry
-average	A typical value; often the sum divided by the count.	औसत	Maths
-axis	A reference line used in graphs or rotation.	अक्ष	Maths
-bacteria	Single-celled microorganisms without a true nucleus.	जीवाणु	Biology
-balance	A state in which forces or amounts are equal.	संतुलन	Science
-base	A substance that can accept hydrogen ions.	क्षारक	Chemistry
-binary	A number system using only 0 and 1.	द्विआधारी	Computer
-biology	The scientific study of living organisms.	जीवविज्ञान	Biology
-boiling	The change from liquid to gas throughout a liquid.	उबलना	Science
-browser	An application used to access and display websites.	वेब ब्राउज़र	Computer
-budget	A plan showing expected income and spending.	बजट	General
-byte	A unit of digital information usually equal to eight bits.	बाइट	Computer
-calculate	To find a result using numbers or mathematical rules.	गणना करना	Maths
-carbon	A chemical element essential to most known life.	कार्बन	Chemistry
-cell	The smallest structural and functional unit of life.	कोशिका	Biology
-centimeter	A unit of length equal to one hundredth of a meter.	सेंटीमीटर	Maths
-chemical	A substance with a particular composition.	रासायनिक पदार्थ	Chemistry
-chlorophyll	The green pigment that absorbs light in plants.	पर्णहरित	Biology
-circle	A set of points equally distant from a center.	वृत्त	Maths
-climate	Typical weather conditions in a place over many years.	जलवायु	Geography
-cloud	Visible tiny water droplets or ice particles in the sky.	बादल	Science
-code	Instructions written in a programming language.	कोड	Computer
-coefficient	A number multiplying a variable in an expression.	गुणांक	Maths
-collaboration	Working together to achieve a shared goal.	सहयोग	Study
-communication	The process of exchanging information.	संचार	General
-compare	To examine how things are similar or different.	तुलना करना	Study
-compound	A substance made from two or more chemically bonded elements.	यौगिक	Chemistry
-computer	An electronic device that processes information.	कंप्यूटर	Computer
-concentration	The amount of solute in a given quantity of solution.	सांद्रता	Chemistry
-concept	An idea or general understanding of something.	अवधारणा	Study
-conclusion	A judgment reached after considering evidence.	निष्कर्ष	Study
-conduct	To allow heat or electricity to pass through.	चालन करना	Physics
-conductor	A material that allows energy or electricity to pass easily.	सुचालक	Physics
-constant	A quantity that does not change in a given situation.	स्थिरांक	Maths
-continent	One of Earth's very large land regions.	महाद्वीप	Geography
-coordinate	A number that gives a position in a system.	निर्देशांक	Maths
-corrosion	Gradual damage to metal by chemical reactions.	क्षरण	Chemistry
-creative	Able to produce original ideas or work.	रचनात्मक	General
-crystal	A solid whose particles form a repeating pattern.	क्रिस्टल	Chemistry
-current	The rate of flow of electric charge.	विद्युत धारा	Physics
-data	Facts or values collected for analysis.	आँकड़े	Computer
-database	An organized collection of information.	डेटाबेस	Computer
-decimal	A number system based on powers of ten.	दशमलव	Maths
-define	To state the exact meaning of a word or concept.	परिभाषित करना	English
-density	Mass per unit volume of a substance.	घनत्व	Physics
-describe	To explain the features of someone or something.	वर्णन करना	English
-difference	The result of subtracting one number from another.	अंतर	Maths
-diffusion	Movement of particles from higher to lower concentration.	विसरण	Science
-digital	Using data represented by discrete values.	डिजिटल	Computer
-dimension	A measurable extent such as length, width, or height.	आयाम	Maths
-dioxide	A compound containing two oxygen atoms per molecule.	डाइऑक्साइड	Chemistry
-discovery	Finding something previously unknown.	खोज	Science
-distance	The length of a path between two points.	दूरी	Physics
-division	The mathematical operation of splitting into equal parts.	भाग	Maths
-document	A written or electronic record.	दस्तावेज़	General
-download	To transfer data from a remote system to a device.	डाउनलोड करना	Computer
-earth	The planet on which humans live.	पृथ्वी	Geography
-ecosystem	Living organisms interacting with their surroundings.	पारिस्थितिकी तंत्र	Biology
-efficiency	The fraction of useful output obtained from total input.	दक्षता	Physics
-electricity	Energy associated with electric charge.	विद्युत	Physics
-electron	A negatively charged subatomic particle.	इलेक्ट्रॉन	Physics
-element	A pure substance consisting of one type of atom.	तत्व	Chemistry
-energy	The capacity to do work or cause change.	ऊर्जा	Physics
-equation	A mathematical statement showing two expressions are equal.	समीकरण	Maths
-equilibrium	A condition in which opposing effects are balanced.	साम्यावस्था	Science
-erosion	The wearing away of soil or rock by natural forces.	अपरदन	Geography
-essay	A structured piece of writing about a topic.	निबंध	English
-evidence	Information supporting or challenging a claim.	प्रमाण	Study
-evolution	Changes in inherited traits of populations over generations.	क्रमविकास	Biology
-example	Something used to illustrate an idea or rule.	उदाहरण	Study
-experiment	A test carried out to investigate a question.	प्रयोग	Science
-explain	To make a fact or idea clear and understandable.	समझाना	Study
-expression	A combination of numbers and symbols representing a value.	व्यंजक	Maths
-factor	A number that divides another number exactly.	गुणनखंड	Maths
-fiction	Literature about imagined events and people.	कल्पना साहित्य	English
-filter	A tool or process used to remove unwanted items.	छननी / फ़िल्टर	Science
-focus	To give careful attention to one activity.	एकाग्रता	Study
-force	A push or pull that can change an object's motion.	बल	Physics
-formula	A rule written using mathematical symbols.	सूत्र	Maths
-fraction	A number representing part of a whole.	भिन्न	Maths
-frequency	The number of cycles occurring per second.	आवृत्ति	Physics
-friction	A force that resists relative motion between surfaces.	घर्षण	Physics
-function	A rule assigning one output to each allowed input.	फलन	Maths
-galaxy	A large system of stars, gas, and dust.	आकाशगंगा	Science
-gas	A state of matter without a fixed shape or volume.	गैस	Science
-genetics	The scientific study of genes and inheritance.	आनुवंशिकी	Biology
-geography	The study of Earth's places and environments.	भूगोल	Geography
-geometry	The branch of mathematics dealing with shapes and spaces.	ज्यामिति	Maths
-global	Relating to the whole world.	वैश्विक	Geography
-glossary	A list of specialized words and their meanings.	शब्दावली	English
-grammar	Rules describing how a language is structured.	व्याकरण	English
-graph	A diagram showing relationships between quantities.	आलेख	Maths
-gravity	The attractive force between objects with mass.	गुरुत्वाकर्षण	Physics
-habitat	The natural place where an organism lives.	आवास	Biology
-heat	Energy transferred due to a temperature difference.	ऊष्मा	Physics
-hemisphere	One half of Earth or another sphere.	गोलार्ध	Geography
-history	The study of events from the past.	इतिहास	History
-hypothesis	A testable explanation proposed for an observation.	परिकल्पना	Science
-identify	To recognize or name someone or something.	पहचानना	Study
-illustrate	To make an idea clear using an example or image.	उदाहरण देकर समझाना	English
-impact	A strong effect or collision.	प्रभाव	General
-independent	Not relying on something else for control or support.	स्वतंत्र	General
-index	A list used to find information quickly.	सूची	Study
-inertia	The tendency of an object to resist changes in motion.	जड़त्व	Physics
-information	Facts or knowledge communicated or learned.	जानकारी	General
-input	Data entered into a computer or system.	इनपुट	Computer
-insulator	A material that does not easily transmit heat or electricity.	कुचालक	Physics
-integer	A whole number, including negative numbers and zero.	पूर्णांक	Maths
-internet	A global network connecting computers.	इंटरनेट	Computer
-interpret	To explain the meaning of information.	अर्थ समझाना	Study
-ion	An atom or molecule with a net electric charge.	आयन	Chemistry
-isotope	Atoms of an element with different numbers of neutrons.	समस्थानिक	Chemistry
-keyboard	A device or interface used to enter characters.	कीबोर्ड	Computer
-kinetic	Relating to motion, especially energy of motion.	गतिज	Physics
-knowledge	Information and understanding gained through learning.	ज्ञान	Study
-laboratory	A place equipped for scientific work and experiments.	प्रयोगशाला	Science
-language	A system used to communicate meanings.	भाषा	English
-latitude	Angular distance north or south of the equator.	अक्षांश	Geography
-learning	The process of acquiring knowledge or skills.	अधिगम	Study
-length	The measurement of how long something is.	लंबाई	Maths
-library	A collection of books and learning resources.	पुस्तकालय	Study
-light	Electromagnetic radiation visible to the human eye.	प्रकाश	Physics
-literature	Written works, especially those valued as art.	साहित्य	English
-longitude	Angular distance east or west of a reference meridian.	देशांतर	Geography
-magnet	An object that produces a magnetic field.	चुंबक	Physics
-magnitude	The size or amount of a quantity.	परिमाण	Maths
-mass	The quantity of matter or inertia in an object.	द्रव्यमान	Physics
-matter	Anything that has mass and occupies space.	पदार्थ	Science
-mean	The sum of values divided by the number of values.	माध्य	Maths
-measure	To find the amount or size of something.	मापना	Maths
-memory	A system's ability to store and retrieve information.	स्मृति	Computer
-metabolism	Chemical reactions that sustain a living organism.	उपापचय	Biology
-metal	An element typically able to conduct electricity and heat.	धातु	Chemistry
-method	An organized way of doing something.	विधि	Study
-microbe	A microscopic organism or agent.	सूक्ष्मजीव	Biology
-migration	Movement of people or animals from one place to another.	प्रवास	Geography
-mineral	A naturally occurring solid with a definite composition.	खनिज	Geography
-mitosis	Cell division that produces two similar daughter cells.	समसूत्री विभाजन	Biology
-molecule	A group of bonded atoms forming a unit.	अणु	Chemistry
-momentum	Mass multiplied by velocity.	संवेग	Physics
-multiplication	Repeated addition or scaling by a factor.	गुणा	Maths
-narrative	A spoken or written account of events.	वृत्तांत	English
-natural	Existing in nature rather than made artificially.	प्राकृतिक	General
-neuron	A nerve cell that carries signals.	तंत्रिका कोशिका	Biology
-neutral	Neither acidic nor basic; or without charge.	उदासीन	Chemistry
-neutron	An uncharged particle found in atomic nuclei.	न्यूट्रॉन	Physics
-noun	A word naming a person, place, thing, or idea.	संज्ञा	English
-nucleus	The central part of an atom or eukaryotic cell.	नाभिक	Science
-observation	Noticing and recording information about an event.	अवलोकन	Science
-ocean	A vast body of salt water.	महासागर	Geography
-organism	An individual living thing.	जीव	Biology
-osmosis	Movement of water through a selectively permeable membrane.	परासरण	Biology
-output	Information or results produced by a system.	आउटपुट	Computer
-oxygen	A chemical element required for most human respiration.	ऑक्सीजन	Chemistry
-paragraph	A section of writing focused on one main idea.	अनुच्छेद	English
-parallel	Lines that stay the same distance apart and do not meet.	समांतर	Maths
-particle	A very small piece or unit of matter.	कण	Science
-percentage	An amount expressed as parts per hundred.	प्रतिशत	Maths
-perimeter	The total length around a two-dimensional shape.	परिमाप	Maths
-periodic	Occurring repeatedly at regular intervals.	आवधिक	Science
-photosynthesis	The process by which plants make sugars using light.	प्रकाश संश्लेषण	Biology
-physics	The scientific study of matter, energy, and forces.	भौतिकी	Physics
-planet	A large body orbiting a star that meets certain criteria.	ग्रह	Science
-plasma	An ionized gas containing charged particles.	प्लाज़्मा	Science
-plot	To mark points or values on a graph.	आलेखित करना	Maths
-poem	A literary work using carefully arranged language.	कविता	English
-polygon	A closed plane figure made from straight line segments.	बहुभुज	Maths
-population	A group of organisms of one species in an area.	जनसंख्या	Biology
-potential	Energy stored due to position or condition.	स्थितिज	Physics
-pressure	Force applied per unit area.	दाब	Physics
-probability	A measure of how likely an event is.	प्रायिकता	Maths
-process	A sequence of actions leading to a result.	प्रक्रिया	General
-programming	Writing instructions that a computer executes.	प्रोग्रामिंग	Computer
-pronoun	A word used in place of a noun.	सर्वनाम	English
-proton	A positively charged particle in an atomic nucleus.	प्रोटॉन	Physics
-purpose	The reason something is done or exists.	उद्देश्य	Study
-qualitative	Describing qualities rather than numerical amounts.	गुणात्मक	Science
-quantity	An amount that can be measured or counted.	मात्रा	Maths
-question	A request for information or an answer.	प्रश्न	Study
-radius	The distance from a circle's center to its edge.	त्रिज्या	Maths
-ratio	A comparison of quantities by division.	अनुपात	Maths
-reaction	A process in which substances change chemically.	अभिक्रिया	Chemistry
-reading	The process of understanding written text.	पठन	English
-research	Careful study to discover or verify knowledge.	अनुसंधान	Study
-resource	A useful supply or source of help.	संसाधन	Study
-revision	Reviewing material to improve understanding and memory.	दोहराई	Study
-rhythm	A pattern of beats or repeated sounds.	लय	English
-rotation	Turning around an axis.	घूर्णन	Physics
-rule	A principle governing how something works.	नियम	Study
-satellite	A natural or artificial body orbiting another body.	उपग्रह	Science
-science	The systematic study of the natural world using evidence.	विज्ञान	Science
-search	To look carefully for something or some information.	खोज करना	Computer
-sentence	A group of words expressing a complete thought.	वाक्य	English
-sequence	A set of items arranged in a particular order.	क्रम	Maths
-solution	A mixture in which one substance is dissolved in another.	विलयन	Chemistry
-sound	Vibrations that travel through a medium as waves.	ध्वनि	Physics
-speed	Distance traveled per unit of time.	चाल	Physics
-square	A four-sided figure with equal sides and right angles.	वर्ग	Maths
-state	A form or condition of matter or something else.	अवस्था	Science
-statistics	The study of collecting and interpreting data.	सांख्यिकी	Maths
-study	The act of learning about a subject.	अध्ययन	Study
-subject	An area of knowledge taught or studied.	विषय	Study
-subtract	To take one quantity away from another.	घटाना	Maths
-summary	A short statement of the main points.	सारांश	Study
-surface	The outside boundary of an object.	सतह	Science
-symbol	A mark used to represent an idea or quantity.	प्रतीक	Maths
-synonym	A word with the same or nearly the same meaning.	पर्यायवाची	English
-technology	Practical use of scientific knowledge and tools.	प्रौद्योगिकी	Computer
-temperature	A measure related to how hot or cold something is.	तापमान	Physics
-textbook	A book used to teach or study a subject.	पाठ्यपुस्तक	Study
-theorem	A statement proven using accepted logical rules.	प्रमेय	Maths
-theory	An explanation supported by evidence and reasoning.	सिद्धांत	Science
-thermometer	An instrument used to measure temperature.	तापमापी	Physics
-timeline	A sequence of events displayed in time order.	समयरेखा	History
-tissue	A group of similar cells performing a function.	ऊतक	Biology
-topic	The subject being discussed or studied.	विषय	Study
-triangle	A polygon with three sides.	त्रिभुज	Maths
-unit	A standard amount used for measurement.	इकाई	Maths
-universe	All space, time, matter, and energy.	ब्रह्मांड	Science
-upload	To send data from a device to another system.	अपलोड करना	Computer
-variable	A symbol representing a value that can change.	चर	Maths
-velocity	Speed in a specified direction.	वेग	Physics
-verb	A word describing an action, event, or state.	क्रिया	English
-vertex	A point at which sides or edges meet.	शीर्ष	Maths
-virus	A microscopic infectious agent needing host cells to reproduce.	विषाणु	Biology
-vocabulary	Words known or used in a language or subject.	शब्दभंडार	English
-volume	The space occupied by a three-dimensional object.	आयतन	Maths
-wave	A disturbance that transfers energy.	तरंग	Physics
-weather	Atmospheric conditions at a particular time and place.	मौसम	Geography
-website	A collection of related web pages on the internet.	वेबसाइट	Computer
-weight	The force of gravity acting on an object.	भार	Physics
-wavelength	The distance between corresponding points on waves.	तरंगदैर्ध्य	Physics
-work	Energy transferred when a force moves an object.	कार्य	Physics
-xylem	Plant tissue that carries water and dissolved minerals.	जाइलम	Biology
-zero	The number representing no quantity.	शून्य	Maths
-zoology	The scientific study of animals.	प्राणिविज्ञान	Biology
+# word<TAB>English explanation<TAB>Hindi meaning<TAB>Example
+ability	Power or skill to do something	योग्यता	Reading is an important ability.
+accurate	Correct and without mistakes	सटीक	Use accurate measurements.
+achieve	To succeed in reaching a goal	प्राप्त करना	You can achieve your goals with practice.
+acid	A substance with a sour chemical character	अम्ल	Lemon juice contains an acid.
+adapt	To change to suit new conditions	अनुकूल होना	Animals adapt to their surroundings.
+addition	The process of combining numbers	जोड़	Addition helps find a total.
+adjective	A word that describes a noun	विशेषण	Beautiful is an adjective.
+algorithm	A set of steps to solve a problem	कलन विधि	An algorithm can sort numbers.
+altitude	Height above a reference level	ऊँचाई	Mountain altitude affects temperature.
+amplitude	Maximum displacement of a wave	आयाम	The wave has a large amplitude.
+analyze	To examine something carefully	विश्लेषण करना	Analyze the data before answering.
+ancient	Belonging to a long time ago	प्राचीन	They studied ancient history.
+angle	The space between intersecting lines	कोण	A right angle is 90 degrees.
+annual	Happening once every year	वार्षिक	The annual exam is next month.
+antonym	A word with the opposite meaning	विलोम शब्द	Hot is an antonym of cold.
+application	A practical use or a computer program	अनुप्रयोग	The application helps students.
+approximate	Close to the actual value	लगभग	The approximate length is ten metres.
+archaeology	Study of human history through objects	पुरातत्व	Archaeology reveals ancient cultures.
+area	Amount of surface inside a boundary	क्षेत्रफल	Find the area of the rectangle.
+argument	A reason given to support an idea	तर्क	Explain your argument clearly.
+arithmetic	The study of basic number operations	अंकगणित	Arithmetic includes multiplication.
+atom	Basic unit of a chemical element	परमाणु	An atom has a nucleus.
+average	A typical value found from data	औसत	Find the average of five marks.
+axis	A reference line on a graph	अक्ष	Label the x-axis.
+balance	A state of equality or stability	संतुलन	Keep a balance between study and rest.
+base	A number used in a power or a chemical substance	आधार	Ten is the base of the decimal system.
+biology	The scientific study of living things	जीवविज्ञान	Biology explores plants and animals.
+boundary	A line separating two areas	सीमा	The river marks the boundary.
+budget	A plan for using money	बजट	Create a budget for your project.
+calculate	To find an answer using numbers	गणना करना	Calculate the total cost.
+carbon	A chemical element found in living things	कार्बन	Carbon is present in wood.
+category	A group of similar things	श्रेणी	Sort the books by category.
+cause	A reason why something happens	कारण	What is the cause of rainfall?
+cell	The basic structural unit of life	कोशिका	A plant cell has a cell wall.
+century	A period of one hundred years	शताब्दी	A century is 100 years.
+chemical	Related to substances and their reactions	रासायनिक	The chemical reaction gave off heat.
+circle	A round shape with equal distance from its centre	वृत्त	Draw a circle using a compass.
+citizen	A legal member of a country	नागरिक	Every citizen has responsibilities.
+climate	Typical weather patterns over many years	जलवायु	Climate affects farming.
+coefficient	A number multiplying a variable	गुणांक	The coefficient of x is three.
+compare	To examine similarities and differences	तुलना करना	Compare the two methods.
+compound	A substance made from combined elements	यौगिक	Water is a chemical compound.
+conclusion	A decision reached after reasoning	निष्कर्ष	Write a conclusion for the report.
+conduct	To carry out an activity	संचालित करना	Conduct the experiment safely.
+constant	A value that does not change	स्थिरांक	Pi is a mathematical constant.
+context	The circumstances around an event or text	संदर्भ	Read the sentence in context.
+coordinate	A number used to locate a point	निर्देशांक	Plot the coordinate on the graph.
+creative	Able to make new ideas	रचनात्मक	She wrote a creative story.
+culture	Customs and beliefs shared by a group	संस्कृति	The festival celebrates local culture.
+data	Facts or measurements collected for study	आँकड़े	Record the data in a table.
+decimal	A number system based on ten	दशमलव	Write the fraction as a decimal.
+define	To explain the meaning of something	परिभाषित करना	Define the word carefully.
+democracy	Government in which people choose representatives	लोकतंत्र	India is a democracy.
+density	Mass per unit of volume	घनत्व	Oil has a lower density than water.
+design	To plan how something will work or look	रचना करना	Design a clear diagram.
+difference	The amount by which things vary	अंतर	Find the difference between two numbers.
+diffusion	Spreading of particles from high to low concentration	प्रसरण	Diffusion spreads the scent.
+digital	Using electronic information or signals	डिजिटल	The library has digital resources.
+dimension	A measurement of length width or height	आयाम	Measure each dimension.
+discover	To find something not known before	खोज करना	Scientists discover new facts.
+distance	How far apart two points are	दूरी	Measure the distance in kilometres.
+distribution	The way something is spread	वितरण	Study the population distribution.
+diversity	The presence of many different forms	विविधता	The forest supports biodiversity.
+division	Splitting a quantity into equal parts	भाग	Division can find equal groups.
+ecosystem	A community of organisms and surroundings	पारितंत्र	A pond is an ecosystem.
+education	The process of learning	शिक्षा	Education builds understanding.
+electricity	Energy associated with electric charge	विद्युत	Electricity powers the lamp.
+element	A pure substance of one kind of atom	तत्व	Oxygen is an element.
+energy	The ability to do work or cause change	ऊर्जा	Food provides energy.
+environment	The natural world around us	पर्यावरण	Protect the environment.
+equation	A statement that two expressions are equal	समीकरण	Solve the equation for x.
+estimate	A rough calculation or judgment	अनुमान	Estimate the length first.
+evidence	Facts that support a claim	साक्ष्य	Use evidence in your answer.
+evolution	Change in populations over generations	विकास	Evolution explains biological diversity.
+example	Something that illustrates an idea	उदाहरण	Give an example of a noun.
+experiment	A planned test of an idea	प्रयोग	Repeat the experiment.
+explain	To make an idea clear	समझाना	Explain how rain forms.
+factor	A number that divides another number	गुणनखंड	Three is a factor of twelve.
+fiction	Stories created from imagination	काल्पनिक साहित्य	The novel is fiction.
+force	A push or pull that can change motion	बल	Gravity is a force.
+formula	A mathematical rule written with symbols	सूत्र	Use the area formula.
+fraction	Part of a whole	भिन्न	One half is a fraction.
+frequency	Number of repetitions in a unit of time	आवृत्ति	Frequency is measured in hertz.
+function	A relation assigning one output to each input	फलन	Graph the function.
+geography	Study of the Earth and its features	भूगोल	Geography includes maps.
+geometry	Study of shapes and space	ज्यामिति	Triangles are part of geometry.
+gravity	Force attracting objects with mass	गुरुत्वाकर्षण	Gravity pulls objects toward Earth.
+habitat	Natural home of an organism	आवास	A forest is a habitat.
+hypothesis	A testable explanation or prediction	परिकल्पना	Write a hypothesis before testing.
+identity	Who or what something is	पहचान	Protect your online identity.
+impact	An effect or influence	प्रभाव	The change had a positive impact.
+improve	To make something better	सुधारना	Practice can improve your writing.
+inference	A conclusion drawn from evidence	अनुमानित निष्कर्ष	Make an inference from the data.
+information	Facts that provide knowledge	जानकारी	Check the source of information.
+integer	A whole number including negatives and zero	पूर्णांक	Negative three is an integer.
+interpret	To explain the meaning of information	व्याख्या करना	Interpret the graph.
+invention	A new device or method	आविष्कार	The wheel was an important invention.
+investigate	To examine a question closely	जाँच करना	Investigate the result.
+isotope	Atoms with equal proton numbers but different neutrons	समस्थानिक	Carbon has several isotopes.
+knowledge	Information and understanding gained by learning	ज्ञान	Reading increases knowledge.
+latitude	Distance north or south of the equator in degrees	अक्षांश	Latitude helps locate places.
+literature	Written artistic works	साहित्य	Literature includes poetry.
+logic	Reasoning according to clear rules	तर्कशास्त्र	Logic helps solve puzzles.
+longitude	Distance east or west of a prime meridian	देशांतर	Longitude helps locate places.
+mass	Amount of matter in an object	द्रव्यमान	Mass is measured in kilograms.
+matter	Anything that has mass and occupies space	पदार्थ	Air is matter.
+measurement	Finding size or quantity using units	मापन	Accurate measurement is important.
+metaphor	A comparison without using like or as	रूपक	Time is a thief is a metaphor.
+method	An organized way of doing something	विधि	Choose a reliable method.
+microscope	An instrument that magnifies tiny things	सूक्ष्मदर्शी	Use a microscope to view cells.
+migration	Movement from one place to another	प्रवास	Bird migration follows seasons.
+mixture	Two or more substances not chemically combined	मिश्रण	Air is a mixture of gases.
+molecule	Two or more atoms bonded together	अणु	A water molecule has three atoms.
+momentum	Mass multiplied by velocity	संवेग	The moving ball has momentum.
+multiply	To find a product	गुणा करना	Multiply four by six.
+noun	A word that names a person place or thing	संज्ञा	School is a noun.
+observation	Careful noticing and recording of facts	अवलोकन	Write down each observation.
+oxygen	An element used in respiration	ऑक्सीजन	Plants release oxygen in sunlight.
+paragraph	A group of sentences about one idea	अनुच्छेद	Write a paragraph on trees.
+percentage	A proportion out of one hundred	प्रतिशत	Calculate the percentage.
+perimeter	Distance around a shape	परिमाप	Find the perimeter of the square.
+periodic	Happening at regular intervals	आवधिक	The periodic table lists elements.
+photosynthesis	Process by which plants make food using light	प्रकाश संश्लेषण	Photosynthesis uses sunlight.
+planet	A large body orbiting a star	ग्रह	Earth is a planet.
+population	The number of organisms in an area	जनसंख्या	The city has a large population.
+pressure	Force divided by area	दाब	Pressure increases underwater.
+probability	How likely an event is to happen	प्रायिकता	Find the probability of heads.
+process	A series of steps or changes	प्रक्रिया	Follow each process carefully.
+proportion	A relationship between quantities	अनुपातिक संबंध	The map shows correct proportion.
+protein	A nutrient used to build body tissues	प्रोटीन	Beans contain protein.
+radius	Distance from centre to circle edge	त्रिज्या	Measure the radius.
+ratio	Comparison of two quantities	अनुपात	The ratio is two to one.
+reaction	A chemical change or a response	प्रतिक्रिया	The reaction produced gas.
+reason	An explanation of why something happens	कारण	Give a reason for your answer.
+research	Careful study to discover knowledge	अनुसंधान	Research the topic using sources.
+resource	A useful supply or source	संसाधन	Water is a natural resource.
+respiration	Process of releasing energy from food in cells	श्वसन	Respiration occurs in cells.
+result	An outcome of an action or experiment	परिणाम	Record the result.
+science	Systematic study of the natural world	विज्ञान	Science asks testable questions.
+sequence	An ordered list of events or numbers	क्रम	Find the next number in the sequence.
+solution	An answer to a problem or a uniform mixture	समाधान	Check the solution.
+species	A group of organisms with shared characteristics	प्रजाति	The species lives in forests.
+spectrum	A range of colours or values	वर्णक्रम	A rainbow shows a colour spectrum.
+square	A shape with four equal sides	वर्ग	Draw a square.
+statistics	The study of collecting and analysing data	सांख्यिकी	Statistics helps describe data.
+structure	How parts are arranged	संरचना	Study the structure of a flower.
+subject	The topic being studied	विषय	Choose your favourite subject.
+summary	A brief statement of main ideas	सारांश	Write a summary of the chapter.
+surface	The outer part of something	सतह	The surface of the lake is calm.
+syllable	A unit of spoken language	शब्दांश	Apple has two syllables.
+synonym	A word with similar meaning	पर्यायवाची	Quick is a synonym of fast.
+technology	Application of knowledge to practical tasks	प्रौद्योगिकी	Technology can support learning.
+temperature	Measure of how hot or cold something is	तापमान	Measure the temperature.
+theorem	A statement proved using reasoning	प्रमेय	Use the theorem to solve the problem.
+timeline	A sequence of events arranged by date	समयरेखा	Make a timeline of history.
+translate	To express in another language	अनुवाद करना	Translate the sentence into Hindi.
+triangle	A shape with three sides	त्रिभुज	The triangle has three corners.
+unit	A standard measurement quantity	इकाई	The metre is a unit of length.
+universe	All of space matter and energy	ब्रह्मांड	The universe includes galaxies.
+variable	A quantity that can change	चर	Use x as a variable.
+velocity	Speed in a specified direction	वेग	Velocity includes direction.
+verb	A word that expresses action or state	क्रिया	Run is a verb.
+volume	The space occupied by an object	आयतन	Find the volume of the box.
+water	A liquid essential for life	पानी	Drink clean water.
+wave	A disturbance carrying energy	तरंग	Sound travels as a wave.
+wavelength	Distance between corresponding points on a wave	तरंगदैर्ध्य	Wavelength affects colour.
+weather	Conditions of the air at a time and place	मौसम	The weather is cloudy today.
+work	Transfer of energy by a force through distance	कार्य	Work is done when a force moves an object.

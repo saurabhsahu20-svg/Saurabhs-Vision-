@@ -4,57 +4,91 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import java.security.MessageDigest;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Bounded on-device history and bookmarks. No account, analytics, or sync. */
+/** Local-only storage. No syncing, analytics, logins or network transmission. */
 public final class BrowserStore {
-    public static final class Page {
-        public final String title,url;
-        Page(String title,String url) {this.title=title;this.url=url;}
+    public static final class Site {
+        public final String url,title;
+        Site(String u,String t){url=u;title=t;}
     }
-    private static final String PREFS="sbrowser_data_v1";
-    private static SharedPreferences prefs(Context c){return c.getSharedPreferences(PREFS,Context.MODE_PRIVATE);}
-    public static List<Page> list(Context c,String key){
-        List<Page> result=new ArrayList<>();
-        try {
-            JSONArray array=new JSONArray(prefs(c).getString(key,"[]"));
-            for(int i=0;i<array.length();i++){
-                JSONObject item=array.optJSONObject(i);if(item==null)continue;
-                String url=item.optString("u","");
-                if(UrlTools.validated(url)!=null)result.add(new Page(item.optString("t",url),url));
-            }
-        }catch(Exception ignored){}
-        return result;
+    private final SharedPreferences prefs;
+    public BrowserStore(Context context){
+        prefs=context.getSharedPreferences("s_browser_local_v1",Context.MODE_PRIVATE);
     }
-    public static void put(Context c,String key,String title,String url,int limit){
-        if(UrlTools.validated(url)==null)return;
-        List<Page> existing=list(c,key);
-        JSONArray out=new JSONArray();
-        out.put(make(title,url));
-        int count=1;
-        for(Page p:existing){
-            if(p.url.equals(url))continue;
-            if(count++>=limit)break;
-            out.put(make(p.title,p.url));
+    public String searchEngine(){return prefs.getString("search_engine","google");}
+    public void setSearchEngine(String value){prefs.edit().putString("search_engine",value).apply();}
+    public boolean focusMode(){return prefs.getBoolean("focus",false);}
+    public void setFocusMode(boolean enabled){prefs.edit().putBoolean("focus",enabled).apply();}
+    private JSONArray load(String key){
+        try{return new JSONArray(prefs.getString(key,"[]"));}
+        catch(Exception ignored){return new JSONArray();}
+    }
+    private void save(String key,JSONArray data){prefs.edit().putString(key,data.toString()).apply();}
+    private Site parse(JSONObject j){return new Site(j.optString("url",""),j.optString("title","Page"));}
+    private JSONObject json(String url,String title){
+        JSONObject j=new JSONObject();
+        try{j.put("url",url);j.put("title",title);}catch(Exception ignored){}
+        return j;
+    }
+    public List<Site> list(String key){
+        JSONArray array=load(key);
+        List<Site> out=new ArrayList<>();
+        for(int i=0;i<array.length();i++){
+            JSONObject value=array.optJSONObject(i);
+            if(value!=null&&!value.optString("url","").isEmpty())out.add(parse(value));
         }
-        prefs(c).edit().putString(key,out.toString()).apply();
+        return out;
     }
-    private static JSONObject make(String title,String url){
-        JSONObject obj=new JSONObject();
-        try{obj.put("u",url);obj.put("t",title==null||title.trim().isEmpty()?url:title);}catch(Exception ignored){}
-        return obj;
+    public void history(String url,String title){
+        if(url==null||!(url.startsWith("http://")||url.startsWith("https://")))return;
+        JSONArray output=new JSONArray();
+        output.put(json(url,title==null||title.isEmpty()?url:title));
+        for(Site item:list("history")){
+            if(!item.url.equals(url)&&output.length()<250)output.put(json(item.url,item.title));
+        }
+        save("history",output);
     }
-    public static void remove(Context c,String key,String url){
-        JSONArray arr=new JSONArray();
-        for(Page p:list(c,key))if(!p.url.equals(url))arr.put(make(p.title,p.url));
-        prefs(c).edit().putString(key,arr.toString()).apply();
-    }
-    public static boolean has(Context c,String key,String url){
-        for(Page p:list(c,key))if(p.url.equals(url))return true;
+    public boolean bookmarked(String url){
+        for(Site item:list("bookmarks"))if(item.url.equals(url))return true;
         return false;
     }
-    public static void clear(Context c,String key){prefs(c).edit().remove(key).apply();}
-    public static void setSetting(Context c,String key,String value){prefs(c).edit().putString(key,value).apply();}
-    public static String getSetting(Context c,String key,String value){return prefs(c).getString(key,value);}
+    public boolean toggleBookmark(String url,String title){
+        if(url==null||!url.startsWith("http"))return false;
+        boolean exists=bookmarked(url);
+        JSONArray output=new JSONArray();
+        if(!exists)output.put(json(url,title));
+        for(Site item:list("bookmarks"))if(!item.url.equals(url))output.put(json(item.url,item.title));
+        save("bookmarks",output);
+        return !exists;
+    }
+    public void clearHistory(){prefs.edit().remove("history").apply();}
+    public void clearBookmarks(){prefs.edit().remove("bookmarks").apply();}
+    public String note(String url){return prefs.getString("note_"+key(url),"");}
+    public void saveNote(String url,String note){
+        prefs.edit().putString("note_"+key(url),note).apply();
+    }
+    public void saveSession(List<String> urls){
+        JSONArray j=new JSONArray();
+        for(String url:urls){if(url!=null&&url.startsWith("http"))j.put(url);}
+        prefs.edit().putString("session",j.toString()).apply();
+    }
+    public List<String> session(){
+        JSONArray j=load("session");List<String> out=new ArrayList<>();
+        for(int i=0;i<j.length()&&i<8;i++){String u=j.optString(i,"");
+            if(u.startsWith("http"))out.add(u);}
+        return out;
+    }
+    private static String key(String input){
+        try{
+            byte[] bytes=MessageDigest.getInstance("SHA-256").digest(
+                (input==null?"":input).getBytes(StandardCharsets.UTF_8));
+            StringBuilder out=new StringBuilder();
+            for(int i=0;i<10;i++)out.append(String.format("%02x",bytes[i]&255));
+            return out.toString();
+        }catch(Exception e){return "unknown";}
+    }
 }
