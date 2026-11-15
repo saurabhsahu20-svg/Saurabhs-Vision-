@@ -346,6 +346,82 @@ public final class MainActivity extends Activity {
             catch(Exception ignored){toast("Open Settings → Default Apps → Phone");}
         }
     }
+    /** Opens a real app tab. Home tiles never simulate unsupported features. */
+    private void openTab(int target){homeOpen=false;tab=target;buildUi();}
+    private void dashboardTile(LinearLayout row,String icon,String label,
+        String subtitle,Runnable action,boolean purple){
+        LinearLayout tile=new LinearLayout(this);
+        tile.setOrientation(LinearLayout.VERTICAL);
+        tile.setGravity(Gravity.CENTER);
+        tile.setPadding(dp(6),dp(10),dp(6),dp(10));
+        tile.setBackground(gradient(purple?0xff47207d:0xff0b4777,
+            purple?0xff15163a:0xff0c1937,24,purple?0xffbb66f3:0xff43b9fa));
+        tile.setElevation(dp(4));
+        TextView symbol=text(icon,27,purple?0xffe2acff:0xff9cecff,true);
+        symbol.setGravity(Gravity.CENTER);
+        tile.addView(symbol);
+        TextView title=text(label,15,WHITE,true);
+        title.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams tp=new LinearLayout.LayoutParams(-1,-2);
+        tp.topMargin=dp(5);tile.addView(title,tp);
+        TextView detail=text(subtitle,10,MUTED,false);
+        detail.setGravity(Gravity.CENTER);tile.addView(detail);
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(108),1);
+        p.setMargins(dp(4),dp(5),dp(4),dp(5));
+        row.addView(tile,p);
+        tile.setContentDescription(label+" - "+subtitle);
+        tile.setOnClickListener(v->action.run());
+    }
+    /** Premium home screen; features link only to functions actually implemented. */
+    private void buildHomeDashboard(){
+        LinearLayout hero=new LinearLayout(this);
+        hero.setOrientation(LinearLayout.VERTICAL);
+        hero.setPadding(dp(20),dp(23),dp(20),dp(21));
+        hero.setBackground(gradient(0xff005d9c,0xff7a169c,28,0xff96a4ff));
+        hero.setElevation(dp(6));
+        add(hero,text("✦  PREMIUM PHONE EXPERIENCE",11,0xffe6f7ff,true),0);
+        add(hero,text("Your calls. Your style.",25,WHITE,true),9);
+        add(hero,text("Full-screen caller photos  •  Fast dialpad  •  Offline privacy",
+            13,0xffecedff,false),8);
+        TextView action=text("☎   OPEN DIALPAD    ›",15,WHITE,true);
+        action.setGravity(Gravity.CENTER);
+        action.setBackground(gradient(0xff264fcb,0xffa424c5,24,0xffaba2ff));
+        LinearLayout.LayoutParams actionLp=new LinearLayout.LayoutParams(-1,dp(51));
+        actionLp.topMargin=dp(18);hero.addView(action,actionLp);
+        action.setOnClickListener(v->openTab(0));
+        add(panel,hero,9);
+        add(panel,text("✦  QUICK ACCESS",13,0xffd7bfff,true),19);
+        String[][] labels={{"▦","Dialpad","Make a call"},
+            {"♙","Contacts","Find a person"},
+            {"◷","Recents","Local call history"},
+            {"★","Favorites","Saved numbers"},
+            {"▧","Caller Photos","HD wallpapers"},
+            {"◈","Themes","Six color styles"},
+            {"⚙","Settings","Customize app"},
+            {"✓","Permissions","Phone setup"}};
+        Runnable[] actions={
+            ()->openTab(0),()->openTab(1),()->openTab(2),()->openTab(3),
+            ()->{if(dialText.trim().isEmpty()){
+                openTab(0);toast("Enter a number then tap HD Photo");
+            }else showPhotoOptions(dialText);},
+            this::showThemes,this::showSettings,this::showPermissionSetup
+        };
+        for(int i=0;i<labels.length;i+=2){
+            LinearLayout row=new LinearLayout(this);
+            for(int col=0;col<2;col++){
+                int index=i+col;
+                dashboardTile(row,labels[index][0],labels[index][1],
+                    labels[index][2],actions[index],(index%2)==1);
+            }
+            add(panel,row,3);
+        }
+        TextView footer=text(
+            "3.0  •  CONTACTS STAY ON YOUR PHONE  •  NO ADS OR CLOUD TRACKING",
+            10,CYAN,true);
+        footer.setGravity(Gravity.CENTER);
+        add(panel,footer,18);
+    }
+
     /** Thumb-friendly fixed dock; the contacts and dialpad remain scrollable. */
     private void buildBottomNav(LinearLayout screen){
         LinearLayout dock=new LinearLayout(this);
