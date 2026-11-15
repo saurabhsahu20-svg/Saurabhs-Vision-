@@ -1,3 +1,26 @@
+# SV Caller Pro 3.3 — Clean & Fast UI (Beta)
+
+**SAURABH'S VISION™** · Android 14 compatible · original blue-and-gold phone icon
+
+## Changes based on actual device screenshot
+
+- **Bottom tabs lifted:** Insets-aware padding keeps the fixed Keypad / Contacts / Recents / Favorites navigation safely above Android's gesture/home controls, with additional 14 dp breathing room.
+- **Cleaner, minimal interface:** compact number entry panel, calmer navy gradients, regular-weight typography, subtler button borders, reduced visual clutter.
+- **Responsive dialpad:** reduced press animation time, immediate local input/haptic response, smaller buttons and shorter vertical content for compact phones.
+- **Accurate number editing:** inserting and deleting now respect the current cursor/selected digits instead of always editing the end.
+- **Double-tap guard:** 650 ms protection from quickly triggering duplicate call requests.
+- Existing Android InCallService, full-screen caller photos, 75%-threshold slide-to-answer / decline, and on-device contacts remain.
+
+The reference **image is a design concept**, not a screenshot of the APK. Its "Spam Protection" label is **not a real feature** and has not been added. No call recording or internet-based identification is implemented.
+
+## Build and installation
+
+GitHub Actions produces `SV_CALLER_PRO_v3.3.0_CLEAN_FAST_UI.apk` under release tag `sv-caller-pro-v3.3.0`, pending successful build and signature checks.
+
+The APK is debug signed. Build success cannot confirm real incoming calls, lock-screen appearance or carrier-specific Telecom behavior. Test with another phone and retain the system Phone app for emergency calling. Do not uninstall an older app version without considering that a signing mismatch or uninstall can affect saved data.
+
+---
+
 # SV Caller Pro 3.2 — Original Premium Slide Calling (Beta)
 
 **By SAURABH'S VISION™** · Android native default-dialer candidate · offline design
