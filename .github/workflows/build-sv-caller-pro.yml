@@ -121,9 +121,13 @@ jobs:
           assert 'CallerNumberKey.normalized(number)' in main
           assert 'recentFilter==1' in main
           assert 'buildIncomingButtons()' in activity
+          assert 'applyPhotoPresentation(' in activity
+          assert 'private void controlRow(' in activity
+          assert 'profileImage.setImageBitmap(image)' in activity
+          assert 'profileRing.setVisibility(' in activity
           assert 'SVCaller-AsyncPhoto' in activity
           assert 'CACHE_TTL_MS' in photos
-          assert "versionName '3.0.0'" in gradle
+          assert "versionName '3.1.0'" in gradle
           assert (p/'app/src/main/res/drawable-nodpi/ic_sv_caller_pro.webp').is_file()
           icon=(p/'app/src/main/res/drawable-nodpi/ic_sv_caller_pro.webp').read_bytes()
           assert icon[0:4]==b'RIFF' and icon[8:12]==b'WEBP' and len(icon)>2500
@@ -171,13 +175,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml |
             grep -q "android.telecom.InCallService"
           mkdir -p caller-deliverables
-          cp "$apk" caller-deliverables/SV_CALLER_PRO_v3.0.0_FULL_PHOTO_NEON.apk
+          cp "$apk" caller-deliverables/SV_CALLER_PRO_v3.1.0_PROFESSIONAL_CALL_UI.apk
           ( cd caller-deliverables && sha256sum *.apk > SHA256SUMS.txt )
 
       - name: Upload debug APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SV_CALLER_PRO_v3_0_0_FULL_PHOTO_APK
+          name: SV_CALLER_PRO_v3_1_0_CALL_SCREEN_APK
           path: caller-deliverables/*
           retention-days: 90
 
@@ -187,13 +191,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="sv-caller-pro-v3.0.0"
-          apk="caller-deliverables/SV_CALLER_PRO_v3.0.0_FULL_PHOTO_NEON.apk"
+          tag="sv-caller-pro-v3.1.0"
+          apk="caller-deliverables/SV_CALLER_PRO_v3.1.0_PROFESSIONAL_CALL_UI.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$apk" caller-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$apk" caller-deliverables/SHA256SUMS.txt \
-              --title "SV Caller Pro 3.0 • Premium Full-Screen Caller Photo" \
-              --notes "SV Caller Pro 3.0 by SAURABH'S VISION preserves your blue-gold launcher icon and native default Phone app features. Adds a neon-glass home dashboard, large full-screen photo incoming-call buttons, optimized asynchronous caller photo loading, short-lived bounded contact cache, debounced indexed contact search, +91/0091 phone-number matching, and filtered accurate call history. The debug APK is compiled and signed by GitHub Actions; real Android 14 call, screen-lock, emergency-call and Bluetooth behavior still require device testing. No recording, cloud spam detection or automatic dual-SIM selection is included. Keep the system Phone app installed." \
+              --title "SV Caller Pro 3.1 • Professional Calling Screen" \
+              --notes "SV Caller Pro v3.1 professional calling interface by SAURABH'S VISION, with the original blue-gold icon, full-bleed incoming contact photo, vivid large Answer/Decline controls, elegant circular portrait during active calls, readable live call status/timer and accessible working Mute/Keypad/Speaker/Hold/Audio Output/End Call controls. Native default Phone role, local call history, contacts and privacy preserved. No fabricated verified badges, recorded calls, video calling, AI spam filtering or automatic dual-SIM selection. GitHub checks compile/signature; real-device calling, lock-screen and OEM behavior must still be tested. Keep the original system Phone app installed." \
               --latest=false
           fi

@@ -41,10 +41,13 @@ public final class InCallActivity extends Activity {
         }
     };
     private FrameLayout frame;
-    private ImageView photoView;
-    private TextView nameView,numberView,stateView,timeView,avatarView;
+    private ImageView photoView, profileImage;
+    private TextView nameView,numberView,stateView,timeView,avatarView,profileFallback;
+    private FrameLayout profileRing;
+    private View wallpaperTint;
+    private android.graphics.Bitmap currentBitmap;
     private LinearLayout actionPanel,dtmfPanel;
-    private String displayedNumber="",loadedPhoto="";
+    private String displayedNumber="",loadedPhoto=null;
     private int previousState=-123;
     private int previousAudioSignature=Integer.MIN_VALUE;
     private int missedTicks=0;
@@ -91,7 +94,7 @@ public final class InCallActivity extends Activity {
     @Override protected void onStart(){
         super.onStart();
         active=true;
-        if(loadedPhoto.isEmpty()&&photoView!=null){
+        if(loadedPhoto==null&&photoView!=null){
             String number=previewOnly?getIntent().getStringExtra("previewNumber"):
                 displayedNumber;
             if(number!=null&&!number.isEmpty())updatePhoto(number);
@@ -109,7 +112,7 @@ public final class InCallActivity extends Activity {
     }
     @Override protected void onStop(){
         active=false;
-        loadedPhoto="";
+        loadedPhoto=null;
         handler.removeCallbacks(everySecond);
         if(receiverAttached&&receiver!=null){
             unregisterReceiver(receiver);
@@ -153,8 +156,8 @@ public final class InCallActivity extends Activity {
         photoView.setContentDescription("Full-screen caller photo wallpaper");
         frame.addView(photoView,new FrameLayout.LayoutParams(-1,-1));
 
-        // Fallback gradient and dark scrim keep both photos and text legible.
-        View wallpaperTint=new View(this);
+        // Dynamic gradient protects legibility in edge-to-edge incoming photos.
+        wallpaperTint=new View(this);
         wallpaperTint.setBackground(new GradientDrawable(
             GradientDrawable.Orientation.TOP_BOTTOM,
             new int[]{0xbb071124,0x2808112b,0x440b0729,0xf9050920}));
@@ -169,31 +172,64 @@ public final class InCallActivity extends Activity {
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(21),dp(21),dp(21),dp(26));
         scroll.addView(content);
-        TextView logo=text("✦   SV CALLER PRO 3.0   •   HD CALLER PHOTO",12,
-            0xffe8d7ff,true);
+        TextView logo=text("✦   SV CALLER PRO   •   SAURABH'S VISION™",12,
+            0xfff0e7ff,true);
         logo.setLetterSpacing(.06f);
         logo.setPadding(dp(8),dp(9),dp(8),dp(9));
-        logo.setBackground(fill(0x99532e9d,0x88201848,25,0x99d1a4ff));
-        content.addView(logo,new LinearLayout.LayoutParams(-1,dp(49)));
-        stateView=text("Connecting…",16,0xffa3f7fc,true);
+        logo.setBackground(fill(0x7d2b225a,0x8c101b3f,25,0x72d1b5fc));
+        content.addView(logo,new LinearLayout.LayoutParams(-1,dp(48)));
+
+        // Circular portrait is shown during an active call only.
+        profileRing=new FrameLayout(this);
+        GradientDrawable ring=new GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            new int[]{0xffffce77,0xffa14cff,0xff5bafff});
+        ring.setShape(GradientDrawable.OVAL);
+        profileRing.setBackground(ring);
+        profileRing.setElevation(dp(7));
+        profileRing.setPadding(dp(3),dp(3),dp(3),dp(3));
+        profileFallback=text("☎",48,0xffd5c9ff,true);
+        profileFallback.setBackground(fill(0xff2a285e,0xff101d44,85,0));
+        profileRing.addView(profileFallback,new FrameLayout.LayoutParams(-1,-1));
+        profileImage=new ImageView(this);
+        profileImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        GradientDrawable mask=new GradientDrawable();
+        mask.setShape(GradientDrawable.OVAL);
+        mask.setColor(0xff1a224b);
+        profileImage.setBackground(mask);
+        profileImage.setClipToOutline(true);
+        profileRing.addView(profileImage,new FrameLayout.LayoutParams(-1,-1));
+        profileRing.setContentDescription("Caller contact photo");
+        LinearLayout.LayoutParams profileParams=new LinearLayout.LayoutParams(
+            dp(136),dp(136));
+        profileParams.gravity=Gravity.CENTER_HORIZONTAL;
+        profileParams.topMargin=dp(17);
+        content.addView(profileRing,profileParams);
+        profileRing.setVisibility(View.GONE);
+
+        stateView=text("Connecting…",15,0xffc1dffb,true);
         LinearLayout.LayoutParams stateLp=new LinearLayout.LayoutParams(-1,dp(39));
-        stateLp.topMargin=dp(21);
+        stateLp.topMargin=dp(16);
         content.addView(stateView,stateLp);
 
-        nameView=text("Unknown caller",38,WHITE,true);
-        nameView.setShadowLayer(dp(3),0,dp(2),Color.BLACK);
+        nameView=text("Unknown caller",35,WHITE,true);
+        nameView.setShadowLayer(dp(2),0,dp(2),0xbf000000);
         nameView.setMaxLines(2);
         nameView.setEllipsize(android.text.TextUtils.TruncateAt.END);
-        content.addView(nameView,new LinearLayout.LayoutParams(-1,dp(81)));
+        content.addView(nameView,new LinearLayout.LayoutParams(-1,dp(76)));
         numberView=text("",17,MUTED,false);
         content.addView(numberView,new LinearLayout.LayoutParams(-1,dp(29)));
-        timeView=text("",15,0xff9cf8da,true);
-        content.addView(timeView,new LinearLayout.LayoutParams(-1,dp(31)));
+        timeView=text("",16,0xffd5fbff,true);
+        timeView.setBackground(fill(0x99352a75,0x99122247,27,0x77a77aff));
+        LinearLayout.LayoutParams timeLp=new LinearLayout.LayoutParams(
+            -1,dp(40));
+        timeLp.setMargins(dp(43),dp(12),dp(43),0);
+        content.addView(timeView,timeLp);
 
         // Wallpaper is always visible beyond this subtle central monogram.
         View centerSpace=new View(this);
         content.addView(centerSpace,new LinearLayout.LayoutParams(-1,0,1));
-        avatarView=text("☎",72,0x55ffffff,true);
+        avatarView=text("☎",72,0x50ffffff,true);
         avatarView.setContentDescription("Placeholder when caller has no image");
         content.addView(avatarView,new LinearLayout.LayoutParams(-1,dp(95)));
         View spacer=new View(this);
@@ -210,7 +246,7 @@ public final class InCallActivity extends Activity {
         actionPanel=new LinearLayout(this);
         actionPanel.setOrientation(LinearLayout.VERTICAL);
         actionPanel.setPadding(dp(8),dp(10),dp(8),dp(10));
-        actionPanel.setBackground(fill(0xb5221b52,0xdb0c1437,31,0xa58b8ff5));
+        actionPanel.setBackground(fill(0x5a22164b,0x96200e40,30,0x708a6bb2));
         LinearLayout.LayoutParams actionP=new LinearLayout.LayoutParams(-1,-2);
         actionP.topMargin=dp(12);
         content.addView(actionPanel,actionP);
@@ -223,7 +259,8 @@ public final class InCallActivity extends Activity {
         previousState=-123;
         previousAudioSignature=Integer.MIN_VALUE;
         displayedNumber="";
-        loadedPhoto="";
+        loadedPhoto=null;
+        currentBitmap=null;
         if(previewOnly){
             stateView.setText("CALLER SCREEN PREVIEW");
             String number=getIntent().getStringExtra("previewNumber");
@@ -233,6 +270,23 @@ public final class InCallActivity extends Activity {
             buttonRow(new String[]{"✕  CLOSE PREVIEW"},
                 new Runnable[]{this::finish},new int[]{0xff2a315d});
         }else refresh();
+        applyPhotoPresentation(previewOnly ||
+            (!previewOnly&&SVInCallService.activeCall()!=null &&
+              SVInCallService.activeCall().getState()==Call.STATE_RINGING));
+    }
+    private void applyPhotoPresentation(boolean incoming){
+        if(photoView==null||profileRing==null)return;
+        profileRing.setVisibility(incoming?View.GONE:View.VISIBLE);
+        photoView.setVisibility(incoming&&currentBitmap!=null?View.VISIBLE:View.GONE);
+        avatarView.setVisibility(incoming&&currentBitmap==null?View.VISIBLE:View.GONE);
+        profileImage.setVisibility(!incoming&&currentBitmap!=null?
+            View.VISIBLE:View.GONE);
+        profileFallback.setVisibility(!incoming&&currentBitmap==null?
+            View.VISIBLE:View.GONE);
+        wallpaperTint.setBackground(new GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            incoming?new int[]{0xe009101b,0x2703070e,0x46090a1f,0xf2070b1c}:
+                new int[]{0x990a0d23,0x80311959,0xcc090d25,0xfc070b1c}));
     }
     private TextView action(String title,int top,int bottom,int outline){
         TextView t=text(title,14,WHITE,true);
@@ -258,6 +312,37 @@ public final class InCallActivity extends Activity {
         }
         actionPanel.addView(row,new LinearLayout.LayoutParams(-1,-2));
     }
+    /** Accessible in-call controls. Only actions backed by Telecom are shown. */
+    private void controlRow(String[] icons,String[] labels,Runnable[] actions,
+        boolean[] highlighted){
+        LinearLayout row=new LinearLayout(this);
+        row.setGravity(Gravity.CENTER);
+        for(int i=0;i<labels.length;i++){
+            final int index=i;
+            LinearLayout stack=new LinearLayout(this);
+            stack.setOrientation(LinearLayout.VERTICAL);
+            stack.setGravity(Gravity.CENTER);
+            TextView orb=action(icons[i],
+                highlighted[i]?0xff7136e7:0xff2b305e,
+                highlighted[i]?0xff4b1aab:0xff111831,
+                highlighted[i]?0xffdf9cff:0xff6b83b8);
+            orb.setTextSize(26);
+            orb.setGravity(Gravity.CENTER);
+            orb.setElevation(dp(3));
+            stack.addView(orb,new LinearLayout.LayoutParams(dp(67),dp(67)));
+            TextView label=text(labels[i],12,WHITE,true);
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(29));
+            p.topMargin=dp(6);
+            stack.addView(label,p);
+            LinearLayout.LayoutParams item=new LinearLayout.LayoutParams(0,dp(108),1);
+            item.setMargins(dp(2),0,dp(2),0);
+            row.addView(stack,item);
+            stack.setContentDescription(labels[i]);
+            stack.setOnClickListener(v->actions[index].run());
+            orb.setOnClickListener(v->actions[index].run());
+        }
+        actionPanel.addView(row,new LinearLayout.LayoutParams(-1,-2));
+    }
     private void buildActions(Call call){
         actionPanel.removeAllViews();
         int state=call.getState();
@@ -270,31 +355,62 @@ public final class InCallActivity extends Activity {
         boolean muted=audio!=null&&audio.isMuted();
         boolean speaker=audio!=null&&audio.getRoute()==CallAudioState.ROUTE_SPEAKER;
         boolean held=state==Call.STATE_HOLDING;
-        buttonRow(new String[]{muted?"MIC ON":"MUTE",speaker?"EARPIECE":"SPEAKER","KEYPAD"},
+        controlRow(new String[]{"♩","▦","◖"},
+            new String[]{muted?"Unmute":"Mute","Keypad",speaker?"Earpiece":"Speaker"},
             new Runnable[]{
-                ()->{SVInCallService svc=SVInCallService.activeService();
-                    if(svc!=null)svc.setMuted(!muted);refreshControls();},
-                ()->{SVInCallService svc=SVInCallService.activeService();
-                    if(svc!=null)svc.setAudioRoute(speaker?
-                        CallAudioState.ROUTE_EARPIECE:CallAudioState.ROUTE_SPEAKER);
-                    refreshControls();},
-                ()->{keypadVisible=!keypadVisible;
-                    dtmfPanel.setVisibility(keypadVisible?View.VISIBLE:View.GONE);}
-            },new int[]{0xff2a315d,0xff2a315d,0xff2a315d});
+                ()->{
+                    SVInCallService svc=SVInCallService.activeService();
+                    if(svc!=null)svc.setMuted(!muted);
+                    refreshControls();
+                },
+                ()->{
+                    keypadVisible=!keypadVisible;
+                    dtmfPanel.setVisibility(keypadVisible?View.VISIBLE:View.GONE);
+                },
+                ()->{
+                    SVInCallService svc=SVInCallService.activeService();
+                    CallAudioState route=svc==null?null:svc.getCallAudioState();
+                    if(route==null){showAudioRoutes();return;}
+                    int target=speaker?CallAudioState.ROUTE_EARPIECE:
+                        CallAudioState.ROUTE_SPEAKER;
+                    if((route.getSupportedRouteMask()&target)!=0)
+                        svc.setAudioRoute(target);
+                    else showAudioRoutes();
+                    refreshControls();
+                }
+            },new boolean[]{muted,keypadVisible,speaker});
         boolean canHold=call.getDetails()!=null && call.getDetails().can(
             Details.CAPABILITY_HOLD);
-        buttonRow(new String[]{"◉  CHOOSE AUDIO OUTPUT"},
-            new Runnable[]{this::showAudioRoutes},new int[]{0xff2a315d});
         if(canHold||held){
-            buttonRow(new String[]{held?"RESUME":"HOLD","✕  END CALL"},
+            controlRow(new String[]{"Ⅱ","◉"},
+                new String[]{held?"Resume":"Hold","Audio output"},
                 new Runnable[]{
-                    ()->{if(call.getState()==Call.STATE_HOLDING)call.unhold();else call.hold();},
-                    SVInCallService::end
-                },new int[]{0xff2a315d,0xffe32943});
+                    ()->{
+                        if(call.getState()==Call.STATE_HOLDING)call.unhold();
+                        else if(call.getState()==Call.STATE_ACTIVE)call.hold();
+                    },
+                    this::showAudioRoutes
+                },new boolean[]{held,false});
         }else{
-            buttonRow(new String[]{"✕  END CALL"},
-                new Runnable[]{SVInCallService::end},new int[]{0xffe32943});
+            controlRow(new String[]{"◉"},new String[]{"Audio output"},
+                new Runnable[]{this::showAudioRoutes},new boolean[]{false});
         }
+        LinearLayout endStack=new LinearLayout(this);
+        endStack.setOrientation(LinearLayout.VERTICAL);
+        endStack.setGravity(Gravity.CENTER);
+        TextView end=action("☎",0xffff3b54,0xffbc102f,0xffff9aaa);
+        end.setTextSize(32);
+        end.setElevation(dp(7));
+        end.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams endSize=new LinearLayout.LayoutParams(dp(80),dp(80));
+        endSize.topMargin=dp(11);
+        endStack.addView(end,endSize);
+        TextView endLabel=text("END CALL",13,WHITE,true);
+        endStack.addView(endLabel,new LinearLayout.LayoutParams(-1,dp(30)));
+        endStack.setContentDescription("End the current phone call");
+        endStack.setOnClickListener(v->SVInCallService.end());
+        end.setOnClickListener(v->SVInCallService.end());
+        actionPanel.addView(endStack,new LinearLayout.LayoutParams(-1,-2));
     }
     /** Large, clearly labelled answer/decline controls over the caller photo. */
     private void buildIncomingButtons(){
@@ -403,14 +519,19 @@ public final class InCallActivity extends Activity {
      * Read contacts AND decode photos off the UI thread. Resolving a provider
      * synchronously can otherwise freeze the call screen on slower phones.
      */
+    /** Resolve and decode once on a worker thread; both views share the result. */
     private void updatePhoto(String number){
         final String target=number==null?"":number;
         if(target.equals(loadedPhoto))return;
         loadedPhoto=target;
+        currentBitmap=null;
         photoView.setImageDrawable(null);
-        avatarView.setVisibility(View.VISIBLE);
+        profileImage.setImageDrawable(null);
         nameView.setText(target.isEmpty()?"Unknown caller":target);
         numberView.setText("");
+        applyPhotoPresentation(previewOnly ||
+            (SVInCallService.activeCall()!=null &&
+             SVInCallService.activeCall().getState()==Call.STATE_RINGING));
         final Context application=getApplicationContext();
         new Thread(()->{
             PhotoStore.Match contact=PhotoStore.resolve(application,target);
@@ -420,10 +541,14 @@ public final class InCallActivity extends Activity {
                 if(!active||!target.equals(loadedPhoto)||photoView==null)return;
                 nameView.setText(contact.name);
                 numberView.setText(contact.name.equals(target)?"":target);
+                currentBitmap=image;
                 if(image!=null){
                     photoView.setImageBitmap(image);
-                    avatarView.setVisibility(View.GONE);
+                    profileImage.setImageBitmap(image);
                 }
+                applyPhotoPresentation(previewOnly ||
+                    (SVInCallService.activeCall()!=null &&
+                      SVInCallService.activeCall().getState()==Call.STATE_RINGING));
             });
         },"SVCaller-AsyncPhoto").start();
     }
@@ -450,6 +575,7 @@ public final class InCallActivity extends Activity {
             previousState=state;
             previousAudioSignature=audioSignature;
             buildActions(call);
+            applyPhotoPresentation(state==Call.STATE_RINGING);
         }
         stateView.setText(callLabel(state));
         String number=SVInCallService.number(call);
