@@ -57,7 +57,7 @@ public final class InCallActivity extends Activity {
         return (int)(value*getResources().getDisplayMetrics().density+.5f);
     }
     private GradientDrawable fill(int top,int bottom,int radius,int stroke){
-        GradientDrawable d=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+        GradientDrawable d=new GradientDrawable(GradientDrawable.Orientation.TL_BR,
             new int[]{top,bottom});
         d.setCornerRadius(dp(radius));
         if(stroke!=0)d.setStroke(dp(1.2f),stroke);
@@ -130,12 +130,12 @@ public final class InCallActivity extends Activity {
     private void build(){
         frame=new FrameLayout(this);
         int[][] palettes={
-            {0xff0e2656,0xff09172e,0xff230949},
-            {0xff382070,0xff0b194a,0xff25073e},
-            {0xff82404c,0xff311a37,0xff120d2d},
-            {0xff065d57,0xff0a3447,0xff0a172b},
-            {0xff8d6c2e,0xff2d2844,0xff090d1e},
-            {0xff0577ac,0xff352e8e,0xff070c28}
+            {0xff11265e,0xff181144,0xff050818},
+            {0xff632a91,0xff271457,0xff09091c},
+            {0xffa8586e,0xff3d204c,0xff070a21},
+            {0xff066e6b,0xff0c3451,0xff070f24},
+            {0xff98753b,0xff42365e,0xff070b20},
+            {0xff1b5bba,0xff272184,0xff070b25}
         };
         int choice=DialerRules.theme(
             getSharedPreferences("caller_settings",MODE_PRIVATE).getInt("theme",0));
@@ -150,7 +150,7 @@ public final class InCallActivity extends Activity {
         View wallpaperTint=new View(this);
         wallpaperTint.setBackground(new GradientDrawable(
             GradientDrawable.Orientation.TL_BR,
-            new int[]{0x66341267,0x9906112c,0xaa08122e,0xea050d1c}));
+            new int[]{0x663c217f,0x7720103f,0xb0081029,0xf205091a}));
         frame.addView(wallpaperTint,new FrameLayout.LayoutParams(-1,-1));
         ScrollView scroll=new ScrollView(this);
         scroll.setFillViewport(true);
@@ -160,33 +160,33 @@ public final class InCallActivity extends Activity {
 
         LinearLayout content=new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
-        content.setPadding(dp(19),dp(18),dp(19),dp(25));
+        content.setPadding(dp(21),dp(21),dp(21),dp(26));
         scroll.addView(content);
-        TextView logo=text("✦ SV CALLER PRO  •  SAURABH'S VISION™",14,
-            0xffffda80,true);
+        TextView logo=text("✦  SV CALLER PRO   •   PRIVATE & PREMIUM",12,
+            0xffebd4ff,true);
         logo.setLetterSpacing(.06f);
         logo.setPadding(dp(8),dp(9),dp(8),dp(9));
-        logo.setBackground(fill(0x660b2b54,0x660a152f,17,0x88e6bd63));
+        logo.setBackground(fill(0x9933215e,0x88201940,25,0x99aa89e9));
         content.addView(logo,new LinearLayout.LayoutParams(-1,dp(49)));
-        stateView=text("Connecting…",18,WHITE,true);
+        stateView=text("Connecting…",15,0xffb8f8fc,true);
         LinearLayout.LayoutParams stateLp=new LinearLayout.LayoutParams(-1,dp(39));
         stateLp.topMargin=dp(21);
         content.addView(stateView,stateLp);
 
-        nameView=text("Unknown caller",32,WHITE,true);
+        nameView=text("Unknown caller",35,WHITE,true);
         nameView.setShadowLayer(dp(3),0,dp(2),Color.BLACK);
         nameView.setMaxLines(2);
         nameView.setEllipsize(android.text.TextUtils.TruncateAt.END);
         content.addView(nameView,new LinearLayout.LayoutParams(-1,dp(81)));
         numberView=text("",15,MUTED,false);
         content.addView(numberView,new LinearLayout.LayoutParams(-1,dp(29)));
-        timeView=text("",16,0xffa3f6dd,true);
+        timeView=text("",15,0xff9cf8da,true);
         content.addView(timeView,new LinearLayout.LayoutParams(-1,dp(31)));
 
         // Wallpaper is always visible beyond this subtle central monogram.
         View centerSpace=new View(this);
         content.addView(centerSpace,new LinearLayout.LayoutParams(-1,0,1));
-        avatarView=text("S",90,0x55ffffff,true);
+        avatarView=text("✦",80,0x55ffffff,true);
         avatarView.setContentDescription("Placeholder when caller has no image");
         content.addView(avatarView,new LinearLayout.LayoutParams(-1,dp(95)));
         View spacer=new View(this);
@@ -195,18 +195,20 @@ public final class InCallActivity extends Activity {
         dtmfPanel=new LinearLayout(this);
         dtmfPanel.setOrientation(LinearLayout.VERTICAL);
         dtmfPanel.setPadding(dp(6),dp(7),dp(6),dp(6));
-        dtmfPanel.setBackground(fill(0xcc102d4b,0xcc08162e,18,0xff285475));
+        dtmfPanel.setBackground(fill(0xdd252653,0xdd0d1230,25,0xff6b61ae));
         content.addView(dtmfPanel,new LinearLayout.LayoutParams(-1,-2));
         dtmfPanel.setVisibility(View.GONE);
         buildDtmf();
 
         actionPanel=new LinearLayout(this);
         actionPanel.setOrientation(LinearLayout.VERTICAL);
+        actionPanel.setPadding(dp(8),dp(10),dp(8),dp(10));
+        actionPanel.setBackground(fill(0x992a2756,0xcc101733,31,0x996a64a9));
         LinearLayout.LayoutParams actionP=new LinearLayout.LayoutParams(-1,-2);
         actionP.topMargin=dp(12);
         content.addView(actionPanel,actionP);
 
-        TextView footer=text("Your call • Your photo • On your device",11,
+        TextView footer=text("YOUR CALL   •   YOUR PHOTO   •   YOUR PRIVACY",11,
             0xffd7dceb,false);
         LinearLayout.LayoutParams footerP=new LinearLayout.LayoutParams(-1,dp(35));
         footerP.topMargin=dp(8);
@@ -221,13 +223,13 @@ public final class InCallActivity extends Activity {
             timeView.setText("Preview only • no active call");
             actionPanel.removeAllViews();
             buttonRow(new String[]{"✕  CLOSE PREVIEW"},
-                new Runnable[]{this::finish},new int[]{0xff184b76});
+                new Runnable[]{this::finish},new int[]{0xff2a315d});
         }else refresh();
     }
     private TextView action(String title,int top,int bottom,int outline){
-        TextView t=text(title,16,WHITE,true);
+        TextView t=text(title,14,WHITE,true);
         t.setPadding(dp(3),dp(11),dp(3),dp(11));
-        t.setBackground(fill(top,bottom,22,outline));
+        t.setBackground(fill(top,bottom,32,outline));
         t.setElevation(dp(2));
         t.setContentDescription(title);
         return t;
@@ -238,7 +240,7 @@ public final class InCallActivity extends Activity {
         for(int i=0;i<labels.length;i++){
             int c=colors[i];
             int bot=c==0xffe32943?0xffa31534:
-                c==0xff16bd71?0xff0b824f:0xff0c315a;
+                c==0xff16bd71?0xff0b824f:0xff141c41;
             TextView b=action(labels[i],c,bot,0x88d5efff);
             LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(62),1);
             p.setMargins(dp(3),dp(3),dp(3),dp(3));
@@ -272,17 +274,17 @@ public final class InCallActivity extends Activity {
                     refreshControls();},
                 ()->{keypadVisible=!keypadVisible;
                     dtmfPanel.setVisibility(keypadVisible?View.VISIBLE:View.GONE);}
-            },new int[]{0xff184b76,0xff184b76,0xff184b76});
+            },new int[]{0xff2a315d,0xff2a315d,0xff2a315d});
         boolean canHold=call.getDetails()!=null && call.getDetails().can(
             Details.CAPABILITY_HOLD);
         buttonRow(new String[]{"◉  CHOOSE AUDIO OUTPUT"},
-            new Runnable[]{this::showAudioRoutes},new int[]{0xff184b76});
+            new Runnable[]{this::showAudioRoutes},new int[]{0xff2a315d});
         if(canHold||held){
             buttonRow(new String[]{held?"RESUME":"HOLD","✕  END CALL"},
                 new Runnable[]{
                     ()->{if(call.getState()==Call.STATE_HOLDING)call.unhold();else call.hold();},
                     SVInCallService::end
-                },new int[]{0xff184b76,0xffe32943});
+                },new int[]{0xff2a315d,0xffe32943});
         }else{
             buttonRow(new String[]{"✕  END CALL"},
                 new Runnable[]{SVInCallService::end},new int[]{0xffe32943});
