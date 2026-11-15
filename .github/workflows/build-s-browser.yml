@@ -6,6 +6,11 @@ on:
     paths:
       - 's-browser/**'
       - '.github/workflows/build-s-browser.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 's-browser/**'
+      - '.github/workflows/build-s-browser.yml'
   workflow_dispatch:
 
 permissions:
