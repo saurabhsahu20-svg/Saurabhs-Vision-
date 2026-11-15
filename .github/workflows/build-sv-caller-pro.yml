@@ -106,7 +106,7 @@ jobs:
               'Settings.ACTION_APPLICATION_DETAILS_SETTINGS'):
               assert feature in main, feature
           for action in ('"▧  Caller photos"',
-              '"▧  Caller Photos"', 'buildBottomNav(screen)',
+              '"◈  Call themes"', 'buildBottomNav(screen)',
               'FrameLayout holder=', 'callStack', 'circle.animate()',
               'search.setOnClickListener(', 'buildHomeDashboard()'):
               assert action in main, action
@@ -207,6 +207,6 @@ jobs:
           else
             gh release create "$tag" "$apk" caller-deliverables/SHA256SUMS.txt \
               --title "SV Caller Pro 3.2 • Slide Calling & Professional Phone UI" \
-              --notes "SV Caller Pro 3.2 by SAURABH'S VISION. Original midnight-indigo phone UI, full-screen contact photo, tested bidirectional swipe: right to Answer and left to Decline (75% threshold), accessible Answer/Decline tap controls, on-device contact card with SMS handoff, full Settings page, compact dialpad and real recent-call shortcuts. Original blue-gold app icon preserved. No AI spam filtering, call recording or video calling. GitHub CI builds, verifies and signs a debug beta APK; test incoming/outgoing, locked-screen and emergency call behavior on your own phone before treating it as default. Keep original Phone app installed."" \
+              --notes "SV Caller Pro 3.2 by SAURABH'S VISION. Original midnight-indigo phone UI, full-screen contact photo, tested bidirectional swipe: right to Answer and left to Decline (75% threshold), accessible Answer/Decline tap controls, on-device contact card with SMS handoff, full Settings page, compact dialpad and real recent-call shortcuts. Original blue-gold app icon preserved. No AI spam filtering, call recording or video calling. GitHub CI builds, verifies and signs a debug beta APK; test incoming/outgoing, locked-screen and emergency call behavior on your own phone before treating it as default. Keep original Phone app installed." \
               --latest=false
           fi
