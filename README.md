@@ -1,37 +1,50 @@
-# SAURABH'S VISION™ — Android Projects
+<p align="center">
+  <img src="assets/saurabhs-vision-banner.svg" width="100%" alt="SAURABH'S VISION — Android Apps and Creative Technology">
+</p>
 
-Apps, educational tools and websites developed under **SAURABH'S VISION™**.
+<div align="center">
 
-> **Build status:** The badges below reflect the *latest workflow run on the main branch*. Earlier red ❌ runs in GitHub Actions are retained as historical build logs; they do not mean the current code is failing. Last manual audit: **15 November 2026**.
+### Thoughtful Android apps. Clean experiences.
 
-## Apps and live build status
+**SAURABH'S VISION™** · Independent Android app development
 
-| Project | Source | Live GitHub Actions status |
-| --- | --- | --- |
-| **S CALC Pro — Scientific Calculator** | [Android source](vision-scientific-calculator/) | [![S CALC APK](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-vision-scientific-calculator.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-vision-scientific-calculator.yml) |
-| **SV Caller Pro** — Caller photos and dialer | [Android source](sv-caller-pro/) | [![SV Caller Pro APK](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-sv-caller-pro.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-sv-caller-pro.yml) |
-| **S VISION Launcher** | [Android source](science-maths-launcher/) | [![Launcher APK](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-s-vision-launcher.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-s-vision-launcher.yml) |
-| **Maths & Science Keyboard** | [Android source](vision-maths-science-keyboard/) | [![Keyboard APK](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-vision-maths-science-keyboard.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-vision-maths-science-keyboard.yml) |
-| **Education Live Wallpaper** | [Android source](education-live-wallpaper/) | [![Education Wallpaper APK](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-education-wallpaper.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-education-wallpaper.yml) |
-| **Saurabh Vision Website** | [Website source](website/) | [![Website deployment](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/deploy-pages.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/deploy-pages.yml) |
+[Explore Android Apps](#our-apps) · [Download Releases](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases) · [Live Build Status](#live-build-status)
 
-## Other GitHub repositories
+</div>
 
-| Repository | Latest workflows |
-| --- | --- |
-| [SAUNE VIBE & Vision Walls](https://github.com/saurabhsahu20-svg/Saurabh-s-vision) | [![SAUNE VIBE APK](https://github.com/saurabhsahu20-svg/Saurabh-s-vision/actions/workflows/android.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/Saurabh-s-vision/actions/workflows/android.yml) [![Vision Walls APK](https://github.com/saurabhsahu20-svg/Saurabh-s-vision/actions/workflows/vision-walls-build.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/Saurabh-s-vision/actions/workflows/vision-walls-build.yml) |
-| [Aura Dialer](https://github.com/saurabhsahu20-svg/aura-dialer) | [![Aura Dialer APK](https://github.com/saurabhsahu20-svg/aura-dialer/actions/workflows/build-apk.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/aura-dialer/actions/workflows/build-apk.yml) |
-| [S call](https://github.com/saurabhsahu20-svg/aura-dialer-) | [![S call APK](https://github.com/saurabhsahu20-svg/aura-dialer-/actions/workflows/android-debug-apk.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/aura-dialer-/actions/workflows/android-debug-apk.yml) [![Preview release](https://github.com/saurabhsahu20-svg/aura-dialer-/actions/workflows/publish-s-call.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/aura-dialer-/actions/workflows/publish-s-call.yml) [![Photo Studio release](https://github.com/saurabhsahu20-svg/aura-dialer-/actions/workflows/publish-s-call-v11.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/aura-dialer-/actions/workflows/publish-s-call-v11.yml) |
-| [Vision Calculator](https://github.com/saurabhsahu20-svg/vision-calculator) | No GitHub Actions runs configured in this repository. |
+---
 
-## Getting a working APK
+## Our Apps
 
-1. Open the project's **Actions** workflow from the badge or the [Releases page](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases).
-2. Select the **most recent green ✅ run** or a published APK release.
-3. Download its artifact or APK. An artifact ZIP needs extracting before installation.
+| Project | What it does | Source & latest build |
+| :--- | :--- | :--- |
+| **SV Caller Pro** | Personal caller wallpapers, contacts, dialpad and slide calling | [Source](sv-caller-pro/) · [![Call APK](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-sv-caller-pro.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-sv-caller-pro.yml) |
+| **S CALC Pro** | Scientific calculator with a custom branded icon | [Source](vision-scientific-calculator/) · [![Calculator APK](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-vision-scientific-calculator.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-vision-scientific-calculator.yml) |
+| **S VISION Launcher** | Maths and science learning launcher | [Source](science-maths-launcher/) · [![Launcher APK](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-s-vision-launcher.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-s-vision-launcher.yml) |
+| **Maths & Science Keyboard** | STEM-oriented Android keyboard | [Source](vision-maths-science-keyboard/) · [![Keyboard APK](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-vision-maths-science-keyboard.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-vision-maths-science-keyboard.yml) |
+| **Education Live Wallpaper** | Educational Android live wallpapers | [Source](education-live-wallpaper/) · [![Wallpaper APK](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-education-wallpaper.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-education-wallpaper.yml) |
+| **Saurabh Vision Website** | Public website for the app collection | [Source](website/) · [![Website](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/deploy-pages.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/deploy-pages.yml) |
 
-**Important:** A green badge means GitHub successfully completed automated checks; it is not a guarantee that an Android app has been tested on a real phone. Keep the built-in Phone app installed when evaluating experimental dialers. Debug-signed APK updates may require a matching signing certificate.
+## More Projects
 
-### Why old red crosses remain
+| App collection | Build status |
+| :--- | :--- |
+| [**SAUNE VIBE / Vision Walls**](https://github.com/saurabhsahu20-svg/Saurabh-s-vision) | [![SAUNE VIBE](https://github.com/saurabhsahu20-svg/Saurabh-s-vision/actions/workflows/android.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/Saurabh-s-vision/actions/workflows/android.yml) [![Vision Walls](https://github.com/saurabhsahu20-svg/Saurabh-s-vision/actions/workflows/vision-walls-build.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/Saurabh-s-vision/actions/workflows/vision-walls-build.yml) |
+| [**Aura Dialer**](https://github.com/saurabhsahu20-svg/aura-dialer) | [![Aura Dialer](https://github.com/saurabhsahu20-svg/aura-dialer/actions/workflows/build-apk.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/aura-dialer/actions/workflows/build-apk.yml) |
+| [**S call**](https://github.com/saurabhsahu20-svg/aura-dialer-) | [![S call](https://github.com/saurabhsahu20-svg/aura-dialer-/actions/workflows/android-debug-apk.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/aura-dialer-/actions/workflows/android-debug-apk.yml) [![Release preview](https://github.com/saurabhsahu20-svg/aura-dialer-/actions/workflows/publish-s-call.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/aura-dialer-/actions/workflows/publish-s-call.yml) [![Photo Studio preview](https://github.com/saurabhsahu20-svg/aura-dialer-/actions/workflows/publish-s-call-v11.yml/badge.svg?branch=main)](https://github.com/saurabhsahu20-svg/aura-dialer-/actions/workflows/publish-s-call-v11.yml) |
+| [**Vision Calculator**](https://github.com/saurabhsahu20-svg/vision-calculator) | Source repository; no GitHub Actions workflow configured |
 
-GitHub Actions stores each attempt (including old failures and cancelled builds) as an audit trail. A later successful build does **not** rewrite an earlier run. To check current health, look at the latest workflow run or the live status badges above rather than counting historical red crosses.
+## Live Build Status
+
+The badges above show each workflow's **latest** result on `main`. For installable APKs, open a green build or the project's [Releases](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases) page. Download the APK (or extract `app-debug.apk` from a workflow artifact ZIP).
+
+> **Android app testing:** A successful build confirms compilation/automation, not real-device reliability. Keep the built-in Phone app available when testing experimental dialers.
+
+---
+
+<div align="center">
+
+**Designed and built by SAURABH'S VISION™**  
+*Practical apps · Minimal design · Continuous improvement*
+
+</div>
