@@ -1,3 +1,17 @@
+# S CALC Pro 1.7 — Bigger & Clearer Calculator Icon (Beta)
+
+**SAURABH'S VISION™** · Original offline calculator functionality preserved
+
+## What changed
+
+The user's uploaded 4-button blue/green icon with glossy red **S** now replaces the previous 128×128 launcher bitmap. The new 192×192 WebP is tightly framed, with surrounding pale background removed and a dark navy edge so the red S and button symbols are clearer at launcher size. The launcher icon, round icon and in-app header share the **same** new artwork. The header image also increases from 46dp to 56dp.
+
+**Unchanged:** basic calculator, scientific maths functions, unit conversions, history, calculation cache, four soft themes, original optional dark theme, and offline privacy. No new permissions.
+
+The GitHub Actions release uses tag `s-calc-pro-v1.7.0` and file `S_CALC_Pro_v1.7.0_BIG_CLEAR_ICON.apk`; publication depends on passing Java maths/accuracy/layout tests and APK signature checks. Because this is debug signed, an older installed APK may have a different signing key. Do not uninstall before saving any calculation data you need.
+
+---
+
 # S CALC 1.4 — Premium Scientific Calculator for Android
 
 **By SAURABH'S VISION™ — Smart Maths, Simple Learning**
