@@ -523,26 +523,14 @@ public final class MainActivity extends Activity {
         add(face,small,8);
         add(panel,face,0);
 
-        // Premium editorial banner: explanatory design only, not a fake service.
-        LinearLayout hero=new LinearLayout(this);
-        hero.setOrientation(LinearLayout.VERTICAL);
-        hero.setPadding(dp(18),dp(15),dp(18),dp(15));
-        hero.setBackground(gradient(0xff072f83,0xff7e159a,26,0xff8d77fa));
-        hero.setElevation(dp(5));
-        TextView heroTitle=text("✦  FULL SCREEN. FULL PERSONALITY.",15,WHITE,true);
-        add(hero,heroTitle,0);
-        TextView heroDesc=text("Personal caller wallpapers • Six themes • Private on your phone",
-            12,0xffe0e9ff,false);
-        add(hero,heroDesc,5);
-        TextView heroAction=text("CUSTOMIZE CALLER PHOTO  ›",11,0xffb2ffeb,true);
-        heroAction.setPadding(0,dp(10),0,0);
-        add(hero,heroAction,0);
-        hero.setOnClickListener(v->showPhotoOptions(numberInput.getText().toString()));
-        add(panel,hero,13);
+        TextView hint=text("Dial a number • Tap FULL PHOTO to personalize calls",
+            12,0xffb8cbec,false);
+        hint.setGravity(Gravity.CENTER);
+        add(panel,hint,9);
 
         LinearLayout guide=new LinearLayout(this);
         guide.setGravity(Gravity.CENTER);
-        TextView help=text("LONG-PRESS 0 FOR +   •   SECURE ON-DEVICE CALLING",11,MUTED,false);
+        TextView help=text("LONG-PRESS 0 FOR +   •   CALLS STAY ON YOUR PHONE",11,MUTED,false);
         help.setGravity(Gravity.CENTER);
         guide.addView(help);
         add(panel,guide,11);
@@ -588,22 +576,22 @@ public final class MainActivity extends Activity {
         LinearLayout callStack=new LinearLayout(this);
         callStack.setOrientation(LinearLayout.VERTICAL);
         callStack.setGravity(Gravity.CENTER);
-        TextView call=text("☎",32,Color.WHITE,true);
+        TextView call=text("☎︎",33,Color.WHITE,true);
         call.setGravity(Gravity.CENTER);
         call.setBackground(gradient(0xff18f55a,0xff0ba94c,48,0xffa3ffbb));
         call.setElevation(dp(7));
-        callStack.addView(call,new LinearLayout.LayoutParams(dp(83),dp(83)));
+        callStack.addView(call,new LinearLayout.LayoutParams(dp(74),dp(74)));
         TextView callLabel=text("CALL NOW",13,0xff95ffd4,true);
         callLabel.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams labelP=new LinearLayout.LayoutParams(-1,dp(27));
         labelP.topMargin=dp(5);
         callStack.addView(callLabel,labelP);
-        LinearLayout.LayoutParams callP=new LinearLayout.LayoutParams(-1,dp(124));
+        LinearLayout.LayoutParams callP=new LinearLayout.LayoutParams(-1,dp(110));
         callP.topMargin=dp(7);
         panel.addView(callStack,callP);
         call.setContentDescription("Call typed phone number");
         call.setOnClickListener(v->callNumber(numberInput.getText().toString()));
-        TextView foot=text("✧  BEAUTIFUL CALLS. PRIVATE BY DESIGN.  ✧",11,GOLD,true);
+        TextView foot=text("FULL-SCREEN CALLER PHOTO • SLIDE TO ANSWER",11,GOLD,true);
         foot.setGravity(Gravity.CENTER);
         add(panel,foot,0);
         buildDialpadExtras();
@@ -635,31 +623,20 @@ public final class MainActivity extends Activity {
             setup.setOnClickListener(v->showPermissionSetup());
             add(panel,box,10);
         }
-        TextView head=text("✦   CUSTOMIZE YOUR CALLS   ✦",12,0xffd6c4ff,true);
-        head.setGravity(Gravity.CENTER);
-        add(panel,head,18);
-        String[] names={"▧  Caller photos","◈  Themes",
-            "⚙  Permissions","☎  Phone app"};
-        int[] tools={3,4,5,6};
-        for(int row=0;row<2;row++){
-            LinearLayout strip=new LinearLayout(this);
-            for(int col=0;col<2;col++){
-                final int index=row*2+col;
-                TextView tile=text(names[index],13,WHITE,true);
-                tile.setGravity(Gravity.CENTER);
-                tile.setBackground(gradient(index%2==0?0xff153f67:0xff423578,
-                    0xff121b41,23,index%2==0?0xff4489c8:0xffa27ee5));
-                tile.setElevation(dp(3));
-                LinearLayout.LayoutParams tp=new LinearLayout.LayoutParams(0,dp(61),1);
-                tp.setMargins(dp(4),dp(4),dp(4),dp(4));
-                strip.addView(tile,tp);
-                tile.setOnClickListener(v->runQuickTool(tools[index]));
-            }
-            add(panel,strip,4);
-        }
-        TextView footer=text("SV CALLER PRO 3.2   •   SAURABH'S VISION™",11,CYAN,true);
-        footer.setGravity(Gravity.CENTER);
-        add(panel,footer,14);
+        LinearLayout tools=new LinearLayout(this);
+        TextView photo=smallButton("▧  Caller photos");
+        TextView themes=smallButton("◈  Call themes");
+        LinearLayout.LayoutParams left=new LinearLayout.LayoutParams(0,dp(51),1);
+        left.setMargins(dp(4),dp(12),dp(4),dp(6));
+        tools.addView(photo,left);
+        LinearLayout.LayoutParams right=new LinearLayout.LayoutParams(0,dp(51),1);
+        right.setMargins(dp(4),dp(12),dp(4),dp(6));
+        tools.addView(themes,right);
+        photo.setGravity(Gravity.CENTER);
+        themes.setGravity(Gravity.CENTER);
+        photo.setOnClickListener(v->showPhotoOptions(dialText));
+        themes.setOnClickListener(v->showThemes());
+        add(panel,tools,3);
     }
     private void runQuickTool(int action){
         switch(action){
@@ -827,7 +804,7 @@ public final class MainActivity extends Activity {
                 recentsLoading=false;recentCalls.clear();recentCalls.addAll(items);
                 recentDataLoaded=true;
                 lastHistoryLoadAt=System.currentTimeMillis();
-                if(tab==2&&!homeOpen)buildUi();
+                if((tab==2&&!homeOpen)||homeOpen)buildUi();
             });
         },"SVCaller-CallHistory").start();
     }
