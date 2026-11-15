@@ -73,6 +73,7 @@ public final class JobsHubActivity extends Activity {
             GovtAlerts.PREFS,MODE_PRIVATE);
         selectedArea=prefs.getString("job_area","All Chhattisgarh");
         selectedType=prefs.getString("job_type","All");
+        if(GovtAlerts.enabled(this))GovtAlerts.schedule(this);
         build();
     }
     private void build(){
@@ -187,7 +188,8 @@ public final class JobsHubActivity extends Activity {
         List<GovtSources.Source> sources=GovtSources.filter(
             selectedArea,selectedType,query());
         currentCount=sources.size();
-        subtitle.setText(currentCount+" MATCHING OFFICIAL SOURCE"+(currentCount==1?"":"S"));
+        subtitle.setText(currentCount+" OFFICIAL PORTAL"+(currentCount==1?"":"S")+
+            " FOR YOUR SELECTION");
         if(sources.isEmpty()){
             TextView none=label("No matching portal in this curated directory. Try Government Site Search above, or change the city/category.",14,MUTED,false);
             add(list,none,12);
@@ -267,8 +269,13 @@ public final class JobsHubActivity extends Activity {
     }
     private void showAlertSettings(){
         boolean enabled=GovtAlerts.enabled(this);
+        long last=GovtAlerts.prefs(this).getLong("last_check",0L);
+        String lastChecked=last==0L?"Not checked yet":
+            java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.SHORT,
+                java.text.DateFormat.SHORT).format(new java.util.Date(last));
         String details="Your saved region: "+selectedArea+"\n"+
-            "Category: "+selectedType+"\n\n"+
+            "Category: "+selectedType+"\n"+
+            "Last background check: "+lastChecked+"\n\n"+
             "Optional Android background check (approximately daily when the system allows)."+
             " If a watched official page changes, the app can alert you to review it."+
             " Changes are NOT guaranteed to be a new vacancy or an open application."+
