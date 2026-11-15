@@ -116,16 +116,18 @@ jobs:
           assert 'previewCallScreen(' in main
           assert 'showAudioRoutes()' in activity
           assert 'MessageDigest.getInstance("SHA-256")' in (src/'CallerNumberKey.java').read_text()
-          assert "versionName '2.0.0'" in gradle
+          assert "versionName '2.0.1'" in gradle
           assert (p/'app/src/main/res/drawable-nodpi/ic_sv_caller_pro.webp').is_file()
           icon=(p/'app/src/main/res/drawable-nodpi/ic_sv_caller_pro.webp').read_bytes()
-          assert icon[0:4]==b'RIFF' and icon[8:12]==b'WEBP' and len(icon)>5000
+          assert icon[0:4]==b'RIFF' and icon[8:12]==b'WEBP' and len(icon)>2500
+          import hashlib
+          assert hashlib.sha256(icon).hexdigest() == '818019b6a3c36cf7ee00e0b300fbea5741aa65e38f721d79b76ef6088628c9a2'
           assert 'android:icon="@drawable/ic_sv_caller_pro"' in mf
           assert 'android:roundIcon="@drawable/ic_sv_caller_pro"' in mf
           assert 'emblem.setImageResource(R.drawable.ic_sv_caller_pro)' in main
           print('PASS: real default Phone role, full screen in-call photo and controls')
           print('PASS: contact photo picker, permissions, dialpad, recents and local privacy')
-          print('PASS: user-approved neon S Caller icon in launcher, header and no Internet/recording permission')
+          print('PASS: user-approved blue-gold phone icon in launcher, header and no Internet/recording permission')
           PY
 
       - name: Run safe phone dialpad and theme regression tests
@@ -162,13 +164,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml |
             grep -q "android.telecom.InCallService"
           mkdir -p caller-deliverables
-          cp "$apk" caller-deliverables/SV_CALLER_PRO_v2.0.0_BETA.apk
+          cp "$apk" caller-deliverables/SV_CALLER_PRO_v2.0.1_BLUE_GOLD_ICON.apk
           ( cd caller-deliverables && sha256sum *.apk > SHA256SUMS.txt )
 
       - name: Upload debug APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SV_CALLER_PRO_v2_0_0_BETA_APK
+          name: SV_CALLER_PRO_v2_0_1_BLUE_GOLD_ICON_APK
           path: caller-deliverables/*
           retention-days: 90
 
@@ -178,13 +180,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="sv-caller-pro-v2.0.0"
-          apk="caller-deliverables/SV_CALLER_PRO_v2.0.0_BETA.apk"
+          tag="sv-caller-pro-v2.0.1"
+          apk="caller-deliverables/SV_CALLER_PRO_v2.0.1_BLUE_GOLD_ICON.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$apk" caller-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$apk" caller-deliverables/SHA256SUMS.txt \
-              --title "SV Caller Pro 2.0 • Premium Caller Screen" \
-              --notes "SV Caller Pro v2.0 beta by SAURABH'S VISION preserves native Phone role, existing icon, contacts/history/favorites and full-screen caller photos. Adds safe wallpaper preview without a call, six themes, device-supported audio route selection, photo management and +91 matching. CI verifies Java rules and the signed debug APK. OEM calling behavior needs real device testing; keep the original Phone app available." \
+              --title "SV Caller Pro 2.0.1 • Blue-Gold Phone Icon" \
+              --notes "SV Caller Pro v2.0.1 by SAURABH'S VISION preserves native Phone role, new blue-gold phone icon, contacts/history/favorites and full-screen caller photos. Adds safe wallpaper preview without a call, six themes, device-supported audio route selection, photo management and +91 matching. CI verifies Java rules and the signed debug APK. OEM calling behavior needs real device testing; keep the original Phone app available." \
               --latest=false
           fi
