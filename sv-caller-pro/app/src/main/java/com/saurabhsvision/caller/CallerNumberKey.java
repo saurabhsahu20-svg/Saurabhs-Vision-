@@ -12,6 +12,7 @@ public final class CallerNumberKey {
         String clean=phone.replaceAll("[^+0-9]","");
         if(clean.matches("\\+91[0-9]{10}"))return clean.substring(3);
         if(clean.matches("91[0-9]{10}"))return clean.substring(2);
+        if(clean.matches("0091[0-9]{10}"))return clean.substring(4);
         if(clean.matches("0[0-9]{10}"))return clean.substring(1);
         return clean;
     }
