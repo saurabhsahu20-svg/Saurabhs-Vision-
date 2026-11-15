@@ -118,6 +118,12 @@ jobs:
           assert 'showAudioRoutes()' in activity
           assert 'MessageDigest.getInstance("SHA-256")' in (src/'CallerNumberKey.java').read_text()
           assert 'buildHomeDashboard()' in main
+          assert 'screen.setOnApplyWindowInsetsListener(' in main
+          assert 'insets.getSystemWindowInsetBottom()+dp(14)' in main
+          assert 'insertAtCursor(key)' in main
+          assert 'deleteAtCursor()' in main
+          assert 'lastCallTapAt<650L' in main
+          assert 'Math.min(edit.length(),start+value.length())' in main
           assert 'searchHandler.postDelayed(' in main
           assert 'CallerNumberKey.normalized(number)' in main
           assert 'recentFilter==1' in main
@@ -133,7 +139,7 @@ jobs:
           assert 'profileRing.setVisibility(' in activity
           assert 'SVCaller-AsyncPhoto' in activity
           assert 'CACHE_TTL_MS' in photos
-          assert "versionName '3.2.0'" in gradle
+          assert "versionName '3.3.0'" in gradle
           assert (p/'app/src/main/res/drawable-nodpi/ic_sv_caller_pro.webp').is_file()
           icon=(p/'app/src/main/res/drawable-nodpi/ic_sv_caller_pro.webp').read_bytes()
           assert icon[0:4]==b'RIFF' and icon[8:12]==b'WEBP' and len(icon)>2500
@@ -184,13 +190,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml |
             grep -q "android.telecom.InCallService"
           mkdir -p caller-deliverables
-          cp "$apk" caller-deliverables/SV_CALLER_PRO_v3.2.0_SLIDE_CALLING.apk
+          cp "$apk" caller-deliverables/SV_CALLER_PRO_v3.3.0_CLEAN_FAST_UI.apk
           ( cd caller-deliverables && sha256sum *.apk > SHA256SUMS.txt )
 
       - name: Upload debug APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SV_CALLER_PRO_v3_2_0_SLIDE_CALLING_APK
+          name: SV_CALLER_PRO_v3_3_0_CLEAN_FAST_UI_APK
           path: caller-deliverables/*
           retention-days: 90
 
@@ -200,13 +206,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="sv-caller-pro-v3.2.0"
-          apk="caller-deliverables/SV_CALLER_PRO_v3.2.0_SLIDE_CALLING.apk"
+          tag="sv-caller-pro-v3.3.0"
+          apk="caller-deliverables/SV_CALLER_PRO_v3.3.0_CLEAN_FAST_UI.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$apk" caller-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$apk" caller-deliverables/SHA256SUMS.txt \
-              --title "SV Caller Pro 3.2 • Slide Calling & Professional Phone UI" \
-              --notes "SV Caller Pro 3.2 by SAURABH'S VISION. Original midnight-indigo phone UI, full-screen contact photo, tested bidirectional swipe: right to Answer and left to Decline (75% threshold), accessible Answer/Decline tap controls, on-device contact card with SMS handoff, full Settings page, compact dialpad and real recent-call shortcuts. Original blue-gold app icon preserved. No AI spam filtering, call recording or video calling. GitHub CI builds, verifies and signs a debug beta APK; test incoming/outgoing, locked-screen and emergency call behavior on your own phone before treating it as default. Keep original Phone app installed." \
+              --title "SV Caller Pro 3.3 • Clean & Fast Dialer UI" \
+              --notes "SV Caller Pro v3.3 by SAURABH'S VISION is a clean, minimal and responsive update. Raises the bottom navigation above Android gesture controls using actual device window insets plus comfortable spacing, tones down heavy dark-purple gradients and typography, compacts the dialpad and button layout, shortens touch animations, implements cursor-accurate digit insertion and delete, and prevents accidental duplicate call attempts within 650 ms. Preserves existing blue-gold launcher icon, real InCallService, full-screen contact photos and 75%-threshold slide-to-answer/decline controls. This is a debug beta; GitHub build and regression tests do not replace actual phone, locked-screen and OEM testing. Do not rely on it for emergencies. No spam protection or call recording is implemented." \
               --latest=false
           fi
