@@ -1,3 +1,29 @@
+# SV Caller Pro 3.0 — Neon Full-Screen Caller ID (Beta)
+
+**SAURABH'S VISION™** • Android 14 compatible native dialer • blue-and-gold phone launcher icon
+
+## What is new in 3.0
+- Functional premium violet-blue glass home dashboard, quick shortcuts, contacts, favorites and recents.
+- Full-screen contact image on incoming/ongoing call screens where Android permits it, with large red decline and green answer buttons. When a photo is unavailable, a six-theme gradient appears.
+- Contacts and caller wallpaper lookups run off the main screen thread where appropriate, avoiding UI freezes from large photo reads.
+- Small in-memory contact-lookup cache (48 entries maximum, 30-second expiry) to reduce repeated local database queries.
+- Debounced contact search with precomputed searchable names/phone numbers and normalized Indian +91 / 0091 number matching.
+- Call history filters: All, Missed, Incoming, Outgoing; rejected and blocked call types are not incorrectly labelled incoming.
+- Existing real Telecom InCallService, speaker/mute/hold/DTMF controls, photo picker and Android default Phone role retained.
+
+## Build and install
+GitHub Actions creates `SV_CALLER_PRO_v3.0.0_FULL_PHOTO_NEON.apk` in the `sv-caller-pro-v3.0.0` release after successful compilation, signature verification and Java tests.
+
+The APK is a **debug-signed beta**. It may fail to update an APK signed with a different key. Don't uninstall your current dialer before changing the default Phone app back to the system dialer. Uninstalling may erase local app settings and custom wallpaper links.
+
+**Important:** This is a calling UI, not a certified full phone replacement. A successful GitHub build is not proof of reliable calls on all Android 14 devices. Test regular incoming/outgoing calls and locked-screen presentation before choosing it as your default. Keep your system Phone app installed and available for emergency calls. Android may restrict full-screen notifications.
+
+Concept art may include example designs for spam blocking, recording, video calling and advanced SIM switching. **Those features are not implemented and are not claimed in this build.** No internet permission, cloud analytics, call recording or SMS permission is requested.
+
+---
+
+## Earlier release notes
+
 # SV Caller Pro v2.1 — Premium Glass UI Beta
 
 **SAURABH'S VISION™** Android phone app keeps its user-approved blue-and-gold phone icon, Android Phone role and full-screen photo support.
