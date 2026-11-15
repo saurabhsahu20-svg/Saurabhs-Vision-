@@ -113,6 +113,7 @@ public final class MainActivity extends Activity {
         getWindow().setNavigationBarColor(BG);
         store=new BrowserStore(this);
         dictionary=new DictionaryRepository(this);
+        if(GovtAlerts.enabled(this))GovtAlerts.schedule(this);
         tts=new TextToSpeech(this,result->{
             if(result==TextToSpeech.SUCCESS&&tts!=null)tts.setLanguage(Locale.US);
         });
@@ -188,15 +189,15 @@ public final class MainActivity extends Activity {
         bottom=row();
         bottom.setPadding(dp(7),dp(5),dp(7),dp(5));
         bottom.setBackground(card(0xff10223d,0xff254970,24));
-        String[] icons={"‹","›","⌂","▣","Aa"};
-        String[] labels={"Back","Next","Home","Tabs","Dictionary"};
+        String[] icons={"‹","›","⌂","▣","Aa","⚑"};
+        String[] labels={"Back","Next","Home","Tabs","Words","Jobs"};
         Runnable[] actions={this::back,this::forward,this::showHome,this::showTabs,
-            ()->showDictionary("")};
+            ()->showDictionary(""),this::showJobsHub};
         for(int i=0;i<icons.length;i++){
             final int index=i;
             LinearLayout cell=column();
             cell.setGravity(Gravity.CENTER);
-            TextView icon=text(icons[i],25,i==4?MINT:CYAN,true);
+            TextView icon=text(icons[i],23,i==4||i==5?MINT:CYAN,true);
             icon.setGravity(Gravity.CENTER);cell.addView(icon);
             TextView label=text(labels[i],10,MUTED,false);
             label.setGravity(Gravity.CENTER);cell.addView(label);
@@ -253,6 +254,13 @@ public final class MainActivity extends Activity {
         LinearLayout.LayoutParams booksP=new LinearLayout.LayoutParams(0,dp(55),1);
         booksP.leftMargin=dp(10);second.addView(books,booksP);
         add(layout,second,10);
+        LinearLayout jobs=row();
+        TextView careers=pill("⚑  CG Jobs & Exam Notices  →",this::showJobsHub);
+        careers.setTextColor(MINT);
+        careers.setBackground(card(0xff163b4c,0xff3c937e,19));
+        jobs.addView(careers,new LinearLayout.LayoutParams(-1,dp(58)));
+        add(layout,jobs,11);
+        add(layout,text("City-wise official portals • Railway • JEE • Navodaya • Sainik School",12,MUTED,false),7);
         TextView links=text("LEARNING SHORTCUTS",13,MUTED,true);add(layout,links,23);
         String[] labels={"NCERT","Wikipedia","Khan Academy","Google Scholar"};
         String[] urls={"https://ncert.nic.in/","https://www.wikipedia.org/",
@@ -299,7 +307,9 @@ public final class MainActivity extends Activity {
         if(url==null){toast("Enter a valid website or search. Unsafe links are blocked.");return;}
         Uri uri=Uri.parse(url);
         if(focusBlocked(uri)){toast("Study Focus is on. Turn it off to open this site.");return;}
-        if(selected<0||selected>=tabs.size())createTab();
+        if(selected<0||selected>=tabs.size()){
+            if(createTab()==null)return;
+        }
         Tab current=tabs.get(selected);
         attachCurrent();
         current.web.loadUrl(url);
@@ -491,6 +501,7 @@ public final class MainActivity extends Activity {
         new AlertDialog.Builder(this).setTitle(title).setItems(options,
             (d,i)->openAddress(items.get(i).url)).setNegativeButton("Close",null).show();
     }
+    private void showJobsHub(){startActivity(new Intent(this,JobsHubActivity.class));}
     private void showBookmarks(){showList("Bookmarks",store.list("bookmarks"));}
     private void showHistory(){showList("Browsing history",store.list("history"));}
     private void editNote(){
@@ -616,7 +627,8 @@ public final class MainActivity extends Activity {
             "Aa  Define selected word","☷  Reading mode","✎  Study notes",
             "◉  Study Focus","▣  Bookmarks","◷  History","↓  Downloads",
             "⌕  Search engine","▤  Desktop / mobile site","↗  Share page",
-            "⊘  Clear browsing data","ⓘ  About S Browser"};
+            "⊘  Clear browsing data","ⓘ  About S Browser",
+            "⚑  CG Jobs, Railway & Exams"};
         new AlertDialog.Builder(this).setTitle("S Browser tools").setItems(choices,(d,i)->{
             Tab tab=current();
             switch(i){
@@ -653,10 +665,11 @@ public final class MainActivity extends Activity {
                     startActivity(Intent.createChooser(share,"Share page"));break;
                 case 12:clearData();break;
                 case 13:new AlertDialog.Builder(this).setTitle("About S Browser")
-                    .setMessage("S Browser 1.1 Beta • SAURABH'S VISION™\n\n"+
+                    .setMessage("S Browser 1.2 Beta • SAURABH'S VISION™\n\n"+
                     "Android WebView-powered browsing; a curated offline English–Hindi student dictionary, local bookmarks, notes and Study Focus. No ads or analytics.\n\n"+
                     "Study Focus blocks selected top-level websites, not every possible distracting resource. This browser is an early beta and does not yet provide full incognito isolation, automatic spam protection or universal ad blocking.")
                     .setPositiveButton("OK",null).show();break;
+                case 14:showJobsHub();break;
             }
         }).show();
     }

@@ -1,28 +1,25 @@
-# S Browser — Student-First Android Web Browser (1.1 Beta)
+# S Browser 1.2 Beta — Chhattisgarh Jobs & Exams
 
-**by SAURABH'S VISION™** · Android 8.0+ · Optimized for Android 14
+**by SAURABH'S VISION™** · Android 8.0+ · official source-first search
 
 ![S Browser build](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-s-browser.yml/badge.svg?branch=main)
 
-## Real working features
+## New: CG Jobs & Exams Hub
+Open **Jobs** from S Browser's bottom navigation, home dashboard, or tools menu.
 
-- **Browser:** Address/search bar, Google / DuckDuckGo / Bing, HTTPS-first typed domains, native WebView, Back/Forward, progress, up to 8 tabs, tab switcher and restore session.
-- **Student dictionary:** 304 curated English–Hindi terms stored in a UTF-8 TSV asset. Search works **offline**, shows Hindi meanings and English explanations/examples, and provides Android text-to-speech for pronunciation where a voice is installed. Tap **Dictionary** in bottom navigation.
-- **Learning:** NCERT, Khan Academy, Wikipedia and Google Scholar shortcuts; per-page local notes; readable text extraction from accessible pages; optional Study Focus that blocks a small preset of distracting top-level domains. These are actual app features, not placeholder buttons.
-- **Personal browsing:** Local bookmarks/history, find in page, share links, desktop mode, file uploads and downloads through Android DownloadManager.
-- **Security baseline:** SSL certificate errors cancelled (never bypassed), HTTPS used for address-bar domain input, unsafe address schemes blocked, file/content WebView access disabled, mixed content blocked, third-party cookies disabled, Safe Browsing enabled. No JavaScript bridge, analytics, advertising SDK or unnecessary permissions.
+- **City filters:** Raipur, Bhilai (Durg district), Durg, Rajnandgaon, Bilaspur, Dhamtari, Mahasamund, Saraipali (Mahasamund district), Raigarh, plus all 33 Chhattisgarh districts through the district selector.
+- **20 curated official portals:** District recruitment notices, CG Vyapam, CGPSC, CG Medical Education, RRB Bilaspur, UPSC, SSC, National Career Service, JEE Main / JEE Advanced, Navodaya Vidyalaya, Sainik School AISSEE, and NCERT NTSE information.
+- **To-the-point source discovery:** Choose city and category, type a department/post keyword, open the publisher's official notices and PDFs, or run a host-restricted government website search. Search results are **web links**, not independently verified vacancies.
+- **Opt-in change alerts:** Android may periodically check a rotating group of official pages. After an initial baseline, a changed page can trigger a local notification telling the user to check the official site. The alert NEVER claims a vacancy is open; page changes also include corrections, results and archived notices. Check timing depends on Android battery/network constraints.
+- **No fake vacancy dates:** Eligibility, age, category rules, application fees, active status and last dates must be verified from the original official recruitment notice. NTSE is a link to NCERT for programme/status updates, not a claim that registration is currently open.
 
-## APK
-On a successful GitHub Actions run, download **S-Browser-1.1.0-APK** from the run's Artifacts, or get the debug APK from the release **s-browser-v1.1.0-beta**.
+### Privacy and safeguards
+Background checks are **optional**, use direct HTTPS official pages, store small local page fingerprints and do not send user data to our servers. The app requests notification permission only when enabling alerts on newer Android. Alerts are not a guaranteed daily feed: pages can be blocked, change without a new vacancy, or fail to update immediately. No account, location permission, or marketing analytics.
 
-**Android Studio:** Open the `s-browser/` directory. JDK 17, Gradle 8.9, Android SDK 35, Android Gradle Plugin 8.7.3.
+## Existing browser features
+Native Android WebView browsing; Google/DuckDuckGo/Bing search; 8 tabs, bookmarks and history; local study notes, reading mode, and Study Focus. **304 offline English–Hindi dictionary entries**, with definitions and pronunciation where Android supports it. All previous browser features and the S Browser app name/icon remain.
 
-## Limitations
+## Build
+Open `s-browser/` in Android Studio (Java 17, Gradle 8.9, Android SDK 35, AGP 8.7.3), or download a debug-signed APK from the [v1.2 beta release](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases/tag/s-browser-v1.2.0-beta). GitHub Actions compiles and checks signing plus Java tests for official source filtering and city mapping.
 
-This is an early beta that needs device testing. Websites requiring specialized Chromium/Chrome services may not work in Android WebView. Study Focus is only a *top-level website blocklist*, not a comprehensive network filter. This initial release **does not** promise full private/incognito isolation, ad blocking, AI assistance, cloud sync, unrestricted PDF editing or a complete lexical dictionary. The dictionary has 304 locally curated entries and is expandable via `app/src/main/assets/dictionary.tsv`.
-
-Downloads are handled by Android and might have different visibility on Android versions. Browser session restore reloads previous pages and needs internet. Basic local history and notes are stored in app preferences; uninstalling loses them. Test in a non-critical environment before relying on the browser daily. Do not mistake a green CI build for real-world website compatibility.
-
-## Planned next steps
-
-Expandable offline dictionary with subject packs, imported reading lists, better WebView lifecycle handling, battery/performance profiling, and independent accessibility and browser security audit.
+**Beta limitation:** A green CI build does not guarantee all government sites work in Android WebView, or verify their current application deadlines. Browser security and accessibility need real-device testing. Full private/incognito isolation, AI tutoring, scraping every official vacancy into structured cards, and instant verified push notifications are NOT yet implemented.
