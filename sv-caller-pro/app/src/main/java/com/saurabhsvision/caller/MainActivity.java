@@ -399,6 +399,16 @@ public final class MainActivity extends Activity {
     }
     /** Premium home screen; features link only to functions actually implemented. */
     private void buildHomeDashboard(){
+        TextView search=text("⌕    Search contacts or enter a number    ›",15,0xffd5e6ff,false);
+        search.setGravity(Gravity.CENTER_VERTICAL);
+        search.setPadding(dp(18),dp(9),dp(13),dp(9));
+        search.setBackground(gradient(0xff222f56,0xff0d1b37,26,0xff6274a0));
+        LinearLayout.LayoutParams searchP=new LinearLayout.LayoutParams(-1,dp(52));
+        searchP.bottomMargin=dp(14);
+        panel.addView(search,searchP);
+        search.setContentDescription("Open contact search");
+        search.setOnClickListener(v->openTab(1));
+
         LinearLayout hero=new LinearLayout(this);
         hero.setOrientation(LinearLayout.VERTICAL);
         hero.setPadding(dp(20),dp(23),dp(20),dp(21));
@@ -415,6 +425,51 @@ public final class MainActivity extends Activity {
         actionLp.topMargin=dp(18);hero.addView(action,actionLp);
         action.setOnClickListener(v->openTab(0));
         add(panel,hero,9);
+
+        if(defaultDialer()&&granted(Manifest.permission.READ_CALL_LOG)){
+            TextView callTitle=text("RECENT ACTIVITY",13,GOLD,true);
+            add(panel,callTitle,19);
+            if(!recentDataLoaded){
+                if(!recentsLoading)loadRecents();
+            }else if(recentCalls.isEmpty()){
+                TextView empty=text("Your recent calls will appear here",13,MUTED,false);
+                add(panel,empty,6);
+            }else{
+                int shown=0;
+                for(Recent item:recentCalls){
+                    if(shown++>=3)break;
+                    LinearLayout card=new LinearLayout(this);
+                    card.setGravity(Gravity.CENTER_VERTICAL);
+                    card.setPadding(dp(14),dp(9),dp(13),dp(9));
+                    card.setBackground(gradient(0xff202c4b,0xff0c1a34,22,0xff455e86));
+                    TextView avatar=text(item.name.isEmpty()?"?":
+                        item.name.substring(0,1).toUpperCase(Locale.ROOT),
+                        22,WHITE,true);
+                    avatar.setGravity(Gravity.CENTER);
+                    avatar.setBackground(gradient(0xff6633a7,0xff225083,22,0xff996bd1));
+                    card.addView(avatar,new LinearLayout.LayoutParams(dp(45),dp(45)));
+                    LinearLayout words=new LinearLayout(this);
+                    words.setOrientation(LinearLayout.VERTICAL);
+                    words.setPadding(dp(12),0,0,0);
+                    words.addView(text(item.name,15,WHITE,true));
+                    words.addView(text(item.type==CallLog.Calls.MISSED_TYPE?
+                        "Missed call":item.type==CallLog.Calls.OUTGOING_TYPE?
+                        "Outgoing call":"Incoming call",12,MUTED,false));
+                    card.addView(words,new LinearLayout.LayoutParams(0,-2,1));
+                    TextView call=text("☎",24,0xff7df6be,true);
+                    call.setGravity(Gravity.CENTER);
+                    card.addView(call,new LinearLayout.LayoutParams(dp(41),dp(43)));
+                    call.setOnClickListener(v->callNumber(item.number));
+                    card.setOnClickListener(v->{dialText=item.number;openTab(0);});
+                    add(panel,card,5);
+                }
+                TextView all=text("VIEW ALL RECENT CALLS  ›",12,CYAN,true);
+                all.setGravity(Gravity.RIGHT);
+                all.setPadding(dp(10),dp(8),dp(6),dp(6));
+                add(panel,all,2);
+                all.setOnClickListener(v->openTab(2));
+            }
+        }
         add(panel,text("✦  QUICK ACCESS",13,0xffd7bfff,true),19);
         String[][] labels={{"▦","Dialpad","Make a call"},
             {"♙","Contacts","Find a person"},
