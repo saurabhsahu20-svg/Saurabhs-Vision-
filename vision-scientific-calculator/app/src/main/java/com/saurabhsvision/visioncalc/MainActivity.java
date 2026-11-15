@@ -244,7 +244,8 @@ public final class MainActivity extends Activity {
         icon.setImageResource(R.drawable.ic_s_calc_comfort);
         icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
         icon.setContentDescription("S CALC glossy 3D red S calculator app icon");
-        row.addView(icon,new LinearLayout.LayoutParams(dp(46),dp(46)));
+        // Larger in-app S CALC Pro logo; same updated artwork as the launcher icon.
+        row.addView(icon,new LinearLayout.LayoutParams(dp(56),dp(56)));
 
         LinearLayout labels=new LinearLayout(this);
         labels.setPadding(dp(9),0,0,0);
