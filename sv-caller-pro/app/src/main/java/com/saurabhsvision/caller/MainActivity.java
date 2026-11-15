@@ -67,6 +67,7 @@ public final class MainActivity extends Activity {
     private final Handler searchHandler=new Handler(Looper.getMainLooper());
     private Runnable pendingSearch;
     private long lastHistoryLoadAt=0;
+    private int recentFilter=0;
     private String dialText="", photoTarget="",pendingDial="";
     private LinearLayout root,panel;
     private ScrollView scroll;
@@ -79,8 +80,13 @@ public final class MainActivity extends Activity {
     private String permissionSnapshot="";
 
     private static final class Person {
-        final String name,number;
-        Person(String name,String number){this.name=name;this.number=number;}
+        final String name,number,searchName,searchDigits;
+        Person(String name,String number){
+            this.name=name;
+            this.number=number;
+            this.searchName=name==null?"":name.toLowerCase(Locale.ROOT);
+            this.searchDigits=CallerNumberKey.normalized(number).replaceAll("[^0-9]","");
+        }
     }
     private static final class Recent {
         final String number,name;
@@ -130,6 +136,7 @@ public final class MainActivity extends Activity {
             dialText=state.getString("dialText","");
             tab=state.getInt("tab",0);
             homeOpen=state.getBoolean("homeOpen",true);
+            recentFilter=state.getInt("recentFilter",0);
         }
         readDialIntent(getIntent());
         buildUi();
@@ -176,6 +183,7 @@ public final class MainActivity extends Activity {
         state.putString("dialText",dialText);
         state.putInt("tab",tab);
         state.putBoolean("homeOpen",homeOpen);
+        state.putInt("recentFilter",recentFilter);
         super.onSaveInstanceState(state);
     }
     @Override public void onBackPressed(){
@@ -806,15 +814,19 @@ public final class MainActivity extends Activity {
             });
         },"SVCaller-CallHistory").start();
     }
+    private boolean matchesPerson(Person p,String q,String digits){
+        return q.isEmpty() || p.searchName.contains(q) || p.number.contains(q)
+            || (!digits.isEmpty() && p.searchDigits.contains(digits));
+    }
     private void renderContacts(){
         if(panel==null||tab!=1||searchInput==null||!contactDataLoaded)return;
         String q=searchInput.getText().toString().trim().toLowerCase(Locale.ROOT);
+        String digits=q.replaceAll("[^0-9]","");
         // Keep search field in place, rerender only result cards.
         while(panel.getChildCount()>1)panel.removeViewAt(1);
         int count=0;
         for(Person p:contacts){
-            if(!q.isEmpty()&&!p.name.toLowerCase(Locale.ROOT).contains(q)&&
-                !p.number.toLowerCase(Locale.ROOT).contains(q))continue;
+            if(!matchesPerson(p,q,digits))continue;
             showPerson(p,false);
             if(++count>=140)break;
         }
@@ -823,13 +835,13 @@ public final class MainActivity extends Activity {
     private void renderFavorites(){
         if(panel==null||tab!=3||searchInput==null||!contactDataLoaded)return;
         String q=searchInput.getText().toString().trim().toLowerCase(Locale.ROOT);
+        String digits=q.replaceAll("[^0-9]","");
         while(panel.getChildCount()>1)panel.removeViewAt(1);
         Set<String> favorites=prefs.getStringSet("favorite_numbers",new HashSet<String>());
         int count=0;
         for(Person p:contacts){
             if(!favorites.contains(p.number))continue;
-            if(!q.isEmpty()&&!p.name.toLowerCase(Locale.ROOT).contains(q)&&
-                !p.number.toLowerCase(Locale.ROOT).contains(q))continue;
+            if(!matchesPerson(p,q,digits))continue;
             showPerson(p,true);
             if(++count>=140)break;
         }
@@ -839,12 +851,12 @@ public final class MainActivity extends Activity {
         LinearLayout card=new LinearLayout(this);
         card.setGravity(Gravity.CENTER_VERTICAL);
         card.setPadding(dp(12),dp(10),dp(10),dp(10));
-        card.setBackground(gradient(0xff232a50,0xff101a39,24,0xff4a5388));
+        card.setBackground(gradient(0xff242c60,0xff0c1537,24,0xff705db0));
         TextView badge=text(person.name.isEmpty()?"?":
             person.name.substring(0,1).toUpperCase(Locale.ROOT),
             23,GOLD,true);
         badge.setGravity(Gravity.CENTER);
-        badge.setBackground(gradient(0xff6c45c5,0xff2b3185,44,0xffb4a0f4));
+        badge.setBackground(gradient(0xff9c2de8,0xff174bad,44,0xffca93ff));
         card.addView(badge,new LinearLayout.LayoutParams(dp(45),dp(45)));
         LinearLayout info=new LinearLayout(this);
         info.setPadding(dp(11),0,dp(5),0);
