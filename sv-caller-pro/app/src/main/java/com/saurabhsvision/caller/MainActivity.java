@@ -51,8 +51,8 @@ import java.util.Set;
  * as Android's default Dialer. Never sends contacts/call data over Internet.
  */
 public final class MainActivity extends Activity {
-    private static final int NAVY=0xff07152e,CYAN=0xff3ce6ed,WHITE=0xfff7fbff,
-        GOLD=0xffffd772,MUTED=0xffa3bfd6;
+    private static final int NAVY=0xff080b1f,CYAN=0xff79eaf7,WHITE=0xfff7fbff,
+        GOLD=0xffe7cbff,MUTED=0xffa9b8d5;
     private static final int REQUEST_ROLE=301,REQUEST_PHONE=302,
         REQUEST_CONTACTS=303,REQUEST_LOG=304,REQUEST_IMAGE=305,
         REQUEST_NOTIFICATIONS=306;
@@ -88,7 +88,7 @@ public final class MainActivity extends Activity {
         return (int)(v*getResources().getDisplayMetrics().density+.5f);
     }
     private GradientDrawable gradient(int top,int bottom,int radius,int border){
-        GradientDrawable d=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+        GradientDrawable d=new GradientDrawable(GradientDrawable.Orientation.TL_BR,
             new int[]{top,bottom});
         d.setCornerRadius(dp(radius));
         if(border!=0)d.setStroke(dp(1),border);
@@ -171,22 +171,26 @@ public final class MainActivity extends Activity {
         getWindow().setStatusBarColor(NAVY);
         getWindow().setNavigationBarColor(NAVY);
         getWindow().getDecorView().setSystemUiVisibility(0);
+        LinearLayout screen=new LinearLayout(this);
+        screen.setOrientation(LinearLayout.VERTICAL);
+        screen.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
+            new int[]{0xff07091a,0xff111434,0xff080c1e}));
         scroll=new ScrollView(this);
         scroll.setFillViewport(true);
         scroll.setVerticalScrollBarEnabled(false);
-        scroll.setBackgroundColor(NAVY);
+        scroll.setBackgroundColor(Color.TRANSPARENT);
         root=new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setPadding(dp(14),dp(10),dp(14),dp(24));
+        root.setPadding(dp(18),dp(10),dp(18),dp(24));
         scroll.addView(root);
-        setContentView(scroll);
+        screen.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
+        setContentView(screen);
         scroll.setOnApplyWindowInsetsListener((v,insets)->{
-            root.setPadding(dp(14),Math.max(dp(10),insets.getSystemWindowInsetTop()+dp(7)),
-                dp(14),Math.max(dp(24),insets.getSystemWindowInsetBottom()+dp(13)));
+            root.setPadding(dp(18),Math.max(dp(10),insets.getSystemWindowInsetTop()+dp(7)),
+                dp(18),dp(24));
             return insets;
         });
         buildHeader();
-        buildTabs();
         panel=new LinearLayout(this);
         panel.setOrientation(LinearLayout.VERTICAL);
         add(root,panel,13);
@@ -196,6 +200,7 @@ public final class MainActivity extends Activity {
             case 2:buildRecents();break;
             case 3:buildFavorites();break;
         }
+        buildBottomNav(screen);
         permissionSnapshot=permissionsSnapshot();
     }
     private void buildHeader(){
@@ -209,12 +214,12 @@ public final class MainActivity extends Activity {
         LinearLayout names=new LinearLayout(this);
         names.setPadding(dp(10),0,0,0);
         names.setOrientation(LinearLayout.VERTICAL);
-        names.addView(text("SV CALLER PRO  2.0",21,WHITE,true));
-        names.addView(text("by SAURABH'S VISION™",11,CYAN,true));
+        names.addView(text("SV Caller Pro",23,WHITE,true));
+        names.addView(text("by SAURABH'S VISION™  •  PREMIUM 2.1",10,CYAN,true));
         row.addView(names,new LinearLayout.LayoutParams(0,-2,1));
         TextView settings=text("⚙",25,WHITE,true);
         settings.setGravity(Gravity.CENTER);
-        settings.setBackground(gradient(0xff214471,0xff112a4c,13,0xff4da2d6));
+        settings.setBackground(gradient(0xff392a67,0xff191a3d,19,0xff8a66df));
         settings.setContentDescription("Call and theme settings");
         row.addView(settings,new LinearLayout.LayoutParams(dp(45),dp(45)));
         settings.setOnClickListener(v->showSettings());
@@ -227,9 +232,9 @@ public final class MainActivity extends Activity {
         roleIndicator.setGravity(Gravity.CENTER);
         roleIndicator.setPadding(dp(5),dp(9),dp(5),dp(9));
         roleIndicator.setBackground(gradient(
-            defaultDialer()?0xff0a4b46:0xff553b17,
-            defaultDialer()?0xff0b292e:0xff332711,13,
-            defaultDialer()?0xff3acbac:0xff9c7746));
+            defaultDialer()?0xff0e5349:0xff42325b,
+            defaultDialer()?0xff112b3b:0xff211a3c,23,
+            defaultDialer()?0xff43c9a5:0xff8062c2));
         add(root,roleIndicator,13);
         roleIndicator.setOnClickListener(v->showPermissionSetup());
     }
@@ -314,24 +319,35 @@ public final class MainActivity extends Activity {
             catch(Exception ignored){toast("Open Settings → Default Apps → Phone");}
         }
     }
-    private void buildTabs(){
-        LinearLayout row=new LinearLayout(this);
-        row.setPadding(dp(3),dp(4),dp(3),dp(4));
-        row.setBackground(gradient(0xff173a6b,0xff0c2548,17,0xff346a92));
-        for(int i=0;i<TABS.length;i++){
-            int index=i;
-            TextView t=text(TABS[i],i==3?10:11,i==tab?NAVY:MUTED,true);
-            t.setGravity(Gravity.CENTER);
-            t.setSingleLine(true);
-            t.setBackground(gradient(i==tab?CYAN:0xff173658,
-                i==tab?0xff75f4ef:0xff102a4a,12,0));
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(44),1);
-            lp.setMargins(dp(2),0,dp(2),0);
-            row.addView(t,lp);
-            t.setContentDescription("Open "+TABS[i]);
-            t.setOnClickListener(v->{tab=index;buildUi();});
+    /** Thumb-friendly fixed dock; the contacts and dialpad remain scrollable. */
+    private void buildBottomNav(LinearLayout screen){
+        LinearLayout dock=new LinearLayout(this);
+        dock.setGravity(Gravity.CENTER);
+        dock.setPadding(dp(6),dp(6),dp(6),dp(6));
+        dock.setBackground(gradient(0xff1e2247,0xff0c1431,27,0xff4a4d7a));
+        String[] icons={"⌗","♙","◷","★"};
+        String[] names={"Keypad","Contacts","Recents","Favorites"};
+        for(int i=0;i<4;i++){
+            final int index=i;
+            LinearLayout item=new LinearLayout(this);
+            item.setOrientation(LinearLayout.VERTICAL);
+            item.setGravity(Gravity.CENTER);
+            if(i==tab)item.setBackground(gradient(0xff6942c4,0xff343085,22,0xff8774ea));
+            TextView icon=text(icons[i],22,i==tab?WHITE:MUTED,true);
+            icon.setGravity(Gravity.CENTER);
+            item.addView(icon,new LinearLayout.LayoutParams(-1,dp(28)));
+            TextView label=text(names[i],11,i==tab?WHITE:0xffb3bed5,true);
+            label.setGravity(Gravity.CENTER);
+            item.addView(label,new LinearLayout.LayoutParams(-1,dp(22)));
+            LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(0,dp(62),1);
+            size.setMargins(dp(2),0,dp(2),0);
+            dock.addView(item,size);
+            item.setContentDescription("Open "+names[i]);
+            item.setOnClickListener(v->{if(tab!=index){tab=index;buildUi();}});
         }
-        add(root,row,15);
+        LinearLayout.LayoutParams dockP=new LinearLayout.LayoutParams(-1,dp(74));
+        dockP.setMargins(dp(8),dp(2),dp(8),dp(8));
+        screen.addView(dock,dockP);
     }
     private void buildDialpad(){
         LinearLayout face=new LinearLayout(this);
