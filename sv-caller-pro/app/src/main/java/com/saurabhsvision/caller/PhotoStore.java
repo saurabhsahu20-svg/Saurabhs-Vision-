@@ -10,9 +10,6 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.Locale;
 
 /** Phone number lookup and optional full-screen caller photo are local-only. */
 public final class PhotoStore {
@@ -23,34 +20,25 @@ public final class PhotoStore {
     }
     private PhotoStore(){}
 
-    private static String numberKey(String phone){
-        String norm=phone==null?"":phone.replaceAll("[^+0-9]","");
-        try{
-            byte[] digest=MessageDigest.getInstance("SHA-256")
-                .digest(norm.getBytes(StandardCharsets.UTF_8));
-            StringBuilder out=new StringBuilder("photo_");
-            for(int i=0;i<12;i++)out.append(String.format(Locale.ROOT,"%02x",digest[i]));
-            return out.toString();
-        }catch(Exception ex){
-            return "photo_default"; // Safe fallback, no raw numbers in keys.
-        }
-    }
     public static Uri chosenPhoto(Context context,String phone){
         if(TextUtils.isEmpty(phone))return null;
-        String value=context.getSharedPreferences("caller_photos",Context.MODE_PRIVATE)
-            .getString(numberKey(phone),null);
+        android.content.SharedPreferences prefs=context.getSharedPreferences(
+            "caller_photos",Context.MODE_PRIVATE);
+        String value=prefs.getString(CallerNumberKey.key(phone),null);
+        if(value==null)value=prefs.getString(CallerNumberKey.legacyKey(phone),null);
         if(value==null)return null;
         try{return Uri.parse(value);}catch(Exception e){return null;}
     }
     public static void savePhoto(Context context,String phone,Uri uri){
         if(TextUtils.isEmpty(phone)||uri==null)return;
         context.getSharedPreferences("caller_photos",Context.MODE_PRIVATE).edit()
-            .putString(numberKey(phone),uri.toString()).apply();
+            .putString(CallerNumberKey.key(phone),uri.toString()).apply();
     }
     public static void removePhoto(Context context,String phone){
         if(TextUtils.isEmpty(phone))return;
         context.getSharedPreferences("caller_photos",Context.MODE_PRIVATE).edit()
-            .remove(numberKey(phone)).apply();
+            .remove(CallerNumberKey.key(phone))
+            .remove(CallerNumberKey.legacyKey(phone)).apply();
     }
     public static Match resolve(Context context,String phone){
         Uri custom=chosenPhoto(context,phone);
