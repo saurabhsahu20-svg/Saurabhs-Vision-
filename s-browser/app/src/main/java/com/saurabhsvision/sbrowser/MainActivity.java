@@ -545,7 +545,7 @@ public final class MainActivity extends Activity {
     }
     private void showWord(DictionaryEntry entry){
         String body="Hindi: "+entry.hindi+"\n\nMeaning: "+entry.meaning+
-            "\n\nExample: "+entry.example;
+            "\n\n"+entry.example;
         new AlertDialog.Builder(this).setTitle(entry.word).setMessage(body)
             .setPositiveButton("🔊 Pronounce",(d,w)->{
                 if(tts!=null)tts.speak(entry.word,TextToSpeech.QUEUE_FLUSH,null,"dictionary");
@@ -653,7 +653,7 @@ public final class MainActivity extends Activity {
                     startActivity(Intent.createChooser(share,"Share page"));break;
                 case 12:clearData();break;
                 case 13:new AlertDialog.Builder(this).setTitle("About S Browser")
-                    .setMessage("S Browser 0.1 Beta • SAURABH'S VISION™\n\n"+
+                    .setMessage("S Browser 1.1 Beta • SAURABH'S VISION™\n\n"+
                     "Android WebView-powered browsing; a curated offline English–Hindi student dictionary, local bookmarks, notes and Study Focus. No ads or analytics.\n\n"+
                     "Study Focus blocks selected top-level websites, not every possible distracting resource. This browser is an early beta and does not yet provide full incognito isolation, automatic spam protection or universal ad blocking.")
                     .setPositiveButton("OK",null).show();break;
