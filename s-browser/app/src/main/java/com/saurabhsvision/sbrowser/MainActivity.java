@@ -3,535 +3,685 @@ package com.saurabhsvision.sbrowser;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
+import android.speech.tts.TextToSpeech;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
-import android.webkit.PermissionRequest;
 import android.webkit.SslErrorHandler;
 import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.net.http.SslError;
-import android.widget.*;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
+import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/** Native Java browser shell built on the system WebView engine.
- *  Privacy: https-only main-frame URLs, no blanket site permissions,
- *  no third-party cookies, and bounded on-device history/bookmarks.
+/**
+ * S Browser beta: native Android WebView, no ads or analytics.
+ * Offline dictionary and local browsing data. No JavaScript bridges.
  */
 public final class MainActivity extends Activity {
-    private static final int BG=0xff081526, CARD=0xff132b43, CARD2=0xff1b3551,
-        TEXT=0xfff2fbff, MUTED=0xffabc6d7, CYAN=0xff53e1e9, GREEN=0xff77f0c1;
-    private static final int PICK_FILE=4005, MAX_TABS=8;
-    private static final String HISTORY="history", BOOKMARKS="bookmarks";
-    private final ArrayList<Tab> tabs=new ArrayList<>();
-    private final Handler ui=new Handler(Looper.getMainLooper());
-    private LinearLayout container,top,nav;
-    private FrameLayout pageFrame;
-    private EditText address;
-    private ProgressBar progress;
-    private TextView tabBadge;
-    private Tab selected;
-    private boolean home=true;
-    private ValueCallback<Uri[]> uploadCallback;
-    private View videoView;
-    private WebChromeClient.CustomViewCallback videoCallback;
-    private FrameLayout videoOverlay;
-    private String searchEngine="Google";
-    private long lastNavigate=0;
-
+    private static final int BG=0xff071327, PANEL=0xff11233f, EDGE=0xff244d74,
+        WHITE=0xfff4f8ff, MUTED=0xff9cb2ce, CYAN=0xff55e4f4,
+        MINT=0xff72eabb, PURPLE=0xffa993ff;
+    private static final int PICK_FILE=81, MAX_TABS=8;
+    private static final String[] FOCUS_DOMAINS={
+        "instagram.com","tiktok.com","facebook.com","x.com","reddit.com"
+    };
     private static final class Tab {
         WebView web;
-        String url="", title="New tab";
-        Tab(WebView web){this.web=web;}
+        String title="New Tab";
+        String mobileUserAgent="";
+        boolean desktop=false;
     }
+    private final ArrayList<Tab> tabs=new ArrayList<>();
+    private int selected=-1;
+    private boolean home=true;
+    private BrowserStore store;
+    private DictionaryRepository dictionary;
+    private TextToSpeech tts;
+    private LinearLayout root,top,bottom;
+    private FrameLayout contentFrame;
+    private EditText address;
+    private ProgressBar progress;
+    private TextView tabBadge,focusBadge;
+    private ValueCallback<Uri[]> fileCallback;
+    private View fullScreenVideo;
+    private WebChromeClient.CustomViewCallback videoCallback;
+
     private int dp(float n){return Math.round(n*getResources().getDisplayMetrics().density);}
-    private GradientDrawable shape(int color,int radius){
-        GradientDrawable d=new GradientDrawable();d.setColor(color);d.setCornerRadius(dp(radius));return d;
+    private GradientDrawable card(int fill,int stroke,int radius){
+        GradientDrawable d=new GradientDrawable();
+        d.setColor(fill);d.setCornerRadius(dp(radius));
+        if(stroke!=0)d.setStroke(dp(1),stroke);
+        return d;
     }
-    private GradientDrawable gradient(int start,int end,int radius){
-        GradientDrawable d=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{start,end});
-        d.setCornerRadius(dp(radius));return d;
+    private TextView text(String label,int size,int color,boolean medium){
+        TextView v=new TextView(this);
+        v.setText(label);v.setTextSize(size);v.setTextColor(color);
+        v.setTypeface(Typeface.create(medium?"sans-serif-medium":"sans-serif",Typeface.NORMAL));
+        v.setGravity(Gravity.CENTER_VERTICAL);
+        return v;
     }
-    private TextView t(String value,int size,int color,boolean bold){
-        TextView x=new TextView(this);x.setText(value);x.setTextSize(size);x.setTextColor(color);
-        if(bold)x.setTypeface(Typeface.create("sans-serif-medium",Typeface.NORMAL));return x;
+    private LinearLayout column(){LinearLayout v=new LinearLayout(this);v.setOrientation(1);return v;}
+    private LinearLayout row(){LinearLayout v=new LinearLayout(this);v.setOrientation(0);v.setGravity(Gravity.CENTER_VERTICAL);return v;}
+    private void toast(String msg){Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();}
+    private void add(LinearLayout container,View view,int topMargin){
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);
+        p.topMargin=dp(topMargin);container.addView(view,p);
     }
-    private void toast(String message){Toast.makeText(this,message,Toast.LENGTH_SHORT).show();}
-    private void add(LinearLayout layout,View view,int topMargin){
-        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.topMargin=dp(topMargin);layout.addView(view,p);
-    }
-    private TextView button(String text,int color){
-        TextView b=t(text,14,TEXT,true);b.setGravity(Gravity.CENTER);
-        b.setBackground(shape(color,16));b.setPadding(dp(11),dp(11),dp(11),dp(11));
-        return b;
+    private TextView pill(String title,Runnable onClick){
+        TextView t=text(title,14,WHITE,true);
+        t.setGravity(Gravity.CENTER);
+        t.setBackground(card(PANEL,EDGE,17));
+        t.setPadding(dp(12),dp(13),dp(12),dp(13));
+        t.setOnClickListener(v->onClick.run());
+        return t;
     }
     @Override public void onCreate(Bundle state){
         super.onCreate(state);
-        getWindow().setStatusBarColor(BG);getWindow().setNavigationBarColor(BG);
-        searchEngine=BrowserStore.getSetting(this,"search_engine","Google");
-        WebView.setWebContentsDebuggingEnabled(false);
-        makeLayout();
-        if(getIntent()!=null && Intent.ACTION_VIEW.equals(getIntent().getAction())){
-            Uri url=getIntent().getData();
-            if(url!=null)navigate(url.toString());
-        }
+        getWindow().setStatusBarColor(BG);
+        getWindow().setNavigationBarColor(BG);
+        store=new BrowserStore(this);
+        dictionary=new DictionaryRepository(this);
+        tts=new TextToSpeech(this,result->{
+            if(result==TextToSpeech.SUCCESS&&tts!=null)tts.setLanguage(Locale.US);
+        });
+        buildShell();
+        Intent intent=getIntent();
+        if(intent!=null&&Intent.ACTION_VIEW.equals(intent.getAction())&&intent.getData()!=null)
+            openAddress(intent.getData().toString());
+        else showHome();
     }
     @Override protected void onNewIntent(Intent intent){
         super.onNewIntent(intent);setIntent(intent);
-        if(Intent.ACTION_VIEW.equals(intent.getAction())&&intent.getData()!=null)
-            navigate(intent.getData().toString());
+        if(intent!=null&&Intent.ACTION_VIEW.equals(intent.getAction())&&intent.getData()!=null)
+            openAddress(intent.getData().toString());
     }
-    private void makeLayout(){
-        container=new LinearLayout(this);container.setOrientation(LinearLayout.VERTICAL);
-        container.setBackgroundColor(BG);setContentView(container);
-        buildToolbar();
-        progress=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
-        progress.setIndeterminate(false);progress.setMax(100);progress.setProgressTintList(
-            android.content.res.ColorStateList.valueOf(CYAN));
-        container.addView(progress,new LinearLayout.LayoutParams(-1,dp(2)));
-        progress.setVisibility(View.INVISIBLE);
-        pageFrame=new FrameLayout(this);
-        container.addView(pageFrame,new LinearLayout.LayoutParams(-1,0,1));
-        buildNav();
-        container.setOnApplyWindowInsetsListener((v,insets)->{
-            container.setPadding(0,0,0,Math.max(dp(5),insets.getSystemWindowInsetBottom()));
-            return insets;
-        });
-        if(selected==null||home)showHome();else showTab(selected);
-    }
-    private void buildToolbar(){
-        top=new LinearLayout(this);top.setOrientation(LinearLayout.VERTICAL);
-        top.setPadding(dp(14),dp(9),dp(14),dp(12));
-        top.setBackgroundColor(BG);container.addView(top);
-        LinearLayout branding=new LinearLayout(this);branding.setGravity(Gravity.CENTER_VERTICAL);
+    private void buildShell(){
+        root=column();root.setBackgroundColor(BG);
+        root.setPadding(0,0,0,dp(7));
+        setContentView(root);
+        top=column();top.setPadding(dp(15),dp(12),dp(15),dp(8));
+        root.addView(top,new LinearLayout.LayoutParams(-1,-2));
+        LinearLayout header=row();
         ImageView logo=new ImageView(this);
-        logo.setImageResource(R.mipmap.ic_launcher);
+        logo.setImageResource(R.drawable.s_browser_icon);
         logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        logo.setContentDescription("S Browser logo");
-        branding.addView(logo,new LinearLayout.LayoutParams(dp(43),dp(43)));
-        LinearLayout words=new LinearLayout(this);words.setOrientation(LinearLayout.VERTICAL);words.setPadding(dp(9),0,0,0);
-        words.addView(t("S Browser",21,TEXT,true));words.addView(t("by SAURABH'S VISION™",10,CYAN,false));
-        branding.addView(words,new LinearLayout.LayoutParams(0,-2,1));
-        TextView dictionary=button("A↔अ",CARD2);
-        branding.addView(dictionary,new LinearLayout.LayoutParams(dp(61),dp(39)));
-        dictionary.setContentDescription("Open offline dictionary");dictionary.setOnClickListener(v->openDictionary(null));
-        add(top,branding,0);
-        LinearLayout row=new LinearLayout(this);row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(dp(8),0,dp(5),0);row.setBackground(shape(CARD,18));
-        address=new EditText(this);address.setSingleLine(true);address.setTextColor(TEXT);
-        address.setHintTextColor(MUTED);address.setHint("Search or enter website");address.setTextSize(15);
+        header.addView(logo,new LinearLayout.LayoutParams(dp(42),dp(42)));
+        TextView name=text("S Browser",21,WHITE,true);
+        LinearLayout.LayoutParams n=new LinearLayout.LayoutParams(0,-2,1);
+        n.leftMargin=dp(9);header.addView(name,n);
+        focusBadge=text("STUDY",10,store.focusMode()?MINT:MUTED,true);
+        focusBadge.setBackground(card(0xff17354a,0xff326477,13));
+        focusBadge.setPadding(dp(9),dp(9),dp(9),dp(9));
+        header.addView(focusBadge);
+        focusBadge.setOnClickListener(v->toggleFocus());
+        TextView menu=text("⋮",27,WHITE,true);
+        menu.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams mp=new LinearLayout.LayoutParams(dp(42),dp(42));
+        mp.leftMargin=dp(5);header.addView(menu,mp);
+        menu.setOnClickListener(v->showTools());
+        add(top,header,0);
+
+        LinearLayout search=row();
+        search.setBackground(card(PANEL,EDGE,21));
+        search.setPadding(dp(10),dp(4),dp(7),dp(4));
+        TextView lock=text("⌕",25,CYAN,false);lock.setGravity(Gravity.CENTER);
+        search.addView(lock,new LinearLayout.LayoutParams(dp(37),dp(40)));
+        address=new EditText(this);
+        address.setSingleLine(true);
+        address.setTextSize(15);address.setTextColor(WHITE);
+        address.setHintTextColor(MUTED);
+        address.setHint("Search or enter a website");
+        address.setSelectAllOnFocus(true);
         address.setBackgroundColor(Color.TRANSPARENT);
+        address.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_URI);
         address.setImeOptions(EditorInfo.IME_ACTION_GO);
-        address.setSelectAllOnFocus(true);address.setPadding(dp(10),0,dp(4),0);
-        row.addView(address,new LinearLayout.LayoutParams(0,dp(49),1));
-        TextView submit=t("➜",25,CYAN,true);submit.setGravity(Gravity.CENTER);
-        row.addView(submit,new LinearLayout.LayoutParams(dp(43),dp(49)));
-        submit.setContentDescription("Search or navigate");submit.setOnClickListener(v->navigate(address.getText().toString()));
+        search.addView(address,new LinearLayout.LayoutParams(0,dp(44),1));
         address.setOnEditorActionListener((v,id,event)->{
             if(id==EditorInfo.IME_ACTION_GO||id==EditorInfo.IME_ACTION_SEARCH){
-                navigate(address.getText().toString());return true;}
-            return false;
+                openAddress(address.getText().toString());return true;
+            }return false;
         });
-        add(top,row,12);
+        TextView go=text("GO",13,CYAN,true);go.setGravity(Gravity.CENTER);
+        search.addView(go,new LinearLayout.LayoutParams(dp(48),dp(42)));
+        go.setOnClickListener(v->openAddress(address.getText().toString()));
+        add(top,search,7);
+        progress=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
+        progress.setMax(100);progress.setProgress(0);
+        progress.setVisibility(View.GONE);
+        LinearLayout.LayoutParams progressP=new LinearLayout.LayoutParams(-1,dp(3));
+        progressP.topMargin=dp(3);top.addView(progress,progressP);
+        contentFrame=new FrameLayout(this);
+        root.addView(contentFrame,new LinearLayout.LayoutParams(-1,0,1));
+
+        bottom=row();
+        bottom.setPadding(dp(7),dp(5),dp(7),dp(5));
+        bottom.setBackground(card(0xff10223d,0xff254970,24));
+        String[] icons={"‹","›","⌂","▣","Aa"};
+        String[] labels={"Back","Next","Home","Tabs","Dictionary"};
+        Runnable[] actions={this::back,this::forward,this::showHome,this::showTabs,
+            ()->showDictionary("")};
+        for(int i=0;i<icons.length;i++){
+            final int index=i;
+            LinearLayout cell=column();
+            cell.setGravity(Gravity.CENTER);
+            TextView icon=text(icons[i],25,i==4?MINT:CYAN,true);
+            icon.setGravity(Gravity.CENTER);cell.addView(icon);
+            TextView label=text(labels[i],10,MUTED,false);
+            label.setGravity(Gravity.CENTER);cell.addView(label);
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(61),1);
+            bottom.addView(cell,p);
+            cell.setContentDescription(labels[i]);
+            cell.setOnClickListener(v->actions[index].run());
+            if(i==3)tabBadge=label;
+        }
+        LinearLayout.LayoutParams b=new LinearLayout.LayoutParams(-1,dp(72));
+        b.setMargins(dp(12),dp(2),dp(12),dp(7));root.addView(bottom,b);
+        refreshTabBadge();
     }
-    private void buildNav(){
-        nav=new LinearLayout(this);nav.setPadding(dp(8),dp(7),dp(8),dp(6));
-        nav.setGravity(Gravity.CENTER);nav.setBackgroundColor(0xff0b1c30);
-        container.addView(nav,new LinearLayout.LayoutParams(-1,dp(67)));
-        navItem("⌂","Home",()->showHome());
-        navItem("‹","Back",()->goBack());
-        navItem("▣","Tabs",()->showTabs());
-        navItem("A↔अ","Dictionary",()->lookupSelection());
-        navItem("⋯","More",()->showMore());
+    private void refreshTabBadge(){
+        if(tabBadge!=null)tabBadge.setText("Tabs "+tabs.size());
+        if(focusBadge!=null)focusBadge.setText(store.focusMode()?"FOCUS ON":"STUDY");
+        if(focusBadge!=null)focusBadge.setTextColor(store.focusMode()?MINT:MUTED);
     }
-    private void navItem(String icon,String title,Runnable action){
-        LinearLayout item=new LinearLayout(this);item.setOrientation(LinearLayout.VERTICAL);
-        item.setGravity(Gravity.CENTER);item.setContentDescription(title);
-        TextView glyph=t(icon,23,title.equals("Dictionary")?GREEN:CYAN,true);
-        glyph.setGravity(Gravity.CENTER);item.addView(glyph);
-        TextView label=t(title,11,MUTED,false);label.setGravity(Gravity.CENTER);
-        item.addView(label);
-        nav.addView(item,new LinearLayout.LayoutParams(0,-1,1));item.setOnClickListener(v->action.run());
-        if(title.equals("Tabs"))tabBadge=glyph;
-    }
-    private void updateNav(){if(tabBadge!=null)tabBadge.setText("▣"+(tabs.isEmpty()?"":tabs.size()));}
     private void showHome(){
-        home=true;pageFrame.removeAllViews();
-        if(address!=null)address.setText("");
+        home=true;
+        if(contentFrame==null)return;
+        contentFrame.removeAllViews();
+        address.setText("");
+        progress.setVisibility(View.GONE);
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);
-        pageFrame.addView(scroll);
-        LinearLayout body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);
-        body.setPadding(dp(18),dp(24),dp(18),dp(26));scroll.addView(body);
-        LinearLayout hero=new LinearLayout(this);hero.setOrientation(LinearLayout.VERTICAL);
-        hero.setPadding(dp(21),dp(26),dp(21),dp(24));
-        hero.setBackground(gradient(0xff164d79,0xff30245f,28));
-        add(hero,t("Explore. Learn. Discover.",25,TEXT,true),0);
-        add(hero,t("A simpler way to browse and study — built for everyone.",14,0xffd5e9f8,false),12);
-        TextView open=button("Search the web  →",0xff337a9d);
-        add(hero,open,20);open.setOnClickListener(v->{address.requestFocus();
-            ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).showSoftInput(address,InputMethodManager.SHOW_IMPLICIT);});
-        add(body,hero,0);
-        TextView quick=t("YOUR STUDY SHORTCUTS",12,CYAN,true);quick.setPadding(0,dp(7),0,dp(4));
-        add(body,quick,20);
-        String[][] shortcuts={
-            {"📚","Wikipedia","https://www.wikipedia.org"},
-            {"📖","NCERT","https://ncert.nic.in"},
-            {"🎓","Khan Academy","https://www.khanacademy.org"},
-            {"🏫","DIKSHA","https://diksha.gov.in"},
-            {"🔬","Google Scholar","https://scholar.google.com"},
-            {"🌐","Dictionary","dictionary"}
-        };
-        for(int index=0;index<shortcuts.length;index+=2){
-            LinearLayout row=new LinearLayout(this);
-            for(int c=0;c<2;c++){
-                String[] item=shortcuts[index+c];
-                LinearLayout tile=new LinearLayout(this);tile.setOrientation(LinearLayout.VERTICAL);
-                tile.setGravity(Gravity.CENTER);tile.setBackground(shape(CARD,18));
-                tile.setPadding(dp(6),dp(13),dp(6),dp(13));
-                TextView em=t(item[0],23,TEXT,true);em.setGravity(Gravity.CENTER);tile.addView(em);
-                TextView title=t(item[1],14,TEXT,true);title.setGravity(Gravity.CENTER);
-                LinearLayout.LayoutParams tp=new LinearLayout.LayoutParams(-1,-2);tp.topMargin=dp(8);tile.addView(title,tp);
-                LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(95),1);
-                p.setMargins(dp(4),dp(5),dp(4),dp(5));row.addView(tile,p);
-                tile.setContentDescription("Open "+item[1]);
-                tile.setOnClickListener(v->{if(item[2].equals("dictionary"))openDictionary(null);else navigate(item[2]);});
+        contentFrame.addView(scroll);
+        LinearLayout layout=column();
+        layout.setPadding(dp(18),dp(16),dp(18),dp(26));scroll.addView(layout);
+        LinearLayout hero=column();hero.setPadding(dp(20),dp(20),dp(20),dp(19));
+        hero.setBackground(card(0xff21325d,0xff536bad,24));
+        TextView eyebrow=text("LEARN  •  EXPLORE  •  CREATE",12,MINT,true);
+        add(hero,eyebrow,0);
+        add(hero,text("The web, made for your ideas.",25,WHITE,true),10);
+        add(hero,text("Fast browsing with an offline student dictionary and private local notes.",13,0xffd2e1f5,false),10);
+        TextView enter=pill("⌕  Search the web  →",()->{
+            address.requestFocus();
+            ((android.view.inputmethod.InputMethodManager)getSystemService(INPUT_METHOD_SERVICE))
+                .showSoftInput(address,android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
+        });
+        enter.setBackground(card(0xff304a7c,0xff7488c9,17));add(hero,enter,16);
+        add(layout,hero,2);
+        TextView quick=text("STUDY TOOLS",13,MUTED,true);add(layout,quick,22);
+        LinearLayout first=row();
+        TextView dictionaryBtn=pill("Aa  Dictionary",()->showDictionary(""));
+        TextView notes=pill("✎  Quick Notes",this::editNote);
+        first.addView(dictionaryBtn,new LinearLayout.LayoutParams(0,dp(55),1));
+        LinearLayout.LayoutParams noteP=new LinearLayout.LayoutParams(0,dp(55),1);
+        noteP.leftMargin=dp(10);first.addView(notes,noteP);
+        add(layout,first,9);
+        LinearLayout second=row();
+        TextView study=pill(store.focusMode()?"◉  Focus is ON":"◉  Study Focus",this::toggleFocus);
+        TextView books=pill("☆  Bookmarks",this::showBookmarks);
+        second.addView(study,new LinearLayout.LayoutParams(0,dp(55),1));
+        LinearLayout.LayoutParams booksP=new LinearLayout.LayoutParams(0,dp(55),1);
+        booksP.leftMargin=dp(10);second.addView(books,booksP);
+        add(layout,second,10);
+        TextView links=text("LEARNING SHORTCUTS",13,MUTED,true);add(layout,links,23);
+        String[] labels={"NCERT","Wikipedia","Khan Academy","Google Scholar"};
+        String[] urls={"https://ncert.nic.in/","https://www.wikipedia.org/",
+            "https://www.khanacademy.org/","https://scholar.google.com/"};
+        for(int i=0;i<labels.length;i+=2){
+            LinearLayout row=row();
+            for(int j=0;j<2;j++){
+                final int n=i+j;
+                TextView shortcut=pill("↗  "+labels[n],()->openAddress(urls[n]));
+                LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(51),1);
+                if(j==1)p.leftMargin=dp(10);
+                row.addView(shortcut,p);
             }
-            add(body,row,0);
+            add(layout,row,10);
         }
-        TextView offline=t("OFFLINE LEARNING",12,CYAN,true);add(body,offline,20);
-        LinearLayout wordCard=new LinearLayout(this);wordCard.setOrientation(LinearLayout.VERTICAL);
-        wordCard.setBackground(shape(CARD2,22));wordCard.setPadding(dp(18),dp(18),dp(18),dp(20));
-        wordCard.addView(t("Inbuilt Dictionary",19,TEXT,true));
-        add(wordCard,t("260 English words • Hindi meanings • Pronunciation",13,MUTED,false),8);
-        TextView dictionary=button("Open dictionary  →",0xff246e78);
-        add(wordCard,dictionary,15);dictionary.setOnClickListener(v->openDictionary(null));
-        add(body,wordCard,10);
-        String last=BrowserStore.getSetting(this,"last_url","");
-        if(UrlTools.validated(last)!=null){
-            TextView lastTitle=t("RESUME BROWSING",12,CYAN,true);add(body,lastTitle,20);
-            TextView resume=button(last.length()>47?last.substring(0,47)+"…":last,CARD);
-            add(body,resume,7);resume.setOnClickListener(v->navigate(last));
+        List<String> last=store.session();
+        if(!last.isEmpty()){
+            TextView restore=pill("↶  Restore "+last.size()+" previous tabs",()->restoreTabs(last));
+            add(layout,restore,24);
         }
-        TextView footer=t("S Browser  •  Designed by SAURABH'S VISION™",11,MUTED,false);
-        footer.setGravity(Gravity.CENTER);add(body,footer,30);
-        updateNav();
+        add(layout,text("S Browser  •  by SAURABH'S VISION™",11,MUTED,false),25);
+        refreshTabBadge();
     }
-    private void navigate(String raw){
-        String url=UrlTools.resolve(raw,searchEngine);
-        if(url==null){toast("Please enter a valid HTTPS address or search term");return;}
-        long now=android.os.SystemClock.elapsedRealtime();
-        if(now-lastNavigate<180)return;lastNavigate=now;
-        if(address!=null){address.clearFocus();
-            ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(address.getWindowToken(),0);}
-        if(selected==null)selected=newTab();
-        if(selected==null)return;
+    private void restoreTabs(List<String> urls){
+        store.saveSession(new ArrayList<>());
+        for(String url:urls){
+            if(tabs.size()>=MAX_TABS)break;
+            Tab tab=createTab();
+            tab.web.loadUrl(url);
+        }
+        if(!tabs.isEmpty()){selected=tabs.size()-1;attachCurrent();}
+    }
+    private boolean focusBlocked(Uri uri){
+        if(!store.focusMode())return false;
+        String host=uri.getHost();
+        if(host==null)return false;
+        String h=host.toLowerCase(Locale.ROOT);
+        for(String domain:FOCUS_DOMAINS)
+            if(h.equals(domain)||h.endsWith("."+domain))return true;
+        return false;
+    }
+    private void openAddress(String input){
+        String url=AddressResolver.resolve(input,store.searchEngine());
+        if(url==null){toast("Enter a valid website or search. Unsafe links are blocked.");return;}
+        Uri uri=Uri.parse(url);
+        if(focusBlocked(uri)){toast("Study Focus is on. Turn it off to open this site.");return;}
+        if(selected<0||selected>=tabs.size())createTab();
+        Tab current=tabs.get(selected);
+        attachCurrent();
+        current.web.loadUrl(url);
+        address.clearFocus();
+        ((android.view.inputmethod.InputMethodManager)getSystemService(INPUT_METHOD_SERVICE))
+            .hideSoftInputFromWindow(address.getWindowToken(),0);
+    }
+    private Tab createTab(){
+        if(tabs.size()>=MAX_TABS){toast("Maximum 8 tabs. Close one to add another.");return null;}
+        Tab tab=new Tab();
+        tab.web=new WebView(this);
+        tab.mobileUserAgent=tab.web.getSettings().getUserAgentString();
+        configureWebView(tab);
+        tabs.add(tab);selected=tabs.size()-1;
+        refreshTabBadge();
+        return tab;
+    }
+    private void attachCurrent(){
+        if(selected<0||selected>=tabs.size()){showHome();return;}
         home=false;
-        showTab(selected);
-        selected.web.loadUrl(url);
+        contentFrame.removeAllViews();
+        WebView web=tabs.get(selected).web;
+        if(web.getParent() instanceof ViewGroup)((ViewGroup)web.getParent()).removeView(web);
+        contentFrame.addView(web,new FrameLayout.LayoutParams(-1,-1));
+        String url=web.getUrl();
+        address.setText(url!=null&&url.startsWith("http")?url:"");
+        refreshTabBadge();
     }
-    private Tab newTab(){
-        if(tabs.size()>=MAX_TABS){toast("Maximum 8 tabs. Close one to continue.");return null;}
-        WebView web=new WebView(this);WebSettings settings=web.getSettings();
+    private void configureWebView(Tab tab){
+        WebView web=tab.web;
+        web.setBackgroundColor(WHITE);
+        WebSettings settings=web.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
-        settings.setJavaScriptCanOpenWindowsAutomatically(false);
-        settings.setSupportMultipleWindows(false);
         settings.setAllowFileAccess(false);
-        settings.setAllowContentAccess(true);
+        settings.setAllowContentAccess(false);
         settings.setAllowFileAccessFromFileURLs(false);
         settings.setAllowUniversalAccessFromFileURLs(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        settings.setBuiltInZoomControls(true);
+        settings.setDisplayZoomControls(false);
+        settings.setSupportZoom(true);
+        settings.setSupportMultipleWindows(false);
+        settings.setJavaScriptCanOpenWindowsAutomatically(false);
+        settings.setMediaPlaybackRequiresUserGesture(true);
         settings.setSafeBrowsingEnabled(true);
-        settings.setBuiltInZoomControls(true);settings.setDisplayZoomControls(false);
-        settings.setUseWideViewPort(true);settings.setLoadWithOverviewMode(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(web,false);
-        web.setBackgroundColor(Color.WHITE);
-        final Tab tab=new Tab(web);tabs.add(tab);selected=tab;
         web.setWebViewClient(new WebViewClient(){
             @Override public boolean shouldOverrideUrlLoading(WebView view,WebResourceRequest req){
-                if(!req.isForMainFrame())return false;
-                Uri uri=req.getUrl();String scheme=uri.getScheme();
-                if("https".equalsIgnoreCase(scheme))return false;
-                if("http".equalsIgnoreCase(scheme)){
-                    String upgraded=UrlTools.resolve(uri.toString(),searchEngine);
-                    if(upgraded!=null){view.loadUrl(upgraded);return true;}
+                Uri uri=req.getUrl();
+                String scheme=uri.getScheme();
+                if(!"https".equalsIgnoreCase(scheme)&&!"http".equalsIgnoreCase(scheme)){
+                    toast("Only web pages can open in S Browser");return true;
                 }
-                toast("Unsupported or insecure link blocked");return true;
+                if(focusBlocked(uri)){
+                    toast("Site blocked while Study Focus is enabled");return true;
+                }
+                return false;
             }
             @Override public void onReceivedSslError(WebView view,SslErrorHandler handler,SslError error){
-                handler.cancel();toast("Unsafe SSL certificate blocked");
+                handler.cancel();toast("Unsafe certificate: connection blocked");
+            }
+            @Override public void onPageStarted(WebView view,String url,android.graphics.Bitmap icon){
+                if(selected>=0&&selected<tabs.size()&&tabs.get(selected)==tab&&!home){
+                    address.setText(url);progress.setVisibility(View.VISIBLE);
+                }
             }
             @Override public void onPageFinished(WebView view,String url){
-                String verified=UrlTools.validated(url);
-                if(verified==null)return;
-                tab.url=verified;
-                tab.title=view.getTitle()==null?verified:view.getTitle();
-                if(selected==tab&&!home&&address!=null)address.setText(verified);
-                BrowserStore.put(MainActivity.this,HISTORY,tab.title,verified,250);
-                BrowserStore.setSetting(MainActivity.this,"last_url",verified);
-            }
-            @Override public void onReceivedError(WebView view,WebResourceRequest request,WebResourceError error){
-                if(request.isForMainFrame())toast("Page could not load. Check your internet connection.");
+                tab.title=view.getTitle()==null||view.getTitle().isEmpty()?url:view.getTitle();
+                if(url!=null)store.history(url,tab.title);
+                if(selected>=0&&selected<tabs.size()&&tabs.get(selected)==tab&&!home){
+                    address.setText(url);progress.setVisibility(View.GONE);
+                }
             }
         });
         web.setWebChromeClient(new WebChromeClient(){
-            @Override public void onProgressChanged(WebView view,int value){
-                if(selected!=tab||progress==null)return;
-                progress.setVisibility(value>=100?View.INVISIBLE:View.VISIBLE);
-                progress.setProgress(value);
+            @Override public void onProgressChanged(WebView view,int p){
+                if(!home&&selected>=0&&selected<tabs.size()&&tabs.get(selected)==tab){
+                    progress.setProgress(p);
+                    progress.setVisibility(p>=100?View.GONE:View.VISIBLE);
+                }
             }
-            @Override public void onReceivedTitle(WebView view,String title){tab.title=title==null?tab.url:title;}
-            @Override public void onPermissionRequest(PermissionRequest request){request.deny();}
-            @Override public boolean onShowFileChooser(WebView view,ValueCallback<Uri[]> result,
+            @Override public boolean onShowFileChooser(WebView v,ValueCallback<Uri[]> callback,
                 FileChooserParams params){
-                if(uploadCallback!=null)uploadCallback.onReceiveValue(null);
-                uploadCallback=result;
+                if(fileCallback!=null)fileCallback.onReceiveValue(null);
+                fileCallback=callback;
                 try{startActivityForResult(params.createIntent(),PICK_FILE);return true;}
-                catch(Exception e){uploadCallback=null;toast("File picker unavailable");return false;}
+                catch(Exception e){fileCallback=null;toast("File picker unavailable");return false;}
             }
             @Override public void onShowCustomView(View view,CustomViewCallback callback){
-                if(videoView!=null){callback.onCustomViewHidden();return;}
-                videoView=view;videoCallback=callback;
-                videoOverlay=new FrameLayout(MainActivity.this);videoOverlay.setBackgroundColor(Color.BLACK);
-                videoOverlay.addView(view,new FrameLayout.LayoutParams(-1,-1));
-                container.setVisibility(View.GONE);setContentView(videoOverlay);
-                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                if(fullScreenVideo!=null){callback.onCustomViewHidden();return;}
+                fullScreenVideo=view;videoCallback=callback;
+                ((ViewGroup)root.getParent()).addView(view,
+                    new ViewGroup.LayoutParams(-1,-1));
+                top.setVisibility(View.GONE);bottom.setVisibility(View.GONE);
+                root.setVisibility(View.INVISIBLE);
             }
-            @Override public void onHideCustomView(){leaveVideo();}
+            @Override public void onHideCustomView(){hideVideo();}
         });
-        web.setDownloadListener((url,userAgent,contentDisposition,mime,length)->download(url,userAgent,contentDisposition,mime));
-        updateNav();return tab;
+        web.setDownloadListener((url,userAgent,disposition,mimeType,length)->
+            downloadFile(url,mimeType,disposition));
     }
-    private void showTab(Tab tab){
-        if(tab==null)return;
-        home=false;selected=tab;pageFrame.removeAllViews();
-        if(tab.web.getParent()!=null)((ViewGroup)tab.web.getParent()).removeView(tab.web);
-        pageFrame.addView(tab.web,new FrameLayout.LayoutParams(-1,-1));
-        if(address!=null)address.setText(tab.url);
-        updateNav();
+    private void hideVideo(){
+        if(fullScreenVideo==null)return;
+        if(fullScreenVideo.getParent() instanceof ViewGroup)
+            ((ViewGroup)fullScreenVideo.getParent()).removeView(fullScreenVideo);
+        fullScreenVideo=null;
+        root.setVisibility(View.VISIBLE);top.setVisibility(View.VISIBLE);
+        bottom.setVisibility(View.VISIBLE);
+        if(videoCallback!=null){videoCallback.onCustomViewHidden();videoCallback=null;}
     }
-    private void showTabs(){
-        List<String> choices=new ArrayList<>();choices.add("＋  New tab");
-        for(int i=0;i<tabs.size();i++){
-            Tab tab=tabs.get(i);
-            String title=tab.title==null?"New tab":tab.title;
-            choices.add((tab==selected?"● ":"○ ")+(i+1)+". "+
-                (title.length()>32?title.substring(0,32)+"…":title));
+    @Override protected void onActivityResult(int code,int result,Intent data){
+        super.onActivityResult(code,result,data);
+        if(code==PICK_FILE&&fileCallback!=null){
+            Uri[] uris=WebChromeClient.FileChooserParams.parseResult(result,data);
+            fileCallback.onReceiveValue(uris);fileCallback=null;
         }
-        choices.add("✕  Close current tab");
-        new AlertDialog.Builder(this).setTitle("Tabs ("+tabs.size()+" / "+MAX_TABS+")")
-            .setItems(choices.toArray(new String[0]),(dialog,index)->{
-                if(index==0){Tab tab=newTab();if(tab!=null){selected=tab;showHome();}}
-                else if(index==choices.size()-1)closeTab();
-                else {selected=tabs.get(index-1);if(selected.url.isEmpty())showHome();else showTab(selected);}
-            }).setNegativeButton("Cancel",null).show();
     }
-    private void closeTab(){
-        if(selected==null){showHome();return;}
-        Tab dead=selected;int index=tabs.indexOf(dead);
-        if(dead.web.getParent()!=null)((ViewGroup)dead.web.getParent()).removeView(dead.web);
-        dead.web.stopLoading();dead.web.destroy();tabs.remove(dead);
-        if(tabs.isEmpty()){selected=null;showHome();}else{
-            selected=tabs.get(Math.min(index,tabs.size()-1));showTab(selected);}
-        updateNav();
-    }
-    private void goBack(){
-        if(videoView!=null){leaveVideo();return;}
-        if(home){if(selected!=null && !selected.url.isEmpty())showTab(selected);else toast("You're on the homepage");}
-        else if(selected!=null&&selected.web.canGoBack())selected.web.goBack();
+    private Tab current(){return selected>=0&&selected<tabs.size()?tabs.get(selected):null;}
+    private void back(){
+        if(fullScreenVideo!=null){hideVideo();return;}
+        Tab tab=current();
+        if(!home&&tab!=null&&tab.web.canGoBack())tab.web.goBack();
         else showHome();
     }
-    @Override public void onBackPressed(){goBack();}
-    private void showMore(){
-        String[] options={"☆  Bookmark this page","★  Bookmarks","◷  History",
-            "↻  Reload","⌕  Find on page","▣  Desktop site","↗  Share page",
-            "A↔अ  Look up selected word","⚙  Search engine","✕  Clear browsing data","ⓘ  Privacy & About"};
-        new AlertDialog.Builder(this).setTitle("S Browser")
-            .setItems(options,(d,which)->{
-                switch(which){
-                    case 0: bookmark();break;
-                    case 1: listSaved(BOOKMARKS);break;
-                    case 2: listSaved(HISTORY);break;
-                    case 3: if(selected!=null&&!home)selected.web.reload();break;
-                    case 4: findInPage();break;
-                    case 5: toggleDesktop();break;
-                    case 6: sharePage();break;
-                    case 7: lookupSelection();break;
-                    case 8: changeEngine();break;
-                    case 9: clearData();break;
-                    case 10: about();break;
-                }
-            }).setNegativeButton("Close",null).show();
+    private void forward(){
+        Tab tab=current();
+        if(!home&&tab!=null&&tab.web.canGoForward())tab.web.goForward();
+        else if(home&&tab!=null)attachCurrent();
     }
-    private void bookmark(){
-        if(home||selected==null||selected.url.isEmpty()){toast("Open a website first");return;}
-        String url=selected.url;
-        if(BrowserStore.has(this,BOOKMARKS,url)){
-            new AlertDialog.Builder(this).setMessage("Remove this bookmark?")
-                .setPositiveButton("Remove",(d,w)->{BrowserStore.remove(this,BOOKMARKS,url);toast("Bookmark removed");})
-                .setNegativeButton("Cancel",null).show();
-        }else{
-            BrowserStore.put(this,BOOKMARKS,selected.title,url,250);toast("Saved to bookmarks");
+    private void showTabs(){
+        LinearLayout list=column();list.setPadding(dp(13),dp(8),dp(13),dp(8));
+        ScrollView scroll=new ScrollView(this);scroll.addView(list);
+        AlertDialog dialog=new AlertDialog.Builder(this).setTitle("Open tabs ("+tabs.size()+")")
+            .setView(scroll).setPositiveButton("+ New Tab",(d,w)->{
+                if(tabs.size()<MAX_TABS){createTab();showHome();}
+                else toast("Close a tab first.");
+            }).setNegativeButton("Done",null).create();
+        if(tabs.isEmpty())add(list,text("No tabs open yet.",15,MUTED,false),10);
+        for(int i=0;i<tabs.size();i++){
+            final Tab tab=tabs.get(i);
+            LinearLayout entry=row();
+            TextView title=text((i+1)+". "+(tab.title==null?"New Tab":tab.title),
+                14,WHITE,false);
+            title.setSingleLine(true);
+            entry.addView(title,new LinearLayout.LayoutParams(0,dp(59),1));
+            title.setOnClickListener(v->{
+                selected=tabs.indexOf(tab);dialog.dismiss();attachCurrent();
+            });
+            TextView close=pill("✕",()->{
+                closeTab(tab);dialog.dismiss();showTabs();
+            });
+            entry.addView(close,new LinearLayout.LayoutParams(dp(49),dp(48)));
+            add(list,entry,4);
         }
+        dialog.show();
     }
-    private void listSaved(String key){
-        List<BrowserStore.Page> items=BrowserStore.list(this,key);
-        if(items.isEmpty()){toast(key.equals(HISTORY)?"No history yet":"No bookmarks yet");return;}
-        String[] labels=new String[items.size()];
-        for(int i=0;i<items.size();i++){
-            BrowserStore.Page p=items.get(i);
-            labels[i]=(p.title.length()>36?p.title.substring(0,36)+"…":p.title)+"\n"+p.url;
+    private void closeTab(Tab tab){
+        int index=tabs.indexOf(tab);
+        if(index<0)return;
+        tabs.remove(index);
+        if(tab.web.getParent() instanceof ViewGroup)
+            ((ViewGroup)tab.web.getParent()).removeView(tab.web);
+        tab.web.stopLoading();tab.web.destroy();
+        selected=tabs.isEmpty()?-1:Math.min(index,tabs.size()-1);
+        showHome();
+    }
+    private void downloadFile(String url,String mime,String disposition){
+        if(url==null||!(url.startsWith("https://")||url.startsWith("http://"))){
+            toast("Only web downloads are supported");return;
         }
-        new AlertDialog.Builder(this).setTitle(key.equals(HISTORY)?"Browsing history":"Bookmarks")
-            .setItems(labels,(d,position)->navigate(items.get(position).url))
-            .setNeutralButton("Manage",(d,position)->{
-                String[] rowLabels=new String[items.size()];
-                for(int i=0;i<items.size();i++)rowLabels[i]=items.get(i).title;
-                new AlertDialog.Builder(this).setTitle("Tap to remove an entry")
-                    .setItems(rowLabels,(x,i)->{BrowserStore.remove(this,key,items.get(i).url);toast("Entry removed");})
-                    .setNegativeButton("Cancel",null).show();
-            }).setNegativeButton("Close",null).show();
+        try{
+            String filename=URLUtil.guessFileName(url,disposition,mime);
+            DownloadManager.Request request=new DownloadManager.Request(Uri.parse(url));
+            request.setTitle(filename);
+            request.setMimeType(mime==null?"application/octet-stream":mime);
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            if(Build.VERSION.SDK_INT>=29)
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,filename);
+            else request.setDestinationInExternalFilesDir(this,Environment.DIRECTORY_DOWNLOADS,filename);
+            ((DownloadManager)getSystemService(Context.DOWNLOAD_SERVICE)).enqueue(request);
+            toast("Downloading: "+filename);
+        }catch(Exception e){toast("Download could not start");}
+    }
+    private void showList(String title,List<BrowserStore.Site> items){
+        if(items.isEmpty()){toast("Nothing saved yet");return;}
+        String[] options=new String[items.size()];
+        for(int i=0;i<items.size();i++)options[i]=items.get(i).title;
+        new AlertDialog.Builder(this).setTitle(title).setItems(options,
+            (d,i)->openAddress(items.get(i).url)).setNegativeButton("Close",null).show();
+    }
+    private void showBookmarks(){showList("Bookmarks",store.list("bookmarks"));}
+    private void showHistory(){showList("Browsing history",store.list("history"));}
+    private void editNote(){
+        Tab tab=current();
+        String url=tab!=null&&tab.web.getUrl()!=null?tab.web.getUrl():"s-browser-home";
+        EditText editor=new EditText(this);
+        editor.setText(store.note(url));editor.setTextSize(16);
+        editor.setHint("Write your study notes here…");
+        editor.setMinLines(5);
+        editor.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        new AlertDialog.Builder(this).setTitle("Study note • Saved on device")
+            .setView(editor).setNegativeButton("Cancel",null)
+            .setPositiveButton("Save",(d,w)->{store.saveNote(url,editor.getText().toString());
+                toast("Note saved locally");}).show();
+    }
+    private void showDictionary(String initial){
+        final LinearLayout body=column();body.setPadding(dp(14),dp(5),dp(14),dp(12));
+        EditText search=new EditText(this);search.setSingleLine(true);
+        search.setHint("Search an English or Hindi word");
+        search.setTextSize(16);
+        body.addView(search,new LinearLayout.LayoutParams(-1,dp(56)));
+        TextView summary=text(dictionary.size()+" words stored offline • English ↔ Hindi",
+            12,MUTED,false);add(body,summary,2);
+        ScrollView scroll=new ScrollView(this);
+        final LinearLayout results=column();scroll.addView(results);
+        LinearLayout.LayoutParams sp=new LinearLayout.LayoutParams(-1,dp(390));
+        sp.topMargin=dp(8);body.addView(scroll,sp);
+        AlertDialog dialog=new AlertDialog.Builder(this).setTitle("Aa  Student Dictionary")
+            .setView(body).setNegativeButton("Close",null).create();
+        Runnable render=()->{
+            results.removeAllViews();
+            List<DictionaryEntry> matches=dictionary.search(search.getText().toString());
+            if(matches.isEmpty())add(results,text("Not in the offline starter dictionary.",14,MUTED,false),10);
+            for(DictionaryEntry word:matches){
+                LinearLayout item=column();
+                item.setPadding(dp(11),dp(11),dp(11),dp(11));
+                item.setBackground(card(0xff172943,0xff34567f,12));
+                add(item,text(word.word+"   •   "+word.hindi,15,WHITE,true),0);
+                add(item,text(word.meaning,12,MUTED,false),5);
+                add(results,item,5);
+                item.setOnClickListener(v->showWord(word));
+            }
+        };
+        search.addTextChangedListener(new TextWatcher(){
+            public void beforeTextChanged(CharSequence s,int st,int c,int a){}
+            public void onTextChanged(CharSequence s,int st,int before,int count){render.run();}
+            public void afterTextChanged(Editable e){}
+        });
+        search.setText(initial==null?"":initial);
+        render.run();
+        dialog.show();
+    }
+    private void showWord(DictionaryEntry entry){
+        String body="Hindi: "+entry.hindi+"\n\nMeaning: "+entry.meaning+
+            "\n\nExample: "+entry.example;
+        new AlertDialog.Builder(this).setTitle(entry.word).setMessage(body)
+            .setPositiveButton("🔊 Pronounce",(d,w)->{
+                if(tts!=null)tts.speak(entry.word,TextToSpeech.QUEUE_FLUSH,null,"dictionary");
+            }).setNegativeButton("Done",null).show();
+    }
+    private void defineSelected(){
+        Tab tab=current();
+        if(tab==null||home){showDictionary("");return;}
+        tab.web.evaluateJavascript("(function(){return String(window.getSelection()).slice(0,100)})()",value->{
+            try{
+                String chosen=new JSONArray("["+value+"]").getString(0).trim();
+                showDictionary(chosen.split(" ")[0]);
+            }catch(Exception ignored){showDictionary("");}
+        });
+    }
+    private void showReadingMode(){
+        Tab tab=current();
+        if(tab==null||home){toast("Open an article first");return;}
+        tab.web.evaluateJavascript(
+            "(function(){return document.body ? document.body.innerText.slice(0,16000) : ''})()",value->{
+            try{
+                String article=new JSONArray("["+value+"]").getString(0);
+                if(article.isEmpty()){toast("No readable text found");return;}
+                ScrollView scroll=new ScrollView(this);
+                TextView reading=text(article,17,WHITE,false);
+                reading.setTextIsSelectable(true);reading.setPadding(dp(17),dp(17),dp(17),dp(18));
+                reading.setBackgroundColor(0xff13203c);scroll.addView(reading);
+                new AlertDialog.Builder(this).setTitle("Reading mode")
+                    .setView(scroll).setPositiveButton("Close",null).show();
+            }catch(Exception ignored){toast("Reading mode unavailable on this page");}
+        });
+    }
+    private void toggleFocus(){
+        boolean enabled=!store.focusMode();store.setFocusMode(enabled);
+        refreshTabBadge();
+        if(home)showHome();
+        toast(enabled?"Study Focus on: distracting sites paused":"Study Focus off");
     }
     private void changeEngine(){
         String[] engines={"Google","DuckDuckGo","Bing"};
-        int current=java.util.Arrays.asList(engines).indexOf(searchEngine);
-        new AlertDialog.Builder(this).setTitle("Search engine")
-            .setSingleChoiceItems(engines,Math.max(0,current),(d,i)->{
-                searchEngine=engines[i];BrowserStore.setSetting(this,"search_engine",searchEngine);
-                toast("Search engine: "+searchEngine);d.dismiss();
+        String[] values={"google","duckduckgo","bing"};
+        int current=0;
+        for(int i=0;i<values.length;i++)if(values[i].equals(store.searchEngine()))current=i;
+        new AlertDialog.Builder(this).setTitle("Default search engine")
+            .setSingleChoiceItems(engines,current,(d,which)->{
+                store.setSearchEngine(values[which]);d.dismiss();
+                toast("Search engine: "+engines[which]);
             }).setNegativeButton("Cancel",null).show();
-    }
-    private void findInPage(){
-        if(home||selected==null){toast("Open a page first");return;}
-        EditText input=new EditText(this);input.setSingleLine(true);input.setHint("Find text");
-        new AlertDialog.Builder(this).setTitle("Find on page").setView(input)
-            .setPositiveButton("Find",(d,w)->selected.web.findAllAsync(input.getText().toString()))
-            .setNeutralButton("Next",(d,w)->selected.web.findNext(true))
-            .setNegativeButton("Cancel",null).show();
-    }
-    private void toggleDesktop(){
-        if(home||selected==null){toast("Open a page first");return;}
-        WebSettings settings=selected.web.getSettings();boolean old=settings.getUseWideViewPort();
-        boolean desktop= !selected.web.getSettings().getUserAgentString().contains("X11; Linux x86_64");
-        if(desktop)settings.setUserAgentString("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
-        else settings.setUserAgentString(null);
-        settings.setUseWideViewPort(true);selected.web.reload();
-        toast(desktop?"Desktop view on":"Mobile view on");
-    }
-    private void sharePage(){
-        if(home||selected==null||selected.url.isEmpty()){toast("Open a page first");return;}
-        Intent share=new Intent(Intent.ACTION_SEND);share.setType("text/plain");
-        share.putExtra(Intent.EXTRA_TEXT,selected.url);
-        startActivity(Intent.createChooser(share,"Share website"));
-    }
-    private void lookupSelection(){
-        if(home||selected==null){openDictionary(null);return;}
-        selected.web.evaluateJavascript("(function(){try{return String(window.getSelection()).slice(0,80)}catch(e){return ''}})()",raw->{
-            String word="";
-            try{org.json.JSONArray a=new org.json.JSONArray("["+raw+"]");word=a.optString(0,"");}catch(Exception ignored){}
-            String clean=word.trim();
-            openDictionary(clean.isEmpty()?null:clean);
-        });
-    }
-    private void openDictionary(String word){
-        Intent i=new Intent(this,DictionaryActivity.class);
-        if(word!=null)i.putExtra("word",word);
-        startActivity(i);
     }
     private void clearData(){
         new AlertDialog.Builder(this).setTitle("Clear browsing data?")
-            .setMessage("Remove saved browsing history, cookies and cached website data? Bookmarks are kept.")
-            .setPositiveButton("Clear",(d,w)->{
-                BrowserStore.clear(this,HISTORY);BrowserStore.setSetting(this,"last_url","");
-                CookieManager.getInstance().removeAllCookies(null);CookieManager.getInstance().flush();
+            .setMessage("This removes local history, website cookies and stored site data. Saved bookmarks and dictionary remain.")
+            .setNegativeButton("Cancel",null).setPositiveButton("Clear",(d,w)->{
+                store.clearHistory();
+                CookieManager.getInstance().removeAllCookies(null);
+                CookieManager.getInstance().flush();
                 WebStorage.getInstance().deleteAllData();
-                for(Tab tab:tabs){tab.web.clearCache(true);tab.web.clearHistory();}
-                toast("Browsing data cleared");
-            }).setNegativeButton("Cancel",null).show();
+                for(Tab t:tabs)t.web.clearCache(true);
+                toast("Local browsing data cleared");
+            }).show();
     }
-    private void about(){
-        new AlertDialog.Builder(this).setTitle("S Browser 1.0 beta")
-            .setMessage("by SAURABH'S VISION™\n\n"+
-                "A lightweight Android browser with an inbuilt offline 260-word English/Hindi study dictionary.\n\n"+
-                "Privacy defaults: HTTPS-only navigation, Android Safe Browsing, third-party cookies disabled, no analytics, and website camera/microphone access denied.\n\n"+
-                "Limitations: this first version has no AI assistant, full private mode, online translation, browser extensions, sync, or universal ad blocking. Some sites need permissions we intentionally deny.\n\n"+
-                "Website searches and page requests use the internet. Dictionary word lookups work offline.")
-            .setPositiveButton("OK",null).show();
+    private void openDownloads(){
+        try{startActivity(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS));}
+        catch(Exception e){toast("Open your phone's Downloads app");}
     }
-    private void download(String url,String userAgent,String contentDisposition,String mime){
-        String safe=UrlTools.validated(url);
-        if(safe==null){toast("Only HTTPS downloads are supported");return;}
-        try{
-            String filename=URLUtil.guessFileName(url,contentDisposition,mime);
-            filename=filename.replaceAll("[^A-Za-z0-9._()-]","_");
-            DownloadManager.Request request=new DownloadManager.Request(Uri.parse(url));
-            request.setTitle(filename);request.setDescription("S Browser download");
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            if(mime!=null&&!mime.isEmpty())request.setMimeType(mime);
-            if(userAgent!=null)request.addRequestHeader("User-Agent",userAgent);
-            String cookies=CookieManager.getInstance().getCookie(url);
-            if(cookies!=null)request.addRequestHeader("Cookie",cookies);
-            request.setDestinationInExternalFilesDir(this,Environment.DIRECTORY_DOWNLOADS,filename);
-            DownloadManager manager=(DownloadManager)getSystemService(DOWNLOAD_SERVICE);
-            manager.enqueue(request);toast("Download started. Check notifications.");
-        }catch(Exception e){toast("Download failed: unable to save file");}
+    private void showTools(){
+        String[] choices={"☆  Bookmark this page","⌕  Find in page",
+            "Aa  Define selected word","☷  Reading mode","✎  Study notes",
+            "◉  Study Focus","▣  Bookmarks","◷  History","↓  Downloads",
+            "⌕  Search engine","▤  Desktop / mobile site","↗  Share page",
+            "⊘  Clear browsing data","ⓘ  About S Browser"};
+        new AlertDialog.Builder(this).setTitle("S Browser tools").setItems(choices,(d,i)->{
+            Tab tab=current();
+            switch(i){
+                case 0:
+                    if(tab==null||home){toast("Open a website first");return;}
+                    boolean on=store.toggleBookmark(tab.web.getUrl(),tab.title);
+                    toast(on?"Bookmarked":"Bookmark removed");break;
+                case 1:
+                    if(tab==null||home){toast("Open a page first");return;}
+                    EditText q=new EditText(this);q.setSingleLine(true);
+                    new AlertDialog.Builder(this).setTitle("Find in page").setView(q)
+                        .setNegativeButton("Cancel",null)
+                        .setPositiveButton("Find",(x,k)->tab.web.findAllAsync(q.getText().toString()))
+                        .show();break;
+                case 2:defineSelected();break;
+                case 3:showReadingMode();break;
+                case 4:editNote();break;
+                case 5:toggleFocus();break;
+                case 6:showBookmarks();break;
+                case 7:showHistory();break;
+                case 8:openDownloads();break;
+                case 9:changeEngine();break;
+                case 10:
+                    if(tab==null||home){toast("Open a page first");return;}
+                    tab.desktop=!tab.desktop;
+                    tab.web.getSettings().setUserAgentString(tab.desktop?
+                        tab.mobileUserAgent.replace("Mobile",""):
+                        tab.mobileUserAgent);
+                    tab.web.reload();toast(tab.desktop?"Desktop mode":"Mobile mode");break;
+                case 11:
+                    if(tab==null||home){toast("Open a page first");return;}
+                    Intent share=new Intent(Intent.ACTION_SEND);
+                    share.setType("text/plain");share.putExtra(Intent.EXTRA_TEXT,tab.web.getUrl());
+                    startActivity(Intent.createChooser(share,"Share page"));break;
+                case 12:clearData();break;
+                case 13:new AlertDialog.Builder(this).setTitle("About S Browser")
+                    .setMessage("S Browser 0.1 Beta • SAURABH'S VISION™\n\n"+
+                    "Android WebView-powered browsing; a curated offline English–Hindi student dictionary, local bookmarks, notes and Study Focus. No ads or analytics.\n\n"+
+                    "Study Focus blocks selected top-level websites, not every possible distracting resource. This browser is an early beta and does not yet provide full incognito isolation, automatic spam protection or universal ad blocking.")
+                    .setPositiveButton("OK",null).show();break;
+            }
+        }).show();
     }
-    private void leaveVideo(){
-        if(videoView==null)return;
-        if(videoOverlay!=null)videoOverlay.removeAllViews();
-        videoView=null;videoOverlay=null;
-        setContentView(container);container.setVisibility(View.VISIBLE);
-        getWindow().getDecorView().setSystemUiVisibility(0);
-        if(videoCallback!=null){videoCallback.onCustomViewHidden();videoCallback=null;}
+    @Override public void onBackPressed(){
+        if(fullScreenVideo!=null){hideVideo();return;}
+        back();
     }
-    @Override protected void onActivityResult(int request,int result,Intent data){
-        super.onActivityResult(request,result,data);
-        if(request==PICK_FILE && uploadCallback!=null){
-            uploadCallback.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(result,data));
-            uploadCallback=null;
+    @Override protected void onStop(){
+        super.onStop();
+        ArrayList<String> session=new ArrayList<>();
+        for(Tab tab:tabs){
+            String url=tab.web.getUrl();
+            if(url!=null&&url.startsWith("http"))session.add(url);
         }
-    }
-    @Override protected void onPause(){
-        super.onPause();CookieManager.getInstance().flush();
-        for(Tab tab:tabs)tab.web.onPause();
-    }
-    @Override protected void onResume(){
-        super.onResume();for(Tab tab:tabs)tab.web.onResume();
+        store.saveSession(session);
     }
     @Override protected void onDestroy(){
-        if(uploadCallback!=null)uploadCallback.onReceiveValue(null);
-        if(videoView!=null)leaveVideo();
+        if(tts!=null){tts.stop();tts.shutdown();tts=null;}
+        if(fileCallback!=null){fileCallback.onReceiveValue(null);fileCallback=null;}
         for(Tab tab:tabs){
-            if(tab.web.getParent()!=null)((ViewGroup)tab.web.getParent()).removeView(tab.web);
+            if(tab.web.getParent() instanceof ViewGroup)
+                ((ViewGroup)tab.web.getParent()).removeView(tab.web);
             tab.web.stopLoading();tab.web.destroy();
         }
-        tabs.clear();super.onDestroy();
+        tabs.clear();
+        super.onDestroy();
     }
 }
