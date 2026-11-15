@@ -1,4 +1,17 @@
-# SV Caller Pro 1.1 — Full-Screen Caller Wallpaper Phone App
+# SV Caller Pro 2.0 beta — Full-Screen Caller Wallpaper Phone App
+
+## v2.0 beta — Upgrade from v1.2.0
+
+- Preview the real full-screen call wallpaper without placing a phone call.
+- Six caller-screen color themes (adds Midnight Gold and Aurora Blue).
+- Choose audio output during actual calls from Android-provided options: earpiece, speaker, wired headset and Bluetooth.
+- Choose, preview, replace and remove a custom per-number caller wallpaper; built-in contact photos remain.
+- India local +91 and 0 prefix numbers match the same custom-photo mapping, with a v1.x fallback.
+- Keeps original SAURABH'S VISION icon, contacts, call history, favorites, privacy model and Android default Phone role.
+
+**Beta safety:** GitHub builds a debug-signed test APK. Device-specific incoming call and lock-screen operation needs testing. Different debug signing certificates may prevent installing it over an older version; uninstalling erases local app data. Keep your system Phone app installed and available.
+
+
 
 **By SAURABH'S VISION™** — a privacy-conscious, native Android dialer with immersive incoming and ongoing call wallpaper. This is a genuine experimental Android default Phone app, not a static mockup.
 
@@ -56,7 +69,7 @@ This is version 1.0 of a real Android dialer; its compatibility with every phone
 
 ## How to install and test safely
 
-1. Download the APK from the GitHub Release `sv-caller-pro-v1.1.0`, install, open **SV Caller Pro**.
+1. Download the APK from the GitHub Release `sv-caller-pro-v2.0.0`, install, open **SV Caller Pro**.
 2. Explore its dialpad and theme screens before changing your default Phone app.
 3. Select **Set as Default Phone App**, and confirm via **Android's system chooser**. Request Phone, Contacts and Notification access only when the feature needs it.
 4. Grant **Full-screen notifications** permission in the app's Settings if Android requires it.
