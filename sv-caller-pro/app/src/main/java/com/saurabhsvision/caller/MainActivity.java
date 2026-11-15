@@ -898,32 +898,65 @@ public final class MainActivity extends Activity {
     private void renderRecents(){
         if(panel==null||tab!=2||!recentDataLoaded)return;
         panel.removeAllViews();
+        LinearLayout filters=new LinearLayout(this);
+        filters.setGravity(Gravity.CENTER);
+        String[] categories={"ALL","MISSED","INCOMING","OUTGOING"};
+        for(int i=0;i<categories.length;i++){
+            final int selected=i;
+            TextView pill=text(categories[i],11,recentFilter==i?WHITE:MUTED,true);
+            pill.setGravity(Gravity.CENTER);
+            pill.setBackground(gradient(
+                recentFilter==i?0xff9326d8:0xff1b2a4e,
+                recentFilter==i?0xff3a4ab9:0xff101831,22,
+                recentFilter==i?0xffbf87ff:0xff4c5687));
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(44),1);
+            p.setMargins(dp(2),dp(2),dp(2),dp(2));
+            filters.addView(pill,p);
+            pill.setOnClickListener(v->{recentFilter=selected;renderRecents();});
+        }
+        add(panel,filters,2);
         if(recentCalls.isEmpty()){
-            add(panel,text("No call history available on this device.",15,MUTED,false),10);
+            add(panel,text("No call history available on this device.",15,MUTED,false),12);
             return;
         }
+        SimpleDateFormat format=new SimpleDateFormat("d MMM, h:mm a",Locale.getDefault());
+        int visible=0;
         for(Recent item:recentCalls){
+            if(recentFilter==1&&item.type!=CallLog.Calls.MISSED_TYPE)continue;
+            if(recentFilter==2&&item.type!=CallLog.Calls.INCOMING_TYPE)continue;
+            if(recentFilter==3&&item.type!=CallLog.Calls.OUTGOING_TYPE)continue;
             String type=item.type==CallLog.Calls.MISSED_TYPE?"MISSED":
-                item.type==CallLog.Calls.OUTGOING_TYPE?"OUTGOING":"INCOMING";
+                item.type==CallLog.Calls.OUTGOING_TYPE?"OUTGOING":
+                item.type==CallLog.Calls.INCOMING_TYPE?"INCOMING":
+                item.type==CallLog.Calls.REJECTED_TYPE?"REJECTED":
+                item.type==CallLog.Calls.BLOCKED_TYPE?"BLOCKED":"OTHER";
+            int callColor=item.type==CallLog.Calls.MISSED_TYPE?0xffff9bb0:
+                item.type==CallLog.Calls.OUTGOING_TYPE?0xff65eab3:0xffabcbff;
             LinearLayout line=new LinearLayout(this);
             line.setGravity(Gravity.CENTER_VERTICAL);
-            line.setPadding(dp(16),dp(10),dp(11),dp(10));
-            line.setBackground(gradient(0xff252d5a,0xff0e1839,25,0xff6378af));
+            line.setPadding(dp(14),dp(10),dp(11),dp(10));
+            line.setBackground(gradient(0xff292e64,0xff0e1839,25,0xff686bb6));
+            TextView glyph=text(item.type==CallLog.Calls.MISSED_TYPE?"↙":
+                item.type==CallLog.Calls.OUTGOING_TYPE?"↗":"↘",25,callColor,true);
+            glyph.setGravity(Gravity.CENTER);
+            glyph.setBackground(gradient(0xff1b305c,0xff151b3d,22,0xff5b79b3));
+            line.addView(glyph,new LinearLayout.LayoutParams(dp(46),dp(46)));
             LinearLayout names=new LinearLayout(this);
             names.setOrientation(LinearLayout.VERTICAL);
+            names.setPadding(dp(11),0,0,0);
             names.addView(text(item.name,16,WHITE,true));
-            names.addView(text(type+"  •  "+new SimpleDateFormat(
-                "d MMM, h:mm a",Locale.getDefault()).format(new Date(item.date))+
-                "  •  "+item.duration+"s",11,
-                item.type==CallLog.Calls.MISSED_TYPE?0xffffa7aa:MUTED,false));
+            names.addView(text(type+"  •  "+format.format(new Date(item.date))+
+                "  •  "+item.duration+"s",11,callColor,false));
             line.addView(names,new LinearLayout.LayoutParams(0,-2,1));
             TextView dial=smallButton("☎");
             dial.setGravity(Gravity.CENTER);
-            line.addView(dial,new LinearLayout.LayoutParams(dp(51),dp(45)));
+            line.addView(dial,new LinearLayout.LayoutParams(dp(49),dp(43)));
             dial.setOnClickListener(v->callNumber(item.number));
             line.setOnClickListener(v->{dialText=item.number;tab=0;buildUi();});
             add(panel,line,7);
+            visible++;
         }
+        if(visible==0)add(panel,text("No calls in this category.",14,MUTED,false),14);
     }
     private void toggleFavorite(String number){
         Set<String> items=new HashSet<>(prefs.getStringSet(
