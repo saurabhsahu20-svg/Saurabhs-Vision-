@@ -1,6 +1,7 @@
 package com.saurabhsvision.caller;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /** Genuine Telecom call UI. Available after SV Caller is chosen as Phone app.
  * Caller photo fills the ENTIRE screen and is never restricted to an avatar.
@@ -49,6 +51,7 @@ public final class InCallActivity extends Activity {
     private BroadcastReceiver receiver;
     private volatile boolean active=true;
     private boolean receiverAttached=false;
+    private boolean previewOnly=false;
 
     private int dp(float value){
         return (int)(value*getResources().getDisplayMetrics().density+.5f);
@@ -81,6 +84,7 @@ public final class InCallActivity extends Activity {
             WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         getWindow().setNavigationBarColor(0xff071225);
+        previewOnly=getIntent()!=null&&getIntent().getBooleanExtra("previewOnly",false);
         build();
     }
     @Override protected void onStart(){
@@ -109,13 +113,17 @@ public final class InCallActivity extends Activity {
     @Override protected void onNewIntent(Intent intent){
         super.onNewIntent(intent);
         setIntent(intent);
-        refresh();
+        boolean wasPreview=previewOnly;
+        previewOnly=intent!=null&&intent.getBooleanExtra("previewOnly",false);
+        if(wasPreview!=previewOnly)build();
+        else refresh();
     }
     @Override public void onConfigurationChanged(Configuration config){
         super.onConfigurationChanged(config);
         build();
     }
     @Override public void onBackPressed(){
+        if(previewOnly){finish();return;}
         // Back leaves the call running, not disconnected.
         moveTaskToBack(true);
     }
@@ -125,10 +133,12 @@ public final class InCallActivity extends Activity {
             {0xff0e2656,0xff09172e,0xff230949},
             {0xff382070,0xff0b194a,0xff25073e},
             {0xff82404c,0xff311a37,0xff120d2d},
-            {0xff065d57,0xff0a3447,0xff0a172b}
+            {0xff065d57,0xff0a3447,0xff0a172b},
+            {0xff8d6c2e,0xff2d2844,0xff090d1e},
+            {0xff0577ac,0xff352e8e,0xff070c28}
         };
-        int choice=Math.max(0,Math.min(3,
-            getSharedPreferences("caller_settings",MODE_PRIVATE).getInt("theme",0)));
+        int choice=DialerRules.theme(
+            getSharedPreferences("caller_settings",MODE_PRIVATE).getInt("theme",0));
         frame.setBackground(new GradientDrawable(
             GradientDrawable.Orientation.TL_BR,palettes[choice]));
         photoView=new ImageView(this);
@@ -204,7 +214,15 @@ public final class InCallActivity extends Activity {
         previousState=-123;
         displayedNumber="";
         loadedPhoto="";
-        refresh();
+        if(previewOnly){
+            stateView.setText("CALLER SCREEN PREVIEW");
+            String number=getIntent().getStringExtra("previewNumber");
+            updatePhoto(number==null?"":number);
+            timeView.setText("Preview only • no active call");
+            actionPanel.removeAllViews();
+            buttonRow(new String[]{"✕  CLOSE PREVIEW"},
+                new Runnable[]{this::finish},new int[]{0xff184b76});
+        }else refresh();
     }
     private TextView action(String title,int top,int bottom,int outline){
         TextView t=text(title,16,WHITE,true);
@@ -257,6 +275,8 @@ public final class InCallActivity extends Activity {
             },new int[]{0xff184b76,0xff184b76,0xff184b76});
         boolean canHold=call.getDetails()!=null && call.getDetails().can(
             Details.CAPABILITY_HOLD);
+        buttonRow(new String[]{"◉  CHOOSE AUDIO OUTPUT"},
+            new Runnable[]{this::showAudioRoutes},new int[]{0xff184b76});
         if(canHold||held){
             buttonRow(new String[]{held?"RESUME":"HOLD","✕  END CALL"},
                 new Runnable[]{
@@ -267,6 +287,36 @@ public final class InCallActivity extends Activity {
             buttonRow(new String[]{"✕  END CALL"},
                 new Runnable[]{SVInCallService::end},new int[]{0xffe32943});
         }
+    }
+    /** Show only audio routes that Android Telecom reports as available. */
+    private void showAudioRoutes(){
+        SVInCallService service=SVInCallService.activeService();
+        CallAudioState state=service==null?null:service.getCallAudioState();
+        if(state==null){
+            Toast.makeText(this,"Audio routes not available",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        int mask=state.getSupportedRouteMask();
+        java.util.ArrayList<String> labels=new java.util.ArrayList<>();
+        java.util.ArrayList<Integer> routes=new java.util.ArrayList<>();
+        int[] ids={CallAudioState.ROUTE_EARPIECE,
+            CallAudioState.ROUTE_SPEAKER,CallAudioState.ROUTE_WIRED_HEADSET,
+            CallAudioState.ROUTE_BLUETOOTH};
+        String[] names={"Phone earpiece","Speaker","Wired headset","Bluetooth"};
+        for(int j=0;j<ids.length;j++){
+            if((mask&ids[j])==0)continue;
+            labels.add((state.getRoute()==ids[j]?"✓  ":"     ")+names[j]);
+            routes.add(ids[j]);
+        }
+        if(routes.isEmpty()){
+            Toast.makeText(this,"No selectable audio routes",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        new AlertDialog.Builder(this).setTitle("Choose call audio output")
+            .setItems(labels.toArray(new String[0]),(dialog,which)->{
+                SVInCallService svc=SVInCallService.activeService();
+                if(svc!=null){svc.setAudioRoute(routes.get(which));refreshControls();}
+            }).setNegativeButton("Cancel",null).show();
     }
     private void refreshControls(){
         Call call=SVInCallService.activeCall();
@@ -324,7 +374,7 @@ public final class InCallActivity extends Activity {
         },"SVCaller-ContactPhoto").start();
     }
     private void refresh(){
-        if(actionPanel==null)return;
+        if(previewOnly||actionPanel==null)return;
         Call call=SVInCallService.activeCall();
         if(call==null){
             missedTicks++;
