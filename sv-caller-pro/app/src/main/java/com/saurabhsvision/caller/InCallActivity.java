@@ -18,6 +18,8 @@ import android.telecom.Call;
 import android.telecom.CallAudioState;
 import android.telecom.Call.Details;
 import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -56,6 +58,7 @@ public final class InCallActivity extends Activity {
     private volatile boolean active=true;
     private boolean receiverAttached=false;
     private boolean previewOnly=false;
+    private boolean slideActionSent=false;
 
     private int dp(float value){
         return (int)(value*getResources().getDisplayMetrics().density+.5f);
@@ -172,7 +175,7 @@ public final class InCallActivity extends Activity {
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(21),dp(21),dp(21),dp(26));
         scroll.addView(content);
-        TextView logo=text("✦   SV CALLER PRO   •   SAURABH'S VISION™",12,
+        TextView logo=text("SV CALLER PRO   •   PRIVATE PHONE",12,
             0xfff0e7ff,true);
         logo.setLetterSpacing(.06f);
         logo.setPadding(dp(8),dp(9),dp(8),dp(9));
@@ -212,7 +215,7 @@ public final class InCallActivity extends Activity {
         stateLp.topMargin=dp(16);
         content.addView(stateView,stateLp);
 
-        nameView=text("Unknown caller",35,WHITE,true);
+        nameView=text("Unknown caller",33,WHITE,true);
         nameView.setShadowLayer(dp(2),0,dp(2),0xbf000000);
         nameView.setMaxLines(2);
         nameView.setEllipsize(android.text.TextUtils.TruncateAt.END);
@@ -285,7 +288,7 @@ public final class InCallActivity extends Activity {
             View.VISIBLE:View.GONE);
         wallpaperTint.setBackground(new GradientDrawable(
             GradientDrawable.Orientation.TOP_BOTTOM,
-            incoming?new int[]{0xe009101b,0x2703070e,0x46090a1f,0xf2070b1c}:
+            incoming?new int[]{0xe10b1823,0x26030710,0x3009111c,0xfb08111b}:
                 new int[]{0x990a0d23,0x80311959,0xcc090d25,0xfc070b1c}));
     }
     private TextView action(String title,int top,int bottom,int outline){
@@ -413,37 +416,103 @@ public final class InCallActivity extends Activity {
         actionPanel.addView(endStack,new LinearLayout.LayoutParams(-1,-2));
     }
     /** Large, clearly labelled answer/decline controls over the caller photo. */
+    /**
+     * Original two-direction slide control: slide RIGHT to answer or LEFT to
+     * decline. Telecom is invoked ONLY after the threshold is reached on up.
+     * Separate tap buttons below remain accessible to TalkBack users.
+     */
     private void buildIncomingButtons(){
-        LinearLayout row=new LinearLayout(this);
-        row.setGravity(Gravity.CENTER);
-        String[] icons={"✕","☎"};
-        String[] labels={"DECLINE","ANSWER"};
-        int[][] colors={{0xfffb3155,0xffad1237},{0xff00e56d,0xff069a55}};
-        Runnable[] actions={SVInCallService::decline,SVInCallService::answer};
-        for(int i=0;i<2;i++){
-            final int index=i;
-            LinearLayout stack=new LinearLayout(this);
-            stack.setGravity(Gravity.CENTER);
-            stack.setOrientation(LinearLayout.VERTICAL);
-            TextView orb=action(icons[i],colors[i][0],colors[i][1],0xffe7f5ff);
-            orb.setTextSize(32);
-            orb.setElevation(dp(7));
-            stack.addView(orb,new LinearLayout.LayoutParams(dp(82),dp(82)));
-            TextView label=text(labels[i],14,WHITE,true);
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(29));
-            lp.topMargin=dp(8);stack.addView(label,lp);
-            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(124),1);
-            p.setMargins(dp(5),0,dp(5),0);
-            row.addView(stack,p);
-            stack.setContentDescription(labels[i]+" phone call");
-            orb.setOnClickListener(v->actions[index].run());
-            stack.setOnClickListener(v->actions[index].run());
-        }
-        actionPanel.addView(row,new LinearLayout.LayoutParams(-1,-2));
-        TextView hint=text("TAP GREEN TO ANSWER  •  RED TO DECLINE",11,
-            0xffdaebff,false);
-        actionPanel.addView(hint,new LinearLayout.LayoutParams(-1,dp(28)));
+        slideActionSent=false;
+        TextView guide=text("SLIDE TO ANSWER OR DECLINE",12,0xffedf4ff,true);
+        guide.setLetterSpacing(.06f);
+        actionPanel.addView(guide,new LinearLayout.LayoutParams(-1,dp(30)));
+
+        final FrameLayout track=new FrameLayout(this);
+        track.setBackground(fill(0xb30e213d,0xe91b1c3a,40,0xa06f92c6));
+        final TextView left=text("✕  DECLINE",12,0xffff9faa,true);
+        final TextView right=text("ANSWER  ☎",12,0xffb4ffda,true);
+        FrameLayout.LayoutParams leftP=new FrameLayout.LayoutParams(
+            dp(112),-1,Gravity.LEFT|Gravity.CENTER_VERTICAL);
+        leftP.leftMargin=dp(12);
+        track.addView(left,leftP);
+        FrameLayout.LayoutParams rightP=new FrameLayout.LayoutParams(
+            dp(112),-1,Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        rightP.rightMargin=dp(12);
+        track.addView(right,rightP);
+
+        final TextView thumb=action("⇆",0xff8d52dc,0xff32238b,0xffc7acff);
+        thumb.setTextSize(28);
+        thumb.setGravity(Gravity.CENTER);
+        thumb.setElevation(dp(8));
+        FrameLayout.LayoutParams thumbP=new FrameLayout.LayoutParams(
+            dp(66),dp(66),Gravity.CENTER);
+        track.addView(thumb,thumbP);
+        track.setContentDescription(
+            "Swipe right to answer or left to decline. Tap action buttons below as an alternative.");
+
+        final float[] startX={0f};
+        final float[] progress={0f};
+        View.OnTouchListener sliderListener=(view,event)->{
+            if(slideActionSent)return true;
+            int action=event.getActionMasked();
+            if(action==MotionEvent.ACTION_DOWN){
+                startX[0]=event.getRawX();
+                progress[0]=0f;
+                thumb.animate().cancel();
+                return true;
+            }
+            if(action==MotionEvent.ACTION_MOVE||action==MotionEvent.ACTION_UP){
+                float maxDistance=Math.max(1f,
+                    (track.getWidth()-thumb.getWidth())/2f-dp(9));
+                float offset=Math.max(-maxDistance,
+                    Math.min(maxDistance,event.getRawX()-startX[0]));
+                progress[0]=offset/maxDistance;
+                thumb.setTranslationX(offset);
+                if(action==MotionEvent.ACTION_UP){
+                    boolean ringing=SVInCallService.activeCall()!=null &&
+                        SVInCallService.activeCall().getState()==Call.STATE_RINGING;
+                    if(ringing&&Math.abs(progress[0])>=.75f){
+                        slideActionSent=true;
+                        track.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                        if(progress[0]>0f)SVInCallService.answer();
+                        else SVInCallService.decline();
+                    }else{
+                        thumb.animate().translationX(0f).setDuration(170).start();
+                    }
+                }
+                return true;
+            }
+            if(action==MotionEvent.ACTION_CANCEL){
+                thumb.animate().translationX(0f).setDuration(170).start();
+                return true;
+            }
+            return true;
+        };
+        track.setOnTouchListener(sliderListener);
+        thumb.setOnTouchListener(sliderListener);
+        LinearLayout.LayoutParams trackParams=new LinearLayout.LayoutParams(-1,dp(82));
+        trackParams.setMargins(dp(3),dp(4),dp(3),dp(12));
+        actionPanel.addView(track,trackParams);
+
+        // Alternative accessible actions: these are real call controls,
+        // not a simulated swipe animation.
+        LinearLayout options=new LinearLayout(this);
+        options.setGravity(Gravity.CENTER);
+        TextView decline=action("✕  DECLINE",0xff873348,0xff4f1833,0xffdb667c);
+        TextView answer=action("☎  ANSWER",0xff167d55,0xff0a533d,0xff63d8a0);
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(49),1);
+        p.setMargins(dp(4),0,dp(4),0);
+        options.addView(decline,p);
+        LinearLayout.LayoutParams p2=new LinearLayout.LayoutParams(0,dp(49),1);
+        p2.setMargins(dp(4),0,dp(4),0);
+        options.addView(answer,p2);
+        decline.setOnClickListener(v->{if(!slideActionSent){slideActionSent=true;
+            SVInCallService.decline();}});
+        answer.setOnClickListener(v->{if(!slideActionSent){slideActionSent=true;
+            SVInCallService.answer();}});
+        actionPanel.addView(options,new LinearLayout.LayoutParams(-1,-2));
     }
+
     /** Show only audio routes that Android Telecom reports as available. */
     private void showAudioRoutes(){
         SVInCallService service=SVInCallService.activeService();
