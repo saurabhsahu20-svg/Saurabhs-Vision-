@@ -116,7 +116,7 @@ jobs:
           assert 'previewCallScreen(' in main
           assert 'showAudioRoutes()' in activity
           assert 'MessageDigest.getInstance("SHA-256")' in (src/'CallerNumberKey.java').read_text()
-          assert "versionName '2.1.0'" in gradle
+          assert "versionName '2.2.0'" in gradle
           assert (p/'app/src/main/res/drawable-nodpi/ic_sv_caller_pro.webp').is_file()
           icon=(p/'app/src/main/res/drawable-nodpi/ic_sv_caller_pro.webp').read_bytes()
           assert icon[0:4]==b'RIFF' and icon[8:12]==b'WEBP' and len(icon)>2500
@@ -164,13 +164,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml |
             grep -q "android.telecom.InCallService"
           mkdir -p caller-deliverables
-          cp "$apk" caller-deliverables/SV_CALLER_PRO_v2.1.0_PREMIUM_UI.apk
+          cp "$apk" caller-deliverables/SV_CALLER_PRO_v2.2.0_GLASS_UI.apk
           ( cd caller-deliverables && sha256sum *.apk > SHA256SUMS.txt )
 
       - name: Upload debug APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SV_CALLER_PRO_v2_1_0_PREMIUM_UI_APK
+          name: SV_CALLER_PRO_v2_2_0_GLASS_UI_APK
           path: caller-deliverables/*
           retention-days: 90
 
@@ -180,13 +180,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="sv-caller-pro-v2.1.0"
-          apk="caller-deliverables/SV_CALLER_PRO_v2.1.0_PREMIUM_UI.apk"
+          tag="sv-caller-pro-v2.2.0"
+          apk="caller-deliverables/SV_CALLER_PRO_v2.2.0_GLASS_UI.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$apk" caller-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$apk" caller-deliverables/SHA256SUMS.txt \
-              --title "SV Caller Pro 2.1 • Premium Glass Interface" \
-              --notes "SV Caller Pro v2.1 Premium Glass UI preserves the blue-gold phone icon, native Phone role and full-screen caller photos. Adds a purple-blue gradient, circular animated keypad, bottom navigation, glass contact cards and refreshed in-call controls. Offline, no ads. CI builds a debug-signed APK; real-device testing required. Keep the built-in Phone app available." \
+              --title "SV Caller Pro 2.2 • Violet & Cyan Glass UI" \
+              --notes "SV Caller Pro v2.2 Violet-Cyan Premium UI preserves the blue-gold phone icon, native Phone role and full-screen caller photos. Adds a purple-blue gradient, circular animated keypad, bottom navigation, glass contact cards and refreshed in-call controls. Offline, no ads. CI builds a debug-signed APK; real-device testing required. Keep the built-in Phone app available." \
               --latest=false
           fi
