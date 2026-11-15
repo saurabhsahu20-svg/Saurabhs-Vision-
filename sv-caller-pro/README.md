@@ -1,3 +1,20 @@
+# SV Caller Pro 3.2 — Original Premium Slide Calling (Beta)
+
+**By SAURABH'S VISION™** · Android native default-dialer candidate · offline design
+
+## What's new
+- **Swipe right to answer** and **swipe left to decline** on real incoming calls. The gesture requires a 75% drag distance to prevent unintentional actions; separate tap buttons are provided for accessibility.
+- Original midnight-blue/purple calling design (inspired by references but not copied), full-screen contact photo with readable gradient and active-call circular profile.
+- Dedicated Settings page with real permission, themes, full-screen alert and calling controls. Unsupported call recording, AI spam blocking, video calling or SIM switching are not represented as working capabilities.
+- Dedicated contact details: on-device photo, call, messaging-app handoff, favorites and caller wallpaper preview.
+- More compact dialpad, working contact search and real recent-call preview on the home screen.
+- Pure Java unit tests verify right/left swipe threshold behavior.
+
+## Installation and safety
+GitHub Actions publishes `SV_CALLER_PRO_v3.2.0_SLIDE_CALLING.apk` as a debug-signed APK. A build success **does not prove real-world calling works on your device**. Test incoming/outgoing SIM calls and lock-screen behavior with another device before relying on it. Keep the original Phone app installed and available for emergencies. Full-screen notifications are controlled by Android and your device manufacturer. If an older version used another signing key, an in-place install may fail; uninstalling erases app-local data.
+
+## Older versions
+
 # SV Caller Pro 3.1 — Professional Full-Screen Call UI (Beta)
 
 **SAURABH'S VISION™** • Android 14 native phone app • user-selected blue-gold phone icon
