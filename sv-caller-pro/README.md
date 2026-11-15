@@ -1,3 +1,23 @@
+# SV Caller Pro 3.1 — Professional Full-Screen Call UI (Beta)
+
+**SAURABH'S VISION™** • Android 14 native phone app • user-selected blue-gold phone icon
+
+### Design upgrade over v3.0
+- Incoming caller photo fills the entire display with a translucent top/bottom contrast gradient.
+- Clear caller name and number, high-visibility large red Decline and green Answer controls.
+- Active call interface uses a circular caller portrait with a gradient ring, readable time/status and clean spaced controls.
+- Real Telecom-backed Mute/Unmute, keypad, speaker/earpiece (when available), Hold/Resume, output selection and End Call buttons. No placeholder features.
+- Contact resolution and bitmap decode still run off the UI thread. Same cached, offline contact lookup and accurate local call-history filters.
+
+### Limits and safe testing
+GitHub Actions produces a debug-signed `SV_CALLER_PRO_v3.1.0_PROFESSIONAL_CALL_UI.apk` in a separate `sv-caller-pro-v3.1.0` release. The build must pass Android compilation, unit tests, package and APK signature validation.
+
+**This is a beta**. Successful compilation does not prove that phone calls, Bluetooth, locked-screen notifications or full-screen incoming UI behave correctly on a particular device. Keep your original Phone app installed and available for emergencies. Test using normal calls with another phone before setting SV Caller Pro as default.
+
+The promotional image is a concept only: Verified caller badge, message reminder, video calling, call recording, AI spam identification and automated SIM selection are NOT implemented in this version.
+
+---
+
 # SV Caller Pro 3.0 — Neon Full-Screen Caller ID (Beta)
 
 **SAURABH'S VISION™** • Android 14 compatible native dialer • blue-and-gold phone launcher icon
