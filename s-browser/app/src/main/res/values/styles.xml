@@ -1,11 +1,9 @@
 <resources>
-  <style name="SBrowserTheme" parent="android:style/Theme.Material.Light.NoActionBar">
-    <item name="android:fontFamily">sans</item>
-    <item name="android:colorAccent">#37D9EE</item>
-    <item name="android:statusBarColor">#091429</item>
-    <item name="android:navigationBarColor">#091429</item>
-    <item name="android:windowLightStatusBar">false</item>
-    <item name="android:windowActionModeOverlay">true</item>
-  </style>
-  <color name="icon_bg">#07152F</color>
+    <style name="SBrowserTheme" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#45DBF5</item>
+        <item name="android:statusBarColor">#071327</item>
+        <item name="android:navigationBarColor">#071327</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
 </resources>
