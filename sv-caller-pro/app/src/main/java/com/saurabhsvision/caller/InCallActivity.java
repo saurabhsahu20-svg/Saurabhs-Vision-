@@ -91,6 +91,11 @@ public final class InCallActivity extends Activity {
     @Override protected void onStart(){
         super.onStart();
         active=true;
+        if(loadedPhoto.isEmpty()&&photoView!=null){
+            String number=previewOnly?getIntent().getStringExtra("previewNumber"):
+                displayedNumber;
+            if(number!=null&&!number.isEmpty())updatePhoto(number);
+        }
         receiver=new BroadcastReceiver(){
             @Override public void onReceive(Context ctx,Intent intent){refresh();}
         };
@@ -104,6 +109,7 @@ public final class InCallActivity extends Activity {
     }
     @Override protected void onStop(){
         active=false;
+        loadedPhoto="";
         handler.removeCallbacks(everySecond);
         if(receiverAttached&&receiver!=null){
             unregisterReceiver(receiver);
@@ -393,28 +399,33 @@ public final class InCallActivity extends Activity {
             default:return "PHONE CALL";
         }
     }
+    /**
+     * Read contacts AND decode photos off the UI thread. Resolving a provider
+     * synchronously can otherwise freeze the call screen on slower phones.
+     */
     private void updatePhoto(String number){
-        PhotoStore.Match contact=PhotoStore.resolve(this,number);
-        nameView.setText(contact.name);
-        numberView.setText(contact.name.equals(number)?"":number);
-        Uri photo=contact.photo;
-        String key=photo==null?"":photo.toString();
-        if(loadedPhoto.equals(key))return;
-        loadedPhoto=key;
+        final String target=number==null?"":number;
+        if(target.equals(loadedPhoto))return;
+        loadedPhoto=target;
         photoView.setImageDrawable(null);
         avatarView.setVisibility(View.VISIBLE);
-        if(photo==null)return;
+        nameView.setText(target.isEmpty()?"Unknown caller":target);
+        numberView.setText("");
+        final Context application=getApplicationContext();
         new Thread(()->{
-            android.graphics.Bitmap bitmap=PhotoStore.loadScaled(
-                getApplicationContext(),photo,1600);
+            PhotoStore.Match contact=PhotoStore.resolve(application,target);
+            android.graphics.Bitmap image=PhotoStore.loadScaled(
+                application,contact.photo,1440);
             runOnUiThread(()->{
-                if(!active||!key.equals(loadedPhoto)||photoView==null)return;
-                if(bitmap!=null){
-                    photoView.setImageBitmap(bitmap);
+                if(!active||!target.equals(loadedPhoto)||photoView==null)return;
+                nameView.setText(contact.name);
+                numberView.setText(contact.name.equals(target)?"":target);
+                if(image!=null){
+                    photoView.setImageBitmap(image);
                     avatarView.setVisibility(View.GONE);
                 }
             });
-        },"SVCaller-ContactPhoto").start();
+        },"SVCaller-AsyncPhoto").start();
     }
     private void refresh(){
         if(previewOnly||actionPanel==null)return;
