@@ -61,8 +61,8 @@ public final class DailyAssemblyContentTest {
             originalSpeeches.add(s.title);
             crosswordLayouts.add(String.join(",",c.rows));
         }
-        check(originalThoughts.size()>=21,"21 unique thoughts");
-        check(originalSpeeches.size()>=14,"14 short speeches");
+        check(originalThoughts.size()==31,"31 unique daily thoughts");
+        check(originalSpeeches.size()==31,"31 unique short speeches");
         check(crosswordLayouts.size()>=3,"3 crossword layouts");
         System.out.println("PASS daily assembly thoughts, speeches, horoscope "+
             "entertainment and playable crossword/puzzles");

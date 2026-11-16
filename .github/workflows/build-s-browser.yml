@@ -54,6 +54,8 @@ jobs:
           javac -encoding UTF-8 -cp "$dir" -d "$dir"             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/DailyAssemblyContent.java             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/DailyNewsSources.java             s-browser/tests/DailyAssemblyContentTest.java             s-browser/tests/DailyNewsSourcesTest.java
           java -ea -cp "$dir" DailyAssemblyContentTest
           java -ea -cp "$dir" DailyNewsSourcesTest
+          javac -encoding UTF-8 -cp "$dir" -d "$dir"             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/NewsQualityGate.java             s-browser/tests/NewsQualityGateTest.java
+          java -ea -cp "$dir" NewsQualityGateTest
           python3 - <<'PY'
           from pathlib import Path
           dictionary=Path('s-browser/app/src/main/assets/dictionary.tsv')
@@ -85,13 +87,13 @@ jobs:
           test -s "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
           mkdir -p dist
-          cp "$APK" dist/S_Browser_v1.4.0_Daily_Assembly_Fun_Beta.apk
+          cp "$APK" dist/S_Browser_v1.5.0_Accuracy_First_Daily_Beta.apk
 
       - name: Upload installable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S-Browser-1.4.0-APK
-          path: dist/S_Browser_v1.4.0_Daily_Assembly_Fun_Beta.apk
+          name: S-Browser-1.5.0-APK
+          path: dist/S_Browser_v1.5.0_Accuracy_First_Daily_Beta.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -103,13 +105,13 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          TAG="s-browser-v1.4.0-beta"
-          FILE="dist/S_Browser_v1.4.0_Daily_Assembly_Fun_Beta.apk"
+          TAG="s-browser-v1.5.0-beta"
+          FILE="dist/S_Browser_v1.5.0_Accuracy_First_Daily_Beta.apk"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$FILE" --clobber
           else
             gh release create "$TAG" "$FILE" \
-              --title "S Browser 1.4 Beta — Daily Assembly & Fun" \
-              --notes "S Browser 1.4 introduces a dedicated point-wise Daily Assembly and Fun section for students: original rotating thought of the day, 14 short bilingual school speeches with Android text-to-speech, daily ready-to-read assembly script, attributed live Sports and Breaking/Latest news using date-filtered Google News RSS (24h/3d, Hindi/English, India/CG), optional zodiac-themed positive reflections clearly labeled entertainment (not scientific predictions), 3 playable 4x4 word-square crossword boards and 14 word scrambles with riddles, hints and answer checks. 21 thoughts, 304-term offline dictionary, earlier CG city news, government jobs/exams and browser features preserved. No fake headlines, verified breaking claims, unsubstantiated astrology predictions, tracking or ads. This is a debug beta: build checks cannot replace real-device browser tests or guarantee a live feed is always available." \
+              --title "S Browser 1.5 Beta — Accuracy First Daily Assembly" \
+              --notes "S Browser 1.5 by SAURABHS VISION: 31 unique original daily Hindi-English thoughts and 31 short daily school assembly speeches now rotate with the calendar date, including return-from-background date refresh. General News and Sports News load on demand from a time-limited third-party news feed with strict selection of established HTTPS publisher domains, genuine source publication date, six concise news headlines, Read original article and Compare other sources links. If no credible dated story is available, nothing is invented. Trusted source selection does NOT independently fact-check the claims. Existing 304-entry offline dictionary, CG city news, Jobs/Exams, games, crosswords and S logo remain. Debug beta requires real-device news availability and accuracy review before presenting school facts." \
               --prerelease
           fi
