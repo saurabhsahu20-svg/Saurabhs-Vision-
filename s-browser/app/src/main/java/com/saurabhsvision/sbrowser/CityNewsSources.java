@@ -47,11 +47,12 @@ public final class CityNewsSources {
         if(chosen.isEmpty())return null;
         int window=days==1?1:days==3?3:7;
         String query;
+        String region=hindi?"छत्तीसगढ़":"Chhattisgarh";
         if(STATE.equals(chosen)) {
-            query="छत्तीसगढ़ समाचार when:"+window+"d";
+            query=region+" news when:"+window+"d";
         } else {
-            // Region qualifier reduces same-named places from other states.
-            query="\""+chosen+"\" \"छत्तीसगढ़\" when:"+window+"d";
+            // State qualifier reduces same-named places from other regions.
+            query="\""+chosen+"\" \""+region+"\" when:"+window+"d";
         }
         String code=hindi?"hi":"en-IN";
         return "https://news.google.com/rss/search?q="+
