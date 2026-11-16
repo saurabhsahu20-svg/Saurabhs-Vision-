@@ -1,35 +1,33 @@
-# S Browser 1.4 Beta — Daily Assembly & Fun
+# S Browser 1.5 Beta — Accuracy First Daily Assembly
 
-**SAURABH'S VISION™** · Android 8+ · Student-centered browser
+**SAURABH'S VISION™** · Android 8+ · News accuracy, fresh daily school content
 
 ![S Browser build](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/actions/workflows/build-s-browser.yml/badge.svg?branch=main)
 
-## New: Daily Assembly & Fun (7 point-wise activities)
-Open the prominent **Daily Assembly & Fun** tile on the browser homepage, or the Browser Tools menu.
+## Improvements in v1.5
 
-1. **Thought of the Day:** 21 original bilingual Hindi/English reflections. Day-based rotation; copy or share with class.
-2. **School Assembly Speech:** 14 short, prepared Hindi/English school speeches. Copy, share and optional device Text-to-Speech listen button (voice availability depends on Android).
-3. **Sports News:** On-demand sports publisher headlines (Chhattisgarh or India), last 24h or last 3 days, in Hindi/English with publisher and publication time. Requires internet.
-4. **Breaking & Latest News:** Separately loaded current-affairs headlines with publisher/date and link. Headline appearance does not establish that the story is a verified breaking event. Do not read unverified news aloud without checking the article.
-5. **Astrology & Reflection:** Choose any of 12 traditional zodiac signs to see a gentle daily positive suggestion. **Just for entertainment—not evidence-based predictions, life guidance or scientific facts.** Does not ask for birthdays, birth location or other private details.
-6. **Mini Crossword:** 3 rotating playable 4×4 word-square crosswords (rows and columns form words), clue lists, answer check, one-letter hints, clear and local saved progress.
-7. **Puzzle Games:** 14 rotating word scrambles plus short riddles, answer checks, hints and optional extra practice. Works offline.
+**Daily Thought of the Day** — 31 original short thoughts in Hindi and English. The selected thought changes with the phone's local date and is automatically refreshed when the app returns to the foreground after midnight. These are written as original positive educational material, **not quotes falsely attributed to public figures**.
 
-**Bonus: Ready-to-read Assembly Script** brings a short greeting, today's thought, today's speech and a riddle into a point-wise Hindi/English script that can be copied or shared. Live news is deliberately not inserted as supposedly verified facts.
+**Daily Speech** — 31 distinct, concise Hindi–English school assembly speeches on timeless educational topics: reading, honesty, science, digital literacy, sportsmanship, fact-checking, kindness, nature and more. Speakers can copy, share or use Android text-to-speech. New content rotates daily; the prepared 31-item set repeats after 31 days. No AI-generated current-event claims or invented facts.
 
-**Daily rotation:** Based on the phone's local calendar date. All prepared thought, speech and puzzle content is original and stored within the app. No sign-in, ads or additional personal-data permissions needed.
+**General News & Sports News** — refreshed from the network each time their section is opened or Refresh is tapped. 24-hour / 3-day selection, Chhattisgarh/India and Hindi/English filters. Headlines are only shown if the item carries a real publication timestamp in the selected window and a source URL on an allowlist of established HTTPS publishers. Approved domains include `newsonair.gov.in`, `pib.gov.in`, `thehindu.com`, `indianexpress.com`, `reuters.com`, `bbc.com`, `espncricinfo.com`, `olympics.com`, and other reputable reporting outlets in the source.
 
-## News accuracy & availability
-Sports and current-affairs news use third-party Google News RSS searches when the user opens each news section. Each headline is sourced from an identified publisher and carries its actual RSS date. Outdated items outside the selected window are omitted. S Browser **cannot independently fact-check headlines, verify breaking claims or guarantee fresh news for every topic**. Connectivity, source policies and feed availability may affect results. Always open the article and verify sensitive claims before presenting them in a school assembly.
+**To-the-point format** — at most 6 dated, source-attributed headlines per news category. Each card includes: actual publisher, date/time supplied in its feed, link to read the story and link to compare other reports. Official shortcuts to PIB and News On AIR. Unavailable, outdated or unapproved stories are **not replaced with guesses**.
 
-## Previous Features
-- CG City News: Chhattisgarh's 33 districts, other cities and custom localities, publisher/date filtering.
-- CG Jobs & Exams: 20 government/education sources including CGPSC, CG Vyapam, RRB, IIT-JEE, JNVST and AISSEE; optional webpage-change notices.
-- Native browser tabs, downloads, bookmarks, local history/notes, reading mode, Study Focus.
-- 304-word offline English–Hindi study dictionary with pronunciation where available.
-- App name **S Browser**, user-chosen neon S icon and original branding preserved.
+### Factual-accuracy limits
 
-## Build & Beta Testing
-Open `s-browser/` in Android Studio, JDK 17, Gradle 8.9, Android SDK 35, or download the debug-signed APK from [v1.4 beta release](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases/tag/s-browser-v1.4.0-beta). Automated Java tests cover content rotation, valid puzzle answers, news query URL safety, city directory and offline dictionary data. CI also builds the Android APK and verifies its signature.
+A reliable publisher name alone does **not** prove a headline is correct. News feeds may contain errors or editorial changes, and no third-party news app can guarantee that every article is true or cover every developing event instantly. The app does not claim independent fact-checking, and the compare-sources link opens another search for human review. Before speaking a news claim at assembly, check the full article, its date and (for important claims) corroboration or primary official records. If there is no qualifying recent article or no internet, the app explicitly displays that state.
 
-This is an experimental beta. A green build does not prove all websites, news links or speech voices work on real phones. Test with another Android device before relying on it for a class assembly. The live RSS feature may require review of third-party service conditions before commercial deployment.
+Prepared speeches and thoughts are original age-appropriate writing; they are **not** presented as newly reported news. Android's device clock and network access affect refresh timing.
+
+## Existing S Browser features
+
+Daily Assembly & Fun, short speeches, zodiac entertainment-only reflections, offline puzzles/crosswords, 304-word English–Hindi dictionary, CG City News, jobs/exams official portal directory, WebView browsing, bookmarks, notes and downloads. App name, identity and the chosen S logo are preserved.
+
+## Installation & testing
+
+Android Studio: `s-browser/`, JDK 17, Gradle 8.9, Android SDK 35. Automated checks compile the Android APK, verify its debug signature and test 31-item daily rotation, puzzle validity, trusted publisher HTTPS host verification and bounded news query construction.
+
+[Download v1.5 beta APK after successful CI release](https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases/tag/s-browser-v1.5.0-beta).
+
+This is a beta: compilation success does not prove that all news sources, links, Text-to-Speech voices or WebView pages work correctly on a physical Android phone. Provider terms and availability should be checked before commercial deployment.
