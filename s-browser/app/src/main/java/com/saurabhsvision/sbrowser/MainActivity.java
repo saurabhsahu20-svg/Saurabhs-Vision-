@@ -34,6 +34,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.net.http.SslError;
 import android.widget.EditText;
+import android.widget.AutoCompleteTextView;
+import android.widget.ArrayAdapter;
+import android.speech.RecognizerIntent;
+import android.content.ActivityNotFoundException;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -55,7 +59,7 @@ public final class MainActivity extends Activity {
     private static final int BG=0xff071327, PANEL=0xff11233f, EDGE=0xff244d74,
         WHITE=0xfff4f8ff, MUTED=0xff9cb2ce, CYAN=0xff55e4f4,
         MINT=0xff72eabb, PURPLE=0xffa993ff;
-    private static final int PICK_FILE=81, MAX_TABS=8;
+    private static final int PICK_FILE=81, VOICE_SEARCH=82, QR_SCAN=83, MAX_TABS=8;
     private static final String[] FOCUS_DOMAINS={
         "instagram.com","tiktok.com","facebook.com","x.com","reddit.com"
     };
@@ -74,7 +78,7 @@ public final class MainActivity extends Activity {
     private LinearLayout root,top,bottom,tabLine;
     private HorizontalScrollView tabStrip;
     private FrameLayout contentFrame;
-    private EditText address;
+    private AutoCompleteTextView address;
     private ProgressBar progress;
     private TextView tabBadge,focusBadge;
     private ValueCallback<Uri[]> fileCallback;
@@ -153,8 +157,8 @@ public final class MainActivity extends Activity {
     }
     @Override public void onCreate(Bundle state){
         super.onCreate(state);
-        getWindow().setStatusBarColor(BG);
-        getWindow().setNavigationBarColor(BG);
+        getWindow().setStatusBarColor(0xff061c47);
+        getWindow().setNavigationBarColor(0xff061c47);
         store=new BrowserStore(this);
         dictionary=new DictionaryRepository(this);
         if(GovtAlerts.enabled(this))GovtAlerts.schedule(this);
@@ -231,6 +235,31 @@ public final class MainActivity extends Activity {
         banner.setOnClickListener(v->action.run());
         add(host,banner,11);
     }
+    private void requestVoiceSearch(){
+        try{
+            Intent request=new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            request.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            request.putExtra(RecognizerIntent.EXTRA_PROMPT,"Search the web");
+            startActivityForResult(request,VOICE_SEARCH);
+        }catch(ActivityNotFoundException error){
+            toast("Voice recognition is unavailable on this device");
+        }
+    }
+    private void openQrScanner(){
+        // Opens an installed compatible scanner only; no fake built-in scanner.
+        Intent scan=new Intent("com.google.zxing.client.android.SCAN");
+        scan.putExtra("SCAN_MODE","QR_CODE_MODE");
+        try{startActivityForResult(scan,QR_SCAN);}
+        catch(ActivityNotFoundException e){
+            toast("A compatible QR scanner app is required");
+        }
+    }
+    private void showAccountInfo(){
+        new AlertDialog.Builder(this).setTitle("S Browser • Local profile")
+            .setMessage("No account required. Bookmarks, notes and history are stored on this device.")
+            .setPositiveButton("OK",null).show();
+    }
     private void buildShell(){
         root=column();
         root.setBackground(new GradientDrawable(
@@ -247,16 +276,17 @@ public final class MainActivity extends Activity {
         ImageView logo=new ImageView(this);
         logo.setImageResource(R.drawable.s_browser_icon);
         logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        header.addView(logo,new LinearLayout.LayoutParams(dp(42),dp(42)));
+        header.addView(logo,new LinearLayout.LayoutParams(dp(48),dp(48)));
         LinearLayout branding=column();
-        TextView name=text("S Browser  ✓",21,HOME_INK,true);
+        TextView name=text("S Browser  ✓",19,HOME_INK,true);
+        name.setSingleLine(true);
         branding.addView(name);
         TextView byline=text("A Saurabh Vision Product",11,HOME_MUTED,false);
         branding.addView(byline);
         LinearLayout.LayoutParams n=new LinearLayout.LayoutParams(0,-2,1);
         n.leftMargin=dp(11);header.addView(branding,n);
         focusBadge=text("🎓 Student",10,HOME_INK,true);
-        focusBadge.setBackground(card(0xfffff1c4,0xffd5a941,13));
+        focusBadge.setBackground(gradient(0xffffe9a3,0xffffd16f,0xffaa851c,13));
         focusBadge.setPadding(dp(9),dp(9),dp(9),dp(9));
         header.addView(focusBadge);
         focusBadge.setOnClickListener(v->toggleFocus());
@@ -266,6 +296,19 @@ public final class MainActivity extends Activity {
         mp.leftMargin=dp(5);header.addView(menu,mp);
         menu.setOnClickListener(v->showTools());
         add(top,header,0);
+        LinearLayout headerActions=row();
+        TextView gift=homeButton("🎁 Daily",0xffedf7ff,HOME_BORDER,HOME_INK,
+            ()->openAssemblySection(7));
+        TextView notices=homeButton("♧ News",0xffedf7ff,HOME_BORDER,HOME_INK,
+            this::showCityNews);
+        TextView profile=homeButton("♙ Profile",0xffedf7ff,HOME_BORDER,HOME_INK,
+            this::showAccountInfo);
+        LinearLayout.LayoutParams a1=new LinearLayout.LayoutParams(0,dp(36),1);
+        a1.rightMargin=dp(7);headerActions.addView(gift,a1);
+        LinearLayout.LayoutParams a2=new LinearLayout.LayoutParams(0,dp(36),1);
+        a2.rightMargin=dp(7);headerActions.addView(notices,a2);
+        headerActions.addView(profile,new LinearLayout.LayoutParams(0,dp(36),1));
+        add(top,headerActions,6);
 
         LinearLayout search=row();
         search.setBackground(card(0xffffffff,0xff4f93ec,24));
@@ -273,7 +316,17 @@ public final class MainActivity extends Activity {
         search.setPadding(dp(10),dp(4),dp(7),dp(4));
         TextView lock=text("G",25,0xff2384e9,true);lock.setGravity(Gravity.CENTER);
         search.addView(lock,new LinearLayout.LayoutParams(dp(37),dp(40)));
-        address=new EditText(this);
+        address=new AutoCompleteTextView(this);
+        address.setThreshold(1);
+        ArrayList<String> suggestions=new ArrayList<>();
+        for(BrowserStore.Site site:store.list("history")){
+            if(site.url!=null&&suggestions.size()<50)suggestions.add(site.url);
+        }
+        address.setAdapter(new ArrayAdapter<String>(this,
+            android.R.layout.simple_dropdown_item_1line,suggestions));
+        address.setDropDownBackgroundDrawable(card(0xffffffff,HOME_BORDER,12));
+        address.setOnItemClickListener((parent,view,position,id)->
+            openAddress(String.valueOf(parent.getItemAtPosition(position))));
         address.setSingleLine(true);
         address.setTextSize(15);address.setTextColor(HOME_INK);
         address.setHintTextColor(HOME_MUTED);
@@ -283,6 +336,16 @@ public final class MainActivity extends Activity {
         address.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_URI);
         address.setImeOptions(EditorInfo.IME_ACTION_GO);
         search.addView(address,new LinearLayout.LayoutParams(0,dp(44),1));
+        TextView voice=text("🎙",19,HOME_INK,true);
+        voice.setGravity(Gravity.CENTER);
+        voice.setContentDescription("Voice search");
+        voice.setOnClickListener(v->requestVoiceSearch());
+        search.addView(voice,new LinearLayout.LayoutParams(dp(38),dp(43)));
+        TextView qr=text("▦",23,HOME_BLUE,true);
+        qr.setGravity(Gravity.CENTER);
+        qr.setContentDescription("QR scanner (requires installed scanner)");
+        qr.setOnClickListener(v->openQrScanner());
+        search.addView(qr,new LinearLayout.LayoutParams(dp(34),dp(43)));
         address.setOnEditorActionListener((v,id,event)->{
             if(id==EditorInfo.IME_ACTION_GO||id==EditorInfo.IME_ACTION_SEARCH){
                 openAddress(address.getText().toString());return true;
@@ -435,6 +498,7 @@ public final class MainActivity extends Activity {
         add(hero,heroActions,17);
         add(layout,hero,0);
 
+        // TODAY'S NEWS DESK; no fabricated live alerts.
         // Scrollable collection: never squeeze nine shortcuts into one phone row.
         HorizontalScrollView rail=new HorizontalScrollView(this);
         rail.setHorizontalScrollBarEnabled(false);
@@ -463,6 +527,8 @@ public final class MainActivity extends Activity {
         add(layout,rail,14);
 
         homeSection(layout,"🎓","Study Tools");
+        HorizontalScrollView toolsScroll=new HorizontalScrollView(this);
+        toolsScroll.setHorizontalScrollBarEnabled(false);
         LinearLayout tools=row();
         View[] cards={
             homeFeature("📖","Dictionary",0xfff8fcff,0xffcfebff,0xff9fcbff,
@@ -477,11 +543,12 @@ public final class MainActivity extends Activity {
                 this::openDownloads)
         };
         for(int i=0;i<cards.length;i++){
-            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(102),1);
-            if(i!=cards.length-1)p.rightMargin=dp(5);
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(106),dp(104));
+            if(i!=cards.length-1)p.rightMargin=dp(7);
             tools.addView(cards[i],p);
         }
-        add(layout,tools,6);
+        toolsScroll.addView(tools,new HorizontalScrollView.LayoutParams(-2,-2));
+        add(layout,toolsScroll,6);
 
         homeBanner(layout,"▣","CG Jobs & Exam Notices",
             "Official jobs • Admit cards • Results",
@@ -936,6 +1003,21 @@ public final class MainActivity extends Activity {
                 case 17:showDailyAssembly();break;
             }
         }).show();
+    }
+    @Override protected void onActivityResult(int request,int result,Intent data){
+        super.onActivityResult(request,result,data);
+        if(result!=RESULT_OK||data==null)return;
+        if(request==VOICE_SEARCH){
+            ArrayList<String> matches=data.getStringArrayListExtra(
+                RecognizerIntent.EXTRA_RESULTS);
+            if(matches!=null&&!matches.isEmpty()){
+                address.setText(matches.get(0));
+                openAddress(matches.get(0));
+            }
+        }else if(request==QR_SCAN){
+            String scanned=data.getStringExtra("SCAN_RESULT");
+            if(scanned!=null&&!scanned.trim().isEmpty())openAddress(scanned);
+        }
     }
     @Override public void onBackPressed(){
         if(fullScreenVideo!=null){hideVideo();return;}
