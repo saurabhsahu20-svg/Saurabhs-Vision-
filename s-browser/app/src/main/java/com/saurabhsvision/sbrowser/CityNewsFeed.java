@@ -37,12 +37,19 @@ public final class CityNewsFeed {
     private CityNewsFeed(){}
 
     public static Result fetch(String city,boolean hindi,int days) throws Exception {
-        String target=CityNewsSources.rssUrl(city,hindi,days);
-        return fetchTrustedRss(target,days);
+        return fetchRss(CityNewsSources.rssUrl(city,hindi,days),days,false);
     }
 
-    /** Reuse the same safe, dated RSS parser for Sports / Breaking headlines. */
+    /** Generic city feed. Still requires date and publisher attribution. */
     public static Result fetchTrustedRss(String target,int days) throws Exception {
+        return fetchRss(target,days,false);
+    }
+
+    /** School assembly mode only accepts a defined list of HTTPS publishers. */
+    public static Result fetchSchoolNewsRss(String target,int days) throws Exception {
+        return fetchRss(target,days,true);
+    }
+    private static Result fetchRss(String target,int days,boolean curated) throws Exception {
         if(target==null)throw new IllegalArgumentException("Missing trusted news query");
         URL url=new URL(target);
         if(!"https".equals(url.getProtocol())||
@@ -70,18 +77,21 @@ public final class CityNewsFeed {
                     output.write(buffer,0,n);
                 }
             }
-            return parse(output.toByteArray(),days,System.currentTimeMillis());
+            return parse(output.toByteArray(),days,System.currentTimeMillis(),curated);
         }finally{con.disconnect();}
     }
 
     public static Result parse(byte[] raw,int days,long now) throws Exception {
+        return parse(raw,days,now,false);
+    }
+    public static Result parse(byte[] raw,int days,long now,boolean curated) throws Exception {
         XmlPullParser parser=Xml.newPullParser();
         // Refuse any document type declarations and entity-based documents.
         parser.setInput(new ByteArrayInputStream(raw),"UTF-8");
         ArrayList<Story> items=new ArrayList<>();
         LinkedHashSet<String> seen=new LinkedHashSet<>();
         boolean inItem=false,hasDoctype=false;
-        String title="",source="",link="",date="";
+        String title="",source="",sourceUrl="",link="",date="";
         int event=parser.getEventType();
         while(event!=XmlPullParser.END_DOCUMENT){
             if(event==XmlPullParser.DOCDECL){
@@ -90,10 +100,14 @@ public final class CityNewsFeed {
             if(event==XmlPullParser.START_TAG){
                 String tag=parser.getName();
                 if("item".equalsIgnoreCase(tag)){
-                    inItem=true;title="";source="";link="";date="";
+                    inItem=true;title="";source="";sourceUrl="";link="";date="";
                 }else if(inItem){
                     if("title".equalsIgnoreCase(tag))title=parser.nextText().trim();
-                    else if("source".equalsIgnoreCase(tag))source=parser.nextText().trim();
+                    else if("source".equalsIgnoreCase(tag)){
+                        String publisherLink=parser.getAttributeValue(null,"url");
+                        sourceUrl=publisherLink==null?"":publisherLink.trim();
+                        source=parser.nextText().trim();
+                    }
                     else if("link".equalsIgnoreCase(tag))link=parser.nextText().trim();
                     else if("pubDate".equalsIgnoreCase(tag))date=parser.nextText().trim();
                 }
@@ -103,7 +117,9 @@ public final class CityNewsFeed {
                 long published=publishedMillis(date);
                 if(CityNewsSources.inWindow(published,now,days) &&
                     title.length()>8 && title.length()<500 &&
-                    isWebUrl(link) && items.size()<80) {
+                    isWebUrl(link) && items.size()<80 &&
+                    (!curated || (NewsQualityGate.trustedPublisherUrl(sourceUrl)
+                        && NewsQualityGate.suitableHeadline(title)))) {
                     String unique=title.toLowerCase(Locale.ROOT).replaceAll("\\s+"," ");
                     if(seen.add(unique)){
                         items.add(new Story(title,source.isEmpty()?
