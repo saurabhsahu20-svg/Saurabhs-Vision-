@@ -172,17 +172,76 @@ public final class MainActivity extends Activity {
         if(intent!=null&&Intent.ACTION_VIEW.equals(intent.getAction())&&intent.getData()!=null)
             openAddress(intent.getData().toString());
     }
+    private static final int HOME_INK=0xff0e2450, HOME_MUTED=0xff4d6486,
+        HOME_BLUE=0xff1269e9, HOME_BORDER=0xffa7d1ff;
+    private GradientDrawable gradient(int first,int second,int border,int radius){
+        GradientDrawable d=new GradientDrawable(GradientDrawable.Orientation.TL_BR,
+            new int[]{first,second});
+        d.setCornerRadius(dp(radius));
+        if(border!=0)d.setStroke(dp(1),border);
+        return d;
+    }
+    private TextView homeButton(String title,int background,int border,int fg,Runnable click){
+        TextView t=text(title,14,fg,true);
+        t.setGravity(Gravity.CENTER);
+        t.setPadding(dp(10),dp(12),dp(10),dp(12));
+        t.setBackground(card(background,border,17));
+        t.setOnClickListener(v->click.run());
+        t.setContentDescription(title);
+        return t;
+    }
+    private void homeSection(LinearLayout host,String icon,String title){
+        LinearLayout bar=row();
+        TextView label=text(icon+"  "+title,19,HOME_INK,true);
+        bar.addView(label,new LinearLayout.LayoutParams(-2,dp(43)));
+        View line=new View(this);line.setBackgroundColor(0xff8bbaff);
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(1),1);
+        p.leftMargin=dp(10);bar.addView(line,p);
+        add(host,bar,12);
+    }
+    private View homeFeature(String icon,String title,int start,int finish,int border,
+        Runnable action){
+        LinearLayout tile=column();tile.setGravity(Gravity.CENTER);
+        tile.setPadding(dp(5),dp(9),dp(5),dp(9));
+        tile.setBackground(gradient(start,finish,border,19));
+        TextView image=text(icon,29,HOME_BLUE,true);image.setGravity(Gravity.CENTER);
+        tile.addView(image,new LinearLayout.LayoutParams(-1,dp(39)));
+        TextView titleView=text(title,12,HOME_INK,true);
+        titleView.setGravity(Gravity.CENTER);
+        titleView.setMaxLines(2);
+        tile.addView(titleView,new LinearLayout.LayoutParams(-1,dp(37)));
+        tile.setOnClickListener(v->action.run());
+        tile.setContentDescription(title);
+        return tile;
+    }
+    private void homeBanner(LinearLayout host,String icon,String heading,String subtitle,
+        int left,int right,int border,Runnable action){
+        LinearLayout banner=row();
+        banner.setPadding(dp(15),dp(13),dp(13),dp(13));
+        banner.setBackground(gradient(left,right,border,20));
+        TextView symbol=text(icon,29,HOME_BLUE,true);
+        symbol.setGravity(Gravity.CENTER);
+        banner.addView(symbol,new LinearLayout.LayoutParams(dp(47),dp(52)));
+        LinearLayout textBox=column();textBox.setPadding(dp(9),0,0,0);
+        add(textBox,text(heading,17,HOME_INK,true),0);
+        add(textBox,text(subtitle,11,HOME_MUTED,false),5);
+        banner.addView(textBox,new LinearLayout.LayoutParams(0,-2,1));
+        TextView arrow=text("❯",23,HOME_BLUE,true);arrow.setGravity(Gravity.CENTER);
+        banner.addView(arrow,new LinearLayout.LayoutParams(dp(31),dp(48)));
+        banner.setOnClickListener(v->action.run());
+        add(host,banner,11);
+    }
     private void buildShell(){
         root=column();
         root.setBackground(new GradientDrawable(
             GradientDrawable.Orientation.TOP_BOTTOM,
-            new int[]{BG,0xff071527,0xff061125}));
+            new int[]{0xffeaf6ff,0xfffafdff,0xffd9ecff}));
         root.setPadding(0,0,0,dp(7));
         setContentView(root);
-        top=column();top.setPadding(dp(14),dp(11),dp(14),dp(2));
+        top=column();top.setPadding(dp(12),dp(9),dp(12),dp(2));
         top.setBackground(new GradientDrawable(
             GradientDrawable.Orientation.TOP_BOTTOM,
-            new int[]{0xff101e39,0xff0a1931}));
+            new int[]{0xfff7fbff,0xffd5edff}));
         root.addView(top,new LinearLayout.LayoutParams(-1,-2));
         LinearLayout header=row();
         ImageView logo=new ImageView(this);
@@ -190,18 +249,18 @@ public final class MainActivity extends Activity {
         logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
         header.addView(logo,new LinearLayout.LayoutParams(dp(42),dp(42)));
         LinearLayout branding=column();
-        TextView name=text("S Browser  ✓",21,WHITE,true);
+        TextView name=text("S Browser  ✓",21,HOME_INK,true);
         branding.addView(name);
-        TextView byline=text("A Saurabh Vision Product",11,MUTED,false);
+        TextView byline=text("A Saurabh Vision Product",11,HOME_MUTED,false);
         branding.addView(byline);
         LinearLayout.LayoutParams n=new LinearLayout.LayoutParams(0,-2,1);
         n.leftMargin=dp(11);header.addView(branding,n);
-        focusBadge=text("★ STUDENT",10,store.focusMode()?MINT:CYAN,true);
-        focusBadge.setBackground(card(0xff152e4e,0xff4f8fa7,13));
+        focusBadge=text("🎓 Student",10,HOME_INK,true);
+        focusBadge.setBackground(card(0xfffff1c4,0xffd5a941,13));
         focusBadge.setPadding(dp(9),dp(9),dp(9),dp(9));
         header.addView(focusBadge);
         focusBadge.setOnClickListener(v->toggleFocus());
-        TextView menu=text("⋮",27,WHITE,true);
+        TextView menu=text("⋮",27,HOME_INK,true);
         menu.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams mp=new LinearLayout.LayoutParams(dp(42),dp(42));
         mp.leftMargin=dp(5);header.addView(menu,mp);
@@ -209,15 +268,15 @@ public final class MainActivity extends Activity {
         add(top,header,0);
 
         LinearLayout search=row();
-        search.setBackground(card(0xff193456,0xff5796c6,21));
+        search.setBackground(card(0xffffffff,0xff4f93ec,24));
         search.setElevation(dp(3));
         search.setPadding(dp(10),dp(4),dp(7),dp(4));
-        TextView lock=text("⌕",25,CYAN,false);lock.setGravity(Gravity.CENTER);
+        TextView lock=text("G",25,0xff2384e9,true);lock.setGravity(Gravity.CENTER);
         search.addView(lock,new LinearLayout.LayoutParams(dp(37),dp(40)));
         address=new EditText(this);
         address.setSingleLine(true);
-        address.setTextSize(15);address.setTextColor(WHITE);
-        address.setHintTextColor(MUTED);
+        address.setTextSize(15);address.setTextColor(HOME_INK);
+        address.setHintTextColor(HOME_MUTED);
         address.setHint("Search or enter a website");
         address.setSelectAllOnFocus(true);
         address.setBackgroundColor(Color.TRANSPARENT);
@@ -229,7 +288,7 @@ public final class MainActivity extends Activity {
                 openAddress(address.getText().toString());return true;
             }return false;
         });
-        TextView go=text("GO",13,CYAN,true);go.setGravity(Gravity.CENTER);
+        TextView go=text("⌕",26,0xffffffff,true);go.setGravity(Gravity.CENTER);
         search.addView(go,new LinearLayout.LayoutParams(dp(48),dp(42)));
         go.setOnClickListener(v->openAddress(address.getText().toString()));
         go.setBackground(card(0xff174eab,0xff397df0,15));
@@ -279,17 +338,17 @@ public final class MainActivity extends Activity {
     }
     private void refreshTabBadge(){
         if(tabBadge!=null)tabBadge.setText("Tabs "+tabs.size());
-        if(focusBadge!=null)focusBadge.setText(store.focusMode()?"FOCUS ON":"STUDY");
-        if(focusBadge!=null)focusBadge.setTextColor(store.focusMode()?MINT:MUTED);
+        if(focusBadge!=null)focusBadge.setText(store.focusMode()?"★ FOCUS ON":"🎓 Student");
+        if(focusBadge!=null)focusBadge.setTextColor(HOME_INK);
         refreshTabStrip();
     }
     private void refreshTabStrip(){
         if(tabLine==null)return;
         tabLine.removeAllViews();
-        TextView start=text("⌂  Home",13,home?0xff061527:WHITE,true);
+        TextView start=text("⌂  Home",13,home?0xffffffff:HOME_INK,true);
         start.setGravity(Gravity.CENTER);
         start.setPadding(dp(15),0,dp(15),0);
-        start.setBackground(card(home?MINT:PANEL,home?MINT:EDGE,14));
+        start.setBackground(card(home?HOME_BLUE:0xffedf7ff,home?HOME_BLUE:HOME_BORDER,14));
         LinearLayout.LayoutParams startP=new LinearLayout.LayoutParams(-2,dp(39));
         startP.rightMargin=dp(7);tabLine.addView(start,startP);
         start.setOnClickListener(v->showHome());
@@ -297,8 +356,8 @@ public final class MainActivity extends Activity {
             boolean active=!home&&selected>=0&&selected<tabs.size()&&
                 tabs.get(selected)==tab;
             LinearLayout chip=row();
-            chip.setBackground(card(active?0xff24476a:0xff102239,
-                active?CYAN:0xff35516c,13));
+            chip.setBackground(card(active?0xffcee7ff:0xfff4faff,
+                active?HOME_BLUE:HOME_BORDER,13));
             View indicator=new View(this);
             indicator.setBackground(card(active?CYAN:0xff2e4b65,0,3));
             chip.addView(indicator,new LinearLayout.LayoutParams(dp(3),dp(22)));
@@ -310,13 +369,13 @@ public final class MainActivity extends Activity {
                     title=host==null?"New Tab":host;
                 }catch(Exception ignored){title="New Tab";}
             }
-            TextView titleView=text(title,13,active?WHITE:MUTED,true);
+            TextView titleView=text(title,13,HOME_INK,true);
             titleView.setSingleLine(true);
             titleView.setEllipsize(TextUtils.TruncateAt.END);
             titleView.setMaxWidth(dp(142));
             titleView.setPadding(dp(9),0,dp(5),0);
             chip.addView(titleView,new LinearLayout.LayoutParams(-2,dp(37)));
-            TextView close=text("×",21,active?CYAN:MUTED,false);
+            TextView close=text("×",21,HOME_BLUE,false);
             close.setGravity(Gravity.CENTER);
             close.setContentDescription("Close "+title);
             chip.addView(close,new LinearLayout.LayoutParams(dp(32),dp(37)));
@@ -329,10 +388,10 @@ public final class MainActivity extends Activity {
             LinearLayout.LayoutParams chipP=new LinearLayout.LayoutParams(-2,dp(39));
             chipP.rightMargin=dp(7);tabLine.addView(chip,chipP);
         }
-        TextView plus=text("＋ New",13,MINT,true);
+        TextView plus=text("＋ New Tab",13,HOME_BLUE,true);
         plus.setGravity(Gravity.CENTER);
         plus.setPadding(dp(12),0,dp(12),0);
-        plus.setBackground(card(0xff133849,0xff3d867e,13));
+        plus.setBackground(card(0xffe1f2ff,HOME_BORDER,13));
         tabLine.addView(plus,new LinearLayout.LayoutParams(-2,dp(39)));
         plus.setContentDescription("Create new browser tab");
         plus.setOnClickListener(v->{
@@ -342,109 +401,126 @@ public final class MainActivity extends Activity {
     private void showHome(){
         home=true;
         if(contentFrame==null)return;
-        for(Tab t:tabs)t.web.onPause();
+        for(Tab tab:tabs)tab.web.onPause();
         contentFrame.removeAllViews();
         address.setText("");
         progress.setVisibility(View.GONE);
-        ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);
+        ScrollView scroll=new ScrollView(this);
+        scroll.setFillViewport(true);
+        scroll.setBackgroundColor(0xfff6fbff);
         contentFrame.addView(scroll);
         LinearLayout layout=column();
-        layout.setPadding(dp(18),dp(16),dp(18),dp(26));scroll.addView(layout);
-        LinearLayout hero=column();hero.setPadding(dp(20),dp(20),dp(20),dp(19));
-        hero.setBackground(premiumHero());
+        layout.setPadding(dp(14),dp(13),dp(14),dp(25));
+        scroll.addView(layout);
+
+        LinearLayout hero=column();
+        hero.setPadding(dp(18),dp(17),dp(18),dp(18));
+        hero.setBackground(gradient(0xffd7efff,0xff71b7f9,0xff5a9dfe,23));
         hero.setElevation(dp(3));
-        TextView eyebrow=text("✦  SMART BROWSING  •  STUDENT EDITION",12,MINT,true);
-        add(hero,eyebrow,0);
-        add(hero,text("Explore  •  Study  •  Learn  •  Grow",24,WHITE,true),10);
-        add(hero,text("●  DAILY STUDENT DASHBOARD  •  "+
-            java.time.LocalDate.now().format(
-                java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy",Locale.ENGLISH)),
-            11,CYAN,true),8);
-        add(hero,text("Your student-friendly web companion. Browse, read verified-source news, practise and organize study notes.",13,0xffd2e1f5,false),10);
-        TextView enter=pill("⌕  Search the web  →",()->{
-            address.requestFocus();
-            ((android.view.inputmethod.InputMethodManager)getSystemService(INPUT_METHOD_SERVICE))
-                .showSoftInput(address,android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
-        });
-        enter.setBackground(card(0xff174eab,0xff7cb8ff,17));
-        enter.setElevation(dp(2));
-        add(hero,enter,16);
-        add(layout,hero,2);
-        TextView assembly=pill("✦  Daily Assembly & Fun  →",this::showDailyAssembly);
-        assembly.setBackground(card(0xff213e57,0xff6389ab,19));
-        assembly.setTextColor(WHITE);
-        add(layout,assembly,12);
-        add(layout,text("Thought • Speech • Sports • News • Crossword • Puzzles",
-            12,MUTED,false),7);
-        // The three frequently used destinations are always visible.
-        LinearLayout shortcuts=row();
-        View shortcutNews=quickCardView("📰 News Desk","Latest sources",CYAN,
+        add(hero,text("🎓  SMART BROWSING  •  STUDENT EDITION",
+            12,HOME_INK,true),0);
+        add(hero,text("Explore • Study • Learn • Grow",25,HOME_INK,true),9);
+        add(hero,text("A fast, student-friendly browser with study tools, " +
+            "daily updates and learning resources — all in one place.",
+            13,HOME_INK,false),9);
+        LinearLayout heroActions=row();
+        TextView start=homeButton("🎓 Start Studying  →",
+            0xff065de6,0xff3a8fff,0xffffffff,()->
+                openAddress("https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/"));
+        heroActions.addView(start,new LinearLayout.LayoutParams(0,dp(51),1));
+        TextView features=homeButton("▦ Explore",0xffffffff,0xff3989ec,HOME_BLUE,
+            this::showDailyAssembly);
+        LinearLayout.LayoutParams ep=new LinearLayout.LayoutParams(0,dp(51),1);
+        ep.leftMargin=dp(9);heroActions.addView(features,ep);
+        add(hero,heroActions,17);
+        add(layout,hero,0);
+
+        // Scrollable collection: never squeeze nine shortcuts into one phone row.
+        HorizontalScrollView rail=new HorizontalScrollView(this);
+        rail.setHorizontalScrollBarEnabled(false);
+        rail.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        LinearLayout newsRail=row();
+        newsRail.setPadding(dp(1),dp(6),dp(1),dp(5));
+        String[] quickIcons={"▤","🏆","◉","💡","🎙","✧","▦","🎮","＋"};
+        String[] quickLabels={"General News","Sports News","Breaking News",
+            "Daily Thought","Speech","Astrology","Crossword","Puzzle Games","More"};
+        Runnable[] quickActions={
+            ()->openAssemblySection(4),()->openAssemblySection(3),
+            ()->openAssemblySection(4),()->openAssemblySection(1),
+            ()->openAssemblySection(2),()->openAssemblySection(5),
+            ()->openAssemblySection(6),()->openAssemblySection(7),
+            this::showDailyAssembly
+        };
+        for(int i=0;i<quickIcons.length;i++){
+            final int index=i;
+            int tint=i%3==0?0xffe1efff:i%3==1?0xffe7f9f5:0xffffeff3;
+            View tile=homeFeature(quickIcons[i],quickLabels[i],0xffffffff,tint,
+                HOME_BORDER,quickActions[index]);
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(100),dp(94));
+            p.rightMargin=dp(7);newsRail.addView(tile,p);
+        }
+        rail.addView(newsRail,new HorizontalScrollView.LayoutParams(-2,-2));
+        add(layout,rail,14);
+
+        homeSection(layout,"🎓","Study Tools");
+        LinearLayout tools=row();
+        View[] cards={
+            homeFeature("📖","Dictionary",0xfff8fcff,0xffcfebff,0xff9fcbff,
+                ()->showDictionary("")),
+            homeFeature("📝","Quick Notes",0xfff8ffff,0xffc9f4f0,0xff99ded7,
+                this::editNote),
+            homeFeature("🎯","Study Focus",0xfffff9f1,0xffffdfc8,0xffffbe94,
+                this::toggleFocus),
+            homeFeature("⭐","Bookmarks",0xfffaf5ff,0xffe4d6ff,0xffc7adfa,
+                this::showBookmarks),
+            homeFeature("⬇","Downloads",0xfffff4fa,0xffffdbef,0xffeeacd2,
+                this::openDownloads)
+        };
+        for(int i=0;i<cards.length;i++){
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(102),1);
+            if(i!=cards.length-1)p.rightMargin=dp(5);
+            tools.addView(cards[i],p);
+        }
+        add(layout,tools,6);
+
+        homeBanner(layout,"▣","CG Jobs & Exam Notices",
+            "Official jobs • Admit cards • Results",
+            0xffecfff6,0xffc9f2e8,0xff81dbc7,this::showJobsHub);
+        homeBanner(layout,"◉","Latest Chhattisgarh City News",
+            "City-wise updates • Sources • Published dates",
+            0xffe9f5ff,0xffc7e5ff,0xff89baf9,this::showCityNews);
+
+        homeSection(layout,"📖","Saurabh Vision Learning");
+        LinearLayout learning=column();
+        learning.setPadding(dp(17),dp(15),dp(17),dp(16));
+        learning.setBackground(gradient(0xff5622c7,0xffac43e4,0xffe7a5ff,22));
+        TextView learningTitle=text("✦  Saurabh Vision Learning App  ✓",
+            19,0xffffffff,true);
+        add(learning,learningTitle,0);
+        add(learning,text("Study • Quizzes • Practice • PDFs • Daily Updates",
+            12,0xfff5eaff,false),7);
+        TextView open=homeButton("Open Learning App  ↗",
+            0xffffffff,0xffd0b2fb,0xff5e22b9,()->
+                openAddress("https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/"));
+        add(learning,open,12);
+        add(layout,learning,6);
+        LinearLayout utility=row();
+        TextView news=homeButton("▤ Latest News",0xffffffff,HOME_BORDER,HOME_BLUE,
             ()->openAssemblySection(4));
-        View shortcutStudy=quickCardView("✦ Study Portal","Saurabh Vision",MINT,
-            ()->openAddress("https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/"));
-        View shortcutFun=quickCardView("▦ Games","Daily practice",PURPLE,
+        utility.addView(news,new LinearLayout.LayoutParams(0,dp(48),1));
+        TextView games=homeButton("🎮 Games",0xffffffff,HOME_BORDER,HOME_BLUE,
             ()->openAssemblySection(7));
-        LinearLayout.LayoutParams shortcutP1=new LinearLayout.LayoutParams(0,dp(80),1);
-        shortcutP1.rightMargin=dp(7);
-        shortcuts.addView(shortcutNews,shortcutP1);
-        LinearLayout.LayoutParams shortcutP2=new LinearLayout.LayoutParams(0,dp(80),1);
-        shortcutP2.rightMargin=dp(7);
-        shortcuts.addView(shortcutStudy,shortcutP2);
-        shortcuts.addView(shortcutFun,new LinearLayout.LayoutParams(0,dp(80),1));
-        add(layout,shortcuts,12);
-        sectionHeading(layout,"TODAY'S NEWS DESK",CYAN);
-        LinearLayout newsQuick=row();
-        View newsGeneral=quickCardView("📰 General News",
-            "Dated • Source-first",CYAN,()->openAssemblySection(4));
-        View newsSports=quickCardView("🏏 Sports News",
-            "Recent • Attributed",MINT,()->openAssemblySection(3));
-        LinearLayout.LayoutParams leftNews=new LinearLayout.LayoutParams(0,dp(80),1);
-        leftNews.rightMargin=dp(10);
-        newsQuick.addView(newsGeneral,leftNews);
-        newsQuick.addView(newsSports,new LinearLayout.LayoutParams(0,dp(80),1));
-        add(layout,newsQuick,7);
-        sectionHeading(layout,"STUDY TOOLS",CYAN);
-        LinearLayout first=row();
-        TextView dictionaryBtn=pill("Aa  Dictionary",()->showDictionary(""));
-        TextView notes=pill("✎  Quick Notes",this::editNote);
-        first.addView(dictionaryBtn,new LinearLayout.LayoutParams(0,dp(55),1));
-        LinearLayout.LayoutParams noteP=new LinearLayout.LayoutParams(0,dp(55),1);
-        noteP.leftMargin=dp(10);first.addView(notes,noteP);
-        add(layout,first,9);
-        LinearLayout second=row();
-        TextView study=pill(store.focusMode()?"◉  Focus is ON":"◉  Study Focus",this::toggleFocus);
-        TextView books=pill("☆  Bookmarks",this::showBookmarks);
-        second.addView(study,new LinearLayout.LayoutParams(0,dp(55),1));
-        LinearLayout.LayoutParams booksP=new LinearLayout.LayoutParams(0,dp(55),1);
-        booksP.leftMargin=dp(10);second.addView(books,booksP);
-        add(layout,second,10);
-        LinearLayout jobs=row();
-        TextView careers=pill("⚑  CG Jobs & Exam Notices  →",this::showJobsHub);
-        careers.setTextColor(MINT);
-        careers.setBackground(card(0xff163b4c,0xff3c937e,19));
-        jobs.addView(careers,new LinearLayout.LayoutParams(-1,dp(58)));
-        add(layout,jobs,11);
-        add(layout,text("City-wise official portals • Railway • JEE • Navodaya • Sainik School",12,MUTED,false),7);
-        TextView news=pill("▤  Latest Chhattisgarh City News  →",this::showCityNews);
-        news.setTextColor(CYAN);
-        news.setBackground(card(0xff1b3451,0xff3f7294,19));
-        add(layout,news,12);
-        add(layout,text("Select your city • See publisher & published date • Read full story",12,MUTED,false),7);
-        sectionHeading(layout,"SAURABH VISION LEARNING",MINT);
-        TextView learning=pill("✦  Saurabh Vision Learning App  ↗",()->
-            openAddress("https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/"));
-        learning.setTextColor(MINT);
-        learning.setBackground(card(0xff163c4b,0xff3b947b,18));
-        add(layout,learning,10);
-        add(layout,text("Explore your learning app, quizzes and study activities.",
-            12,MUTED,false),7);
+        LinearLayout.LayoutParams gp=new LinearLayout.LayoutParams(0,dp(48),1);
+        gp.leftMargin=dp(8);utility.addView(games,gp);
+        add(layout,utility,13);
         List<String> last=store.session();
         if(!last.isEmpty()){
-            TextView restore=pill("↶  Restore "+last.size()+" previous tabs",()->restoreTabs(last));
-            add(layout,restore,24);
+            TextView restore=homeButton("↶ Restore "+last.size()+" previous tabs",
+                0xffe3f2ff,HOME_BORDER,HOME_BLUE,()->restoreTabs(last));
+            add(layout,restore,13);
         }
-        add(layout,text("S Browser  •  by SAURABH'S VISION™  •  Private local study tools",
-            11,MUTED,false),25);
+        add(layout,text("S Browser  •  SAURABH'S VISION™  •  Student Edition",
+            11,HOME_MUTED,false),22);
         refreshTabBadge();
     }
     private void restoreTabs(List<String> urls){
