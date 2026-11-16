@@ -41,7 +41,7 @@ public final class DailyAssemblyActivity extends Activity {
         WHITE=0xfff3f7ff,MUTED=0xffa9bdd8,MINT=0xff7eeac0,
         CYAN=0xff64e1f6,GOLD=0xffffd28f;
     private static final String PREFS="s_browser_daily_assembly";
-    private final LocalDate today=LocalDate.now(ZoneId.systemDefault());
+    private LocalDate today=LocalDate.now(ZoneId.systemDefault());
     private int scene=0,newsRequest=0,practiceOffset=0;
     private boolean hindi=true,cgNews=true,closed=false;
     private int newsDays=1,zodiac=0;
@@ -118,7 +118,7 @@ public final class DailyAssemblyActivity extends Activity {
             case 1:return "Thought of the Day";
             case 2:return "School Assembly Speech";
             case 3:return "Sports News";
-            case 4:return "Breaking & Latest News";
+            case 4:return "General & Latest News";
             case 5:return "Astrology & Reflection";
             case 6:return "Mini Crossword";
             case 7:return "Puzzle Games";
@@ -216,11 +216,11 @@ public final class DailyAssemblyActivity extends Activity {
         add(page,text("DAILY SECTIONS",13,MINT,true),22);
         section(1,"✦","Thought of the Day","Daily Hindi/English thought • Copy & Share",
             ()->show(1));
-        section(2,"🎤","Speech","Short age-appropriate Hindi/English assembly speech",
+        section(2,"🎤","Speech","Fresh prepared Hindi/English speech each calendar day",
             ()->show(2));
         section(3,"⚽","Sports News","Latest available headlines • publisher & time",
             ()->show(3));
-        section(4,"📰","Breaking News","Current important headlines • verify original source",
+        section(4,"📰","General News","Trusted publisher headlines • confirm original source",
             ()->show(4));
         section(5,"✧","Astrology","Optional zodiac-themed positive reflection (for fun)",
             ()->show(5));
@@ -228,8 +228,8 @@ public final class DailyAssemblyActivity extends Activity {
             ()->show(6));
         section(7,"🧩","Puzzle Games","Word scramble and school riddle",
             ()->show(7));
-        note("Offline: thoughts, speeches, crossword, puzzles and fun reflection. "+
-            "Sports/Breaking News need internet and are not independently fact-checked.");
+        note("New thought and speech every calendar day (31 original items each). "+
+            "News refreshes on opening, needs internet and is NOT independently fact-checked.");
     }
     private void chooseLanguage(){
         new AlertDialog.Builder(this).setTitle("Content language")
@@ -285,9 +285,9 @@ public final class DailyAssemblyActivity extends Activity {
     private void renderNews(){
         boolean sports=scene==3;
         header(sports?"03 • SPORTS BULLETIN":"04 • CURRENT AFFAIRS",
-            sports?"Sports News":"Breaking & Latest News",
-            "Published headlines with source and time. 'Latest' does not certify "+
-                "that any story is breaking or independently verified.");
+            sports?"Sports News":"General & Latest News",
+            "Only selected established publishers with published times. "+
+                "A trusted publisher is NOT proof every claim is correct.");
         actionRow(hindi?"हिन्दी  ▾":"English  ▾",()->{
                 hindi=!hindi;remember();show(scene);
             },cgNews?"Chhattisgarh  ▾":"All India  ▾",()->{
@@ -304,6 +304,12 @@ public final class DailyAssemblyActivity extends Activity {
         p.topMargin=dp(6);page.addView(newsProgress,p);
         LinearLayout newsContainer=vertical();
         add(page,newsContainer,10);
+        TextView official=text(sports?
+            "Official results: check match organisers for confirmed scores.":
+            "Government statements: verify on PIB and News On AIR.",12,GOLD,false);
+        add(page,official,9);
+        actionRow("News On AIR  ↗",()->openStory("https://www.newsonair.gov.in/"),
+            "PIB official  ↗",()->openStory("https://pib.gov.in/"));
         final int selectedScene=scene,days=newsDays;
         final boolean lang=hindi,cg=cgNews;
         final String query=DailyNewsSources.feed(
@@ -311,7 +317,7 @@ public final class DailyAssemblyActivity extends Activity {
         final int request=++newsRequest;
         new Thread(()->{
             CityNewsFeed.Result result=null;String error=null;
-            try{result=CityNewsFeed.fetchTrustedRss(query,days);}
+            try{result=CityNewsFeed.fetchSchoolNewsRss(query,days);}
             catch(Exception e){error=e.getMessage();}
             final CityNewsFeed.Result data=result;
             final String problem=error;
@@ -325,15 +331,17 @@ public final class DailyAssemblyActivity extends Activity {
                         (problem==null?"":": "+problem)+". No old or fabricated"+
                         " headlines have been substituted.",13,MUTED,false),8);
                 }else{
-                    pageStatus.setText(data.stories.size()+
-                        " headline(s) • Checked "+
-                        DateFormat.getTimeInstance(DateFormat.SHORT)
-                            .format(new Date(data.checkedAt)));
+                    pageStatus.setText(Math.min(6,data.stories.size())+
+                        " curated headline(s) • Checked "+
+                        DateFormat.getDateTimeInstance(DateFormat.SHORT,
+                            DateFormat.SHORT).format(new Date(data.checkedAt)));
                     if(data.stories.isEmpty())
-                        add(newsContainer,text("No dated stories found in this filter. "+
-                            "Try all India, another language, or last 3 days. "+
-                            "This does not mean no events happened.",14,MUTED,false),10);
+                        add(newsContainer,text("No recent articles matched the approved "+
+                            "publisher list and date filter. Try a wider region or 3 days. "+
+                            "S Browser will not invent a headline.",14,MUTED,false),10);
+                    int shown=0;
                     for(CityNewsFeed.Story story:data.stories){
+                        if(shown++>=6)break;
                         LinearLayout card=vertical();
                         card.setPadding(dp(14),dp(13),dp(14),dp(13));
                         card.setBackground(background(PANEL,EDGE,18));
@@ -344,15 +352,24 @@ public final class DailyAssemblyActivity extends Activity {
                             .format(new Date(story.published));
                         add(card,text("Publisher: "+story.source+"  •  "+published,
                             12,CYAN,false),8);
-                        add(card,text("Read article  ↗",13,MINT,true),8);
+                        add(card,text("Publisher selected • Not independently fact-checked",
+                            11,MUTED,false),7);
+                        TextView read=text("Read original article  ↗",13,MINT,true);
+                        add(card,read,8);
+                        TextView cross=text("Compare coverage from other news sources  ↗",
+                            12,CYAN,false);
+                        add(card,cross,7);
+                        cross.setOnClickListener(v->openStory(
+                            NewsQualityGate.searchForCorroboration(story.title)));
                         card.setOnClickListener(v->openStory(story.url));
                         add(newsContainer,card,9);
                     }
                 }
             });
         },"SBrowser-AssemblyNews").start();
-        note("Headlines are provided by external publishers. Check the source, "+
-            "article date and any updates before reading aloud in assembly.");
+        note("Only recent dated headlines from a limited list of established HTTPS "+
+            "publishers are displayed. Their claims are not independently verified. "+
+            "Open the article and compare coverage before using it at school.");
     }
     private void fetchNews(){
         if(scene==3||scene==4)show(scene);
@@ -530,6 +547,15 @@ public final class DailyAssemblyActivity extends Activity {
         actionRow("Copy script",()->copy(pack),"Share script",()->share(pack));
         note("Live sports/breaking stories are deliberately NOT inserted"+
             " as facts without a current attributed source. Check those sections before reading news aloud.");
+    }
+    @Override protected void onResume(){
+        super.onResume();
+        LocalDate current=LocalDate.now(ZoneId.systemDefault());
+        if(!current.equals(today)){
+            today=current;
+            practiceOffset=0;
+            show(scene);
+        }
     }
     @Override public void onBackPressed(){if(scene==0)super.onBackPressed();else show(0);}
     @Override protected void onDestroy(){
