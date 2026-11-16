@@ -239,6 +239,12 @@ public final class MainActivity extends Activity {
         });
         enter.setBackground(card(0xff304a7c,0xff7488c9,17));add(hero,enter,16);
         add(layout,hero,2);
+        TextView assembly=pill("✦  Daily Assembly & Fun  →",this::showDailyAssembly);
+        assembly.setBackground(card(0xff213e57,0xff6389ab,19));
+        assembly.setTextColor(WHITE);
+        add(layout,assembly,12);
+        add(layout,text("Thought • Speech • Sports • Breaking News • Astrology • Crossword • Puzzles",
+            12,MUTED,false),7);
         TextView quick=text("STUDY TOOLS",13,MUTED,true);add(layout,quick,22);
         LinearLayout first=row();
         TextView dictionaryBtn=pill("Aa  Dictionary",()->showDictionary(""));
@@ -508,6 +514,9 @@ public final class MainActivity extends Activity {
     }
     private void showJobsHub(){startActivity(new Intent(this,JobsHubActivity.class));}
     private void showCityNews(){startActivity(new Intent(this,CityNewsActivity.class));}
+    private void showDailyAssembly(){
+        startActivity(new Intent(this,DailyAssemblyActivity.class));
+    }
     private void showBookmarks(){showList("Bookmarks",store.list("bookmarks"));}
     private void showHistory(){showList("Browsing history",store.list("history"));}
     private void editNote(){
@@ -634,7 +643,8 @@ public final class MainActivity extends Activity {
             "◉  Study Focus","▣  Bookmarks","◷  History","↓  Downloads",
             "⌕  Search engine","▤  Desktop / mobile site","↗  Share page",
             "⊘  Clear browsing data","ⓘ  About S Browser",
-            "⚑  CG Jobs, Railway & Exams","▤  Latest CG City News","→  Forward page"};
+            "⚑  CG Jobs, Railway & Exams","▤  Latest CG City News",
+            "→  Forward page","✦  Daily Assembly & Fun"};
         new AlertDialog.Builder(this).setTitle("S Browser tools").setItems(choices,(d,i)->{
             Tab tab=current();
             switch(i){
@@ -671,13 +681,14 @@ public final class MainActivity extends Activity {
                     startActivity(Intent.createChooser(share,"Share page"));break;
                 case 12:clearData();break;
                 case 13:new AlertDialog.Builder(this).setTitle("About S Browser")
-                    .setMessage("S Browser 1.3 Beta • SAURABH'S VISION™\n\n"+
+                    .setMessage("S Browser 1.4 Beta • SAURABH'S VISION™\n\n"+
                     "Android WebView-powered browsing; a curated offline English–Hindi student dictionary, local bookmarks, notes and Study Focus. No ads or analytics.\n\n"+
                     "Study Focus blocks selected top-level websites, not every possible distracting resource. This browser is an early beta and does not yet provide full incognito isolation, automatic spam protection or universal ad blocking.")
                     .setPositiveButton("OK",null).show();break;
                 case 14:showJobsHub();break;
                 case 15:showCityNews();break;
                 case 16:forward();break;
+                case 17:showDailyAssembly();break;
             }
         }).show();
     }

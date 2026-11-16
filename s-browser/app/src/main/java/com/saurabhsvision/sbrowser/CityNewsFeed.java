@@ -38,7 +38,12 @@ public final class CityNewsFeed {
 
     public static Result fetch(String city,boolean hindi,int days) throws Exception {
         String target=CityNewsSources.rssUrl(city,hindi,days);
-        if(target==null)throw new IllegalArgumentException("Invalid Chhattisgarh city");
+        return fetchTrustedRss(target,days);
+    }
+
+    /** Reuse the same safe, dated RSS parser for Sports / Breaking headlines. */
+    public static Result fetchTrustedRss(String target,int days) throws Exception {
+        if(target==null)throw new IllegalArgumentException("Missing trusted news query");
         URL url=new URL(target);
         if(!"https".equals(url.getProtocol())||
             !"news.google.com".equalsIgnoreCase(url.getHost()))

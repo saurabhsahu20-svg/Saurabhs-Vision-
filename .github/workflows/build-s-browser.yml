@@ -51,6 +51,9 @@ jobs:
           java -ea -cp "$dir" GovtSourcesTest
           javac -encoding UTF-8 -cp "$dir" -d "$dir"             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/CityNewsSources.java             s-browser/tests/CityNewsSourcesTest.java
           java -ea -cp "$dir" CityNewsSourcesTest
+          javac -encoding UTF-8 -cp "$dir" -d "$dir"             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/DailyAssemblyContent.java             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/DailyNewsSources.java             s-browser/tests/DailyAssemblyContentTest.java             s-browser/tests/DailyNewsSourcesTest.java
+          java -ea -cp "$dir" DailyAssemblyContentTest
+          java -ea -cp "$dir" DailyNewsSourcesTest
           python3 - <<'PY'
           from pathlib import Path
           dictionary=Path('s-browser/app/src/main/assets/dictionary.tsv')
@@ -82,13 +85,13 @@ jobs:
           test -s "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
           mkdir -p dist
-          cp "$APK" dist/S_Browser_v1.3.0_CG_City_News_Beta.apk
+          cp "$APK" dist/S_Browser_v1.4.0_Daily_Assembly_Fun_Beta.apk
 
       - name: Upload installable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S-Browser-1.3.0-APK
-          path: dist/S_Browser_v1.3.0_CG_City_News_Beta.apk
+          name: S-Browser-1.4.0-APK
+          path: dist/S_Browser_v1.4.0_Daily_Assembly_Fun_Beta.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -100,13 +103,13 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          TAG="s-browser-v1.3.0-beta"
-          FILE="dist/S_Browser_v1.3.0_CG_City_News_Beta.apk"
+          TAG="s-browser-v1.4.0-beta"
+          FILE="dist/S_Browser_v1.4.0_Daily_Assembly_Fun_Beta.apk"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$FILE" --clobber
           else
             gh release create "$TAG" "$FILE" \
-              --title "S Browser 1.3 Beta — Chhattisgarh City News" \
-              --notes "S Browser v1.3 by SAURABHS VISION: CG City News displays published headlines from attributed news feeds with publisher, original source link, publication date and manual refresh. Hindi/English news, last 24 hours/3 days/7 days, popular Chhattisgarh cities, all 33 districts and custom town search. Also includes the official Chhattisgarh government news portal shortcut. The app cannot independently verify publisher claims or guarantee every city has articles: no results and network failures are clearly shown, with no invented news. Existing Jobs and Exams hub, 304-word offline dictionary, browsing, bookmarks and S icon remain. This is an Android beta; test on device. News aggregation depends on third-party feed availability." \
+              --title "S Browser 1.4 Beta — Daily Assembly & Fun" \
+              --notes "S Browser 1.4 introduces a dedicated point-wise Daily Assembly and Fun section for students: original rotating thought of the day, 14 short bilingual school speeches with Android text-to-speech, daily ready-to-read assembly script, attributed live Sports and Breaking/Latest news using date-filtered Google News RSS (24h/3d, Hindi/English, India/CG), optional zodiac-themed positive reflections clearly labeled entertainment (not scientific predictions), 3 playable 4x4 word-square crossword boards and 14 word scrambles with riddles, hints and answer checks. 21 thoughts, 304-term offline dictionary, earlier CG city news, government jobs/exams and browser features preserved. No fake headlines, verified breaking claims, unsubstantiated astrology predictions, tracking or ads. This is a debug beta: build checks cannot replace real-device browser tests or guarantee a live feed is always available." \
               --prerelease
           fi
