@@ -27,6 +27,19 @@ public final class DailyNewsSourcesTest {
         check(URLDecoder.decode(DailyNewsSources.feed("breaking",false,false,3),
             StandardCharsets.UTF_8).contains("India latest news"),
             "India headlines in English");
+        for(String topic:new String[]{DailyNewsSources.SPORTS,DailyNewsSources.BREAKING}){
+            for(boolean hindi:new boolean[]{true,false}){
+                for(boolean region:new boolean[]{true,false}){
+                    String page=DailyNewsSources.searchPage(topic,hindi,region);
+                    check(page.startsWith("https://news.google.com/search?q="),
+                        "browser fallback must be a HTTPS news search");
+                    String q=URLDecoder.decode(page,StandardCharsets.UTF_8);
+                    check(q.contains("gl=IN"),"news fallback uses India region");
+                    if(region)check(q.contains("छत्तीसगढ़")||q.contains("Chhattisgarh"),
+                        "Chhattisgarh filter retained in browser fallback");
+                }
+            }
+        }
         boolean rejected=false;
         try{DailyNewsSources.feed("horoscope",true,false,1);}
         catch(IllegalArgumentException e){rejected=true;}
