@@ -272,21 +272,15 @@ public final class MainActivity extends Activity {
         news.setBackground(card(0xff1b3451,0xff3f7294,19));
         add(layout,news,12);
         add(layout,text("Select your city • See publisher & published date • Read full story",12,MUTED,false),7);
-        TextView links=text("LEARNING SHORTCUTS",13,MUTED,true);add(layout,links,23);
-        String[] labels={"NCERT","Wikipedia","Khan Academy","Google Scholar"};
-        String[] urls={"https://ncert.nic.in/","https://www.wikipedia.org/",
-            "https://www.khanacademy.org/","https://scholar.google.com/"};
-        for(int i=0;i<labels.length;i+=2){
-            LinearLayout row=row();
-            for(int j=0;j<2;j++){
-                final int n=i+j;
-                TextView shortcut=pill("↗  "+labels[n],()->openAddress(urls[n]));
-                LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(51),1);
-                if(j==1)p.leftMargin=dp(10);
-                row.addView(shortcut,p);
-            }
-            add(layout,row,10);
-        }
+        TextView links=text("SAURABH VISION LEARNING",13,MUTED,true);
+        add(layout,links,23);
+        TextView learning=pill("✦  Saurabh Vision Learning App  ↗",()->
+            openAddress("https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/"));
+        learning.setTextColor(MINT);
+        learning.setBackground(card(0xff163c4b,0xff3b947b,18));
+        add(layout,learning,10);
+        add(layout,text("Explore your learning app, quizzes and study activities.",
+            12,MUTED,false),7);
         List<String> last=store.session();
         if(!last.isEmpty()){
             TextView restore=pill("↶  Restore "+last.size()+" previous tabs",()->restoreTabs(last));

@@ -66,6 +66,15 @@ jobs:
           assert len(set(words))==len(words), 'Duplicate dictionary words'
           print(f'PASS {len(lines)} offline dictionary entries')
           PY
+          python3 - <<'PY'
+          from pathlib import Path
+          source=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/MainActivity.java').read_text(encoding='utf-8')
+          assert 'Saurabh Vision Learning App' in source, 'Owner learning shortcut missing'
+          assert 'https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/' in source, 'Owner learning app URL missing'
+          legacy=['https://ncert.nic.in/','https://www.khanacademy.org/','https://www.wikipedia.org/','https://scholar.google.com/']
+          assert not any(x in source for x in legacy), 'Legacy learning shortcuts still on homepage'
+          print('PASS owner learning app replaces all external education shortcuts')
+          PY
 
       - name: Install Android SDK 35
         shell: bash
@@ -87,13 +96,13 @@ jobs:
           test -s "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
           mkdir -p dist
-          cp "$APK" dist/S_Browser_v1.5.0_Accuracy_First_Daily_Beta.apk
+          cp "$APK" dist/S_Browser_v1.6.0_Saurabh_Vision_Learning_Beta.apk
 
       - name: Upload installable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S-Browser-1.5.0-APK
-          path: dist/S_Browser_v1.5.0_Accuracy_First_Daily_Beta.apk
+          name: S-Browser-1.6.0-APK
+          path: dist/S_Browser_v1.6.0_Saurabh_Vision_Learning_Beta.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -105,13 +114,13 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          TAG="s-browser-v1.5.0-beta"
-          FILE="dist/S_Browser_v1.5.0_Accuracy_First_Daily_Beta.apk"
+          TAG="s-browser-v1.6.0-beta"
+          FILE="dist/S_Browser_v1.6.0_Saurabh_Vision_Learning_Beta.apk"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$FILE" --clobber
           else
             gh release create "$TAG" "$FILE" \
-              --title "S Browser 1.5 Beta — Accuracy First Daily Assembly" \
-              --notes "S Browser 1.5 by SAURABHS VISION: 31 unique original daily Hindi-English thoughts and 31 short daily school assembly speeches now rotate with the calendar date, including return-from-background date refresh. General News and Sports News load on demand from a time-limited third-party news feed with strict selection of established HTTPS publisher domains, genuine source publication date, six concise news headlines, Read original article and Compare other sources links. If no credible dated story is available, nothing is invented. Trusted source selection does NOT independently fact-check the claims. Existing 304-entry offline dictionary, CG city news, Jobs/Exams, games, crosswords and S logo remain. Debug beta requires real-device news availability and accuracy review before presenting school facts." \
+              --title "S Browser 1.6 Beta — Saurabh Vision Learning App" \
+              --notes "S Browser 1.6: Replaced homepage Learning Shortcuts to show only the owner's Saurabh Vision Learning App; removed NCERT, Khan Academy, Wikipedia and Google Scholar homepage shortcut buttons. The new featured button opens the owner's GitHub Pages-hosted learning application directly at https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/ . Existing browser tabs, offline English-Hindi dictionary, Chhattisgarh Jobs, City News, daily school assembly, sports, thought of the day, speech, puzzles and user-selected icon remain. This remains a debug-signed beta, and internet is required for the web learning app. Real-phone navigation testing is recommended." \
               --prerelease
           fi
