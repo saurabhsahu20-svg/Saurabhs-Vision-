@@ -108,7 +108,11 @@ def collect(root,now,official=False):
     return sorted(out,key=lambda x:x["published_ms"],reverse=True)
 
 def get_feed(category,region,language,now,fetcher=fetch_xml):
-    rows=collect(fetcher(google_rss(category,region,language)),now)
+    rows=[]
+    try:
+        rows=collect(fetcher(google_rss(category,region,language)),now)
+    except Exception as exc:
+        print("Google RSS unavailable:",str(exc)[:100],file=sys.stderr)
     # PIB is an independent official backup source for India general news.
     if category=="breaking" and region=="india":
         try:
