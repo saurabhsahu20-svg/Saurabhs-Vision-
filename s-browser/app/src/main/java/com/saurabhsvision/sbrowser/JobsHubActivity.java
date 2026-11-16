@@ -87,6 +87,9 @@ public final class JobsHubActivity extends Activity {
         add(title,label("Jobs & Exams",24,WHITE,true),0);
         add(title,label("Chhattisgarh  •  Official sources",12,CYAN,false),2);
         top.addView(title,new LinearLayout.LayoutParams(0,-2,1));
+        TextView news=button("📰",()->startActivity(
+            new Intent(this,CityNewsActivity.class)));
+        top.addView(news,new LinearLayout.LayoutParams(dp(50),dp(46)));
         TextView bell=button("🔔",this::showAlertSettings);
         top.addView(bell,new LinearLayout.LayoutParams(dp(50),dp(46)));
         add(root,top,0);
