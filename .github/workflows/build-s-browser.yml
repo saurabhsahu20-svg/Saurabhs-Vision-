@@ -54,6 +54,21 @@ jobs:
           javac -encoding UTF-8 -cp "$dir" -d "$dir"             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/DailyAssemblyContent.java             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/DailyNewsSources.java             s-browser/tests/DailyAssemblyContentTest.java             s-browser/tests/DailyNewsSourcesTest.java
           java -ea -cp "$dir" DailyAssemblyContentTest
           java -ea -cp "$dir" DailyNewsSourcesTest
+          python3 s-browser/tools/test_news_digest.py
+          python3 - <<'PY'
+          from pathlib import Path
+          main=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/MainActivity.java').read_text(encoding='utf-8')
+          activity=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/DailyAssemblyActivity.java').read_text(encoding='utf-8')
+          client=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/AssemblyNewsSource.java').read_text(encoding='utf-8')
+          assert "TODAY'S NEWS DESK" in main
+          assert "openAssemblySection(4)" in main and "openAssemblySection(3)" in main
+          assert "AssemblyNewsSource.fetch(" in activity
+          assert "renderNewsError(" in activity and "renderHeadline(" in activity
+          assert "Read source" in activity and "Cross-check" in activity
+          assert "fetchDigest(" in client and "fetchSchoolNewsRss(" in client
+          assert "trustedPublisherUrl" in client and "MAX_DIGEST_AGE" in client
+          print('PASS news fallback, original source links and professional news desk UI')
+          PY
           javac -encoding UTF-8 -cp "$dir" -d "$dir"             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/NewsQualityGate.java             s-browser/tests/NewsQualityGateTest.java
           java -ea -cp "$dir" NewsQualityGateTest
           python3 - <<'PY'
@@ -114,13 +129,13 @@ jobs:
           test -s "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
           mkdir -p dist
-          cp "$APK" dist/S_Browser_v1.7.0_Smooth_Tabs_City_News_Fix_Beta.apk
+          cp "$APK" dist/S_Browser_v1.8.0_General_News_Professional_Beta.apk
 
       - name: Upload installable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S-Browser-1.7.0-APK
-          path: dist/S_Browser_v1.7.0_Smooth_Tabs_City_News_Fix_Beta.apk
+          name: S-Browser-1.8.0-APK
+          path: dist/S_Browser_v1.8.0_General_News_Professional_Beta.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -132,13 +147,13 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          TAG="s-browser-v1.7.0-beta"
-          FILE="dist/S_Browser_v1.7.0_Smooth_Tabs_City_News_Fix_Beta.apk"
+          TAG="s-browser-v1.8.0-beta"
+          FILE="dist/S_Browser_v1.8.0_General_News_Professional_Beta.apk"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$FILE" --clobber
           else
             gh release create "$TAG" "$FILE" \
-              --title "S Browser 1.7 Beta — Smooth Tabs & City News Recovery" \
-              --notes "S Browser 1.7 fixes the City News timeout user experience: one bounded retry for slow mobile RSS connections, clearly labeled locally cached dated articles if recent, quick Retry, Open live news in WebView, and Hindi/English switch. If no verified recent feed content is available, no fake headlines are invented. Browser now has a premium horizontal tab strip below the address bar showing Home, individual website tabs, close buttons, and + New; switching retains loaded WebViews without reloading. Gradient homepage, visible section divider headers and polished dark styling. Previous SAURABH VISION learning shortcut, 304-word dictionary, CG Jobs, Daily Assembly and news, bookmarks, notes and original S Browser icon preserved. Beta build has automated checks, but actual news availability depends on device internet and Google News; physical device testing required." \
+              --title "S Browser 1.8 Beta — Reliable News & Professional Design" \
+              --notes "S Browser 1.8 repairs General and Sports news timeout dead ends with a two-stage attributed news feed: the privacy-friendly GitHub Pages bulletin, refreshed periodically by scheduled GitHub Actions from established Hindi/English publishers and PIB where possible; fallback to live Google News RSS, and visible Retry/Open Latest News/official PIB-News On AIR links on total outage. All cards have publisher, actual feed publication date, original news link and Cross-check action. No generated or fake news. A scheduled bulletin is clearly marked as last synced, NOT instant live breaking coverage. Premium news desk layout, clean gradient header, polished buttons, and dedicated one-tap General and Sports cards on the main homepage. CG Jobs, City News, Saurabh Vision learning shortcut, offline dictionary, Daily Assembly, smooth tabs and original S Browser icon are preserved. Android beta: real-device tests and external feeds cannot be guaranteed; publishers are not independently fact-checked." \
               --prerelease
           fi
