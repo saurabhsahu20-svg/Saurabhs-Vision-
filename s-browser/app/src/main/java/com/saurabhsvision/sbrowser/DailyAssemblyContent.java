@@ -132,7 +132,7 @@ public final class DailyAssemblyContent {
     };
 
     private static final Puzzle[] PUZZLES={
-        new Puzzle("LEARN","LEARN","What we do at school.","What has many keys but cannot open a door?","A piano."),
+        new Puzzle("RNEAL","LEARN","What we do at school.","What has many keys but cannot open a door?","A piano."),
         new Puzzle("ETARW","WATER","A drink and part of rivers.","What goes up but never comes down?","Your age."),
         new Puzzle("NAPLET","PLANET","Earth is one.","What has hands but cannot clap?","A clock."),
         new Puzzle("LIPENC","PENCIL","Used for writing.","Which month has 28 days?","Every month."),
