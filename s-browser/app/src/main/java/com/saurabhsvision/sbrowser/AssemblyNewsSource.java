@@ -19,6 +19,10 @@ import java.util.Locale;
 public final class AssemblyNewsSource {
     public static final String DIGEST =
         "https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/s-browser-news/latest.json";
+    // GitHub Pages may lag behind a successful news-refresh commit. The public
+    // raw file is an independent delivery route, not an independent news source.
+    private static final String RAW_DIGEST =
+        "https://raw.githubusercontent.com/saurabhsahu20-svg/Saurabhs-Vision-/main/website/s-browser-news/latest.json";
     private static final long MAX_DIGEST_AGE=12L*60L*60L*1000L;
     private AssemblyNewsSource(){}
 
@@ -56,15 +60,36 @@ public final class AssemblyNewsSource {
         if(!DailyNewsSources.SPORTS.equals(category) &&
            !DailyNewsSources.BREAKING.equals(category))
             throw new IllegalArgumentException("Unknown news category");
-        URL url=new URL(DIGEST);
+        Exception firstError=null;
+        // Prefer deployed Pages, but do not make Pages deployment a single point
+        // of failure: the GitHub Actions job commits the same JSON to main.
+        for(String endpoint:new String[]{DIGEST,RAW_DIGEST}){
+            try{
+                CityNewsFeed.Result result=readDigest(endpoint,key,days);
+                if(result!=null && !result.stories.isEmpty())return result;
+            }catch(Exception e){
+                if(firstError==null)firstError=e;
+            }
+        }
+        if(firstError!=null)throw firstError;
+        return null;
+    }
+
+    private static CityNewsFeed.Result readDigest(String endpoint,String key,int days)
+        throws Exception {
+        URL url=new URL(endpoint);
         HttpURLConnection connection=(HttpURLConnection)url.openConnection();
-        connection.setConnectTimeout(6500);
-        connection.setReadTimeout(6500);
-        connection.setInstanceFollowRedirects(false);
+        connection.setConnectTimeout(4500);
+        connection.setReadTimeout(4500);
+        connection.setInstanceFollowRedirects(true);
         connection.setRequestProperty("Accept","application/json");
+        connection.setRequestProperty("User-Agent","SBrowser/1.8 Android");
         try{
             if(connection.getResponseCode()!=200)
-                throw new Exception("News bulletin unavailable");
+                throw new Exception("News bulletin HTTP "+connection.getResponseCode());
+            // Defensive final URL check in case a CDN or proxy redirects us.
+            if(!"https".equalsIgnoreCase(connection.getURL().getProtocol()))
+                throw new Exception("Insecure bulletin redirect");
             ByteArrayOutputStream buffer=new ByteArrayOutputStream();
             try(InputStream in=connection.getInputStream()){
                 byte[] block=new byte[4096];int n;
