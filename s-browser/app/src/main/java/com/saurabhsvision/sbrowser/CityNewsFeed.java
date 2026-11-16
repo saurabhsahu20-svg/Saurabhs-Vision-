@@ -37,7 +37,13 @@ public final class CityNewsFeed {
     private CityNewsFeed(){}
 
     public static Result fetch(String city,boolean hindi,int days) throws Exception {
-        return fetchRss(CityNewsSources.rssUrl(city,hindi,days),days,false);
+        String feedUrl=CityNewsSources.rssUrl(city,hindi,days);
+        try{
+            return fetchRss(feedUrl,days,false,6500);
+        }catch(java.net.SocketTimeoutException timeout){
+            // One bounded retry is useful on slow mobile connections.
+            return fetchRss(feedUrl,days,false,10000);
+        }
     }
 
     /** Generic city feed. Still requires date and publisher attribution. */
@@ -50,13 +56,16 @@ public final class CityNewsFeed {
         return fetchRss(target,days,true);
     }
     private static Result fetchRss(String target,int days,boolean curated) throws Exception {
+        return fetchRss(target,days,curated,8500);
+    }
+    private static Result fetchRss(String target,int days,boolean curated,int timeout) throws Exception {
         if(target==null)throw new IllegalArgumentException("Missing trusted news query");
         URL url=new URL(target);
         if(!"https".equals(url.getProtocol())||
             !"news.google.com".equalsIgnoreCase(url.getHost()))
             throw new IllegalArgumentException("Only trusted news feed host allowed");
         HttpURLConnection con=(HttpURLConnection)url.openConnection();
-        con.setConnectTimeout(7500);con.setReadTimeout(7500);
+        con.setConnectTimeout(timeout);con.setReadTimeout(timeout);
         con.setRequestProperty("User-Agent","SBrowser-StudentNews/1.3");
         con.setRequestProperty("Accept","application/rss+xml, application/xml, text/xml");
         con.setInstanceFollowRedirects(true);
