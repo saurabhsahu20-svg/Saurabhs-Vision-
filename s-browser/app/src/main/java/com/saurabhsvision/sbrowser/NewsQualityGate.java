@@ -18,7 +18,9 @@ public final class NewsQualityGate {
         "news18.com","business-standard.com","livemint.com",
         "economictimes.indiatimes.com","theprint.in",
         "espncricinfo.com","olympics.com","icc-cricket.com",
-        "bcci.tv","sportstar.thehindu.com"
+        "bcci.tv","sportstar.thehindu.com",
+        "naidunia.com","haribhoomi.com","patrika.com","bhaskar.com",
+        "jagran.com","etvbharat.com"
     };
 
     /** Only HTTPS matching publisher domains and their genuine subdomains. */

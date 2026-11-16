@@ -24,6 +24,8 @@ APPROVED={
     "livemint.com","economictimes.indiatimes.com","theprint.in",
     "espncricinfo.com","olympics.com","icc-cricket.com","bcci.tv",
     "sportstar.thehindu.com",
+    "naidunia.com","haribhoomi.com","patrika.com","bhaskar.com",
+    "jagran.com","etvbharat.com",
 }
 CATEGORIES=("breaking","sports")
 REGIONS=("cg","india")
