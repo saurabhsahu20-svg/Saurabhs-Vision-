@@ -69,6 +69,32 @@ public final class CityNewsActivity extends Activity {
         return t;
     }
     private void toast(String msg){Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();}
+    private GradientDrawable newsGradient(){
+        GradientDrawable background=new GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            new int[]{0xff1e4860,0xff172d56,0xff132b3d});
+        background.setCornerRadius(dp(22));
+        background.setStroke(dp(1),0xff4b8298);
+        return background;
+    }
+    private void showRecoveryActions(){
+        LinearLayout actions=row();
+        TextView retry=chip("↻  Retry feed",this::reload);
+        TextView open=chip("↗  Open live news",()->
+            openUrl(CityNewsSources.liveNewsSearch(city)));
+        open.setTextColor(MINT);
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(52),1);
+        p.rightMargin=dp(8);actions.addView(retry,p);
+        actions.addView(open,new LinearLayout.LayoutParams(0,dp(52),1));
+        add(results,actions,12);
+        TextView other=chip(hindi?"⌕  Try English headlines":"⌕  Try Hindi headlines",
+            ()->{hindi=!hindi;langLabel.setText(hindi?"हिन्दी  ▾":"English  ▾");
+                prefs();reload();});
+        add(results,other,9);
+        add(results,text("Tip: If the RSS service is slow on your network, "+
+            "Open live news uses the browser directly. Always check publisher and date.",
+            12,MUTED,false),11);
+    }
     @Override public void onCreate(Bundle state){
         super.onCreate(state);
         getWindow().setStatusBarColor(BG);
@@ -107,8 +133,9 @@ public final class CityNewsActivity extends Activity {
 
         LinearLayout information=column();
         information.setPadding(dp(15),dp(14),dp(15),dp(14));
-        information.setBackground(shape(0xff183451,0xff3f779a,21));
-        add(information,text("खबरें अपने शहर की",20,WHITE,true),0);
+        information.setBackground(newsGradient());
+        add(information,text("📰  CHHATTISGARH • CITY BULLETIN",12,MINT,true),0);
+        add(information,text("खबरें अपने शहर की",22,WHITE,true),9);
         add(information,text(
             "Headlines are provided by news publishers. Check the full original article before sharing or relying on the information.",
             12,MUTED,false),7);
@@ -212,7 +239,7 @@ public final class CityNewsActivity extends Activity {
         final String area=city;
         final int window=days;
         final boolean language=hindi;
-        status.setText("Loading publisher headlines for "+area+"…");
+        status.setText("Updating recent news for "+area+"…");
         results.removeAllViews();
         loading.setVisibility(View.VISIBLE);
         new Thread(()->{
@@ -226,29 +253,50 @@ public final class CityNewsActivity extends Activity {
                 if(closed||request!=sequence)return;
                 loading.setVisibility(View.GONE);
                 if(delivered==null){
-                    status.setText("Could not get live news. Check internet or try News search.");
-                    add(results,text("Network/feed unavailable"+
-                        (failure==null?"":": "+failure)+
-                        ". No outdated headlines have been substituted.",
-                        13,MUTED,false),12);
+                    boolean timedOut=failure!=null&&
+                        failure.toLowerCase(java.util.Locale.ROOT).contains("timed out");
+                    status.setText(timedOut?
+                        "Live RSS timed out • Other ways to read news below":
+                        "Live RSS unavailable • Open news in your browser below");
+                    CityNewsFeed.Result stored=CityNewsCache.load(
+                        this,area,language,window,System.currentTimeMillis());
+                    if(stored!=null){
+                        render(stored,true);
+                    }else{
+                        add(results,text("We could not get fresh RSS headlines "+
+                            "right now. No fabricated or outdated news is shown.",
+                            14,GOLD,false),11);
+                    }
+                    showRecoveryActions();
                 }else{
                     lastFetch=delivered.checkedAt;
-                    render(delivered);
+                    if(!delivered.stories.isEmpty())
+                        CityNewsCache.save(this,area,language,window,delivered);
+                    render(delivered,false);
                 }
             });
         },"SBrowser-CityNews").start();
     }
-    private void render(CityNewsFeed.Result feed){
+    private void render(CityNewsFeed.Result feed,boolean saved){
         results.removeAllViews();
-        DateFormat checked=DateFormat.getTimeInstance(DateFormat.SHORT);
-        status.setText(feed.stories.size()+" published headline(s)  •  Checked "+
-            checked.format(new Date(feed.checkedAt))+
-            "  •  "+periodName());
+        DateFormat checked=DateFormat.getDateTimeInstance(
+            DateFormat.SHORT,DateFormat.SHORT);
+        if(saved){
+            status.setText("⚠ Saved, NOT live • Last fetched "+
+                checked.format(new Date(feed.checkedAt)));
+            add(results,text("Internet/feed is unavailable. These saved headlines "+
+                "are from the last 12 hours and still inside the selected publication "+
+                "window. Their status may have changed.",13,GOLD,false),9);
+        }else{
+            status.setText(feed.stories.size()+" dated headline(s) • Updated "+
+                checked.format(new Date(feed.checkedAt))+" • "+periodName());
+        }
         if(feed.stories.isEmpty()){
-            add(results,text("No dated articles found for this city and time range. "+
-                "Try 7 days, the other language, or News search. "+
+            add(results,text("No dated articles found in this time range. "+
+                "Try another language, a broader time filter or live search. "+
                 "This does not mean nothing happened in your city.",
                 14,MUTED,false),12);
+            showRecoveryActions();
             return;
         }
         for(CityNewsFeed.Story article:feed.stories){
