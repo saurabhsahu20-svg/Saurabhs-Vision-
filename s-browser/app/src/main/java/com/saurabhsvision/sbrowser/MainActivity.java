@@ -189,15 +189,15 @@ public final class MainActivity extends Activity {
         bottom=row();
         bottom.setPadding(dp(7),dp(5),dp(7),dp(5));
         bottom.setBackground(card(0xff10223d,0xff254970,24));
-        String[] icons={"‹","›","⌂","▣","Aa","⚑"};
-        String[] labels={"Back","Next","Home","Tabs","Words","Jobs"};
-        Runnable[] actions={this::back,this::forward,this::showHome,this::showTabs,
-            ()->showDictionary(""),this::showJobsHub};
+        String[] icons={"‹","⌂","▣","Aa","⚑","▤"};
+        String[] labels={"Back","Home","Tabs","Words","Jobs","News"};
+        Runnable[] actions={this::back,this::showHome,this::showTabs,
+            ()->showDictionary(""),this::showJobsHub,this::showCityNews};
         for(int i=0;i<icons.length;i++){
             final int index=i;
             LinearLayout cell=column();
             cell.setGravity(Gravity.CENTER);
-            TextView icon=text(icons[i],23,i==4||i==5?MINT:CYAN,true);
+            TextView icon=text(icons[i],23,i>=4?MINT:CYAN,true);
             icon.setGravity(Gravity.CENTER);cell.addView(icon);
             TextView label=text(labels[i],10,MUTED,false);
             label.setGravity(Gravity.CENTER);cell.addView(label);
@@ -205,7 +205,7 @@ public final class MainActivity extends Activity {
             bottom.addView(cell,p);
             cell.setContentDescription(labels[i]);
             cell.setOnClickListener(v->actions[index].run());
-            if(i==3)tabBadge=label;
+            if(i==2)tabBadge=label;
         }
         LinearLayout.LayoutParams b=new LinearLayout.LayoutParams(-1,dp(72));
         b.setMargins(dp(12),dp(2),dp(12),dp(7));root.addView(bottom,b);
@@ -261,6 +261,11 @@ public final class MainActivity extends Activity {
         jobs.addView(careers,new LinearLayout.LayoutParams(-1,dp(58)));
         add(layout,jobs,11);
         add(layout,text("City-wise official portals • Railway • JEE • Navodaya • Sainik School",12,MUTED,false),7);
+        TextView news=pill("▤  Latest Chhattisgarh City News  →",this::showCityNews);
+        news.setTextColor(CYAN);
+        news.setBackground(card(0xff1b3451,0xff3f7294,19));
+        add(layout,news,12);
+        add(layout,text("Select your city • See publisher & published date • Read full story",12,MUTED,false),7);
         TextView links=text("LEARNING SHORTCUTS",13,MUTED,true);add(layout,links,23);
         String[] labels={"NCERT","Wikipedia","Khan Academy","Google Scholar"};
         String[] urls={"https://ncert.nic.in/","https://www.wikipedia.org/",
@@ -502,6 +507,7 @@ public final class MainActivity extends Activity {
             (d,i)->openAddress(items.get(i).url)).setNegativeButton("Close",null).show();
     }
     private void showJobsHub(){startActivity(new Intent(this,JobsHubActivity.class));}
+    private void showCityNews(){startActivity(new Intent(this,CityNewsActivity.class));}
     private void showBookmarks(){showList("Bookmarks",store.list("bookmarks"));}
     private void showHistory(){showList("Browsing history",store.list("history"));}
     private void editNote(){
@@ -628,7 +634,7 @@ public final class MainActivity extends Activity {
             "◉  Study Focus","▣  Bookmarks","◷  History","↓  Downloads",
             "⌕  Search engine","▤  Desktop / mobile site","↗  Share page",
             "⊘  Clear browsing data","ⓘ  About S Browser",
-            "⚑  CG Jobs, Railway & Exams"};
+            "⚑  CG Jobs, Railway & Exams","▤  Latest CG City News","→  Forward page"};
         new AlertDialog.Builder(this).setTitle("S Browser tools").setItems(choices,(d,i)->{
             Tab tab=current();
             switch(i){
@@ -665,11 +671,13 @@ public final class MainActivity extends Activity {
                     startActivity(Intent.createChooser(share,"Share page"));break;
                 case 12:clearData();break;
                 case 13:new AlertDialog.Builder(this).setTitle("About S Browser")
-                    .setMessage("S Browser 1.2 Beta • SAURABH'S VISION™\n\n"+
+                    .setMessage("S Browser 1.3 Beta • SAURABH'S VISION™\n\n"+
                     "Android WebView-powered browsing; a curated offline English–Hindi student dictionary, local bookmarks, notes and Study Focus. No ads or analytics.\n\n"+
                     "Study Focus blocks selected top-level websites, not every possible distracting resource. This browser is an early beta and does not yet provide full incognito isolation, automatic spam protection or universal ad blocking.")
                     .setPositiveButton("OK",null).show();break;
                 case 14:showJobsHub();break;
+                case 15:showCityNews();break;
+                case 16:forward();break;
             }
         }).show();
     }
