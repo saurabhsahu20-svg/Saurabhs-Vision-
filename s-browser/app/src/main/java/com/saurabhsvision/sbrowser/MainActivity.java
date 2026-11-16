@@ -19,6 +19,7 @@ import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.text.TextUtils;
 import android.view.inputmethod.EditorInfo;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
@@ -34,6 +35,7 @@ import android.webkit.WebViewClient;
 import android.net.http.SslError;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -69,7 +71,8 @@ public final class MainActivity extends Activity {
     private BrowserStore store;
     private DictionaryRepository dictionary;
     private TextToSpeech tts;
-    private LinearLayout root,top,bottom;
+    private LinearLayout root,top,bottom,tabLine;
+    private HorizontalScrollView tabStrip;
     private FrameLayout contentFrame;
     private EditText address;
     private ProgressBar progress;
@@ -84,6 +87,27 @@ public final class MainActivity extends Activity {
         d.setColor(fill);d.setCornerRadius(dp(radius));
         if(stroke!=0)d.setStroke(dp(1),stroke);
         return d;
+    }
+    private GradientDrawable premiumHero(){
+        GradientDrawable d=new GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            new int[]{0xff314874,0xff20345b,0xff173c4c});
+        d.setCornerRadius(dp(24));
+        d.setStroke(dp(1),0xff6381ae);
+        return d;
+    }
+    private void sectionHeading(LinearLayout host,String title,int accent){
+        LinearLayout header=row();
+        View mark=new View(this);
+        mark.setBackground(card(accent,0,5));
+        header.addView(mark,new LinearLayout.LayoutParams(dp(4),dp(21)));
+        TextView label=text(title,12,accent,true);
+        label.setPadding(dp(10),0,dp(7),0);
+        header.addView(label,new LinearLayout.LayoutParams(-2,dp(30)));
+        View rule=new View(this);rule.setBackgroundColor(0xff284565);
+        LinearLayout.LayoutParams ruleP=new LinearLayout.LayoutParams(0,dp(1),1);
+        ruleP.leftMargin=dp(8);header.addView(rule,ruleP);
+        add(host,header,21);
     }
     private TextView text(String label,int size,int color,boolean medium){
         TextView v=new TextView(this);
@@ -129,10 +153,16 @@ public final class MainActivity extends Activity {
             openAddress(intent.getData().toString());
     }
     private void buildShell(){
-        root=column();root.setBackgroundColor(BG);
+        root=column();
+        root.setBackground(new GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            new int[]{BG,0xff071527,0xff061125}));
         root.setPadding(0,0,0,dp(7));
         setContentView(root);
-        top=column();top.setPadding(dp(15),dp(12),dp(15),dp(8));
+        top=column();top.setPadding(dp(14),dp(11),dp(14),dp(2));
+        top.setBackground(new GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            new int[]{0xff101e39,0xff0a1931}));
         root.addView(top,new LinearLayout.LayoutParams(-1,-2));
         LinearLayout header=row();
         ImageView logo=new ImageView(this);
@@ -183,6 +213,15 @@ public final class MainActivity extends Activity {
         progress.setVisibility(View.GONE);
         LinearLayout.LayoutParams progressP=new LinearLayout.LayoutParams(-1,dp(3));
         progressP.topMargin=dp(3);top.addView(progress,progressP);
+        tabStrip=new HorizontalScrollView(this);
+        tabStrip.setHorizontalScrollBarEnabled(false);
+        tabStrip.setFillViewport(false);
+        tabStrip.setSmoothScrollingEnabled(true);
+        tabStrip.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        tabLine=row();tabLine.setPadding(dp(1),dp(6),dp(2),dp(7));
+        tabStrip.addView(tabLine,new HorizontalScrollView.LayoutParams(-2,-2));
+        LinearLayout.LayoutParams tabsP=new LinearLayout.LayoutParams(-1,dp(53));
+        tabsP.topMargin=dp(2);top.addView(tabStrip,tabsP);
         contentFrame=new FrameLayout(this);
         root.addView(contentFrame,new LinearLayout.LayoutParams(-1,0,1));
 
@@ -215,10 +254,68 @@ public final class MainActivity extends Activity {
         if(tabBadge!=null)tabBadge.setText("Tabs "+tabs.size());
         if(focusBadge!=null)focusBadge.setText(store.focusMode()?"FOCUS ON":"STUDY");
         if(focusBadge!=null)focusBadge.setTextColor(store.focusMode()?MINT:MUTED);
+        refreshTabStrip();
+    }
+    private void refreshTabStrip(){
+        if(tabLine==null)return;
+        tabLine.removeAllViews();
+        TextView start=text("⌂  Home",13,home?0xff061527:WHITE,true);
+        start.setGravity(Gravity.CENTER);
+        start.setPadding(dp(15),0,dp(15),0);
+        start.setBackground(card(home?MINT:PANEL,home?MINT:EDGE,14));
+        LinearLayout.LayoutParams startP=new LinearLayout.LayoutParams(-2,dp(39));
+        startP.rightMargin=dp(7);tabLine.addView(start,startP);
+        start.setOnClickListener(v->showHome());
+        for(Tab tab:tabs){
+            boolean active=!home&&selected>=0&&selected<tabs.size()&&
+                tabs.get(selected)==tab;
+            LinearLayout chip=row();
+            chip.setBackground(card(active?0xff24476a:0xff102239,
+                active?CYAN:0xff35516c,13));
+            View indicator=new View(this);
+            indicator.setBackground(card(active?CYAN:0xff2e4b65,0,3));
+            chip.addView(indicator,new LinearLayout.LayoutParams(dp(3),dp(22)));
+            String title=tab.title;
+            if(title==null||title.isEmpty()||title.equals("New Tab")){
+                try{
+                    String url=tab.web.getUrl();
+                    String host=url==null?"":Uri.parse(url).getHost();
+                    title=host==null?"New Tab":host;
+                }catch(Exception ignored){title="New Tab";}
+            }
+            TextView titleView=text(title,13,active?WHITE:MUTED,true);
+            titleView.setSingleLine(true);
+            titleView.setEllipsize(TextUtils.TruncateAt.END);
+            titleView.setMaxWidth(dp(142));
+            titleView.setPadding(dp(9),0,dp(5),0);
+            chip.addView(titleView,new LinearLayout.LayoutParams(-2,dp(37)));
+            TextView close=text("×",21,active?CYAN:MUTED,false);
+            close.setGravity(Gravity.CENTER);
+            close.setContentDescription("Close "+title);
+            chip.addView(close,new LinearLayout.LayoutParams(dp(32),dp(37)));
+            close.setOnClickListener(v->closeTab(tab));
+            chip.setContentDescription("Open tab: "+title);
+            chip.setOnClickListener(v->{
+                int index=tabs.indexOf(tab);
+                if(index>=0){selected=index;attachCurrent();}
+            });
+            LinearLayout.LayoutParams chipP=new LinearLayout.LayoutParams(-2,dp(39));
+            chipP.rightMargin=dp(7);tabLine.addView(chip,chipP);
+        }
+        TextView plus=text("＋ New",13,MINT,true);
+        plus.setGravity(Gravity.CENTER);
+        plus.setPadding(dp(12),0,dp(12),0);
+        plus.setBackground(card(0xff133849,0xff3d867e,13));
+        tabLine.addView(plus,new LinearLayout.LayoutParams(-2,dp(39)));
+        plus.setContentDescription("Create new browser tab");
+        plus.setOnClickListener(v->{
+            if(createTab()!=null)showHome();
+        });
     }
     private void showHome(){
         home=true;
         if(contentFrame==null)return;
+        for(Tab t:tabs)t.web.onPause();
         contentFrame.removeAllViews();
         address.setText("");
         progress.setVisibility(View.GONE);
@@ -227,10 +324,10 @@ public final class MainActivity extends Activity {
         LinearLayout layout=column();
         layout.setPadding(dp(18),dp(16),dp(18),dp(26));scroll.addView(layout);
         LinearLayout hero=column();hero.setPadding(dp(20),dp(20),dp(20),dp(19));
-        hero.setBackground(card(0xff21325d,0xff536bad,24));
-        TextView eyebrow=text("LEARN  •  EXPLORE  •  CREATE",12,MINT,true);
+        hero.setBackground(premiumHero());
+        TextView eyebrow=text("✦  SMART BROWSING  •  STUDENT EDITION",12,MINT,true);
         add(hero,eyebrow,0);
-        add(hero,text("The web, made for your ideas.",25,WHITE,true),10);
+        add(hero,text("Explore more. Learn better.",26,WHITE,true),10);
         add(hero,text("Fast browsing with an offline student dictionary and private local notes.",13,0xffd2e1f5,false),10);
         TextView enter=pill("⌕  Search the web  →",()->{
             address.requestFocus();
@@ -245,7 +342,7 @@ public final class MainActivity extends Activity {
         add(layout,assembly,12);
         add(layout,text("Thought • Speech • Sports • Breaking News • Astrology • Crossword • Puzzles",
             12,MUTED,false),7);
-        TextView quick=text("STUDY TOOLS",13,MUTED,true);add(layout,quick,22);
+        sectionHeading(layout,"STUDY TOOLS",CYAN);
         LinearLayout first=row();
         TextView dictionaryBtn=pill("Aa  Dictionary",()->showDictionary(""));
         TextView notes=pill("✎  Quick Notes",this::editNote);
@@ -272,8 +369,7 @@ public final class MainActivity extends Activity {
         news.setBackground(card(0xff1b3451,0xff3f7294,19));
         add(layout,news,12);
         add(layout,text("Select your city • See publisher & published date • Read full story",12,MUTED,false),7);
-        TextView links=text("SAURABH VISION LEARNING",13,MUTED,true);
-        add(layout,links,23);
+        sectionHeading(layout,"SAURABH VISION LEARNING",MINT);
         TextView learning=pill("✦  Saurabh Vision Learning App  ↗",()->
             openAddress("https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/"));
         learning.setTextColor(MINT);
@@ -286,7 +382,8 @@ public final class MainActivity extends Activity {
             TextView restore=pill("↶  Restore "+last.size()+" previous tabs",()->restoreTabs(last));
             add(layout,restore,24);
         }
-        add(layout,text("S Browser  •  by SAURABH'S VISION™",11,MUTED,false),25);
+        add(layout,text("S Browser  •  by SAURABH'S VISION™  •  Private local study tools",
+            11,MUTED,false),25);
         refreshTabBadge();
     }
     private void restoreTabs(List<String> urls){
@@ -335,10 +432,15 @@ public final class MainActivity extends Activity {
     private void attachCurrent(){
         if(selected<0||selected>=tabs.size()){showHome();return;}
         home=false;
-        contentFrame.removeAllViews();
         WebView web=tabs.get(selected).web;
-        if(web.getParent() instanceof ViewGroup)((ViewGroup)web.getParent()).removeView(web);
-        contentFrame.addView(web,new FrameLayout.LayoutParams(-1,-1));
+        for(Tab tab:tabs)if(tab.web!=web)tab.web.onPause();
+        if(web.getParent()!=contentFrame){
+            contentFrame.removeAllViews();
+            if(web.getParent() instanceof ViewGroup)
+                ((ViewGroup)web.getParent()).removeView(web);
+            contentFrame.addView(web,new FrameLayout.LayoutParams(-1,-1));
+        }
+        web.onResume();
         String url=web.getUrl();
         address.setText(url!=null&&url.startsWith("http")?url:"");
         refreshTabBadge();
@@ -385,6 +487,7 @@ public final class MainActivity extends Activity {
             @Override public void onPageFinished(WebView view,String url){
                 tab.title=view.getTitle()==null||view.getTitle().isEmpty()?url:view.getTitle();
                 if(url!=null)store.history(url,tab.title);
+                refreshTabStrip();
                 if(selected>=0&&selected<tabs.size()&&tabs.get(selected)==tab&&!home){
                     address.setText(url);progress.setVisibility(View.GONE);
                 }
@@ -475,12 +578,16 @@ public final class MainActivity extends Activity {
     private void closeTab(Tab tab){
         int index=tabs.indexOf(tab);
         if(index<0)return;
+        boolean current=!home&&index==selected;
         tabs.remove(index);
         if(tab.web.getParent() instanceof ViewGroup)
             ((ViewGroup)tab.web.getParent()).removeView(tab.web);
         tab.web.stopLoading();tab.web.destroy();
-        selected=tabs.isEmpty()?-1:Math.min(index,tabs.size()-1);
-        showHome();
+        if(tabs.isEmpty()){selected=-1;showHome();return;}
+        if(index<selected)selected--;
+        else if(index==selected)selected=Math.min(index,tabs.size()-1);
+        if(current)attachCurrent();
+        else refreshTabBadge();
     }
     private void downloadFile(String url,String mime,String disposition){
         if(url==null||!(url.startsWith("https://")||url.startsWith("http://"))){
@@ -689,6 +796,15 @@ public final class MainActivity extends Activity {
     @Override public void onBackPressed(){
         if(fullScreenVideo!=null){hideVideo();return;}
         back();
+    }
+    @Override protected void onPause(){
+        for(Tab tab:tabs)tab.web.onPause();
+        super.onPause();
+    }
+    @Override protected void onResume(){
+        super.onResume();
+        if(!home&&selected>=0&&selected<tabs.size())
+            tabs.get(selected).web.onResume();
     }
     @Override protected void onStop(){
         super.onStop();

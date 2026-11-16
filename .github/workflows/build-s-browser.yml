@@ -75,6 +75,24 @@ jobs:
           assert not any(x in source for x in legacy), 'Legacy learning shortcuts still on homepage'
           print('PASS owner learning app replaces all external education shortcuts')
           PY
+          python3 - <<'PY'
+          from pathlib import Path
+          main=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/MainActivity.java').read_text(encoding='utf-8')
+          city=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/CityNewsActivity.java').read_text(encoding='utf-8')
+          cache=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/CityNewsCache.java').read_text(encoding='utf-8')
+          feed=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/CityNewsFeed.java').read_text(encoding='utf-8')
+          assert 'HorizontalScrollView tabStrip' in main
+          assert 'private void refreshTabStrip()' in main
+          assert 'if(web.getParent()!=contentFrame)' in main
+          assert 'web.onResume()' in main and 'tab.web.onPause()' in main
+          assert 'private void showRecoveryActions()' in city
+          assert 'CityNewsCache.load(' in city and 'CityNewsCache.save(' in city
+          assert 'Saved, NOT live' in city
+          assert 'MAX_CACHE_AGE_MS=12L*60L*60L*1000L' in cache
+          assert 'java.net.SocketTimeoutException' in feed
+          assert 'Saurabh Vision Learning App' in main
+          print('PASS visible tab strip, WebView persistence, network recovery, explicit cached-news label')
+          PY
 
       - name: Install Android SDK 35
         shell: bash
@@ -96,13 +114,13 @@ jobs:
           test -s "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
           mkdir -p dist
-          cp "$APK" dist/S_Browser_v1.6.0_Saurabh_Vision_Learning_Beta.apk
+          cp "$APK" dist/S_Browser_v1.7.0_Smooth_Tabs_City_News_Fix_Beta.apk
 
       - name: Upload installable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S-Browser-1.6.0-APK
-          path: dist/S_Browser_v1.6.0_Saurabh_Vision_Learning_Beta.apk
+          name: S-Browser-1.7.0-APK
+          path: dist/S_Browser_v1.7.0_Smooth_Tabs_City_News_Fix_Beta.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -114,13 +132,13 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          TAG="s-browser-v1.6.0-beta"
-          FILE="dist/S_Browser_v1.6.0_Saurabh_Vision_Learning_Beta.apk"
+          TAG="s-browser-v1.7.0-beta"
+          FILE="dist/S_Browser_v1.7.0_Smooth_Tabs_City_News_Fix_Beta.apk"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$FILE" --clobber
           else
             gh release create "$TAG" "$FILE" \
-              --title "S Browser 1.6 Beta — Saurabh Vision Learning App" \
-              --notes "S Browser 1.6: Replaced homepage Learning Shortcuts to show only the owner's Saurabh Vision Learning App; removed NCERT, Khan Academy, Wikipedia and Google Scholar homepage shortcut buttons. The new featured button opens the owner's GitHub Pages-hosted learning application directly at https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/ . Existing browser tabs, offline English-Hindi dictionary, Chhattisgarh Jobs, City News, daily school assembly, sports, thought of the day, speech, puzzles and user-selected icon remain. This remains a debug-signed beta, and internet is required for the web learning app. Real-phone navigation testing is recommended." \
+              --title "S Browser 1.7 Beta — Smooth Tabs & City News Recovery" \
+              --notes "S Browser 1.7 fixes the City News timeout user experience: one bounded retry for slow mobile RSS connections, clearly labeled locally cached dated articles if recent, quick Retry, Open live news in WebView, and Hindi/English switch. If no verified recent feed content is available, no fake headlines are invented. Browser now has a premium horizontal tab strip below the address bar showing Home, individual website tabs, close buttons, and + New; switching retains loaded WebViews without reloading. Gradient homepage, visible section divider headers and polished dark styling. Previous SAURABH VISION learning shortcut, 304-word dictionary, CG Jobs, Daily Assembly and news, bookmarks, notes and original S Browser icon preserved. Beta build has automated checks, but actual news availability depends on device internet and Google News; physical device testing required." \
               --prerelease
           fi
