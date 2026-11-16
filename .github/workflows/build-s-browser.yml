@@ -49,6 +49,8 @@ jobs:
           java -ea -cp "$dir" DictionaryEntryTest
           javac -encoding UTF-8 -d "$dir"             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/GovtSources.java             s-browser/tests/GovtSourcesTest.java
           java -ea -cp "$dir" GovtSourcesTest
+          javac -encoding UTF-8 -cp "$dir" -d "$dir"             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/CityNewsSources.java             s-browser/tests/CityNewsSourcesTest.java
+          java -ea -cp "$dir" CityNewsSourcesTest
           python3 - <<'PY'
           from pathlib import Path
           dictionary=Path('s-browser/app/src/main/assets/dictionary.tsv')
@@ -80,13 +82,13 @@ jobs:
           test -s "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
           mkdir -p dist
-          cp "$APK" dist/S_Browser_v1.2.0_CG_Jobs_Exams_Beta.apk
+          cp "$APK" dist/S_Browser_v1.3.0_CG_City_News_Beta.apk
 
       - name: Upload installable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S-Browser-1.2.0-APK
-          path: dist/S_Browser_v1.2.0_CG_Jobs_Exams_Beta.apk
+          name: S-Browser-1.3.0-APK
+          path: dist/S_Browser_v1.3.0_CG_City_News_Beta.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -98,10 +100,13 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          TAG="s-browser-v1.2.0-beta"
-          FILE="dist/S_Browser_v1.2.0_CG_Jobs_Exams_Beta.apk"
+          TAG="s-browser-v1.3.0-beta"
+          FILE="dist/S_Browser_v1.3.0_CG_City_News_Beta.apk"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$FILE" --clobber
           else
-            gh release create "$TAG" "$FILE"               --title "S Browser 1.2 Beta — CG Jobs & Exams"               --notes "S Browser 1.2 Beta by SAURABHS VISION adds a Chhattisgarh Jobs and Exams Hub with 20 official recruitment and admission portals, filters for Raipur, Bhilai/Durg, Rajnandgaon, Bilaspur, Dhamtari, Mahasamund/Saraipali, Raigarh and all 33 districts, plus Railway, CGPSC, Vyapam, JEE Main and Advanced, Navodaya, Sainik School and NTSE links. Includes government-domain-focused search and opt-in best-effort Android notifications when an official webpage changes. Changes do NOT confirm a new vacancy, eligibility, application status or deadline; verify publisher PDFs and dates. Browser, 304-word offline English-Hindi dictionary, tabs, notes and existing S icon preserved. Android WebView beta, not a certified vacancy alert aggregator. Test real devices, screen locks and portal access."               --prerelease
+            gh release create "$TAG" "$FILE" \
+              --title "S Browser 1.3 Beta — Chhattisgarh City News" \
+              --notes "S Browser v1.3 by SAURABHS VISION: CG City News displays published headlines from attributed news feeds with publisher, original source link, publication date and manual refresh. Hindi/English news, last 24 hours/3 days/7 days, popular Chhattisgarh cities, all 33 districts and custom town search. Also includes the official Chhattisgarh government news portal shortcut. The app cannot independently verify publisher claims or guarantee every city has articles: no results and network failures are clearly shown, with no invented news. Existing Jobs and Exams hub, 304-word offline dictionary, browsing, bookmarks and S icon remain. This is an Android beta; test on device. News aggregation depends on third-party feed availability." \
+              --prerelease
           fi
