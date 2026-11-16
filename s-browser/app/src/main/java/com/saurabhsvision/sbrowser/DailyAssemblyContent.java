@@ -136,15 +136,15 @@ public final class DailyAssemblyContent {
         new Puzzle("ETARW","WATER","A drink and part of rivers.","What goes up but never comes down?","Your age."),
         new Puzzle("NAPLET","PLANET","Earth is one.","What has hands but cannot clap?","A clock."),
         new Puzzle("LIPENC","PENCIL","Used for writing.","Which month has 28 days?","Every month."),
-        new Puzzle("RITBAGH","BRIGHT","Full of light.","What has a neck but no head?","A bottle."),
+        new Puzzle("RIBGHT","BRIGHT","Full of light.","What has a neck but no head?","A bottle."),
         new Puzzle("SITROHY","HISTORY","Study of the past.","What is full of holes but holds water?","A sponge."),
         new Puzzle("NREEGY","ENERGY","Needed to do work.","What can travel around the world while staying in a corner?","A stamp."),
-        new Puzzle("TERUNAT","NATURE","The world around us.","What gets wetter as it dries?","A towel."),
+        new Puzzle("TERUNA","NATURE","The world around us.","What gets wetter as it dries?","A towel."),
         new Puzzle("NECICES","SCIENCE","Study of the natural world.","What can you catch but not throw?","A cold."),
         new Puzzle("TDUNEST","STUDENT","A learner.","What has one eye but cannot see?","A needle."),
         new Puzzle("LRIBARY","LIBRARY","Place to borrow books.","What has words but never speaks?","A book."),
-        new Puzzle("OCTEFPR","PERFECT","Without mistakes.","What begins with T, ends with T and has T in it?","A teapot."),
-        new Puzzle("PERASCTE","RESPECT","Showing consideration.","What comes down but never goes up?","Rain."),
+        new Puzzle("EPCFERT","PERFECT","Without mistakes.","What begins with T, ends with T and has T in it?","A teapot."),
+        new Puzzle("TERESPC","RESPECT","Showing consideration.","What comes down but never goes up?","Rain."),
         new Puzzle("IGVER","GIVER","Someone who shares.","What has a face and two hands but no arms or legs?","A clock.")
     };
 
