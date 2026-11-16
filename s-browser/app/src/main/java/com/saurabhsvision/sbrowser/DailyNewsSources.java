@@ -9,6 +9,21 @@ public final class DailyNewsSources {
     public static final String SPORTS="sports";
     public static final String BREAKING="breaking";
 
+    public static String searchPage(String category,boolean hindi,boolean cgOnly){
+        if(!SPORTS.equals(category)&&!BREAKING.equals(category))
+            throw new IllegalArgumentException("Unknown category");
+        String phrase;
+        if(SPORTS.equals(category)){
+            phrase=hindi?(cgOnly?"छत्तीसगढ़ खेल समाचार":"भारत खेल समाचार"):
+                (cgOnly?"Chhattisgarh sports news":"India sports news");
+        }else{
+            phrase=hindi?(cgOnly?"छत्तीसगढ़ ताजा खबर":"भारत समाचार"):
+                (cgOnly?"Chhattisgarh latest news":"India latest news");
+        }
+        return "https://news.google.com/search?q="+
+            URLEncoder.encode(phrase,StandardCharsets.UTF_8)+
+            "&hl="+(hindi?"hi":"en-IN")+"&gl=IN&ceid=IN:"+(hindi?"hi":"en");
+    }
     public static String feed(String category,boolean hindi,boolean cgOnly,int days){
         if(!SPORTS.equals(category)&&!BREAKING.equals(category))
             throw new IllegalArgumentException("Unknown category");
