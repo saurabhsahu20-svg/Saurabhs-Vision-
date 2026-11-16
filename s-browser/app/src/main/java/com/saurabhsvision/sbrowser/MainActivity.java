@@ -96,6 +96,23 @@ public final class MainActivity extends Activity {
         d.setStroke(dp(1),0xff6381ae);
         return d;
     }
+    private View quickCardView(String title,String detail,int accent,Runnable action){
+        LinearLayout tile=column();
+        tile.setPadding(dp(14),dp(14),dp(12),dp(13));
+        GradientDrawable bg=new GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            new int[]{0xff1e3b59,0xff122a3f});
+        bg.setCornerRadius(dp(18));
+        bg.setStroke(dp(1),accent);
+        tile.setBackground(bg);
+        TextView name=text(title,15,WHITE,true);
+        name.setSingleLine(true);
+        add(tile,name,0);
+        add(tile,text(detail,11,MUTED,false),5);
+        tile.setOnClickListener(v->action.run());
+        tile.setContentDescription(title+". "+detail);
+        return tile;
+    }
     private void sectionHeading(LinearLayout host,String title,int accent){
         LinearLayout header=row();
         View mark=new View(this);
@@ -325,9 +342,14 @@ public final class MainActivity extends Activity {
         layout.setPadding(dp(18),dp(16),dp(18),dp(26));scroll.addView(layout);
         LinearLayout hero=column();hero.setPadding(dp(20),dp(20),dp(20),dp(19));
         hero.setBackground(premiumHero());
+        hero.setElevation(dp(3));
         TextView eyebrow=text("✦  SMART BROWSING  •  STUDENT EDITION",12,MINT,true);
         add(hero,eyebrow,0);
         add(hero,text("Explore more. Learn better.",26,WHITE,true),10);
+        add(hero,text("●  DAILY STUDENT DASHBOARD  •  "+
+            java.time.LocalDate.now().format(
+                java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy",Locale.ENGLISH)),
+            11,CYAN,true),8);
         add(hero,text("Fast browsing with an offline student dictionary and private local notes.",13,0xffd2e1f5,false),10);
         TextView enter=pill("⌕  Search the web  →",()->{
             address.requestFocus();
@@ -340,8 +362,19 @@ public final class MainActivity extends Activity {
         assembly.setBackground(card(0xff213e57,0xff6389ab,19));
         assembly.setTextColor(WHITE);
         add(layout,assembly,12);
-        add(layout,text("Thought • Speech • Sports • Breaking News • Astrology • Crossword • Puzzles",
+        add(layout,text("Thought • Speech • Sports • General News • Crossword • Puzzles",
             12,MUTED,false),7);
+        sectionHeading(layout,"TODAY'S NEWS DESK",CYAN);
+        LinearLayout newsQuick=row();
+        View newsGeneral=quickCardView("📰 General News",
+            "Dated • Source-first",CYAN,()->openAssemblySection(4));
+        View newsSports=quickCardView("🏏 Sports News",
+            "Recent • Attributed",MINT,()->openAssemblySection(3));
+        LinearLayout.LayoutParams leftNews=new LinearLayout.LayoutParams(0,dp(80),1);
+        leftNews.rightMargin=dp(10);
+        newsQuick.addView(newsGeneral,leftNews);
+        newsQuick.addView(newsSports,new LinearLayout.LayoutParams(0,dp(80),1));
+        add(layout,newsQuick,7);
         sectionHeading(layout,"STUDY TOOLS",CYAN);
         LinearLayout first=row();
         TextView dictionaryBtn=pill("Aa  Dictionary",()->showDictionary(""));
@@ -616,7 +649,12 @@ public final class MainActivity extends Activity {
     private void showJobsHub(){startActivity(new Intent(this,JobsHubActivity.class));}
     private void showCityNews(){startActivity(new Intent(this,CityNewsActivity.class));}
     private void showDailyAssembly(){
-        startActivity(new Intent(this,DailyAssemblyActivity.class));
+        openAssemblySection(0);
+    }
+    private void openAssemblySection(int section){
+        Intent intent=new Intent(this,DailyAssemblyActivity.class);
+        intent.putExtra("open_scene",section);
+        startActivity(intent);
     }
     private void showBookmarks(){showList("Bookmarks",store.list("bookmarks"));}
     private void showHistory(){showList("Browsing history",store.list("history"));}

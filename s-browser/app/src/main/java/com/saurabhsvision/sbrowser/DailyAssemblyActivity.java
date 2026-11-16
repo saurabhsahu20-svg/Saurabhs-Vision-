@@ -113,7 +113,8 @@ public final class DailyAssemblyActivity extends Activity {
         speechEngine=new TextToSpeech(this,status->{
             readyToSpeak=(status==TextToSpeech.SUCCESS);
         });
-        show(0);
+        int open=getIntent().getIntExtra("open_scene",0);
+        show(open==3||open==4?open:0);
     }
     private void remember(){
         getSharedPreferences(PREFS,MODE_PRIVATE).edit()
