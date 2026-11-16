@@ -98,17 +98,20 @@ public final class MainActivity extends Activity {
     }
     private View quickCardView(String title,String detail,int accent,Runnable action){
         LinearLayout tile=column();
-        tile.setPadding(dp(14),dp(14),dp(12),dp(13));
+        tile.setPadding(dp(11),dp(13),dp(10),dp(12));
         GradientDrawable bg=new GradientDrawable(
             GradientDrawable.Orientation.TL_BR,
             new int[]{0xff1e3b59,0xff122a3f});
         bg.setCornerRadius(dp(18));
         bg.setStroke(dp(1),accent);
         tile.setBackground(bg);
-        TextView name=text(title,15,WHITE,true);
+        TextView name=text(title,13,WHITE,true);
         name.setSingleLine(true);
         add(tile,name,0);
-        add(tile,text(detail,11,MUTED,false),5);
+        TextView subtitle=text(detail,11,MUTED,false);
+        subtitle.setSingleLine(true);
+        subtitle.setEllipsize(TextUtils.TruncateAt.END);
+        add(tile,subtitle,5);
         tile.setOnClickListener(v->action.run());
         tile.setContentDescription(title+". "+detail);
         return tile;
@@ -186,11 +189,15 @@ public final class MainActivity extends Activity {
         logo.setImageResource(R.drawable.s_browser_icon);
         logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
         header.addView(logo,new LinearLayout.LayoutParams(dp(42),dp(42)));
-        TextView name=text("S Browser",21,WHITE,true);
+        LinearLayout branding=column();
+        TextView name=text("S Browser  ✓",21,WHITE,true);
+        branding.addView(name);
+        TextView byline=text("A Saurabh Vision Product",11,MUTED,false);
+        branding.addView(byline);
         LinearLayout.LayoutParams n=new LinearLayout.LayoutParams(0,-2,1);
-        n.leftMargin=dp(9);header.addView(name,n);
-        focusBadge=text("STUDY",10,store.focusMode()?MINT:MUTED,true);
-        focusBadge.setBackground(card(0xff17354a,0xff326477,13));
+        n.leftMargin=dp(11);header.addView(branding,n);
+        focusBadge=text("★ STUDENT",10,store.focusMode()?MINT:CYAN,true);
+        focusBadge.setBackground(card(0xff152e4e,0xff4f8fa7,13));
         focusBadge.setPadding(dp(9),dp(9),dp(9),dp(9));
         header.addView(focusBadge);
         focusBadge.setOnClickListener(v->toggleFocus());
@@ -202,7 +209,8 @@ public final class MainActivity extends Activity {
         add(top,header,0);
 
         LinearLayout search=row();
-        search.setBackground(card(PANEL,EDGE,21));
+        search.setBackground(card(0xff193456,0xff5796c6,21));
+        search.setElevation(dp(3));
         search.setPadding(dp(10),dp(4),dp(7),dp(4));
         TextView lock=text("⌕",25,CYAN,false);lock.setGravity(Gravity.CENTER);
         search.addView(lock,new LinearLayout.LayoutParams(dp(37),dp(40)));
@@ -224,6 +232,7 @@ public final class MainActivity extends Activity {
         TextView go=text("GO",13,CYAN,true);go.setGravity(Gravity.CENTER);
         search.addView(go,new LinearLayout.LayoutParams(dp(48),dp(42)));
         go.setOnClickListener(v->openAddress(address.getText().toString()));
+        go.setBackground(card(0xff174eab,0xff397df0,15));
         add(top,search,7);
         progress=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
         progress.setMax(100);progress.setProgress(0);
@@ -244,7 +253,8 @@ public final class MainActivity extends Activity {
 
         bottom=row();
         bottom.setPadding(dp(7),dp(5),dp(7),dp(5));
-        bottom.setBackground(card(0xff10223d,0xff254970,24));
+        bottom.setBackground(card(0xff0d2447,0xff4b81ba,24));
+        bottom.setElevation(dp(5));
         String[] icons={"‹","⌂","▣","Aa","⚑","▤"};
         String[] labels={"Back","Home","Tabs","Words","Jobs","News"};
         Runnable[] actions={this::back,this::showHome,this::showTabs,
@@ -345,25 +355,43 @@ public final class MainActivity extends Activity {
         hero.setElevation(dp(3));
         TextView eyebrow=text("✦  SMART BROWSING  •  STUDENT EDITION",12,MINT,true);
         add(hero,eyebrow,0);
-        add(hero,text("Explore more. Learn better.",26,WHITE,true),10);
+        add(hero,text("Explore  •  Study  •  Learn  •  Grow",24,WHITE,true),10);
         add(hero,text("●  DAILY STUDENT DASHBOARD  •  "+
             java.time.LocalDate.now().format(
                 java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy",Locale.ENGLISH)),
             11,CYAN,true),8);
-        add(hero,text("Fast browsing with an offline student dictionary and private local notes.",13,0xffd2e1f5,false),10);
+        add(hero,text("Your student-friendly web companion. Browse, read verified-source news, practise and organize study notes.",13,0xffd2e1f5,false),10);
         TextView enter=pill("⌕  Search the web  →",()->{
             address.requestFocus();
             ((android.view.inputmethod.InputMethodManager)getSystemService(INPUT_METHOD_SERVICE))
                 .showSoftInput(address,android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
         });
-        enter.setBackground(card(0xff304a7c,0xff7488c9,17));add(hero,enter,16);
+        enter.setBackground(card(0xff174eab,0xff7cb8ff,17));
+        enter.setElevation(dp(2));
+        add(hero,enter,16);
         add(layout,hero,2);
         TextView assembly=pill("✦  Daily Assembly & Fun  →",this::showDailyAssembly);
         assembly.setBackground(card(0xff213e57,0xff6389ab,19));
         assembly.setTextColor(WHITE);
         add(layout,assembly,12);
-        add(layout,text("Thought • Speech • Sports • General News • Crossword • Puzzles",
+        add(layout,text("Thought • Speech • Sports • News • Crossword • Puzzles",
             12,MUTED,false),7);
+        // The three frequently used destinations are always visible.
+        LinearLayout shortcuts=row();
+        View shortcutNews=quickCardView("📰 News Desk","Latest sources",CYAN,
+            ()->openAssemblySection(4));
+        View shortcutStudy=quickCardView("✦ Study Portal","Saurabh Vision",MINT,
+            ()->openAddress("https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/"));
+        View shortcutFun=quickCardView("▦ Games","Daily practice",PURPLE,
+            ()->openAssemblySection(7));
+        LinearLayout.LayoutParams shortcutP1=new LinearLayout.LayoutParams(0,dp(80),1);
+        shortcutP1.rightMargin=dp(7);
+        shortcuts.addView(shortcutNews,shortcutP1);
+        LinearLayout.LayoutParams shortcutP2=new LinearLayout.LayoutParams(0,dp(80),1);
+        shortcutP2.rightMargin=dp(7);
+        shortcuts.addView(shortcutStudy,shortcutP2);
+        shortcuts.addView(shortcutFun,new LinearLayout.LayoutParams(0,dp(80),1));
+        add(layout,shortcuts,12);
         sectionHeading(layout,"TODAY'S NEWS DESK",CYAN);
         LinearLayout newsQuick=row();
         View newsGeneral=quickCardView("📰 General News",
@@ -572,9 +600,11 @@ public final class MainActivity extends Activity {
     private Tab current(){return selected>=0&&selected<tabs.size()?tabs.get(selected):null;}
     private void back(){
         if(fullScreenVideo!=null){hideVideo();return;}
+        // On the start page Back must leave the app, not redraw Home forever.
+        if(home){finish();return;}
         Tab tab=current();
-        if(!home&&tab!=null&&tab.web.canGoBack())tab.web.goBack();
-        else showHome();
+        if(tab!=null&&tab.web.canGoBack()){tab.web.goBack();return;}
+        showHome();
     }
     private void forward(){
         Tab tab=current();
