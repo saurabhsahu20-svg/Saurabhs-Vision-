@@ -373,30 +373,42 @@ public final class MainActivity extends Activity {
         contentFrame=new FrameLayout(this);
         root.addView(contentFrame,new LinearLayout.LayoutParams(-1,0,1));
 
+        // Scroll horizontally when eight buttons cannot fit the device width.
+        HorizontalScrollView bottomScroll=new HorizontalScrollView(this);
+        bottomScroll.setHorizontalScrollBarEnabled(false);
+        bottomScroll.setFillViewport(true);
+        bottomScroll.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        bottomScroll.setBackground(gradient(0xff082d5b,0xff061c47,0xff2865aa,24));
+        bottomScroll.setElevation(dp(5));
         bottom=row();
-        bottom.setPadding(dp(7),dp(5),dp(7),dp(5));
-        bottom.setBackground(card(0xff0d2447,0xff4b81ba,24));
-        bottom.setElevation(dp(5));
-        String[] icons={"‹","⌂","▣","Aa","⚑","▤"};
-        String[] labels={"Back","Home","Tabs","Words","Jobs","News"};
-        Runnable[] actions={this::back,this::showHome,this::showTabs,
-            ()->showDictionary(""),this::showJobsHub,this::showCityNews};
+        bottom.setPadding(dp(7),dp(4),dp(7),dp(4));
+        String[] icons={"‹","›","⌂","▣","Aa","⚑","▤","☷"};
+        String[] labels={"Back","Forward","Home","Tabs","Words","Jobs","News","More"};
+        Runnable[] bottomActions={this::back,this::forward,this::showHome,
+            this::showTabs,()->showDictionary(""),this::showJobsHub,
+            this::showCityNews,this::showTools};
         for(int i=0;i<icons.length;i++){
             final int index=i;
             LinearLayout cell=column();
             cell.setGravity(Gravity.CENTER);
-            TextView icon=text(icons[i],23,i>=4?MINT:CYAN,true);
-            icon.setGravity(Gravity.CENTER);cell.addView(icon);
-            TextView label=text(labels[i],10,MUTED,false);
-            label.setGravity(Gravity.CENTER);cell.addView(label);
-            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(61),1);
-            bottom.addView(cell,p);
+            if(i==2)cell.setBackground(gradient(0xff158bff,0xff0051bd,
+                0xff69c6ff,17));
+            TextView icon=text(icons[i],22,0xffffffff,true);
+            icon.setGravity(Gravity.CENTER);
+            cell.addView(icon);
+            TextView label=text(labels[i],10,0xffe5f3ff,false);
+            label.setGravity(Gravity.CENTER);
+            cell.addView(label);
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(59),dp(60));
+            p.rightMargin=dp(1);bottom.addView(cell,p);
             cell.setContentDescription(labels[i]);
-            cell.setOnClickListener(v->actions[index].run());
-            if(i==2)tabBadge=label;
+            cell.setOnClickListener(v->bottomActions[index].run());
+            if(i==3)tabBadge=label;
         }
-        LinearLayout.LayoutParams b=new LinearLayout.LayoutParams(-1,dp(72));
-        b.setMargins(dp(12),dp(2),dp(12),dp(7));root.addView(bottom,b);
+        bottomScroll.addView(bottom,new HorizontalScrollView.LayoutParams(-2,-2));
+        LinearLayout.LayoutParams b=new LinearLayout.LayoutParams(-1,dp(76));
+        b.setMargins(dp(7),dp(2),dp(7),dp(6));
+        root.addView(bottomScroll,b);
         refreshTabBadge();
     }
     private void refreshTabBadge(){
@@ -580,6 +592,16 @@ public final class MainActivity extends Activity {
         LinearLayout.LayoutParams gp=new LinearLayout.LayoutParams(0,dp(48),1);
         gp.leftMargin=dp(8);utility.addView(games,gp);
         add(layout,utility,13);
+        LinearLayout benefits=row();
+        String[] benefitLabels={"⚡ Fast","🛡 Private","📚 All-in-One","💎 Student"};
+        for(int i=0;i<benefitLabels.length;i++){
+            TextView v=homeButton(benefitLabels[i],0xffedf7ff,HOME_BORDER,
+                HOME_INK,this::showAccountInfo);
+            LinearLayout.LayoutParams bp=new LinearLayout.LayoutParams(0,dp(47),1);
+            if(i>0)bp.leftMargin=dp(4);
+            benefits.addView(v,bp);
+        }
+        add(layout,benefits,12);
         List<String> last=store.session();
         if(!last.isEmpty()){
             TextView restore=homeButton("↶ Restore "+last.size()+" previous tabs",
