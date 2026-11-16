@@ -59,6 +59,13 @@ public final class DailyAssemblyActivity extends Activity {
         if(stroke!=0)v.setStroke(dp(1),stroke);
         return v;
     }
+    private GradientDrawable premiumGradient(int c1,int c2,int stroke,int radius){
+        GradientDrawable v=new GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,new int[]{c1,c2});
+        v.setCornerRadius(dp(radius));
+        if(stroke!=0)v.setStroke(dp(1),stroke);
+        return v;
+    }
     private TextView text(String s,int size,int color,boolean medium){
         TextView t=new TextView(this);t.setText(s);t.setTextColor(color);t.setTextSize(size);
         t.setGravity(Gravity.CENTER_VERTICAL);
@@ -106,7 +113,8 @@ public final class DailyAssemblyActivity extends Activity {
         speechEngine=new TextToSpeech(this,status->{
             readyToSpeak=(status==TextToSpeech.SUCCESS);
         });
-        show(0);
+        int open=getIntent().getIntExtra("open_scene",0);
+        show(open==3||open==4?open:0);
     }
     private void remember(){
         getSharedPreferences(PREFS,MODE_PRIVATE).edit()
@@ -131,7 +139,9 @@ public final class DailyAssemblyActivity extends Activity {
         newsRequest++; // stale news fetch must never overwrite another page
         cells=null;
         LinearLayout root=vertical();
-        root.setBackgroundColor(BG);
+        root.setBackground(new GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            new int[]{0xff0b1830,0xff091526,0xff071326}));
         root.setPadding(dp(14),dp(9),dp(14),dp(13));
         setContentView(root);
         LinearLayout top=horizontal();
@@ -167,7 +177,7 @@ public final class DailyAssemblyActivity extends Activity {
     private void header(String eyebrow,String title,String summary){
         LinearLayout box=vertical();
         box.setPadding(dp(17),dp(17),dp(17),dp(17));
-        box.setBackground(background(0xff1e3554,0xff4a759e,23));
+        box.setBackground(premiumGradient(0xff304778,0xff173d4e,0xff5a88b0,23));
         add(box,text(eyebrow,12,MINT,true),0);
         add(box,text(title,23,WHITE,true),8);
         add(box,text(summary,13,MUTED,false),8);
@@ -284,92 +294,155 @@ public final class DailyAssemblyActivity extends Activity {
 
     private void renderNews(){
         boolean sports=scene==3;
-        header(sports?"03 • SPORTS BULLETIN":"04 • CURRENT AFFAIRS",
+        final String category=sports?DailyNewsSources.SPORTS:DailyNewsSources.BREAKING;
+        header(sports?"03 • SPORTS DESK":"04 • DAILY NEWS DESK",
             sports?"Sports News":"General & Latest News",
-            "Only selected established publishers with published times. "+
-                "A trusted publisher is NOT proof every claim is correct.");
+            "A short, date-checked briefing. See the publisher and original article "+
+            "before reading any news aloud in assembly.");
+        add(page,text("CHOOSE YOUR NEWS",12,MINT,true),16);
         actionRow(hindi?"हिन्दी  ▾":"English  ▾",()->{
                 hindi=!hindi;remember();show(scene);
-            },cgNews?"Chhattisgarh  ▾":"All India  ▾",()->{
+            },cgNews?"📍 Chhattisgarh  ▾":"🌐 All India  ▾",()->{
                 cgNews=!cgNews;remember();show(scene);
             });
-        actionRow(newsDays==1?"Last 24 hours  ▾":"Last 3 days  ▾",()->{
+        actionRow(newsDays==1?"◷ Last 24 hours":"◷ Last 3 days",()->{
                 newsDays=newsDays==1?3:1;show(scene);
-            },"↻ Refresh headlines",this::fetchNews);
-        pageStatus=text("Fetching publisher headlines…",13,GOLD,false);
-        add(page,pageStatus,15);
+            },"↻  Refresh bulletin",this::fetchNews);
+
+        LinearLayout bulletin=vertical();
+        bulletin.setPadding(dp(16),dp(15),dp(16),dp(14));
+        bulletin.setBackground(premiumGradient(0xff193b51,0xff162745,
+            0xff387b91,20));
+        add(bulletin,text(sports?"🏏  SPORTS BULLETIN":"📰  CURRENT AFFAIRS",
+            12,MINT,true),0);
+        pageStatus=text("Checking latest available publishers…",14,WHITE,true);
+        add(bulletin,pageStatus,7);
+        TextView guidance=text("Only dated headlines. No guessed facts or fake breaking alerts.",
+            12,MUTED,false);
+        add(bulletin,guidance,6);
+        add(page,bulletin,15);
+
         newsProgress=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
         newsProgress.setIndeterminate(true);
-        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(3));
-        p.topMargin=dp(6);page.addView(newsProgress,p);
+        LinearLayout.LayoutParams progressParams=
+            new LinearLayout.LayoutParams(-1,dp(3));
+        progressParams.topMargin=dp(9);page.addView(newsProgress,progressParams);
         LinearLayout newsContainer=vertical();
-        add(page,newsContainer,10);
-        TextView official=text(sports?
-            "Official results: check match organisers for confirmed scores.":
-            "Government statements: verify on PIB and News On AIR.",12,GOLD,false);
-        add(page,official,9);
-        actionRow("News On AIR  ↗",()->openStory("https://www.newsonair.gov.in/"),
-            "PIB official  ↗",()->openStory("https://pib.gov.in/"));
-        final int selectedScene=scene,days=newsDays;
-        final boolean lang=hindi,cg=cgNews;
-        final String query=DailyNewsSources.feed(
-            sports?DailyNewsSources.SPORTS:DailyNewsSources.BREAKING,lang,cg,days);
-        final int request=++newsRequest;
+        add(page,newsContainer,12);
+
+        add(page,text("OFFICIAL & ALTERNATIVE SOURCES",12,CYAN,true),17);
+        actionRow("🏛  News On AIR",()->
+            openStory("https://www.newsonair.gov.in/"),
+            "PIB • Government",()->openStory("https://pib.gov.in/"));
+        TextView online=button("↗  Open latest news in browser",()->
+            openStory(DailyNewsSources.searchPage(category,hindi,cgNews)));
+        online.setTextColor(MINT);
+        add(page,online,10);
+        add(page,text("News requires connectivity. Third-party publishers can make "+
+            "mistakes; compare important claims with a primary source.",12,MUTED,false),13);
+
+        final int selectedScene=scene,days=newsDays,request=++newsRequest;
+        final boolean language=hindi,region=cgNews;
         new Thread(()->{
-            CityNewsFeed.Result result=null;String error=null;
-            try{result=CityNewsFeed.fetchSchoolNewsRss(query,days);}
-            catch(Exception e){error=e.getMessage();}
-            final CityNewsFeed.Result data=result;
-            final String problem=error;
+            AssemblyNewsSource.Bulletin delivered=null;
+            String failure=null;
+            try{delivered=AssemblyNewsSource.fetch(category,language,region,days);}
+            catch(Exception error){failure=error.getMessage();}
+            final AssemblyNewsSource.Bulletin data=delivered;
+            final String errorText=failure;
             runOnUiThread(()->{
                 if(closed||scene!=selectedScene||request!=newsRequest)return;
                 newsProgress.setVisibility(View.GONE);
                 newsContainer.removeAllViews();
-                if(data==null){
-                    pageStatus.setText("Live headlines unavailable — retry after checking internet");
-                    add(newsContainer,text("Could not load recent news"+
-                        (problem==null?"":": "+problem)+". No old or fabricated"+
-                        " headlines have been substituted.",13,MUTED,false),8);
+                if(data==null||data.result==null||data.result.stories.isEmpty()){
+                    pageStatus.setText("Live headlines not available on this network");
+                    renderNewsError(newsContainer,category,errorText);
                 }else{
-                    pageStatus.setText(Math.min(6,data.stories.size())+
-                        " curated headline(s) • Checked "+
-                        DateFormat.getDateTimeInstance(DateFormat.SHORT,
-                            DateFormat.SHORT).format(new Date(data.checkedAt)));
-                    if(data.stories.isEmpty())
-                        add(newsContainer,text("No recent articles matched the approved "+
-                            "publisher list and date filter. Try a wider region or 3 days. "+
-                            "S Browser will not invent a headline.",14,MUTED,false),10);
+                    String fetched=DateFormat.getDateTimeInstance(
+                        DateFormat.SHORT,DateFormat.SHORT)
+                        .format(new Date(data.result.checkedAt));
+                    pageStatus.setText(data.scheduled?
+                        "✓ Published bulletin • Last synced "+fetched:
+                        "✓ Direct RSS • Retrieved "+fetched);
+                    add(newsContainer,text(data.scheduled?
+                        "Background-checked publisher headlines. Synced periodically, "+
+                        "not a real-time breaking-news feed.":
+                        "Recent dated publisher headlines from the network.",
+                        12,MUTED,false),3);
                     int shown=0;
-                    for(CityNewsFeed.Story story:data.stories){
-                        if(shown++>=6)break;
-                        LinearLayout card=vertical();
-                        card.setPadding(dp(14),dp(13),dp(14),dp(13));
-                        card.setBackground(background(PANEL,EDGE,18));
-                        TextView headline=text(story.title,16,WHITE,true);
-                        headline.setMaxLines(4);add(card,headline,0);
-                        String published=DateFormat.getDateTimeInstance(
-                            DateFormat.MEDIUM,DateFormat.SHORT)
-                            .format(new Date(story.published));
-                        add(card,text("Publisher: "+story.source+"  •  "+published,
-                            12,CYAN,false),8);
-                        add(card,text("Publisher selected • Not independently fact-checked",
-                            11,MUTED,false),7);
-                        TextView read=text("Read original article  ↗",13,MINT,true);
-                        add(card,read,8);
-                        TextView cross=text("Compare coverage from other news sources  ↗",
-                            12,CYAN,false);
-                        add(card,cross,7);
-                        cross.setOnClickListener(v->openStory(
-                            NewsQualityGate.searchForCorroboration(story.title)));
-                        card.setOnClickListener(v->openStory(story.url));
-                        add(newsContainer,card,9);
+                    for(CityNewsFeed.Story story:data.result.stories){
+                        if(shown>=6)break;
+                        renderHeadline(newsContainer,story,++shown);
                     }
                 }
             });
-        },"SBrowser-AssemblyNews").start();
-        note("Only recent dated headlines from a limited list of established HTTPS "+
-            "publishers are displayed. Their claims are not independently verified. "+
-            "Open the article and compare coverage before using it at school.");
+        },"SBrowser-ReliableNews").start();
+    }
+
+    private void renderNewsError(LinearLayout container,String category,String reason){
+        LinearLayout card=vertical();
+        card.setPadding(dp(16),dp(16),dp(16),dp(16));
+        card.setBackground(premiumGradient(0xff263247,0xff182b3f,
+            0xff8b7953,18));
+        add(card,text("⚠ News feed temporarily unavailable",16,GOLD,true),0);
+        add(card,text("The news service did not respond or had no recent "+
+            "approved articles. We will not show made-up or outdated headlines.",
+            13,WHITE,false),9);
+        add(container,card,6);
+        LinearLayout actions=horizontal();
+        TextView retry=button("↻  Try again",this::fetchNews);
+        retry.setTextColor(MINT);
+        TextView online=button("↗  Read online",()->
+            openStory(DailyNewsSources.searchPage(category,hindi,cgNews)));
+        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(53),1);
+        lp.rightMargin=dp(8);actions.addView(retry,lp);
+        actions.addView(online,new LinearLayout.LayoutParams(0,dp(53),1));
+        add(container,actions,12);
+        DailyAssemblyContent.Thought todayThought=DailyAssemblyContent.thought(today);
+        LinearLayout extra=vertical();
+        extra.setPadding(dp(15),dp(15),dp(15),dp(15));
+        extra.setBackground(background(0xff142e42,0xff315a74,18));
+        add(extra,text("TODAY'S ASSEMBLY THOUGHT • OFFLINE",11,CYAN,true),0);
+        add(extra,text(hindi?todayThought.hindi:todayThought.english,
+            17,WHITE,true),10);
+        TextView speech=button("→  Today's short speech",()->show(2));
+        add(extra,speech,12);
+        add(container,extra,15);
+    }
+
+    private void renderHeadline(LinearLayout target,CityNewsFeed.Story story,int position){
+        LinearLayout card=vertical();
+        card.setPadding(dp(15),dp(13),dp(15),dp(15));
+        card.setBackground(premiumGradient(0xff1b3454,0xff11283c,
+            0xff365b7b,19));
+        LinearLayout top=horizontal();
+        TextView index=text(String.format(Locale.ROOT,"%02d",position),
+            19,MINT,true);
+        index.setGravity(Gravity.CENTER);
+        index.setBackground(background(0xff173f49,0xff3a8e84,12));
+        top.addView(index,new LinearLayout.LayoutParams(dp(44),dp(44)));
+        LinearLayout metadata=vertical();metadata.setPadding(dp(12),0,0,0);
+        add(metadata,text(story.source,13,CYAN,true),0);
+        String date=DateFormat.getDateTimeInstance(
+            DateFormat.MEDIUM,DateFormat.SHORT).format(new Date(story.published));
+        add(metadata,text("Published "+date,11,MUTED,false),4);
+        top.addView(metadata,new LinearLayout.LayoutParams(0,-2,1));
+        add(card,top,0);
+        TextView title=text(story.title,16,WHITE,true);
+        title.setMaxLines(4);
+        add(card,title,11);
+        LinearLayout actions=horizontal();
+        TextView original=button("Read source  ↗",()->openStory(story.url));
+        original.setTextColor(MINT);
+        TextView compare=button("Cross-check  ⌕",()->
+            openStory(NewsQualityGate.searchForCorroboration(story.title)));
+        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(49),1);
+        lp.rightMargin=dp(7);actions.addView(original,lp);
+        actions.addView(compare,new LinearLayout.LayoutParams(0,dp(49),1));
+        add(card,actions,10);
+        card.setContentDescription("News "+position+", "+story.title+
+            ", publisher "+story.source+", published "+date);
+        add(target,card,11);
     }
     private void fetchNews(){
         if(scene==3||scene==4)show(scene);
