@@ -297,7 +297,7 @@ public final class DailyAssemblyActivity extends Activity {
         final String category=sports?DailyNewsSources.SPORTS:DailyNewsSources.BREAKING;
         header(sports?"03 • SPORTS DESK":"04 • DAILY NEWS DESK",
             sports?"Sports News":"General & Latest News",
-            "A short, date-checked briefing. See the publisher and original article "+
+            "Up to 10 date-checked headlines with publisher and original article. See the source "+
             "before reading any news aloud in assembly.");
         add(page,text("CHOOSE YOUR NEWS",12,MINT,true),16);
         actionRow(hindi?"हिन्दी  ▾":"English  ▾",()->{
@@ -371,9 +371,16 @@ public final class DailyAssemblyActivity extends Activity {
                         12,MUTED,false),3);
                     int shown=0;
                     for(CityNewsFeed.Story story:data.result.stories){
-                        if(shown>=6)break;
+                        if(shown>=10)break;
                         renderHeadline(newsContainer,story,++shown);
                     }
+                    final int count=shown;
+                    add(newsContainer,text(count==10?
+                        "10 of 10 source-attributed news points shown.":
+                        "Only "+count+" of 10 recent, source-attributed news points available. "+
+                        "Try All India, Last 3 days or Refresh for more. "+
+                        "Missing headlines are never invented.",
+                        12,MUTED,false),12);
                 }
             });
         },"SBrowser-ReliableNews").start();
