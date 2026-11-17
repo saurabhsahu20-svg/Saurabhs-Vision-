@@ -59,7 +59,7 @@ public final class MainActivity extends Activity {
     private static final int BG=0xff071327, PANEL=0xff11233f, EDGE=0xff244d74,
         WHITE=0xfff4f8ff, MUTED=0xff9cb2ce, CYAN=0xff55e4f4,
         MINT=0xff72eabb, PURPLE=0xffa993ff;
-    private static final int PICK_FILE=81, VOICE_SEARCH=82, QR_SCAN=83, MAX_TABS=8;
+    private static final int PICK_FILE=81, VOICE_SEARCH=82, MAX_TABS=8;
     private static final String[] FOCUS_DOMAINS={
         "instagram.com","tiktok.com","facebook.com","x.com","reddit.com"
     };
@@ -250,15 +250,6 @@ public final class MainActivity extends Activity {
             toast("Voice recognition is unavailable on this device");
         }
     }
-    private void openQrScanner(){
-        // Opens an installed compatible scanner only; no fake built-in scanner.
-        Intent scan=new Intent("com.google.zxing.client.android.SCAN");
-        scan.putExtra("SCAN_MODE","QR_CODE_MODE");
-        try{startActivityForResult(scan,QR_SCAN);}
-        catch(ActivityNotFoundException e){
-            toast("A compatible QR scanner app is required");
-        }
-    }
     private void showAccountInfo(){
         new AlertDialog.Builder(this).setTitle("S Browser • Local profile")
             .setMessage("No account required. Bookmarks, notes and history are stored on this device.")
@@ -351,11 +342,6 @@ public final class MainActivity extends Activity {
         voice.setContentDescription("Voice search");
         voice.setOnClickListener(v->requestVoiceSearch());
         search.addView(voice,new LinearLayout.LayoutParams(dp(38),dp(43)));
-        TextView qr=text("▦",23,HOME_BLUE,true);
-        qr.setGravity(Gravity.CENTER);
-        qr.setContentDescription("QR scanner (requires installed scanner)");
-        qr.setOnClickListener(v->openQrScanner());
-        search.addView(qr,new LinearLayout.LayoutParams(dp(34),dp(43)));
         address.setOnEditorActionListener((v,id,event)->{
             if(id==EditorInfo.IME_ACTION_GO||id==EditorInfo.IME_ACTION_SEARCH){
                 openAddress(address.getText().toString());return true;
@@ -624,11 +610,6 @@ public final class MainActivity extends Activity {
         mic.setContentDescription("Voice search");
         mic.setOnClickListener(v->requestVoiceSearch());
         box.addView(mic,new LinearLayout.LayoutParams(dp(40),dp(54)));
-        TextView scan=text("▦",23,HOME_MUTED,true);
-        scan.setGravity(Gravity.CENTER);
-        scan.setContentDescription("Scan QR code with installed scanner");
-        scan.setOnClickListener(v->openQrScanner());
-        box.addView(scan,new LinearLayout.LayoutParams(dp(39),dp(54)));
         add(layout,box,25);
 
         TextView study=text("▦  Open Student Dashboard",14,HOME_BLUE,true);
@@ -988,9 +969,6 @@ public final class MainActivity extends Activity {
                 address.setText(matches.get(0));
                 openAddress(matches.get(0));
             }
-        }else if(request==QR_SCAN){
-            String scanned=data.getStringExtra("SCAN_RESULT");
-            if(scanned!=null&&!scanned.trim().isEmpty())openAddress(scanned);
         }
     }
     private Tab current(){return selected>=0&&selected<tabs.size()?tabs.get(selected):null;}
