@@ -479,6 +479,16 @@ public final class MainActivity extends Activity {
             });
             LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-2,dp(46));
             p.rightMargin=dp(8);tabLine.addView(chip,p);
+            if(active){
+                // Keep the selected tab visible without forcing repeated scroll animations.
+                tabStrip.post(()->{
+                    int left=chip.getLeft(),right=chip.getRight();
+                    int scroll=tabStrip.getScrollX(),width=tabStrip.getWidth();
+                    if(left<scroll)tabStrip.smoothScrollTo(Math.max(0,left-dp(12)),0);
+                    else if(right>scroll+width)
+                        tabStrip.smoothScrollTo(right-width+dp(12),0);
+                });
+            }
         }
     }
     private void showHome(){
