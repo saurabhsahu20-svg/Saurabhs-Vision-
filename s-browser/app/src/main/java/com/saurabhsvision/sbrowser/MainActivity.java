@@ -82,6 +82,9 @@ public final class MainActivity extends Activity {
     private AutoCompleteTextView address;
     private ProgressBar progress;
     private TextView tabBadge,focusBadge;
+    private LinearLayout[] navigationCells;
+    private TextView[] navigationIcons,navigationLabels;
+    private int selectedNavigation=2;
     private ValueCallback<Uri[]> fileCallback;
     private View fullScreenVideo;
     private WebChromeClient.CustomViewCallback videoCallback;
@@ -381,43 +384,76 @@ public final class MainActivity extends Activity {
         contentFrame=new FrameLayout(this);
         root.addView(contentFrame,new LinearLayout.LayoutParams(-1,0,1));
 
-        // Scroll horizontally when eight buttons cannot fit the device width.
+        // Adaptive, thumb-friendly navigation with a single highlighted action.
         HorizontalScrollView bottomScroll=new HorizontalScrollView(this);
         bottomScroll.setHorizontalScrollBarEnabled(false);
         bottomScroll.setFillViewport(true);
         bottomScroll.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        bottomScroll.setBackground(gradient(0xff082d5b,0xff061c47,0xff2865aa,24));
-        bottomScroll.setElevation(dp(5));
+        bottomScroll.setBackground(gradient(0xff0a2f60,0xff061c47,0xff3971ba,24));
+        bottomScroll.setElevation(dp(6));
         bottom=row();
-        bottom.setPadding(dp(7),dp(4),dp(7),dp(4));
+        bottom.setPadding(dp(7),dp(7),dp(7),dp(7));
         String[] icons={"‹","›","⌂","▣","Aa","⚑","▤","☷"};
         String[] labels={"Back","Forward","Home","Tabs","Words","Jobs","News","More"};
         Runnable[] bottomActions={this::back,this::forward,this::showHome,
             this::showTabs,()->showDictionary(""),this::showJobsHub,
             this::showCityNews,this::showTools};
-        for(int i=0;i<icons.length;i++){
+        navigationCells=new LinearLayout[labels.length];
+        navigationIcons=new TextView[labels.length];
+        navigationLabels=new TextView[labels.length];
+        int widthDp=(int)(getResources().getDisplayMetrics().widthPixels/
+            getResources().getDisplayMetrics().density);
+        int itemWidth=Math.max(62,Math.min(92,(widthDp-22)/8));
+        for(int i=0;i<labels.length;i++){
             final int index=i;
             LinearLayout cell=column();
             cell.setGravity(Gravity.CENTER);
-            if(i==2)cell.setBackground(gradient(0xff158bff,0xff0051bd,
-                0xff69c6ff,17));
-            TextView icon=text(icons[i],22,0xffffffff,true);
+            cell.setPadding(dp(2),dp(4),dp(2),dp(4));
+            cell.setMinimumHeight(dp(58));
+            TextView icon=text(icons[i],25,0xffeaf4ff,true);
             icon.setGravity(Gravity.CENTER);
-            cell.addView(icon);
-            TextView label=text(labels[i],10,0xffe5f3ff,false);
+            cell.addView(icon,new LinearLayout.LayoutParams(-1,dp(30)));
+            TextView label=text(labels[i],12,0xffe1edff,true);
             label.setGravity(Gravity.CENTER);
-            cell.addView(label);
-            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(59),dp(60));
-            p.rightMargin=dp(1);bottom.addView(cell,p);
+            label.setSingleLine(true);
+            cell.addView(label,new LinearLayout.LayoutParams(-1,dp(20)));
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(itemWidth),dp(62));
+            p.rightMargin=dp(2);
+            bottom.addView(cell,p);
             cell.setContentDescription(labels[i]);
-            cell.setOnClickListener(v->bottomActions[index].run());
+            cell.setClickable(true);
+            cell.setForeground(new android.graphics.drawable.RippleDrawable(
+                android.content.res.ColorStateList.valueOf(0x44ffffff),null,
+                card(0xffffffff,0,17)));
+            cell.setOnClickListener(v->{
+                selectedNavigation=index;
+                updateBottomNavigation();
+                bottomActions[index].run();
+            });
+            navigationCells[i]=cell;
+            navigationIcons[i]=icon;
+            navigationLabels[i]=label;
             if(i==3)tabBadge=label;
         }
         bottomScroll.addView(bottom,new HorizontalScrollView.LayoutParams(-2,-2));
-        LinearLayout.LayoutParams b=new LinearLayout.LayoutParams(-1,dp(76));
-        b.setMargins(dp(7),dp(2),dp(7),dp(6));
+        LinearLayout.LayoutParams b=new LinearLayout.LayoutParams(-1,dp(86));
+        b.setMargins(dp(8),dp(3),dp(8),dp(8));
         root.addView(bottomScroll,b);
+        updateBottomNavigation();
         refreshTabBadge();
+    }
+    private void updateBottomNavigation(){
+        if(navigationCells==null)return;
+        for(int i=0;i<navigationCells.length;i++){
+            boolean active=i==selectedNavigation;
+            navigationCells[i].setBackground(active?
+                gradient(0xff178fff,0xff0057cb,0xff69cfff,17):
+                card(0x00000000,0,17));
+            navigationIcons[i].setTextColor(active?0xffffffff:0xffd3e7ff);
+            navigationLabels[i].setTextColor(active?0xffffffff:0xffd3e7ff);
+            navigationCells[i].setElevation(active?dp(2):0);
+            navigationCells[i].setSelected(active);
+        }
     }
     private void refreshTabBadge(){
         if(tabBadge!=null)tabBadge.setText("Tabs "+tabs.size());
@@ -495,6 +531,8 @@ public final class MainActivity extends Activity {
         }
     }
     private void showHome(){
+        selectedNavigation=2;
+        updateBottomNavigation();
         dashboardOpen=false;
         home=true;
         if(contentFrame==null)return;
@@ -548,7 +586,7 @@ public final class MainActivity extends Activity {
             dp(98),dp(98));
         rainbowParams.gravity=Gravity.CENTER_HORIZONTAL;
         layout.addView(rainbowLogo,rainbowParams);
-        TextView brand=text("S Browser",44,HOME_BLUE,true);
+        TextView brand=text("Browser",43,HOME_INK,true);
         brand.setGravity(Gravity.CENTER);
         brand.setContentDescription("S Browser search home");
         add(layout,brand,0);
@@ -638,6 +676,8 @@ public final class MainActivity extends Activity {
         host.addView(divider,new LinearLayout.LayoutParams(-1,dp(1)));
     }
     private void showStudentDashboard(){
+        selectedNavigation=2;
+        updateBottomNavigation();
         dashboardOpen=true;
         home=true;
         if(top!=null)top.setVisibility(View.VISIBLE);
@@ -825,6 +865,9 @@ public final class MainActivity extends Activity {
     }
     private void attachCurrent(){
         if(selected<0||selected>=tabs.size()){showHome();return;}
+        // Web tabs use a neutral toolbar state; Home is highlighted only on Home.
+        selectedNavigation=-1;
+        updateBottomNavigation();
         dashboardOpen=false;
         home=false;
         if(top!=null)top.setVisibility(View.VISIBLE);
