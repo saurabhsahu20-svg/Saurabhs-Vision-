@@ -72,6 +72,7 @@ public final class MainActivity extends Activity {
     private final ArrayList<Tab> tabs=new ArrayList<>();
     private int selected=-1;
     private boolean home=true;
+    private boolean dashboardOpen=false;
     private BrowserStore store;
     private DictionaryRepository dictionary;
     private TextToSpeech tts;
@@ -442,6 +443,8 @@ public final class MainActivity extends Activity {
         addQuickTab("⌂ Home",home,this::showHome);
         addQuickTab("◉ Akashvani News",false,
             ()->openAddress("https://www.newsonair.gov.in/"));
+        addQuickTab("▤ Study Dashboard",home&&dashboardOpen,
+            this::showStudentDashboard);
         addQuickTab("▤ Study Portal",false,
             ()->openAddress("https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/"));
         addQuickTab("＋ New Tab",false,()->{
@@ -492,6 +495,140 @@ public final class MainActivity extends Activity {
         }
     }
     private void showHome(){
+        dashboardOpen=false;
+        home=true;
+        if(contentFrame==null)return;
+        for(Tab tab:tabs)tab.web.onPause();
+        contentFrame.removeAllViews();
+        address.setText("");
+        address.dismissDropDown();
+        progress.setVisibility(View.GONE);
+        ScrollView scroll=new ScrollView(this);
+        scroll.setFillViewport(true);
+        scroll.setBackgroundColor(0xffffffff);
+        contentFrame.addView(scroll,new FrameLayout.LayoutParams(-1,-1));
+        LinearLayout layout=column();
+        layout.setPadding(dp(20),dp(12),dp(20),dp(30));
+        scroll.addView(layout);
+        // Inspired by a clean search engine landing page, with S Browser identity.
+        LinearLayout links=row();
+        TextView all=homeButton("ALL",0xffffffff,0,HOME_BLUE,this::showHome);
+        TextView images=homeButton("IMAGES",0xffffffff,0,HOME_MUTED,
+            ()->openAddress("https://www.google.com/imghp?hl=en"));
+        links.addView(all,new LinearLayout.LayoutParams(dp(68),dp(48)));
+        links.addView(images,new LinearLayout.LayoutParams(dp(94),dp(48)));
+        View spacer=new View(this);
+        links.addView(spacer,new LinearLayout.LayoutParams(0,dp(48),1));
+        TextView daily=homeButton("♧",0xffffffff,0,HOME_INK,this::showDailyAssembly);
+        daily.setContentDescription("Daily assembly");
+        links.addView(daily,new LinearLayout.LayoutParams(dp(48),dp(48)));
+        TextView features=homeButton("▦",0xffffffff,0,HOME_INK,
+            this::showStudentDashboard);
+        features.setContentDescription("Study Dashboard");
+        links.addView(features,new LinearLayout.LayoutParams(dp(48),dp(48)));
+        add(layout,links,0);
+        View underline=new View(this);
+        underline.setBackgroundColor(HOME_BLUE);
+        LinearLayout.LayoutParams ul=new LinearLayout.LayoutParams(dp(49),dp(2));
+        layout.addView(underline,ul);
+
+        // Top margin scales gently by screen height. Do not push input off
+        // small phones or leave the keyboard obscuring important controls.
+        int screenDp=(int)(getResources().getDisplayMetrics().heightPixels/
+            getResources().getDisplayMetrics().density);
+        int heroGap=Math.max(46,Math.min(145,screenDp/8));
+        View gap=new View(this);add(layout,gap,heroGap);
+        TextView brand=text("S Browser",44,HOME_BLUE,true);
+        brand.setGravity(Gravity.CENTER);
+        brand.setContentDescription("S Browser search home");
+        add(layout,brand,0);
+        TextView byline=text("Explore • Study • Learn • Grow",12,HOME_MUTED,false);
+        byline.setGravity(Gravity.CENTER);
+        add(layout,byline,2);
+
+        LinearLayout box=row();
+        box.setBackground(card(0xffffffff,0xffdce2ea,30));
+        box.setElevation(dp(2));
+        box.setPadding(dp(12),0,dp(8),0);
+        TextView searchIcon=text("⌕",27,0xff84909f,false);
+        searchIcon.setGravity(Gravity.CENTER);
+        box.addView(searchIcon,new LinearLayout.LayoutParams(dp(35),dp(54)));
+        EditText query=new EditText(this);
+        query.setSingleLine(true);
+        query.setTextSize(16);
+        query.setTextColor(HOME_INK);
+        query.setHintTextColor(0xff82909f);
+        query.setHint("Search or enter a website");
+        query.setBackgroundColor(Color.TRANSPARENT);
+        query.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+        query.setInputType(InputType.TYPE_CLASS_TEXT);
+        box.addView(query,new LinearLayout.LayoutParams(0,dp(54),1));
+        query.setOnEditorActionListener((v,action,event)->{
+            if(action==EditorInfo.IME_ACTION_SEARCH||action==EditorInfo.IME_ACTION_GO){
+                String value=query.getText().toString().trim();
+                if(!value.isEmpty())openAddress(value);
+                return true;
+            }
+            return false;
+        });
+        TextView mic=text("🎙",20,HOME_MUTED,true);
+        mic.setGravity(Gravity.CENTER);
+        mic.setContentDescription("Voice search");
+        mic.setOnClickListener(v->requestVoiceSearch());
+        box.addView(mic,new LinearLayout.LayoutParams(dp(40),dp(54)));
+        TextView scan=text("▦",23,HOME_MUTED,true);
+        scan.setGravity(Gravity.CENTER);
+        scan.setContentDescription("Scan QR code with installed scanner");
+        scan.setOnClickListener(v->openQrScanner());
+        box.addView(scan,new LinearLayout.LayoutParams(dp(39),dp(54)));
+        add(layout,box,25);
+
+        TextView study=text("▦  Open Student Dashboard",14,HOME_BLUE,true);
+        study.setGravity(Gravity.CENTER);
+        study.setPadding(dp(8),dp(13),dp(8),dp(13));
+        study.setOnClickListener(v->showStudentDashboard());
+        add(layout,study,17);
+
+        List<BrowserStore.Site> history=store.list("history");
+        TextView heading=text(history.isEmpty()?"START EXPLORING":"RECENTLY VISITED",
+            18,HOME_INK,true);
+        add(layout,heading,28);
+        if(history.isEmpty()){
+            addSearchSuggestion(layout,"News and current affairs","latest India news");
+            addSearchSuggestion(layout,"Study resources","educational resources");
+            addSearchSuggestion(layout,"Explore Saurabh Vision","https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/");
+            addSearchSuggestion(layout,"Student dashboard",null);
+        }else{
+            int count=0;
+            for(BrowserStore.Site item:history){
+                if(count++>=7)break;
+                String title=item.title==null||item.title.trim().isEmpty()?
+                    item.url:item.title;
+                addSearchSuggestion(layout,title,item.url);
+            }
+        }
+        refreshTabBadge();
+    }
+    private void addSearchSuggestion(LinearLayout host,String title,String target){
+        LinearLayout line=row();
+        line.setPadding(dp(10),dp(13),dp(10),dp(13));
+        TextView icon=text("⌕",23,HOME_MUTED,false);
+        line.addView(icon,new LinearLayout.LayoutParams(dp(37),dp(37)));
+        TextView label=text(title,15,HOME_INK,false);
+        label.setSingleLine(true);
+        label.setEllipsize(TextUtils.TruncateAt.END);
+        line.addView(label,new LinearLayout.LayoutParams(0,dp(37),1));
+        line.setOnClickListener(v->{
+            if(target==null)showStudentDashboard();
+            else openAddress(target);
+        });
+        add(host,line,1);
+        View divider=new View(this);
+        divider.setBackgroundColor(0xffe7e9ef);
+        host.addView(divider,new LinearLayout.LayoutParams(-1,dp(1)));
+    }
+    private void showStudentDashboard(){
+        dashboardOpen=true;
         home=true;
         if(contentFrame==null)return;
         for(Tab tab:tabs)tab.web.onPause();
@@ -804,7 +941,7 @@ public final class MainActivity extends Activity {
     private void back(){
         if(fullScreenVideo!=null){hideVideo();return;}
         // On the start page Back must leave the app, not redraw Home forever.
-        if(home){finish();return;}
+        if(home){if(dashboardOpen)showHome();else finish();return;}
         Tab tab=current();
         if(tab!=null&&tab.web.canGoBack()){tab.web.goBack();return;}
         showHome();
