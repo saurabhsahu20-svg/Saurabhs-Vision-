@@ -1,0 +1,11 @@
+S Browser Android build diagnostic
+Commit: f7f52ef6ac8df26fa57a4db61cf834bcf252cf6a
+Run: 43995013445
+Note: compiler/error excerpts only; not a complete Gradle log
+22:/home/runner/work/Saurabhs-Vision-/Saurabhs-Vision-/s-browser/app/src/main/java/com/saurabhsvision/sbrowser/MainActivity.java:1029: error: method onActivityResult(int,int,Intent) is already defined in class MainActivity
+30:FAILURE: Build failed with an exception.
+32:* What went wrong:
+33:Execution failed for task ':app:compileDebugJavaWithJavac'.
+41:org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:compileDebugJavaWithJavac'.
+73:Caused by: org.gradle.api.internal.tasks.compile.CompilationFailedException: Compilation failed; see the compiler error output for details.
+232:BUILD FAILED in 10s
