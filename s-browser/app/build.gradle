@@ -15,3 +15,21 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 }
+
+ 
+// Generate the small WebP resource deterministically from the checked-in
+// rainbow S artwork. No external image URL or network dependency required.
+android.sourceSets.main.res.srcDir("$buildDir/generated/rainbowLogo")
+tasks.register('generateRainbowLogo') {
+    inputs.file('src/main/assets/rainbow_s_logo.b64')
+    outputs.file("$buildDir/generated/rainbowLogo/drawable-nodpi/rainbow_s_icon.webp")
+    doLast {
+        def destination = file("$buildDir/generated/rainbowLogo/drawable-nodpi/rainbow_s_icon.webp")
+        destination.parentFile.mkdirs()
+        destination.bytes = java.util.Base64.getMimeDecoder().decode(
+            file('src/main/assets/rainbow_s_logo.b64').text)
+    }
+}
+tasks.named('preBuild').configure {
+    dependsOn(tasks.named('generateRainbowLogo'))
+}
