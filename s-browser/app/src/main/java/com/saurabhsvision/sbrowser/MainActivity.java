@@ -275,7 +275,7 @@ public final class MainActivity extends Activity {
         root.addView(top,new LinearLayout.LayoutParams(-1,-2));
         LinearLayout header=row();
         ImageView logo=new ImageView(this);
-        logo.setImageResource(R.drawable.s_browser_icon);
+        logo.setImageResource(R.drawable.rainbow_s_icon);
         logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
         header.addView(logo,new LinearLayout.LayoutParams(dp(48),dp(48)));
         LinearLayout branding=column();
@@ -540,6 +540,14 @@ public final class MainActivity extends Activity {
         int heroGap=Math.max(46,Math.min(145,screenDp/8));
         View gap=new View(this);
         layout.addView(gap,new LinearLayout.LayoutParams(-1,dp(heroGap)));
+        ImageView rainbowLogo=new ImageView(this);
+        rainbowLogo.setImageResource(R.drawable.rainbow_s_icon);
+        rainbowLogo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        rainbowLogo.setContentDescription("Rainbow S Browser logo");
+        LinearLayout.LayoutParams rainbowParams=new LinearLayout.LayoutParams(
+            dp(98),dp(98));
+        rainbowParams.gravity=Gravity.CENTER_HORIZONTAL;
+        layout.addView(rainbowLogo,rainbowParams);
         TextView brand=text("S Browser",44,HOME_BLUE,true);
         brand.setGravity(Gravity.CENTER);
         brand.setContentDescription("S Browser search home");
