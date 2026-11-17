@@ -60,7 +60,10 @@ jobs:
           main=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/MainActivity.java').read_text(encoding='utf-8')
           activity=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/DailyAssemblyActivity.java').read_text(encoding='utf-8')
           client=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/AssemblyNewsSource.java').read_text(encoding='utf-8')
-          assert "TODAY'S NEWS DESK" in main
+          # Check real navigation wiring, not fragile visible copy or comments.
+          assert 'String[] quickLabels=' in main
+          assert 'General News' in main and 'Sports News' in main
+          assert 'homeBanner(layout' in main
           assert "openAssemblySection(4)" in main and "openAssemblySection(3)" in main
           assert "AssemblyNewsSource.fetch(" in activity
           assert "renderNewsError(" in activity and "renderHeadline(" in activity
@@ -119,7 +122,35 @@ jobs:
 
       - name: Compile S Browser debug APK
         working-directory: s-browser
-        run: gradle --no-daemon :app:assembleDebug
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p ../dist
+          gradle --no-daemon --stacktrace --console=plain :app:assembleDebug 2>&1 | tee ../dist/android-build.log
+
+      - name: Explain failed build and retain diagnostic log
+        if: failure()
+        shell: bash
+        run: |
+          echo "### S Browser build failed" >> "$GITHUB_STEP_SUMMARY"
+          if test -s dist/android-build.log; then
+            echo "Check the Compile S Browser debug APK step for the exact compiler error." >> "$GITHUB_STEP_SUMMARY"
+            echo "#### Error excerpts" >> "$GITHUB_STEP_SUMMARY"
+            echo '\`\`\`text' >> "$GITHUB_STEP_SUMMARY"
+            grep -n -E 'error:|FAILURE:|What went wrong|Execution failed|Caused by:|cannot find symbol' dist/android-build.log | tail -50 >> "$GITHUB_STEP_SUMMARY" || true
+            echo '\`\`\`' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Failed before Gradle compilation. Expand the first failed step above." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload failed-build diagnostic log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: S-Browser-Build-Diagnostics
+          path: dist/android-build.log
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Verify APK exists and is signed
         shell: bash
