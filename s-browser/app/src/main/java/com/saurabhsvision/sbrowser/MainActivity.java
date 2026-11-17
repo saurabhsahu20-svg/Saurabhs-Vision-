@@ -296,19 +296,25 @@ public final class MainActivity extends Activity {
         mp.leftMargin=dp(5);header.addView(menu,mp);
         menu.setOnClickListener(v->showTools());
         add(top,header,0);
+        // Header actions need real minimum height: prior 36dp clips text.
         LinearLayout headerActions=row();
         TextView gift=homeButton("🎁 Daily",0xffedf7ff,HOME_BORDER,HOME_INK,
-            ()->openAssemblySection(7));
-        TextView notices=homeButton("♧ News",0xffedf7ff,HOME_BORDER,HOME_INK,
+            this::showDailyAssembly);
+        TextView notices=homeButton("◉ News",0xffedf7ff,HOME_BORDER,HOME_INK,
             this::showCityNews);
         TextView profile=homeButton("♙ Profile",0xffedf7ff,HOME_BORDER,HOME_INK,
             this::showAccountInfo);
-        LinearLayout.LayoutParams a1=new LinearLayout.LayoutParams(0,dp(36),1);
-        a1.rightMargin=dp(7);headerActions.addView(gift,a1);
-        LinearLayout.LayoutParams a2=new LinearLayout.LayoutParams(0,dp(36),1);
-        a2.rightMargin=dp(7);headerActions.addView(notices,a2);
-        headerActions.addView(profile,new LinearLayout.LayoutParams(0,dp(36),1));
-        add(top,headerActions,6);
+        TextView[] headerButtons={gift,notices,profile};
+        for(int i=0;i<headerButtons.length;i++){
+            headerButtons[i].setTextSize(13);
+            headerButtons[i].setSingleLine(true);
+            headerButtons[i].setPadding(dp(5),0,dp(5),0);
+            headerButtons[i].setMinHeight(dp(49));
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(49),1);
+            if(i<2)p.rightMargin=dp(7);
+            headerActions.addView(headerButtons[i],p);
+        }
+        add(top,headerActions,5);
 
         LinearLayout search=row();
         search.setBackground(card(0xffffffff,0xff4f93ec,24));
@@ -366,9 +372,10 @@ public final class MainActivity extends Activity {
         tabStrip.setFillViewport(false);
         tabStrip.setSmoothScrollingEnabled(true);
         tabStrip.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        tabLine=row();tabLine.setPadding(dp(1),dp(6),dp(2),dp(7));
+        tabStrip.setHorizontalFadingEdgeEnabled(false);
+        tabLine=row();tabLine.setPadding(dp(1),dp(5),dp(2),dp(6));
         tabStrip.addView(tabLine,new HorizontalScrollView.LayoutParams(-2,-2));
-        LinearLayout.LayoutParams tabsP=new LinearLayout.LayoutParams(-1,dp(53));
+        LinearLayout.LayoutParams tabsP=new LinearLayout.LayoutParams(-1,dp(59));
         tabsP.topMargin=dp(2);top.addView(tabStrip,tabsP);
         contentFrame=new FrameLayout(this);
         root.addView(contentFrame,new LinearLayout.LayoutParams(-1,0,1));
@@ -417,61 +424,62 @@ public final class MainActivity extends Activity {
         if(focusBadge!=null)focusBadge.setTextColor(HOME_INK);
         refreshTabStrip();
     }
+    private void addQuickTab(String label,boolean active,Runnable action){
+        TextView chip=text(label,13,active?0xffffffff:HOME_INK,true);
+        chip.setGravity(Gravity.CENTER);
+        chip.setSingleLine(true);
+        chip.setPadding(dp(14),0,dp(14),0);
+        chip.setBackground(gradient(active?0xff167eff:0xfff9fcff,
+            active?0xff0055d4:0xffe7f4ff,active?HOME_BLUE:HOME_BORDER,16));
+        chip.setContentDescription(label);
+        chip.setOnClickListener(v->action.run());
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-2,dp(46));
+        p.rightMargin=dp(8);tabLine.addView(chip,p);
+    }
     private void refreshTabStrip(){
         if(tabLine==null)return;
         tabLine.removeAllViews();
-        TextView start=text("⌂  Home",13,home?0xffffffff:HOME_INK,true);
-        start.setGravity(Gravity.CENTER);
-        start.setPadding(dp(15),0,dp(15),0);
-        start.setBackground(card(home?HOME_BLUE:0xffedf7ff,home?HOME_BLUE:HOME_BORDER,14));
-        LinearLayout.LayoutParams startP=new LinearLayout.LayoutParams(-2,dp(39));
-        startP.rightMargin=dp(7);tabLine.addView(start,startP);
-        start.setOnClickListener(v->showHome());
+        addQuickTab("⌂ Home",home,this::showHome);
+        addQuickTab("◉ Akashvani News",false,
+            ()->openAddress("https://www.newsonair.gov.in/"));
+        addQuickTab("▤ Study Portal",false,
+            ()->openAddress("https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/"));
+        addQuickTab("＋ New Tab",false,()->{
+            if(createTab()!=null)showHome();
+        });
+        // Open web tabs stay accessible after the four pinned shortcuts.
         for(Tab tab:tabs){
             boolean active=!home&&selected>=0&&selected<tabs.size()&&
                 tabs.get(selected)==tab;
             LinearLayout chip=row();
-            chip.setBackground(card(active?0xffcee7ff:0xfff4faff,
-                active?HOME_BLUE:HOME_BORDER,13));
-            View indicator=new View(this);
-            indicator.setBackground(card(active?CYAN:0xff2e4b65,0,3));
-            chip.addView(indicator,new LinearLayout.LayoutParams(dp(3),dp(22)));
+            chip.setBackground(card(active?0xffc4e5ff:0xfff9fcff,
+                active?HOME_BLUE:HOME_BORDER,14));
             String title=tab.title;
-            if(title==null||title.isEmpty()||title.equals("New Tab")){
+            if(title==null||title.isEmpty()||"New Tab".equals(title)){
                 try{
                     String url=tab.web.getUrl();
-                    String host=url==null?"":Uri.parse(url).getHost();
+                    String host=url==null?null:Uri.parse(url).getHost();
                     title=host==null?"New Tab":host;
                 }catch(Exception ignored){title="New Tab";}
             }
             TextView titleView=text(title,13,HOME_INK,true);
             titleView.setSingleLine(true);
             titleView.setEllipsize(TextUtils.TruncateAt.END);
-            titleView.setMaxWidth(dp(142));
-            titleView.setPadding(dp(9),0,dp(5),0);
-            chip.addView(titleView,new LinearLayout.LayoutParams(-2,dp(37)));
-            TextView close=text("×",21,HOME_BLUE,false);
+            titleView.setMaxWidth(dp(148));
+            titleView.setPadding(dp(11),0,dp(5),0);
+            chip.addView(titleView,new LinearLayout.LayoutParams(-2,dp(46)));
+            TextView close=text("×",21,HOME_BLUE,true);
             close.setGravity(Gravity.CENTER);
             close.setContentDescription("Close "+title);
-            chip.addView(close,new LinearLayout.LayoutParams(dp(32),dp(37)));
+            chip.addView(close,new LinearLayout.LayoutParams(dp(36),dp(46)));
             close.setOnClickListener(v->closeTab(tab));
-            chip.setContentDescription("Open tab: "+title);
             chip.setOnClickListener(v->{
                 int index=tabs.indexOf(tab);
                 if(index>=0){selected=index;attachCurrent();}
             });
-            LinearLayout.LayoutParams chipP=new LinearLayout.LayoutParams(-2,dp(39));
-            chipP.rightMargin=dp(7);tabLine.addView(chip,chipP);
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-2,dp(46));
+            p.rightMargin=dp(8);tabLine.addView(chip,p);
         }
-        TextView plus=text("＋ New Tab",13,HOME_BLUE,true);
-        plus.setGravity(Gravity.CENTER);
-        plus.setPadding(dp(12),0,dp(12),0);
-        plus.setBackground(card(0xffe1f2ff,HOME_BORDER,13));
-        tabLine.addView(plus,new LinearLayout.LayoutParams(-2,dp(39)));
-        plus.setContentDescription("Create new browser tab");
-        plus.setOnClickListener(v->{
-            if(createTab()!=null)showHome();
-        });
     }
     private void showHome(){
         home=true;
@@ -479,6 +487,7 @@ public final class MainActivity extends Activity {
         for(Tab tab:tabs)tab.web.onPause();
         contentFrame.removeAllViews();
         address.setText("");
+        address.dismissDropDown();
         progress.setVisibility(View.GONE);
         ScrollView scroll=new ScrollView(this);
         scroll.setFillViewport(true);
@@ -639,6 +648,7 @@ public final class MainActivity extends Activity {
             if(createTab()==null)return;
         }
         Tab current=tabs.get(selected);
+        // Reuse the selected WebView instead of recreating it for each search.
         attachCurrent();
         current.web.loadUrl(url);
         address.clearFocus();
@@ -677,6 +687,7 @@ public final class MainActivity extends Activity {
         WebSettings settings=web.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
+        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
         settings.setAllowFileAccessFromFileURLs(false);
