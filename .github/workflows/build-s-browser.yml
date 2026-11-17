@@ -67,6 +67,11 @@ jobs:
           assert "openAssemblySection(4)" in main and "openAssemblySection(3)" in main
           assert "AssemblyNewsSource.fetch(" in activity
           assert "renderNewsError(" in activity and "renderHeadline(" in activity
+          assert "if(shown>=10)break;" in activity
+          assert "Missing headlines are never invented." in activity
+          assert "private void openOnlineDictionary(" in main
+          assert "en.wiktionary.org/w/index.php?search=" in main
+          assert "for(char c='A';c<='Z';c++)" in main
           assert "Read source" in activity and "Cross-check" in activity
           assert "fetchDigest(" in client and "fetchSchoolNewsRss(" in client
           assert "trustedPublisherUrl" in client and "MAX_DIGEST_AGE" in client
@@ -82,7 +87,10 @@ jobs:
           assert all(len(x.split('\t'))==4 for x in lines), 'Malformed dictionary entry'
           words=[x.split('\t')[0].lower() for x in lines]
           assert len(set(words))==len(words), 'Duplicate dictionary words'
-          print(f'PASS {len(lines)} offline dictionary entries')
+          initials={w[0].upper() for w in words if w and 'a'<=w[0]<='z'}
+          missing=set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')-initials
+          assert not missing, f'Offline dictionary missing alphabet initials: {sorted(missing)}'
+          print(f'PASS {len(lines)} offline dictionary entries spanning A-Z')
           PY
           python3 - <<'PY'
           from pathlib import Path
