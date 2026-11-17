@@ -755,11 +755,28 @@ public final class MainActivity extends Activity {
         bottom.setVisibility(View.VISIBLE);
         if(videoCallback!=null){videoCallback.onCustomViewHidden();videoCallback=null;}
     }
-    @Override protected void onActivityResult(int code,int result,Intent data){
-        super.onActivityResult(code,result,data);
-        if(code==PICK_FILE&&fileCallback!=null){
-            Uri[] uris=WebChromeClient.FileChooserParams.parseResult(result,data);
-            fileCallback.onReceiveValue(uris);fileCallback=null;
+    @Override protected void onActivityResult(int request,int result,Intent data){
+        super.onActivityResult(request,result,data);
+        // Always complete a pending WebView file chooser, even on cancellation.
+        if(request==PICK_FILE){
+            if(fileCallback!=null){
+                Uri[] files=WebChromeClient.FileChooserParams.parseResult(result,data);
+                fileCallback.onReceiveValue(files);
+                fileCallback=null;
+            }
+            return;
+        }
+        if(result!=RESULT_OK||data==null)return;
+        if(request==VOICE_SEARCH){
+            ArrayList<String> matches=data.getStringArrayListExtra(
+                RecognizerIntent.EXTRA_RESULTS);
+            if(matches!=null&&!matches.isEmpty()){
+                address.setText(matches.get(0));
+                openAddress(matches.get(0));
+            }
+        }else if(request==QR_SCAN){
+            String scanned=data.getStringExtra("SCAN_RESULT");
+            if(scanned!=null&&!scanned.trim().isEmpty())openAddress(scanned);
         }
     }
     private Tab current(){return selected>=0&&selected<tabs.size()?tabs.get(selected):null;}
@@ -1026,21 +1043,7 @@ public final class MainActivity extends Activity {
             }
         }).show();
     }
-    @Override protected void onActivityResult(int request,int result,Intent data){
-        super.onActivityResult(request,result,data);
-        if(result!=RESULT_OK||data==null)return;
-        if(request==VOICE_SEARCH){
-            ArrayList<String> matches=data.getStringArrayListExtra(
-                RecognizerIntent.EXTRA_RESULTS);
-            if(matches!=null&&!matches.isEmpty()){
-                address.setText(matches.get(0));
-                openAddress(matches.get(0));
-            }
-        }else if(request==QR_SCAN){
-            String scanned=data.getStringExtra("SCAN_RESULT");
-            if(scanned!=null&&!scanned.trim().isEmpty())openAddress(scanned);
-        }
-    }
+
     @Override public void onBackPressed(){
         if(fullScreenVideo!=null){hideVideo();return;}
         back();
