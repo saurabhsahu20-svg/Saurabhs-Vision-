@@ -440,7 +440,7 @@ public final class MainActivity extends Activity {
     private void refreshTabStrip(){
         if(tabLine==null)return;
         tabLine.removeAllViews();
-        addQuickTab("⌂ Home",home,this::showHome);
+        addQuickTab("⌂ Home",home&&!dashboardOpen,this::showHome);
         addQuickTab("◉ Akashvani News",false,
             ()->openAddress("https://www.newsonair.gov.in/"));
         addQuickTab("▤ Study Dashboard",home&&dashboardOpen,
@@ -498,6 +498,7 @@ public final class MainActivity extends Activity {
         dashboardOpen=false;
         home=true;
         if(contentFrame==null)return;
+        if(top!=null)top.setVisibility(View.GONE);
         for(Tab tab:tabs)tab.web.onPause();
         contentFrame.removeAllViews();
         address.setText("");
@@ -537,7 +538,8 @@ public final class MainActivity extends Activity {
         int screenDp=(int)(getResources().getDisplayMetrics().heightPixels/
             getResources().getDisplayMetrics().density);
         int heroGap=Math.max(46,Math.min(145,screenDp/8));
-        View gap=new View(this);add(layout,gap,heroGap);
+        View gap=new View(this);
+        layout.addView(gap,new LinearLayout.LayoutParams(-1,dp(heroGap)));
         TextView brand=text("S Browser",44,HOME_BLUE,true);
         brand.setGravity(Gravity.CENTER);
         brand.setContentDescription("S Browser search home");
@@ -630,6 +632,7 @@ public final class MainActivity extends Activity {
     private void showStudentDashboard(){
         dashboardOpen=true;
         home=true;
+        if(top!=null)top.setVisibility(View.VISIBLE);
         if(contentFrame==null)return;
         for(Tab tab:tabs)tab.web.onPause();
         contentFrame.removeAllViews();
@@ -814,7 +817,9 @@ public final class MainActivity extends Activity {
     }
     private void attachCurrent(){
         if(selected<0||selected>=tabs.size()){showHome();return;}
+        dashboardOpen=false;
         home=false;
+        if(top!=null)top.setVisibility(View.VISIBLE);
         WebView web=tabs.get(selected).web;
         for(Tab tab:tabs)if(tab.web!=web)tab.web.onPause();
         if(web.getParent()!=contentFrame){
