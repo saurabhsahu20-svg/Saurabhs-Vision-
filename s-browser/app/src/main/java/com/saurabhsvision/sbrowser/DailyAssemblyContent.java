@@ -267,6 +267,22 @@ public final class DailyAssemblyContent {
 
     public static Thought thought(LocalDate day){return THOUGHTS[index(day,THOUGHTS.length)];}
     public static Speech speech(LocalDate day){return SPEECHES[index(day,SPEECHES.length)];}
+
+    /** Five distinct bilingual options for today's school assembly.
+     * Position zero retains the existing daily assembly thought/speech;
+     * a stride of six spreads alternatives through the 31-item collection.
+     * The next day's options rotate instead of being permanently fixed.
+     */
+    public static Thought thoughtOption(LocalDate day,int position){
+        if(position<0||position>=5)throw new IllegalArgumentException("Thought option must be 0–4");
+        return THOUGHTS[Math.floorMod(index(day,THOUGHTS.length)+6*position,
+            THOUGHTS.length)];
+    }
+    public static Speech speechOption(LocalDate day,int position){
+        if(position<0||position>=5)throw new IllegalArgumentException("Speech option must be 0–4");
+        return SPEECHES[Math.floorMod(index(day,SPEECHES.length)+6*position,
+            SPEECHES.length)];
+    }
     public static Puzzle puzzle(LocalDate day){return PUZZLES[index(day,PUZZLES.length)];}
     public static Crossword crossword(LocalDate day){return CROSSWORDS[index(day,CROSSWORDS.length)];}
     public static String reflection(LocalDate day,int sign){
