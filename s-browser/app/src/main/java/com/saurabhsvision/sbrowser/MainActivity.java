@@ -6,6 +6,11 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -516,6 +521,42 @@ public final class MainActivity extends Activity {
             }
         }
     }
+    // Decorative vector waves reproduce the supplied screenshot without a
+    // bitmap overlay, so search and navigation stay fully interactive.
+    private static final class HomeWaves extends View {
+        private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
+        HomeWaves(Context context){super(context);setImportantForAccessibility(
+            View.IMPORTANT_FOR_ACCESSIBILITY_NO);}
+        private void wave(Canvas canvas,float w,float h,float center,
+            float peak,int first,int last,boolean reverse){
+            Path path=new Path();
+            path.moveTo(0,center);
+            path.cubicTo(w*.20f,center+(reverse?-peak:peak),
+                w*.29f,center+(reverse?-peak:peak)*1.5f,
+                w*.50f,center+(reverse?peak:-peak)*.26f);
+            path.cubicTo(w*.73f,center+(reverse?peak:-peak),
+                w*.82f,center+(reverse?peak:-peak),
+                w,center);
+            path.lineTo(w,reverse?0:h);
+            path.lineTo(0,reverse?0:h);
+            path.close();
+            float bottom=reverse?Math.max(0,center-peak*1.8f):Math.min(h,center+peak*1.8f);
+            paint.setShader(new LinearGradient(0,center,0,bottom,first,last,
+                Shader.TileMode.CLAMP));
+            canvas.drawPath(path,paint);
+            paint.setShader(null);
+        }
+        @Override protected void onDraw(Canvas canvas){
+            super.onDraw(canvas);
+            float w=getWidth(),h=getHeight();
+            if(w<=0||h<=0)return;
+            // Light layered wave bands behind the S logo and above toolbar.
+            wave(canvas,w,h,h*.22f,h*.075f,0x4a3aa6ff,0x0063c6ff,false);
+            wave(canvas,w,h,h*.235f,h*.055f,0x356bbaff,0x0079d9ff,false);
+            wave(canvas,w,h,h*.87f,h*.04f,0x3d91d4ff,0x00ffffff,false);
+            wave(canvas,w,h,h*.91f,h*.035f,0x4f74c0ff,0x00ffffff,false);
+        }
+    }
     private void showHome(){
         selectedNavigation=2;
         updateBottomNavigation();
@@ -530,10 +571,12 @@ public final class MainActivity extends Activity {
         progress.setVisibility(View.GONE);
         ScrollView scroll=new ScrollView(this);
         scroll.setFillViewport(true);
-        scroll.setBackgroundColor(0xffffffff);
+        scroll.setBackgroundColor(Color.TRANSPARENT);
+        contentFrame.addView(new HomeWaves(this),
+            new FrameLayout.LayoutParams(-1,-1));
         contentFrame.addView(scroll,new FrameLayout.LayoutParams(-1,-1));
         LinearLayout layout=column();
-        layout.setPadding(dp(20),dp(12),dp(20),dp(30));
+        layout.setPadding(dp(14),dp(12),dp(14),dp(30));
         scroll.addView(layout);
         // Inspired by a clean search engine landing page, with S Browser identity.
         LinearLayout links=row();
@@ -561,7 +604,7 @@ public final class MainActivity extends Activity {
         // small phones or leave the keyboard obscuring important controls.
         int screenDp=(int)(getResources().getDisplayMetrics().heightPixels/
             getResources().getDisplayMetrics().density);
-        int heroGap=Math.max(46,Math.min(145,screenDp/8));
+        int heroGap=Math.max(39,Math.min(99,screenDp/10));
         View gap=new View(this);
         layout.addView(gap,new LinearLayout.LayoutParams(-1,dp(heroGap)));
         ImageView rainbowLogo=new ImageView(this);
@@ -569,22 +612,22 @@ public final class MainActivity extends Activity {
         rainbowLogo.setScaleType(ImageView.ScaleType.FIT_CENTER);
         rainbowLogo.setContentDescription("Rainbow S Browser logo");
         LinearLayout.LayoutParams rainbowParams=new LinearLayout.LayoutParams(
-            dp(98),dp(98));
+            dp(106),dp(106));
         rainbowParams.gravity=Gravity.CENTER_HORIZONTAL;
         layout.addView(rainbowLogo,rainbowParams);
-        TextView brand=text("Browser",43,HOME_INK,true);
+        TextView brand=text("Browser",43,0xff061c47,true);
         brand.setGravity(Gravity.CENTER);
         brand.setContentDescription("S Browser search home");
         add(layout,brand,0);
-        TextView byline=text("Explore • Study • Learn • Grow",12,HOME_MUTED,false);
+        TextView byline=text("Explore • Study • Learn • Grow",15,0xff061c47,true);
         byline.setGravity(Gravity.CENTER);
-        add(layout,byline,2);
+        add(layout,byline,6);
 
         LinearLayout box=row();
-        box.setBackground(card(0xffffffff,0xffdce2ea,30));
-        box.setElevation(dp(2));
+        box.setBackground(card(0xffffffff,0xff1272ff,30));
+        box.setElevation(dp(5));
         box.setPadding(dp(12),0,dp(8),0);
-        TextView searchIcon=text("⌕",27,0xff84909f,false);
+        TextView searchIcon=text("⌕",29,0xff0b367d,true);
         searchIcon.setGravity(Gravity.CENTER);
         box.addView(searchIcon,new LinearLayout.LayoutParams(dp(35),dp(54)));
         EditText query=new EditText(this);
@@ -612,16 +655,25 @@ public final class MainActivity extends Activity {
         box.addView(mic,new LinearLayout.LayoutParams(dp(40),dp(54)));
         add(layout,box,25);
 
-        TextView study=text("▦  Open Student Dashboard",14,HOME_BLUE,true);
+        TextView study=text("▦  Open Student Dashboard",17,0xff0860de,true);
         study.setGravity(Gravity.CENTER);
         study.setPadding(dp(8),dp(13),dp(8),dp(13));
         study.setOnClickListener(v->showStudentDashboard());
-        add(layout,study,17);
+        add(layout,study,18);
 
         List<BrowserStore.Site> history=store.list("history");
+        LinearLayout headingRow=row();
+        headingRow.setGravity(Gravity.CENTER_VERTICAL);
+        headingRow.setBackground(gradient(0xffd9ecff,0xfff7fbff,0,0));
+        View accent=new View(this);
+        accent.setBackground(card(0xff086bff,0,3));
+        LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(dp(4),dp(24));
+        ap.rightMargin=dp(12);
+        headingRow.addView(accent,ap);
         TextView heading=text(history.isEmpty()?"START EXPLORING":"RECENTLY VISITED",
-            18,HOME_INK,true);
-        add(layout,heading,28);
+            19,0xff061c47,true);
+        headingRow.addView(heading,new LinearLayout.LayoutParams(0,dp(45),1));
+        add(layout,headingRow,29);
         if(history.isEmpty()){
             addSearchSuggestion(layout,"News and current affairs","latest India news");
             addSearchSuggestion(layout,"Study resources","educational resources");
@@ -640,10 +692,10 @@ public final class MainActivity extends Activity {
     }
     private void addSearchSuggestion(LinearLayout host,String title,String target){
         LinearLayout line=row();
-        line.setPadding(dp(10),dp(13),dp(10),dp(13));
-        TextView icon=text("⌕",23,HOME_MUTED,false);
+        line.setPadding(dp(12),dp(13),dp(10),dp(13));
+        TextView icon=text("⌕",25,0xff0674fc,true);
         line.addView(icon,new LinearLayout.LayoutParams(dp(37),dp(37)));
-        TextView label=text(title,15,HOME_INK,false);
+        TextView label=text(title,17,0xff061c47,true);
         label.setSingleLine(true);
         label.setEllipsize(TextUtils.TruncateAt.END);
         line.addView(label,new LinearLayout.LayoutParams(0,dp(37),1));
@@ -653,7 +705,7 @@ public final class MainActivity extends Activity {
         });
         add(host,line,1);
         View divider=new View(this);
-        divider.setBackgroundColor(0xffe7e9ef);
+        divider.setBackgroundColor(0xffb5d7fb);
         host.addView(divider,new LinearLayout.LayoutParams(-1,dp(1)));
     }
     private void showStudentDashboard(){
