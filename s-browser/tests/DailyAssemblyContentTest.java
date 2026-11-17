@@ -21,6 +21,29 @@ public final class DailyAssemblyContentTest {
             LocalDate day=start.plusDays(i);
             DailyAssemblyContent.Thought t=DailyAssemblyContent.thought(day);
             DailyAssemblyContent.Speech s=DailyAssemblyContent.speech(day);
+            java.util.HashSet<String> fiveThoughts=new java.util.HashSet<>();
+            java.util.HashSet<String> fiveTopics=new java.util.HashSet<>();
+            for(int choice=0;choice<5;choice++){
+                DailyAssemblyContent.Thought option=DailyAssemblyContent.thoughtOption(day,choice);
+                DailyAssemblyContent.Speech speechOption=DailyAssemblyContent.speechOption(day,choice);
+                check(option.english.length()>15&&option.hindi.length()>12,
+                    "daily bilingual thought choice "+choice);
+                check(speechOption.english.length()>150&&speechOption.hindi.length()>80,
+                    "daily bilingual speech choice "+choice);
+                fiveThoughts.add(option.english);
+                fiveTopics.add(speechOption.title);
+            }
+            check(fiveThoughts.size()==5,"five distinct daily thoughts");
+            check(fiveTopics.size()==5,"five distinct daily speech topics");
+            check(DailyAssemblyContent.thoughtOption(day,0).english.equals(t.english),
+                "first thought retains existing daily script");
+            check(DailyAssemblyContent.speechOption(day,0).title.equals(s.title),
+                "first speech retains existing daily script");
+            if(i>0){
+                check(!fiveThoughts.contains(DailyAssemblyContent.thoughtOption(
+                    day.minusDays(1),0).english),
+                    "daily thought selection changes");
+            }
             DailyAssemblyContent.Puzzle p=DailyAssemblyContent.puzzle(day);
             DailyAssemblyContent.Crossword c=DailyAssemblyContent.crossword(day);
             check(t.english.length()>15&&t.hindi.length()>12,"bilingual thought "+i);
