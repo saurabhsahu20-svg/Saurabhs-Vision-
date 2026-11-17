@@ -112,8 +112,8 @@ jobs:
           assert len(handlers)==1, f'Expected 1 activity-result handler, found {len(handlers)}'
           assert 'request==PICK_FILE' in main
           assert 'request==VOICE_SEARCH' in main
-          assert 'request==QR_SCAN' in main
-          print('PASS activity-result handler is unique and supports uploads, voice and QR')
+          assert 'QR_SCAN' not in main and 'openQrScanner' not in main
+          print('PASS activity-result handler is unique; file uploads and voice search work without QR dependency')
           assert 'HorizontalScrollView tabStrip' in main
           assert 'private void refreshTabStrip()' in main
           assert 'if(web.getParent()!=contentFrame)' in main
