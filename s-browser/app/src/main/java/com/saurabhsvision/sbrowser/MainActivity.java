@@ -1046,27 +1046,79 @@ public final class MainActivity extends Activity {
             .setPositiveButton("Save",(d,w)->{store.saveNote(url,editor.getText().toString());
                 toast("Note saved locally");}).show();
     }
+    private void openOnlineDictionary(String query){
+        String word=query==null?"":query.trim();
+        if(word.isEmpty()){toast("Enter a word to search online");return;}
+        // Use a HTTPS reference dictionary rather than manufacturing definitions.
+        String target="https://en.wiktionary.org/w/index.php?search="+
+            Uri.encode(word)+"&title=Special%3ASearch";
+        openAddress(target);
+    }
     private void showDictionary(String initial){
-        final LinearLayout body=column();body.setPadding(dp(14),dp(5),dp(14),dp(12));
-        EditText search=new EditText(this);search.setSingleLine(true);
-        search.setHint("Search an English or Hindi word");
+        final LinearLayout body=column();
+        body.setPadding(dp(14),dp(8),dp(14),dp(12));
+        TextView caption=text("A–Z English / Hindi dictionary",17,WHITE,true);
+        add(body,caption,0);
+        EditText search=new EditText(this);
+        search.setSingleLine(true);
+        search.setTextColor(WHITE);
+        search.setHintTextColor(MUTED);
+        search.setHint("Type any English or Hindi word");
         search.setTextSize(16);
-        body.addView(search,new LinearLayout.LayoutParams(-1,dp(56)));
-        TextView summary=text(dictionary.size()+" words stored offline • English ↔ Hindi",
-            12,MUTED,false);add(body,summary,2);
+        search.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+        add(body,search,5);
+
+        HorizontalScrollView letters=new HorizontalScrollView(this);
+        letters.setHorizontalScrollBarEnabled(false);
+        LinearLayout alphabet=row();
+        alphabet.setPadding(dp(1),dp(6),dp(1),dp(6));
+        for(char c='A';c<='Z';c++){
+            final String letter=String.valueOf(c);
+            TextView chip=text(letter,14,WHITE,true);
+            chip.setGravity(Gravity.CENTER);
+            chip.setBackground(card(0xff193e67,0xff4a83bd,12));
+            chip.setOnClickListener(v->search.setText(letter));
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(44),dp(44));
+            lp.rightMargin=dp(5);
+            alphabet.addView(chip,lp);
+        }
+        letters.addView(alphabet,new HorizontalScrollView.LayoutParams(-2,-2));
+        add(body,letters,5);
+
+        TextView summary=text(dictionary.size()+
+            " curated offline words across A–Z • Online lookup available",
+            12,MUTED,false);
+        add(body,summary,3);
         ScrollView scroll=new ScrollView(this);
         final LinearLayout results=column();scroll.addView(results);
-        LinearLayout.LayoutParams sp=new LinearLayout.LayoutParams(-1,dp(390));
+        LinearLayout.LayoutParams sp=new LinearLayout.LayoutParams(-1,dp(310));
         sp.topMargin=dp(8);body.addView(scroll,sp);
-        AlertDialog dialog=new AlertDialog.Builder(this).setTitle("Aa  Student Dictionary")
+        TextView online=text("🌐  Search word online  ↗",15,MINT,true);
+        online.setGravity(Gravity.CENTER);
+        online.setBackground(card(0xff153e51,0xff388978,15));
+        online.setPadding(dp(10),dp(13),dp(10),dp(13));
+        add(body,online,10);
+
+        AlertDialog dialog=new AlertDialog.Builder(this)
+            .setTitle("Aa  S Browser Dictionary")
             .setView(body).setNegativeButton("Close",null).create();
+        online.setOnClickListener(v->{
+            String query=search.getText().toString().trim();
+            if(query.isEmpty()){toast("Enter a word first");return;}
+            dialog.dismiss();
+            openOnlineDictionary(query);
+        });
         Runnable render=()->{
             results.removeAllViews();
-            List<DictionaryEntry> matches=dictionary.search(search.getText().toString());
-            if(matches.isEmpty())add(results,text("Not in the offline starter dictionary.",14,MUTED,false),10);
+            String query=search.getText().toString();
+            List<DictionaryEntry> matches=dictionary.search(query);
+            if(matches.isEmpty()){
+                add(results,text("Not in offline words. Use Search word online below.",
+                    14,MUTED,false),10);
+            }
             for(DictionaryEntry word:matches){
                 LinearLayout item=column();
-                item.setPadding(dp(11),dp(11),dp(11),dp(11));
+                item.setPadding(dp(11),dp(10),dp(11),dp(10));
                 item.setBackground(card(0xff172943,0xff34567f,12));
                 add(item,text(word.word+"   •   "+word.hindi,15,WHITE,true),0);
                 add(item,text(word.meaning,12,MUTED,false),5);
@@ -1076,7 +1128,9 @@ public final class MainActivity extends Activity {
         };
         search.addTextChangedListener(new TextWatcher(){
             public void beforeTextChanged(CharSequence s,int st,int c,int a){}
-            public void onTextChanged(CharSequence s,int st,int before,int count){render.run();}
+            public void onTextChanged(CharSequence s,int st,int before,int count){
+                render.run();
+            }
             public void afterTextChanged(Editable e){}
         });
         search.setText(initial==null?"":initial);
