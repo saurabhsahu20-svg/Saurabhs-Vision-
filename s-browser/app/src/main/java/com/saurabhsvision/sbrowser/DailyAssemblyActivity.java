@@ -248,17 +248,30 @@ public final class DailyAssemblyActivity extends Activity {
             }).setNegativeButton("Cancel",null).show();
     }
     private void renderThought(){
-        DailyAssemblyContent.Thought t=DailyAssemblyContent.thought(today);
-        header("01 • DAILY INSPIRATION","Thought of the Day",
-            "Original educational thought, rotated automatically each day.");
-        add(page,button(hindi?"हिन्दी  ▾":"English  ▾",this::chooseLanguage),14);
-        TextView words=text(hindi?t.hindi:t.english,22,WHITE,true);
-        words.setPadding(dp(19),dp(26),dp(19),dp(26));
-        words.setBackground(background(0xff143f43,0xff4b9b87,24));
-        add(page,words,12);
-        String chosen=hindi?t.hindi:t.english;
-        actionRow("Copy thought",()->copy(chosen),"Share thought",()->share(chosen));
-        note("Thoughts are original S Browser assembly prompts, not falsely attributed quotes.");
+        header("01 • DAILY INSPIRATION","5 Thoughts of the Day",
+            "Five original Hindi/English options selected for today's school assembly. "+
+            "The selection changes each calendar day.");
+        add(page,button(hindi?"भाषा: हिन्दी  ▾":"Language: English  ▾",
+            this::chooseLanguage),13);
+        add(page,text("TODAY'S FIVE THOUGHTS • "+today,12,MINT,true),14);
+        for(int i=0;i<5;i++){
+            final int number=i+1;
+            DailyAssemblyContent.Thought item=DailyAssemblyContent.thoughtOption(today,i);
+            final String chosen=hindi?item.hindi:item.english;
+            LinearLayout card=vertical();
+            card.setPadding(dp(16),dp(15),dp(16),dp(15));
+            card.setBackground(premiumGradient(0xff153f4a,0xff142b46,
+                0xff438b84,18));
+            add(card,text("✦  THOUGHT "+number,12,MINT,true),0);
+            TextView words=text(chosen,18,WHITE,true);
+            words.setTextIsSelectable(true);
+            add(card,words,10);
+            add(page,card,12);
+            actionRow("Copy "+number,()->copy(chosen),
+                "Share "+number,()->share(chosen));
+        }
+        note("All five thoughts are prepared offline, not attributed to real people. "+
+            "Choose one and read it during morning assembly.");
     }
     private void speak(String content){
         if(speechEngine==null||!readyToSpeak){
@@ -273,23 +286,34 @@ public final class DailyAssemblyActivity extends Activity {
         speechEngine.speak(content,TextToSpeech.QUEUE_FLUSH,null,"s-browser-speech");
     }
     private void renderSpeech(){
-        DailyAssemblyContent.Speech item=DailyAssemblyContent.speech(today);
-        header("02 • SCHOOL ASSEMBLY",
-            hindi?item.hindiTitle:item.title,
-            "Short, respectful speech suitable for school morning assembly.");
+        header("02 • SCHOOL ASSEMBLY","5 Speeches for Today",
+            "Five prepared, age-appropriate assembly speeches with different topics. "+
+            "Today's selection rotates automatically.");
         add(page,button(hindi?"भाषा: हिन्दी  ▾":"Language: English  ▾",
             this::chooseLanguage),13);
-        String speech=hindi?item.hindi:item.english;
-        TextView words=text(speech,17,WHITE,false);
-        words.setTextIsSelectable(true);
-        words.setPadding(dp(18),dp(17),dp(18),dp(17));
-        words.setBackground(background(PANEL,EDGE,20));
-        add(page,words,12);
-        actionRow("🔊 Listen",()->speak(speech),
-            "Copy speech",()->copy(speech));
-        add(page,button("Share speech  ↗",()->share(speech)),9);
-        note("Prepared content, not an event-specific factual news bulletin. "+
-            "Have a teacher review before delivering.");
+        add(page,text("TODAY'S FIVE SPEECH TOPICS • "+today,12,MINT,true),13);
+        for(int i=0;i<5;i++){
+            final int number=i+1;
+            DailyAssemblyContent.Speech item=DailyAssemblyContent.speechOption(today,i);
+            String title=hindi?item.hindiTitle:item.title;
+            final String content=hindi?item.hindi:item.english;
+            LinearLayout card=vertical();
+            card.setPadding(dp(16),dp(15),dp(16),dp(15));
+            card.setBackground(premiumGradient(0xff213a61,0xff112943,
+                0xff4e779e,19));
+            add(card,text("🎤  SPEECH "+number,12,MINT,true),0);
+            add(card,text(title,19,WHITE,true),8);
+            TextView words=text(content,15,WHITE,false);
+            words.setTextIsSelectable(true);
+            add(card,words,11);
+            add(page,card,12);
+            actionRow("🔊 Listen "+number,()->speak(content),
+                "Copy "+number,()->copy(content));
+            add(page,button("Share speech "+number+"  ↗",
+                ()->share(title+"\n\n"+content)),7);
+        }
+        note("Prepared educational speeches, not current-event reporting. "+
+            "Students can select any one topic; teachers can review before delivery.");
     }
 
     private void renderNews(){
