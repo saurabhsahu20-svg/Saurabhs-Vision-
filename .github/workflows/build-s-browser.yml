@@ -99,6 +99,13 @@ jobs:
           city=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/CityNewsActivity.java').read_text(encoding='utf-8')
           cache=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/CityNewsCache.java').read_text(encoding='utf-8')
           feed=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/CityNewsFeed.java').read_text(encoding='utf-8')
+          import re
+          handlers=re.findall(r'@Override\\s+protected\\s+void\\s+onActivityResult\\s*\\(',main)
+          assert len(handlers)==1, f'Expected 1 activity-result handler, found {len(handlers)}'
+          assert 'request==PICK_FILE' in main
+          assert 'request==VOICE_SEARCH' in main
+          assert 'request==QR_SCAN' in main
+          print('PASS activity-result handler is unique and supports uploads, voice and QR')
           assert 'HorizontalScrollView tabStrip' in main
           assert 'private void refreshTabStrip()' in main
           assert 'if(web.getParent()!=contentFrame)' in main
