@@ -6,8 +6,8 @@
     <application
         android:label="S Browser"
         android:theme="@style/SBrowserTheme"
-        android:icon="@drawable/s_browser_icon"
-        android:roundIcon="@drawable/s_browser_icon"
+        android:icon="@drawable/rainbow_s_icon"
+        android:roundIcon="@drawable/rainbow_s_icon"
         android:allowBackup="false"
         android:usesCleartextTraffic="false">
         <service
