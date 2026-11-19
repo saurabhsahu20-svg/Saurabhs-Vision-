@@ -40,7 +40,7 @@ public final class WordSuggestions {
         "kyun","kya","main","mera","mere","meri","mil","mujhe","naam","namaste","naya",
         "naye","nahi","nahin","nhi","padhai","pani","par","please","raha","rahe",
         "rahi","sahi","sath","saath","sab","saurabh","school","shiksha","shubh","sir",
-        "space","theek","thik","tum","tumhara","tumhe","unhe","unko","unka","unki","unse","uska","uske","uski","usko","usme","usne","wala","wale",
+        "space","theek","thik","tum","tumhara","tumhe","unhe","unko","unka","unki","unse","usko","uska","uske","uski","usme","usne","wala","wale",
         "wali","ya","ye","yeh","yahan"
     };
     private static String normalize(String word){
