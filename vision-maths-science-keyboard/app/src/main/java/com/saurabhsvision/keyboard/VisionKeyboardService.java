@@ -703,7 +703,9 @@ public final class VisionKeyboardService extends InputMethodService {
             special||isAction(output)?Typeface.BOLD:Typeface.NORMAL));
         final boolean enter="ENTER".equals(output);
         final boolean functionKey=special||isAction(output);
-        b.setTextColor(theme>=5?
+        b.setTextColor(theme==4?
+            (enter?Color.WHITE:("SPACE".equals(output)?0xff2a2d37:
+                (functionKey?Color.WHITE:0xff242731))):theme>=5?
             (enter?ThemePalette.ON_ACCENT[theme]:ThemePalette.TEXT[theme]):
             (light()? (enter?Color.WHITE:(functionKey?0xff2056bb:0xff162338)):
              (enter?0xff082440:("SPACE".equals(output)?Color.WHITE:
@@ -719,6 +721,13 @@ public final class VisionKeyboardService extends InputMethodService {
                 ("SPACE".equals(output)?ThemePalette.SPACE_BOTTOM[theme]:
                     (functionKey?ThemePalette.FUNCTION_BOTTOM[theme]:ThemePalette.KEY_BOTTOM[theme]));
             stroke=ThemePalette.STROKE[theme];
+        }else if(theme==4){
+            // Flat, high-contrast slate function keys and pure white letter keys.
+            upper=enter?0xff747b8f:("SPACE".equals(output)?Color.WHITE:
+                (functionKey?0xff747b8f:Color.WHITE));
+            lower=enter?0xff697185:("SPACE".equals(output)?Color.WHITE:
+                (functionKey?0xff697185:Color.WHITE));
+            stroke=functionKey?0xff7a8090:0xffeceef4;
         }else if(light()){
             upper=enter?0xff3c82f6:(functionKey?0xffe6eefb:0xffffffff);
             lower=enter?0xff1d55cf:(functionKey?0xffdbe7f8:0xfff7faff);
