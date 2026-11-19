@@ -12,6 +12,21 @@ adb shell wm density 420
 adb shell settings put system accelerometer_rotation 0 || true
 adb shell settings put system user_rotation 0 || true
 adb install -r "$APK"
+adb shell am start -W -n "$APP/.KeyboardVisibilityTestActivity" || true
+# The first boot may complete before Android's InputMethodManager refreshes the
+# installed IME service cache. Poll for registration instead of racing it.
+found=0
+for attempt in $(seq 1 30); do
+  if adb shell ime list -a | grep -F "$APP" >/dev/null; then found=1;break;fi
+  echo "Waiting for S Board to register as Android IME ($attempt/30)"
+  sleep 2
+done
+if [[ "$found" != 1 ]]; then
+  echo "Android IME not registered. IME list:"
+  adb shell ime list -a || true
+  adb shell dumpsys package "$APP" | head -70 || true
+  exit 1
+fi
 adb shell ime enable "$IME"
 adb shell ime set "$IME"
 adb shell am start -W -n "$APP/.KeyboardVisibilityTestActivity"
