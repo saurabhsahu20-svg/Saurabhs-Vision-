@@ -188,14 +188,14 @@ public final class MainActivity extends Activity {
         TextView suggestionStatus=text("",14,0xff1746ad,true);
         add(root,suggestionStatus,9);
         Runnable refreshSuggestions=()->suggestionStatus.setText(
-            getSharedPreferences(PREFS,MODE_PRIVATE).getBoolean("show_suggestions",false)
+            getSharedPreferences(PREFS,MODE_PRIVATE).getBoolean("show_suggestions",true)
                 ?"Smart suggestions: ON (extra typing strip)"
                 :"Smart suggestions: OFF (picture-style layout)");
         Button suggestions=button("Toggle Smart Suggestions",0xffe1f5ff,NAVY);
         add(root,suggestions,9);
         suggestions.setOnClickListener(v->{
             SharedPreferences prefs=getSharedPreferences(PREFS,MODE_PRIVATE);
-            boolean enabled=!prefs.getBoolean("show_suggestions",false);
+            boolean enabled=!prefs.getBoolean("show_suggestions",true);
             prefs.edit().putBoolean("show_suggestions",enabled).apply();
             refreshSuggestions.run();
             showMessage("Reopen S Board to apply the suggestion layout.");
