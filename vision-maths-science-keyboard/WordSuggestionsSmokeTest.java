@@ -18,6 +18,10 @@ public final class WordSuggestionsSmokeTest {
         String[] hindi=WordSuggestions.get("ban",true,3);
         pass(hindi.length>=2 && "ban".equals(hindi[0]) &&
             hindi[1].startsWith("ban"),"Hinglish prefix candidates");
+        pass(java.util.Arrays.asList(WordSuggestions.get("hellp",false,4)).contains("hello"),
+            "Offline correction of one typo");
+        pass(java.util.Arrays.asList(WordSuggestions.get("usk",true,4)).contains("usko"),
+            "Hinglish usko suggestion");
         pass(WordSuggestions.get("",false,3).length==0,
             "Empty input yields no suggestions");
         pass(WordSuggestions.get("password",true,3)[0].equals("password"),
