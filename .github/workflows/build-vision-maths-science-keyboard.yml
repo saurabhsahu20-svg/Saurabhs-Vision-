@@ -151,7 +151,12 @@ jobs:
           assert 'by Saurabh' in ime
           assert 'SBoardKeyButton b=new SBoardKeyButton(this);' in ime
           assert 'setSpaceIndicator("SPACE".equals(output),light(),ACCENTS[theme])' in ime
-          assert 'getBoolean("show_suggestions",false)' in ime
+          assert 'getBoolean("show_suggestions",true)' in ime
+          assert 'suggestionChips=new TextView[4]' in ime
+          assert 'mode==SYMBOLS' in ime and 'KEYCODE_DPAD_RIGHT' in ime
+          assert 'addRow("_ ~ ` | • § © ® ™ ✓");' in ime
+          assert 'getInt(KEY_THEME,4)' in ime
+          assert 'versionCode 19' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
           assert (root/'java/com/saurabhsvision/keyboard/SBoardKeyButton.java').is_file()
           assert 'Toggle Smart Suggestions' in activity
           assert 'setMeasuredDimension(width,Math.min(cap' in panel
@@ -273,13 +278,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.8_PREMIUM_THEMES_CARTOON_EMOJI.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.9_LIGHT_SYMBOLS_SUGGESTIONS.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_8_PREMIUM_THEMES_CARTOON_EMOJI_APK
+          name: S_Board_v1_9_9_LIGHT_SYMBOLS_SUGGESTIONS_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -289,14 +294,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.8"
-          file="keyboard-deliverables/S_Board_v1.9.8_PREMIUM_THEMES_CARTOON_EMOJI.apk"
+          tag="s-board-v1.9.9"
+          file="keyboard-deliverables/S_Board_v1.9.9_LIGHT_SYMBOLS_SUGGESTIONS.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.9.8 • Premium Themes & Cartoon Friends" \
-              --notes "S Board 1.9.8 adds SIX premium keyboard themes: Maroon Velvet, Metallic Silver, Emerald Neon, Sapphire Blue, Rose Gold and Midnight Black, alongside the original five themes (including Cosmic Blue, Green, Gold, Purple and White). Real keyboard keys, toolbar, background, text contrast and wide Spacebar underline now follow the selected color; no change to QWERTY row order or height. Emoji keyboard adds a twelfth category called Cartoon Friends with 90+ expressive original Unicode cartoon-style characters and character combinations that can be inserted as text in messaging apps. These are not official stickers of copyrighted cartoon franchises; Unicode rendering varies with Android font. Keeps offline typing, language modes, Maths, Science and speed improvements. GitHub CI validates the palette and Unicode emoji inventory, Hindi typing, layout, APK compilation and signature. This is a debug-signed test APK; users should verify design on their own phones." \
+              --title "S Board 1.9.9 • Light UI, Word Suggestions & Symbols" \
+              --notes "S Board 1.9.9: screenshot-style light keyboard with white keys, slate controls, four offline word suggestions and basic typo correction, an extra symbols page with underscore and brackets, cursor arrows, and a wide Space key. All original Maths, Science, Emoji, 22 Indian languages and premium themes remain. Password fields receive no predictions. Microphone-shaped shortcut opens the Android keyboard picker; no microphone access is requested. CI tests the Android APK, signature and offline word suggestions. This release is signed with the GitHub Actions DEBUG certificate, so upgrading an APK signed by a different certificate requires backing up settings and uninstalling the old S Board first; do not uninstall the system keyboard. Real-phone testing is still needed." \
               --latest=false
           fi
 
