@@ -35,13 +35,14 @@ import android.content.SharedPreferences;
 public final class VisionKeyboardService extends InputMethodService {
     private static final String PREFS="vision_keyboard_settings";
     private static final String KEY_THEME="theme";
-    private static final int ABC=0,NUMBER=1,MATH=2,SCIENCE=3,EMOJI=4,LANGUAGE=5;
+    private static final int ABC=0,NUMBER=1,MATH=2,SCIENCE=3,EMOJI=4,LANGUAGE=5,SYMBOLS=6;
     private static final int EMOJIS_PER_PAGE=32;
     private int emojiCategory=0,emojiPage=0;
     private static final int[] ACCENTS=ThemePalette.ACCENTS;
     private KeyboardPanel keyboardFrame;
     private LinearLayout keysContent;
-    private int mode=ABC,theme=0;
+    private int mode=ABC,theme=4;
+    private boolean toolbarExpanded=false;
     private int selectedLanguage=IndicLanguages.ENGLISH;
     private boolean sensitiveField=false;
     private final StringBuilder romanComposing=new StringBuilder();
@@ -59,7 +60,7 @@ public final class VisionKeyboardService extends InputMethodService {
 
     @Override public void onCreate(){
         super.onCreate();
-        theme=ThemePalette.norm(getSharedPreferences(PREFS,MODE_PRIVATE).getInt(KEY_THEME,0));
+        theme=ThemePalette.norm(getSharedPreferences(PREFS,MODE_PRIVATE).getInt(KEY_THEME,4));
         selectedLanguage=IndicLanguages.norm(settings().getInt("language",IndicLanguages.ENGLISH));
     }
     private int dp(float value){
@@ -83,7 +84,7 @@ public final class VisionKeyboardService extends InputMethodService {
             int type=info==null?InputType.TYPE_CLASS_TEXT:(info.inputType&InputType.TYPE_MASK_CLASS);
             mode=(type==InputType.TYPE_CLASS_NUMBER || type==InputType.TYPE_CLASS_PHONE)
                 ?NUMBER:ABC;
-            shifted=false;caps=false;
+            shifted=false;caps=false;toolbarExpanded=false;
         }
     }
     private boolean isPasswordField(EditorInfo info){
@@ -100,7 +101,7 @@ public final class VisionKeyboardService extends InputMethodService {
     }
     @Override public void onStartInputView(EditorInfo info,boolean restarting){
         super.onStartInputView(info,restarting);
-        theme=ThemePalette.norm(settings().getInt(KEY_THEME,0));
+        theme=ThemePalette.norm(settings().getInt(KEY_THEME,4));
         selectedLanguage=IndicLanguages.norm(settings().getInt("language",IndicLanguages.ENGLISH));
         sensitiveField=isPasswordField(info);
         if(keyboardFrame!=null)rebuild();
@@ -139,13 +140,14 @@ public final class VisionKeyboardService extends InputMethodService {
         // Avoid adding a second oversized bottom inset: it squeezed the
         // fourth Space/Enter row under the bottom of the real viewport.
         keysContent.setPadding(dp(3),dp(4),dp(3),dp(8));
-        addToolbar();
+        // Compact suggestions bar by default; the grid exposes all original tabs.
+        if(mode!=ABC || toolbarExpanded)addToolbar();
         if(mode==LANGUAGE){
             addLanguagePicker();
         }else if(mode==ABC){
             // Reference screenshot has a single tools row above the keys.
             // Local predictions remain available as an optional setting.
-            if(settings().getBoolean("show_suggestions",false))addSuggestions();
+            if(settings().getBoolean("show_suggestions",true))addSuggestions();
             if(selectedLanguage!=IndicLanguages.ENGLISH)addLanguageStatus();
 
             addRow("Q W E R T Y U I O P");
@@ -158,6 +160,11 @@ public final class VisionKeyboardService extends InputMethodService {
             addRow("1 2 3 4 5 6 7 8 9 0");
             addRow("@ # ₹ % & - + ( ) /");
             addRow("* \" ' : ; ! ? = ← ⌫");
+            addBottom();
+        }else if(mode==SYMBOLS){
+            addRow("_ ~ ` | • § © ® ™ ✓");
+            addRow("[ ] { } \\ ^ € £ ¥ ¢");
+            addRow("« » ‹ › ° ± × ÷ ≈ ⌫");
             addBottom();
         }else if(mode==MATH){
             addRow("π √ ∑ ∞ ≈ ≠ ≤ ≥ ± ×");
@@ -272,7 +279,7 @@ public final class VisionKeyboardService extends InputMethodService {
             tab.setOnClickListener(v->{
                 feedback(v);
                 if(index<5){
-                    finishRomanWord();mode=index;shifted=false;rebuild();
+                    finishRomanWord();mode=index;shifted=false;toolbarExpanded=false;rebuild();
                 }else if(index==5){
                     finishRomanWord();mode=LANGUAGE;rebuild();
                 }else if(index==6){
@@ -303,20 +310,27 @@ public final class VisionKeyboardService extends InputMethodService {
         LinearLayout strip=new LinearLayout(this);
         strip.setOrientation(LinearLayout.HORIZONTAL);
         strip.setGravity(Gravity.CENTER_VERTICAL);
-        suggestionChips=new TextView[3];
-        for(int i=0;i<3;i++){
-            final int position=i;
+        TextView grid=new TextView(this);
+        grid.setText("▦");grid.setTextSize(26);
+        grid.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+        grid.setGravity(Gravity.CENTER);
+        grid.setTextColor(light()?0xff303542:Color.WHITE);
+        grid.setContentDescription("Show S Board tools, maths, science, languages, emoji, settings");
+        strip.addView(grid,new LinearLayout.LayoutParams(dp(42),dp(39)));
+        grid.setOnClickListener(v->{feedback(v);toolbarExpanded=true;rebuild();});
+        suggestionChips=new TextView[4];
+        for(int i=0;i<suggestionChips.length;i++){
             TextView chip=new TextView(this);
             chip.setGravity(Gravity.CENTER);
             chip.setSingleLine(true);
             chip.setEllipsize(android.text.TextUtils.TruncateAt.END);
             chip.setTypeface(Typeface.create("sans-serif-medium",Typeface.NORMAL));
             chip.setTextSize(14);
-            chip.setTextColor(light()?0xff26364f:0xfff0f8ff);
+            chip.setTextColor(light()?0xff272a35:0xfff0f8ff);
             chip.setBackground(new RippleDrawable(
-                ColorStateList.valueOf(light()?0x332b61c6:0x44a4ecff),
+                ColorStateList.valueOf(light()?0x222d3545:0x44a4ecff),
                 new GradientDrawable(),null));
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(34),1f);
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(36),1f);
             lp.setMargins(dp(1),0,dp(1),0);
             strip.addView(chip,lp);
             chip.setOnClickListener(v->{
@@ -325,13 +339,27 @@ public final class VisionKeyboardService extends InputMethodService {
                 if(tag instanceof String)applySuggestion((String)tag);
             });
             suggestionChips[i]=chip;
-            if(position<2){
+            if(i<suggestionChips.length-1){
                 View divider=new View(this);
-                divider.setBackgroundColor(light()?0xffc6d3e7:0x7048a5cb);
-                strip.addView(divider,new LinearLayout.LayoutParams(dp(1),dp(17)));
+                divider.setBackgroundColor(light()?0xff949baa:0x7048a5cb);
+                strip.addView(divider,new LinearLayout.LayoutParams(dp(1),dp(23)));
             }
         }
-        keysContent.addView(strip,new LinearLayout.LayoutParams(-1,dp(37)));
+        TextView mic=new TextView(this);
+        mic.setText("🎙");mic.setTextSize(23);
+        mic.setTextColor(light()?0xff303542:Color.WHITE);
+        mic.setGravity(Gravity.CENTER);
+        mic.setContentDescription("Choose another input method, including voice typing");
+        strip.addView(mic,new LinearLayout.LayoutParams(dp(44),dp(39)));
+        // No audio permission: let Android select an installed voice-capable IME.
+        mic.setOnClickListener(v->{
+            feedback(v);
+            android.view.inputmethod.InputMethodManager imm=
+                (android.view.inputmethod.InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            if(imm!=null)imm.showInputMethodPicker();
+        });
+        keysContent.addView(strip,new LinearLayout.LayoutParams(-1,dp(42)));
         updateSuggestions();
     }
     private void updateSuggestions(){
@@ -353,10 +381,10 @@ public final class VisionKeyboardService extends InputMethodService {
             lastSuggestionKey=lookupKey;
             String[] candidates=sensitiveField||mode!=ABC?
                 new String[0]:WordSuggestions.get(typed,
-                    selectedLanguage!=IndicLanguages.ENGLISH,3);
+                    selectedLanguage!=IndicLanguages.ENGLISH,4);
             String[] fallback=sensitiveField?
-                new String[]{"Private typing","",""}:
-                new String[]{"S Board","by Saurabh's Vision™","⌨ Type to see suggestions"};
+                new String[]{"Private typing","","",""}:
+                new String[]{"S Board","Start typing","Suggestions appear here",""};
             for(int i=0;i<suggestionChips.length;i++){
                 TextView chip=suggestionChips[i];
                 if(i<candidates.length){
@@ -632,20 +660,32 @@ public final class VisionKeyboardService extends InputMethodService {
         row.setTag("sboard_space_action");
         row.setGravity(Gravity.CENTER);
         int height=dp(getResources().getConfiguration().orientation==2?57:62);
-        addKey(row,mode==ABC?"?123":"ABC",mode==ABC?"123":"ABC",1.02f,height,true);
-        addKey(row,"☺","EMOJI",.82f,height,true);
-        addKey(row,"A↔अ","LANG_TOGGLE",.85f,height,true);
-        addKey(row,"Space","SPACE",4.35f,height,true);
-        addKey(row,",",",",.60f,height,false);
-        addKey(row,".",".",.60f,height,false);
-        addKey(row,"↵","ENTER",1.16f,height,true);
+        if(mode==ABC){
+            // Image-inspired row: ?123, emoji, wide space, cursor keys, ?123.
+            addKey(row,"?123","123",1.05f,height,true);
+            addKey(row,"☺","EMOJI",.90f,height,true);
+            addKey(row,"Space","SPACE",5.7f,height,true);
+            addKey(row,"◀","←",.70f,height,true);
+            addKey(row,"▶","→",.70f,height,true);
+            addKey(row,"?123","123",1.05f,height,true);
+        }else{
+            addKey(row,mode==NUMBER?"=<":mode==SYMBOLS?"?123":"ABC",
+                mode==NUMBER?"SYM_MORE":mode==SYMBOLS?"SYM_BACK":"ABC",1.02f,height,true);
+            addKey(row,"☺","EMOJI",.82f,height,true);
+            addKey(row,"A↔अ","LANG_TOGGLE",.85f,height,true);
+            addKey(row,"Space","SPACE",4.35f,height,true);
+            addKey(row,",",",",.60f,height,false);
+            addKey(row,".",".",.60f,height,false);
+            addKey(row,"↵","ENTER",1.16f,height,true);
+        }
         keysContent.addView(row,new LinearLayout.LayoutParams(-1,height+dp(3)));
     }
     private static boolean isAction(String value){
         return value.equals("⇧")||value.equals("⌫")||value.equals("ABC")||
             value.equals("123")||value.equals("MATH")||value.equals("SCI")||
             value.equals("EMOJI")||value.equals("EMOJI_PREV")||value.equals("EMOJI_NEXT")||
-            value.equals("SPACE")||value.equals("ENTER")||value.equals("←")||
+            value.equals("SPACE")||value.equals("ENTER")||value.equals("←")||value.equals("→")||
+            value.equals("SYM_MORE")||value.equals("SYM_BACK")||
             value.startsWith("LANG_");
     }
     private void addKey(LinearLayout row,String display,String output,float weight,int height,boolean special){
@@ -703,6 +743,9 @@ public final class VisionKeyboardService extends InputMethodService {
         lp.setMargins(dp(1.5f),dp(1.0f),dp(1.5f),dp(2.0f));
         row.addView(b,lp);
         b.setContentDescription("⌫".equals(output)?"Delete last character":("SPACE".equals(output)?"Spacebar - insert space":output));
+        if(mode==ABC && "123".equals(output)){
+            b.setOnLongClickListener(v->{feedback(v);finishRomanWord();mode=LANGUAGE;rebuild();return true;});
+        }
         if(mode==ABC && output.length()==1){
             int index="qwertyuiop".indexOf(output.toLowerCase(java.util.Locale.ROOT));
             if(index>=0){
@@ -787,7 +830,9 @@ public final class VisionKeyboardService extends InputMethodService {
         if(code.equals("LANG_HINDI")){selectLanguage(IndicLanguages.HINDI);return;}
         if(code.equals("LANG_HINGLISH")){selectLanguage(IndicLanguages.HINGLISH);return;}
         if(code.equals("LANG_ENGLISH")){selectLanguage(IndicLanguages.ENGLISH);return;}
-        if(code.equals("ABC")){finishRomanWord();mode=ABC;shifted=false;rebuild();return;}
+        if(code.equals("ABC")){finishRomanWord();mode=ABC;shifted=false;toolbarExpanded=false;rebuild();return;}
+        if(code.equals("SYM_MORE")){mode=SYMBOLS;rebuild();return;}
+        if(code.equals("SYM_BACK")){mode=NUMBER;rebuild();return;}
         if(code.equals("123")){finishRomanWord();mode=NUMBER;shifted=false;rebuild();return;}
         if(code.equals("MATH")){finishRomanWord();mode=MATH;shifted=false;rebuild();return;}
         if(code.equals("SCI")){finishRomanWord();mode=SCIENCE;shifted=false;rebuild();return;}
@@ -803,9 +848,9 @@ public final class VisionKeyboardService extends InputMethodService {
         // Toolbar actions do not need an editor IPC round-trip.
         InputConnection conn=getCurrentInputConnection();
         if(conn==null)return;
-        if(code.equals("←")){
+        if(code.equals("←")||code.equals("→")){
             finishRomanWord();
-            int key=KeyEvent.KEYCODE_DPAD_LEFT;
+            int key=code.equals("←")?KeyEvent.KEYCODE_DPAD_LEFT:KeyEvent.KEYCODE_DPAD_RIGHT;
             conn.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,key));
             conn.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP,key));return;
         }
