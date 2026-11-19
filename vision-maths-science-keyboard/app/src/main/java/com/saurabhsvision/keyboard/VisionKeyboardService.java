@@ -68,12 +68,13 @@ public final class VisionKeyboardService extends InputMethodService {
     private final Handler repeatHandler=new Handler(Looper.getMainLooper());
     private boolean backspaceRepeated=false;
     private Runnable backspaceRepeat;
-    private boolean haptics=true;
+    private boolean haptics=false;
 
     @Override public void onCreate(){
         super.onCreate();
         theme=ThemePalette.norm(getSharedPreferences(PREFS,MODE_PRIVATE).getInt(KEY_THEME,4));
         selectedLanguage=IndicLanguages.norm(settings().getInt("language",IndicLanguages.ENGLISH));
+        haptics=settings().getBoolean("key_haptics",false);
     }
     private int dp(float value){
         return (int)(value*getResources().getDisplayMetrics().density+.5f);
@@ -116,6 +117,7 @@ public final class VisionKeyboardService extends InputMethodService {
         theme=ThemePalette.norm(settings().getInt(KEY_THEME,4));
         selectedLanguage=IndicLanguages.norm(settings().getInt("language",IndicLanguages.ENGLISH));
         sensitiveField=isPasswordField(info);
+        haptics=settings().getBoolean("key_haptics",false);
         if(keyboardFrame!=null)rebuild();
     }
     @Override public void onUpdateSelection(int oldSelStart,int oldSelEnd,
@@ -727,6 +729,10 @@ public final class VisionKeyboardService extends InputMethodService {
                 (functionKey?0xffadf9ff:Color.WHITE)))));
         // Never create per-key press animations; keep native ripple and fast tap dispatch.
         b.setStateListAnimator(null);
+        // Disabling button-level audio/haptics avoids redundant system work
+        // during rapid taps. The optional vibration is applied explicitly.
+        b.setSoundEffectsEnabled(false);
+        b.setHapticFeedbackEnabled(haptics);
         b.setPadding(0,0,0,0);b.setMinimumHeight(0);b.setMinHeight(0);
         b.setMinimumWidth(0);b.setMinWidth(0);
         int upper,lower,stroke;
