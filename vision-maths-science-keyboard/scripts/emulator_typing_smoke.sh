@@ -67,8 +67,9 @@ adb shell settings put system user_rotation 1 || true
 # switch to Gboard, invalidating the keyboard's landscape screenshot.
 adb shell am start -W -n "$APP/.KeyboardVisibilityTestActivity"
 sleep 8
-adb shell input tap 130 135 || true
-sleep 2
+# Tap INSIDE the EditText (the field begins at y≈140 on a 528px screen).
+adb shell input tap 250 185
+sleep 3
 adb exec-out screencap -p > /tmp/sboard-landscape.png
 test -s /tmp/sboard-landscape.png
 python3 - <<'PY'
@@ -81,7 +82,8 @@ print(f'Landscape image: {width}x{height}')
 assert width>height, 'Screen did not rotate to landscape'
 PY
 adb shell settings get secure default_input_method | grep -F "$IME"
-echo "PASS: S Board stays selected after rotation; landscape screenshot captured."
+java vision-maths-science-keyboard/scripts/SBoardEmulatorScreenCheck.java /tmp/sboard-landscape.png
+echo "PASS: S Board stays selected, and visible key panel rendered after rotation."
 
 # Inspect only errors, never output sensitive input or clipboard content.
 adb shell logcat -d -t 1800 -s AndroidRuntime:E > /tmp/sboard-androidruntime.log || true
