@@ -666,7 +666,7 @@ public final class VisionKeyboardService extends InputMethodService {
             addKey(row,"☺","EMOJI",.90f,height,true);
             addKey(row,"Space","SPACE",5.7f,height,true);
             addKey(row,"◀","←",.70f,height,true);
-            addKey(row,"▶","→",.70f,height,true);
+            addKey(row,"▶","CURSOR_RIGHT",.70f,height,true);
             addKey(row,"?123","123",1.05f,height,true);
         }else{
             addKey(row,mode==NUMBER?"=<":mode==SYMBOLS?"?123":"ABC",
@@ -684,7 +684,7 @@ public final class VisionKeyboardService extends InputMethodService {
         return value.equals("⇧")||value.equals("⌫")||value.equals("ABC")||
             value.equals("123")||value.equals("MATH")||value.equals("SCI")||
             value.equals("EMOJI")||value.equals("EMOJI_PREV")||value.equals("EMOJI_NEXT")||
-            value.equals("SPACE")||value.equals("ENTER")||value.equals("←")||value.equals("→")||
+            value.equals("SPACE")||value.equals("ENTER")||value.equals("←")||value.equals("CURSOR_RIGHT")||
             value.equals("SYM_MORE")||value.equals("SYM_BACK")||
             value.startsWith("LANG_");
     }
@@ -857,7 +857,7 @@ public final class VisionKeyboardService extends InputMethodService {
         // Toolbar actions do not need an editor IPC round-trip.
         InputConnection conn=getCurrentInputConnection();
         if(conn==null)return;
-        if(code.equals("←")||code.equals("→")){
+        if(code.equals("←")||code.equals("CURSOR_RIGHT")){
             finishRomanWord();
             int key=code.equals("←")?KeyEvent.KEYCODE_DPAD_LEFT:KeyEvent.KEYCODE_DPAD_RIGHT;
             conn.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,key));
