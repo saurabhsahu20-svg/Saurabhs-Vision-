@@ -38,6 +38,8 @@ public final class KeyboardBackdrop extends View {
     /** Called by the compact IME panel to paint the theme without a full-height child. */
     public void drawArtwork(Canvas canvas,int w,int h){
         if(w<=0||h<=0)return;
+        if(theme==4){canvas.drawColor(0xffeeedf3);return;}
+
         paint.reset();paint.setAntiAlias(true);
         paint.setShader(new LinearGradient(0,0,w,h,
             new int[]{BASE[theme],MID[theme],BASE[theme]},
