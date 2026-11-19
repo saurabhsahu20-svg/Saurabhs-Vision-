@@ -49,6 +49,18 @@ public final class VisionKeyboardService extends InputMethodService {
     private TextView romanPreview;
     private TextView[] suggestionChips;
     private boolean updatingSuggestions=false;
+    // Coalesce redundant cursor/keypress callbacks into one display refresh.
+    private final Handler suggestionHandler=new Handler(Looper.getMainLooper());
+    private boolean suggestionsQueued=false;
+    private final Runnable suggestionRefresh=()->{
+        suggestionsQueued=false;
+        updateSuggestions();
+    };
+    private void requestSuggestions(){
+        if(suggestionChips==null||suggestionsQueued)return;
+        suggestionsQueued=true;
+        suggestionHandler.postDelayed(suggestionRefresh,16L);
+    }
     // A cursor-change callback often repeats the same suggestion query after a keypress.
     private String lastSuggestionKey=null;
     private boolean shifted=false,caps=false;
@@ -111,14 +123,16 @@ public final class VisionKeyboardService extends InputMethodService {
         super.onUpdateSelection(oldSelStart,oldSelEnd,
             newSelStart,newSelEnd,candidatesStart,candidatesEnd);
         // Word candidates are calculated locally only, never stored/logged.
-        if(!updatingSuggestions && mode==ABC)updateSuggestions();
+        if(!updatingSuggestions && mode==ABC)requestSuggestions();
     }
     @Override public void onFinishInputView(boolean finishingInput){
+        suggestionHandler.removeCallbacks(suggestionRefresh);suggestionsQueued=false;
         stopRepeat();
         finishRomanWord();
         super.onFinishInputView(finishingInput);
     }
     @Override public void onDestroy(){
+        suggestionHandler.removeCallbacksAndMessages(null);
         stopRepeat();
         finishRomanWord();
         repeatHandler.removeCallbacksAndMessages(null);
@@ -127,6 +141,7 @@ public final class VisionKeyboardService extends InputMethodService {
     private boolean light(){return ThemePalette.isLight(theme);}
     private void rebuild(){
         if(keyboardFrame==null)return;
+        suggestionHandler.removeCallbacks(suggestionRefresh);suggestionsQueued=false;
         keyboardFrame.removeAllViews();
         keyboardFrame.setTheme(theme);
         // Default to screen-safe compact mode; optional normal size still auto-fits
@@ -710,6 +725,8 @@ public final class VisionKeyboardService extends InputMethodService {
             (light()? (enter?Color.WHITE:(functionKey?0xff2056bb:0xff162338)):
              (enter?0xff082440:("SPACE".equals(output)?Color.WHITE:
                 (functionKey?0xffadf9ff:Color.WHITE)))));
+        // Never create per-key press animations; keep native ripple and fast tap dispatch.
+        b.setStateListAnimator(null);
         b.setPadding(0,0,0,0);b.setMinimumHeight(0);b.setMinHeight(0);
         b.setMinimumWidth(0);b.setMinWidth(0);
         int upper,lower,stroke;
@@ -822,7 +839,7 @@ public final class VisionKeyboardService extends InputMethodService {
         }
         if(android.os.Build.VERSION.SDK_INT>=24)conn.deleteSurroundingTextInCodePoints(1,0);
         else conn.deleteSurroundingText(1,0);
-        updateSuggestions();
+        requestSuggestions();
     }
     private void press(String code){
         if(code.equals("⇧")){
@@ -863,7 +880,7 @@ public final class VisionKeyboardService extends InputMethodService {
             conn.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,key));
             conn.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP,key));return;
         }
-        if(code.equals("SPACE")){finishRomanWord();conn.commitText(" ",1);updateSuggestions();return;}
+        if(code.equals("SPACE")){finishRomanWord();conn.commitText(" ",1);requestSuggestions();return;}
         if(code.equals("ENTER")){
             finishRomanWord();
             EditorInfo info=getCurrentInputEditorInfo();
@@ -880,7 +897,7 @@ public final class VisionKeyboardService extends InputMethodService {
             finishRomanWord();
             conn.commitText(code,1);
         }
-        updateSuggestions();
+        requestSuggestions();
         if(mode==ABC && shifted && !caps && code.length()==1 && Character.isLetter(code.charAt(0))){
             shifted=false;rebuild();
         }
