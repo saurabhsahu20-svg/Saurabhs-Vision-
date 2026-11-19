@@ -58,16 +58,30 @@ adb shell settings get secure default_input_method | grep -F "$IME"
 echo "PASS: S Board is the selected input method."
 
 # Switch to a small landscape window and verify the keyboard can still open.
-adb shell wm size 1200x528
+# Android's wm size is expressed in its unrotated display coordinates.
+# A 528x1200 display rotated 90 degrees is genuinely 1200x528 landscape.
+adb shell wm size 528x1200
 adb shell wm density 240
 adb shell settings put system user_rotation 1 || true
-adb shell am force-stop "$APP" || true
+# Never force-stop an app that is also the selected IME: Android can then
+# switch to Gboard, invalidating the keyboard's landscape screenshot.
 adb shell am start -W -n "$APP/.KeyboardVisibilityTestActivity"
 sleep 8
+adb shell input tap 130 135 || true
+sleep 2
 adb exec-out screencap -p > /tmp/sboard-landscape.png
 test -s /tmp/sboard-landscape.png
+python3 - <<'PY'
+from pathlib import Path
+import struct
+b=Path('/tmp/sboard-landscape.png').read_bytes()
+assert b.startswith(bytes((137,80,78,71,13,10,26,10))), 'Invalid screenshot PNG'
+width,height=struct.unpack('>II',b[16:24])
+print(f'Landscape image: {width}x{height}')
+assert width>height, 'Screen did not rotate to landscape'
+PY
 adb shell settings get secure default_input_method | grep -F "$IME"
-echo "PASS: landscape keyboard launches and screenshot captured."
+echo "PASS: S Board stays selected after rotation; landscape screenshot captured."
 
 # Inspect only errors, never output sensitive input or clipboard content.
 adb shell logcat -d -t 1800 -s AndroidRuntime:E > /tmp/sboard-androidruntime.log || true
