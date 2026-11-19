@@ -58,11 +58,11 @@ adb shell settings get secure default_input_method | grep -F "$IME"
 echo "PASS: S Board is the selected input method."
 
 # Switch to a small landscape window and verify the keyboard can still open.
-# Android's wm size is expressed in its unrotated display coordinates.
-# A 528x1200 display rotated 90 degrees is genuinely 1200x528 landscape.
-adb shell wm size 528x1200
+# Force a wide logical display directly. Emulator user_rotation=1 can
+# unexpectedly rotate that simulated display back into portrait mode.
+adb shell wm size 1200x528
 adb shell wm density 240
-adb shell settings put system user_rotation 1 || true
+adb shell settings put system user_rotation 0 || true
 # Never force-stop an app that is also the selected IME: Android can then
 # switch to Gboard, invalidating the keyboard's landscape screenshot.
 adb shell am start -W -n "$APP/.KeyboardVisibilityTestActivity"
