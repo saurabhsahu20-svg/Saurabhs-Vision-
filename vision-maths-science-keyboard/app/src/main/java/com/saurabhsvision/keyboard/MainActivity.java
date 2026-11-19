@@ -202,6 +202,24 @@ public final class MainActivity extends Activity {
         });
         refreshSuggestions.run();
 
+        add(root,text("⚡ Fast Touch & Typing",20,NAVY,true),22);
+        add(root,text("Extra key sound and vibration are off by default for immediate, low-overhead touch feedback. Enable vibration only if preferred.",13,0xff496284,false),6);
+        TextView feedbackStatus=text("",14,0xff1746ad,true);
+        add(root,feedbackStatus,7);
+        Runnable refreshFeedback=()->feedbackStatus.setText(
+            getSharedPreferences(PREFS,MODE_PRIVATE).getBoolean("key_haptics",false)
+                ?"Key vibration: ON":"Key vibration: OFF (Faster response)");
+        Button toggleFeedback=button("Toggle Key Vibration",0xffe1f5ff,NAVY);
+        add(root,toggleFeedback,7);
+        toggleFeedback.setOnClickListener(v->{
+            SharedPreferences prefs=getSharedPreferences(PREFS,MODE_PRIVATE);
+            prefs.edit().putBoolean("key_haptics",
+                !prefs.getBoolean("key_haptics",false)).apply();
+            refreshFeedback.run();
+            showMessage("Close and reopen S Board to apply the touch setting.");
+        });
+        refreshFeedback.run();
+
         add(root,text("🎨 Premium Keyboard Themes",21,NAVY,true),29);
         add(root,text("11 designer themes • Blue, Maroon, Silver, Green, Gold, Purple, Rose & more",13,0xff54708e,false),5);
         themeStatus=text("",15,0xff16519a,true);
