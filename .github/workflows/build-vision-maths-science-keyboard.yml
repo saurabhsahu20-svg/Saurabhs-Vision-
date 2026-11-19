@@ -161,7 +161,7 @@ jobs:
           import hashlib
           logo_digest=hashlib.sha256((root/'res/drawable-nodpi/s_board_logo.webp').read_bytes()).hexdigest()
           assert logo_digest=='66ce747a7ce6089d587f15f12ca2e6384011f02e5ce7740a94e5ae20ce883e59', 'Wrong (old) S Board icon'
-          assert 'versionCode 20' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
+          assert 'versionCode 21' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
           assert (root/'java/com/saurabhsvision/keyboard/SBoardKeyButton.java').is_file()
           assert 'Toggle Smart Suggestions' in activity
           assert 'setMeasuredDimension(width,Math.min(cap' in panel
@@ -283,13 +283,13 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.10_RED_CRYSTAL_FAST_TOUCH.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.11_RED_CRYSTAL_INPLACE_UPDATE.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_10_RED_CRYSTAL_FAST_TOUCH_APK
+          name: S_Board_v1_9_11_RED_CRYSTAL_INPLACE_UPDATE_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -299,14 +299,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.10"
-          file="keyboard-deliverables/S_Board_v1.9.10_RED_CRYSTAL_FAST_TOUCH.apk"
+          tag="s-board-v1.9.11"
+          file="keyboard-deliverables/S_Board_v1.9.11_RED_CRYSTAL_INPLACE_UPDATE.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.9.10 • Red Crystal Icon & Responsive Typing" \
-              --notes "S Board 1.9.10 restores the original red-crystal S / blue keyboard icon taken from the provided v1.9.8 APK, replacing the previous outdated neon logo. This is a full native Android keyboard APK with the v1.9.9 light key layout, smart offline word corrections, left/right cursor keys, underscore plus extended symbols, Maths, Science, 22 Indian languages, emojis and premium themes. Touch performance improves by coalescing duplicate prediction updates and disabling key elevation animations. Package is com.saurabhsvision.keyboard, versionCode 20. Public CI checks the icon checksum, layout, suggestions, Android compilation and APK signature. Test APK uses GitHub runner debug signing: updating a previous APK built with another signing key requires backing up keyboard settings and uninstalling ONLY the old S Board first. Do not uninstall your system keyboard. No physical-device typing performance claims." \
+              --title "S Board 1.9.11 • Faster Touch, Same Red Crystal Logo" \
+              --notes "Version 1.9.11 retains the red crystal S icon, all keyboard modes, word suggestions, symbols, Maths, Science, Emoji and Hindi/Hinglish. Touch processing minimizes unnecessary sound and vibration overhead; keyboard vibration is optional in settings and disabled by default. GitHub CI tests native IME typing, Android emulator portrait and landscape, and package signature. This GitHub test APK is debug signed; it will not upgrade an APK signed by the private stable key. Use the separately distributed stable-signed 1.9.11 APK to upgrade S Board 1.9.10 stable in place; the original 1.9.8 certificate is different and cannot update in place." \
               --latest=false
           fi
 
