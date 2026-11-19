@@ -26,7 +26,7 @@ public final class WordSuggestions {
         "say","science","screen","send","should","simple","small","smart","so","solution",
         "some","space","start","study","student","students","success","support","sure",
         "teacher","test","thank","thanks","that","the","their","them","then","there","these",
-        "they","this","time","to","today","tomorrow","type","typing","update","use","very",
+        "they","this","time","to","today","tomorrow","type","typing","under","underscore","update","use","user","using","very",
         "vision","want","was","we","website","well","were","what","when","where","which",
         "white","who","why","will","with","work","working","world","would","yes","you","your"
     };
@@ -40,7 +40,7 @@ public final class WordSuggestions {
         "kyun","kya","main","mera","mere","meri","mil","mujhe","naam","namaste","naya",
         "naye","nahi","nahin","nhi","padhai","pani","par","please","raha","rahe",
         "rahi","sahi","sath","saath","sab","saurabh","school","shiksha","shubh","sir",
-        "space","theek","thik","tum","tumhara","tumhe","uska","usme","wala","wale",
+        "space","theek","thik","tum","tumhara","tumhe","unhe","unko","unka","unki","unse","uska","uske","uski","usko","usme","usne","wala","wale",
         "wali","ya","ye","yeh","yahan"
     };
     private static String normalize(String word){
@@ -60,7 +60,38 @@ public final class WordSuggestions {
                 if(out.size()>=max)break;
             }
         }
+        // Fast, offline one-edit typo fixes (e.g. 'hellp' -> 'hello').
+        // Only run when prefix matches did not fill all suggestion slots.
+        if(out.size()<max && prefix.length()>=3){
+            for(String candidate:dictionary){
+                if(candidate.length()<3 ||
+                   Math.abs(candidate.length()-prefix.length())>1 ||
+                   out.contains(candidate))continue;
+                if(singleEditOrSwap(prefix,candidate)){
+                    out.add(candidate);
+                    if(out.size()>=max)break;
+                }
+            }
+        }
         return out.toArray(new String[0]);
+    }
+    // Max one insertion, removal, substitution or adjacent swapped letters.
+    private static boolean singleEditOrSwap(String a,String b){
+        int n=a.length(),m=b.length();
+        if(Math.abs(n-m)>1)return false;
+        int i=0,j=0,edits=0;
+        while(i<n && j<m){
+            if(a.charAt(i)==b.charAt(j)){i++;j++;continue;}
+            if(++edits>1)return false;
+            if(n==m){
+                if(i+1<n && a.charAt(i)==b.charAt(i+1) &&
+                   a.charAt(i+1)==b.charAt(i)){
+                    i+=2;j+=2;
+                }else{i++;j++;}
+            }else if(n>m)i++;
+            else j++;
+        }
+        return edits+(n-i)+(m-j)<=1;
     }
     /** Identify the trailing Roman-letter token without saving or transmitting it. */
     public static String trailingWord(CharSequence text){
