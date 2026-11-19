@@ -3,7 +3,7 @@
     <application>
         <!-- Visible only to debug build, used by CI emulator to test IME overlap. -->
         <activity android:name=".KeyboardVisibilityTestActivity"
-            android:exported="true" android:screenOrientation="landscape"
+            android:exported="true"
             android:windowSoftInputMode="stateAlwaysVisible|adjustResize"/>
     </application>
 </manifest>
