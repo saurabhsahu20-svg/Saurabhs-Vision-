@@ -396,6 +396,9 @@ jobs:
             /tmp/sboard-portrait.png
             /tmp/sboard-landscape.png
             /tmp/sboard-tap-result.xml
+            /tmp/sboard-numbers.png
+            /tmp/sboard-before-abc.xml
+            /tmp/sboard-after-abc.xml
             /tmp/sboard-androidruntime.log
           if-no-files-found: ignore
           retention-days: 30
