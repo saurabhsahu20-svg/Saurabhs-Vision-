@@ -1,6 +1,9 @@
 package com.saurabhsvision.keyboard;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.widget.Toast;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -69,6 +72,9 @@ public final class VisionKeyboardService extends InputMethodService {
     private boolean backspaceRepeated=false;
     private Runnable backspaceRepeat;
     private boolean haptics=false;
+    private VoiceDictation voiceDictation;
+    private TextView voiceMicButton;
+    private String voiceStatus="";
 
     @Override public void onCreate(){
         super.onCreate();
@@ -90,6 +96,7 @@ public final class VisionKeyboardService extends InputMethodService {
     @Override public void onStartInput(EditorInfo info,boolean restarting){
         finishRomanWord();
         super.onStartInput(info,restarting);
+        cancelVoiceDictation();
         sensitiveField=isPasswordField(info);
         lastSuggestionKey=null; // Never reuse suggestions from a different editor.
         if(suggestionChips!=null)updateSuggestions();
@@ -128,12 +135,14 @@ public final class VisionKeyboardService extends InputMethodService {
         if(!updatingSuggestions && mode==ABC)requestSuggestions();
     }
     @Override public void onFinishInputView(boolean finishingInput){
+        cancelVoiceDictation();
         suggestionHandler.removeCallbacks(suggestionRefresh);suggestionsQueued=false;
         stopRepeat();
         finishRomanWord();
         super.onFinishInputView(finishingInput);
     }
     @Override public void onDestroy(){
+        cancelVoiceDictation();
         suggestionHandler.removeCallbacksAndMessages(null);
         stopRepeat();
         finishRomanWord();
@@ -151,6 +160,7 @@ public final class VisionKeyboardService extends InputMethodService {
         keyboardFrame.setCompact(settings().getBoolean("compact_height",true));
         keysContent=keyboardFrame;
         suggestionChips=null;
+        voiceMicButton=null;
         lastSuggestionKey=null;
         romanPreview=null;
         // The compat IME window sits ABOVE Android's navigation bar.
@@ -366,18 +376,92 @@ public final class VisionKeyboardService extends InputMethodService {
         mic.setText("🎙");mic.setTextSize(23);
         mic.setTextColor(light()?0xff303542:Color.WHITE);
         mic.setGravity(Gravity.CENTER);
-        mic.setContentDescription("Choose another input method, including voice typing");
+        mic.setContentDescription("Tap to dictate your message using microphone");
         strip.addView(mic,new LinearLayout.LayoutParams(dp(44),dp(39)));
-        // No audio permission: let Android select an installed voice-capable IME.
-        mic.setOnClickListener(v->{
-            feedback(v);
-            android.view.inputmethod.InputMethodManager imm=
-                (android.view.inputmethod.InputMethodManager)
-                    getSystemService(Context.INPUT_METHOD_SERVICE);
-            if(imm!=null)imm.showInputMethodPicker();
-        });
+        voiceMicButton=mic;
+        mic.setOnClickListener(v->{feedback(v);toggleVoiceDictation();});
+        refreshVoiceMic();
         keysContent.addView(strip,new LinearLayout.LayoutParams(-1,dp(42)));
         updateSuggestions();
+    }
+    /** Start one speech recognition session on explicit tap, with runtime consent. */
+    private void toggleVoiceDictation(){
+        if(sensitiveField){
+            Toast.makeText(this,"Voice typing is disabled in password fields.",
+                Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(voiceDictation!=null&&voiceDictation.isActive()){
+            voiceDictation.stop();return;
+        }
+        if(checkSelfPermission(Manifest.permission.RECORD_AUDIO)!=
+            PackageManager.PERMISSION_GRANTED){
+            // Only a foreground Activity can display Android's permission dialog.
+            Intent consent=new Intent(this,VoicePermissionActivity.class);
+            consent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            try{startActivity(consent);}
+            catch(RuntimeException error){
+                Toast.makeText(this,"Open S Board settings and allow microphone permission.",
+                    Toast.LENGTH_LONG).show();
+            }
+            return;
+        }
+        if(getCurrentInputConnection()==null){
+            Toast.makeText(this,"Tap a message field before using voice typing.",
+                Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(voiceDictation!=null)voiceDictation.cancel();
+        voiceDictation=new VoiceDictation(this,new VoiceDictation.Callback(){
+            @Override public void onVoiceState(boolean active,String status){
+                voiceStatus=active?status:"";
+                refreshVoiceMic();
+                if(!active && status!=null && !status.isEmpty()){
+                    Toast.makeText(VisionKeyboardService.this,status,Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override public void onVoiceText(String text){insertVoiceText(text);}
+        });
+        voiceDictation.start(VoiceLanguageTags.forLanguage(selectedLanguage));
+    }
+    private void cancelVoiceDictation(){
+        if(voiceDictation!=null){
+            VoiceDictation old=voiceDictation;
+            voiceDictation=null;
+            old.cancel();
+        }
+        voiceStatus="";
+        refreshVoiceMic();
+    }
+    private void refreshVoiceMic(){
+        if(voiceMicButton!=null){
+            boolean live=voiceDictation!=null&&voiceDictation.isActive();
+            voiceMicButton.setText(live?"■":"🎙");
+            voiceMicButton.setContentDescription(live?
+                "Stop dictating and convert speech to text":"Voice typing: tap to speak");
+            voiceMicButton.setTextColor(live?0xffe34b57:
+                (light()?0xff303542:Color.WHITE));
+        }
+    }
+    /** Writes only final recognized text into the currently active editor. */
+    private void insertVoiceText(String text){
+        if(text==null||text.trim().isEmpty()||sensitiveField)return;
+        InputConnection conn=getCurrentInputConnection();
+        if(conn==null){
+            Toast.makeText(this,"Message field closed. Please dictate again.",
+                Toast.LENGTH_SHORT).show();
+            return;
+        }
+        finishRomanWord();
+        conn.beginBatchEdit();
+        try{
+            CharSequence before=conn.getTextBeforeCursor(1,0);
+            String prefix=(before!=null && before.length()>0 &&
+                !Character.isWhitespace(before.charAt(before.length()-1)))?" ":"";
+            conn.commitText(prefix+text.trim()+" ",1);
+        }finally{conn.endBatchEdit();}
+        lastSuggestionKey=null;
+        requestSuggestions();
     }
     private void updateSuggestions(){
         if(suggestionChips==null||updatingSuggestions)return;
