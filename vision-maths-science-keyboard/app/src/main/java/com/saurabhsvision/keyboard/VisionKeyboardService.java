@@ -254,6 +254,16 @@ public final class VisionKeyboardService extends InputMethodService {
         caption.setSingleLine(true);
         brandWords.addView(caption,new LinearLayout.LayoutParams(-1,-2));
         identity.addView(brandWords,new LinearLayout.LayoutParams(0,-2,1f));
+        // The S Board brand is also a clearly accessible close/return control.
+        identity.setClickable(true);
+        identity.setContentDescription("S Board, close tools and return to typing");
+        identity.setOnClickListener(v->{
+            feedback(v);
+            finishRomanWord();
+            mode=ABC;
+            toolbarExpanded=false;
+            rebuild();
+        });
         LinearLayout.LayoutParams identityLp=new LinearLayout.LayoutParams(
             dp(narrow?151:205),dp(46));
         identityLp.setMargins(dp(1),0,dp(4),0);
@@ -314,6 +324,7 @@ public final class VisionKeyboardService extends InputMethodService {
                     finishRomanWord();mode=LANGUAGE;rebuild();
                 }else if(index==6){
                     theme=(theme+1)%ThemePalette.count();
+                    toolbarExpanded=false;
                     settings().edit().putInt(KEY_THEME,theme).apply();rebuild();
                 }else{
                     finishRomanWord();
@@ -347,7 +358,7 @@ public final class VisionKeyboardService extends InputMethodService {
         grid.setTextColor(light()?0xff303542:Color.WHITE);
         grid.setContentDescription("Show S Board tools, maths, science, languages, emoji, settings");
         strip.addView(grid,new LinearLayout.LayoutParams(dp(42),dp(39)));
-        grid.setOnClickListener(v->{feedback(v);toolbarExpanded=true;rebuild();});
+        grid.setOnClickListener(v->{feedback(v);toolbarExpanded=!toolbarExpanded;rebuild();});
         suggestionChips=new TextView[4];
         for(int i=0;i<suggestionChips.length;i++){
             TextView chip=new TextView(this);
@@ -397,7 +408,7 @@ public final class VisionKeyboardService extends InputMethodService {
         openTools.setTextColor(light()?0xff303542:Color.WHITE);
         openTools.setContentDescription("Show S Board keyboard tools");
         row.addView(openTools,new LinearLayout.LayoutParams(dp(44),dp(40)));
-        openTools.setOnClickListener(v->{feedback(v);toolbarExpanded=true;rebuild();});
+        openTools.setOnClickListener(v->{feedback(v);toolbarExpanded=!toolbarExpanded;rebuild();});
         TextView hint=new TextView(this);
         hint.setText("🎙 Tap microphone to dictate");
         hint.setGravity(Gravity.CENTER);
@@ -586,7 +597,7 @@ public final class VisionKeyboardService extends InputMethodService {
         finishRomanWord();
         selectedLanguage=IndicLanguages.norm(lang);
         settings().edit().putInt("language",selectedLanguage).apply();
-        mode=ABC;shifted=false;caps=false;
+        mode=ABC;shifted=false;caps=false;toolbarExpanded=false;
         rebuild();
     }
     /**
@@ -792,20 +803,27 @@ public final class VisionKeyboardService extends InputMethodService {
         addKey(row,"↵","ENTER",.75f,height,true);
         keysContent.addView(row,new LinearLayout.LayoutParams(-1,height+dp(2)));
     }
+    /** Editor-specific submit key. Search fields use search; chats use Enter/Send. */
+    private boolean isSearchEditor(){
+        EditorInfo info=getCurrentInputEditorInfo();
+        return info!=null &&
+            (info.imeOptions&EditorInfo.IME_MASK_ACTION)==EditorInfo.IME_ACTION_SEARCH;
+    }
+    private String submitKeyLabel(){return isSearchEditor()?"⌕":"↵";}
     private void addBottom(){
-        // Gboard-like bottom row, with mandatory wide Space key in all modes.
+        // One number-mode key plus a context-aware Enter/Search submit action.
         LinearLayout row=new LinearLayout(this);
         row.setTag("sboard_space_action");
         row.setGravity(Gravity.CENTER);
         int height=dp(getResources().getConfiguration().orientation==2?57:62);
         if(mode==ABC){
-            // Image-inspired row: ?123, emoji, wide space, cursor keys, ?123.
+            // Keep only the left ?123; use right for Enter/Search instead.
             addKey(row,"?123","123",1.05f,height,true);
             addKey(row,"☺","EMOJI",.90f,height,true);
             addKey(row,"Space","SPACE",5.7f,height,true);
             addKey(row,"◀","←",.70f,height,true);
             addKey(row,"▶","CURSOR_RIGHT",.70f,height,true);
-            addKey(row,"?123","123",1.05f,height,true);
+            addKey(row,submitKeyLabel(),"ENTER",1.05f,height,true);
         }else{
             addKey(row,mode==NUMBER?"=<":mode==SYMBOLS?"?123":"ABC",
                 mode==NUMBER?"SYM_MORE":mode==SYMBOLS?"SYM_BACK":"ABC",1.02f,height,true);
@@ -895,7 +913,9 @@ public final class VisionKeyboardService extends InputMethodService {
         // Increase practical tap target without changing rows or key labels.
         lp.setMargins(dp(1.5f),dp(1.0f),dp(1.5f),dp(2.0f));
         row.addView(b,lp);
-        b.setContentDescription("⌫".equals(output)?"Delete last character":("SPACE".equals(output)?"Spacebar - insert space":output));
+        b.setContentDescription("⌫".equals(output)?"Delete last character":
+            ("SPACE".equals(output)?"Spacebar - insert space":
+                ("ENTER".equals(output)?(isSearchEditor()?"Search":"Enter or send"):output)));
         if(mode==ABC && "123".equals(output)){
             b.setOnLongClickListener(v->{feedback(v);finishRomanWord();mode=LANGUAGE;rebuild();return true;});
         }
