@@ -337,7 +337,7 @@ public final class VisionKeyboardService extends InputMethodService {
         scroller.addView(bar);
         int toolHeight=dp(getResources().getConfiguration().orientation==2?49:51);
         keysContent.addView(scroller,new LinearLayout.LayoutParams(-1,toolHeight));
-        if(active!=null && mode!=ABC){
+        if(active!=null && mode!=ABC && mode!=NUMBER && mode!=SYMBOLS){
             final View item=active;
             scroller.post(()->scroller.smoothScrollTo(
                 Math.max(0,item.getLeft()-dp(narrow?163:210)),0));
