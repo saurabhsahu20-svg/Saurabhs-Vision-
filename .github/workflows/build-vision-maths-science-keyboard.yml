@@ -85,7 +85,7 @@ jobs:
           assert 'if(sensitiveField)' in ime and 'cancelVoiceDictation()' in ime
           assert 'Voice typing is disabled in password fields' in ime
           assert 'Voice Typing' in activity and 'microphone' in activity.lower()
-          assert 'en-IN' in tags and 'hi-IN' in tags
+          assert '"en-IN"' in tags and 'code+"-IN"' in tags
           assert 'ACTION_INPUT_METHOD_SETTINGS' in activity
           assert 'showInputMethodPicker' in activity
           assert 'S BOARD' in activity and 'Maths • Science' in activity
