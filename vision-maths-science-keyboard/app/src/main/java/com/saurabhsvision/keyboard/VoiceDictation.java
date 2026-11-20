@@ -26,6 +26,7 @@ final class VoiceDictation implements RecognitionListener {
     private final Handler handler=new Handler(Looper.getMainLooper());
     private SpeechRecognizer recognizer;
     private boolean active=false;
+    private boolean awaitingFinal=false;
     private final Runnable timeout=()->{
         if(active)finishWithError("Listening timed out. Tap microphone and try again.");
     };
@@ -53,6 +54,7 @@ final class VoiceDictation implements RecognitionListener {
             // A speech provider may still use its server: this is not offline-only.
             intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE,false);
             active=true;
+            awaitingFinal=false;
             callback.onVoiceState(true,"Listening… Speak clearly.");
             handler.postDelayed(timeout,30000L);
             recognizer.startListening(intent);
@@ -64,17 +66,20 @@ final class VoiceDictation implements RecognitionListener {
     }
     /** End the utterance and let the provider return the final text. */
     void stop(){
-        if(active&&recognizer!=null){
-            callback.onVoiceState(true,"Converting speech to text…");
-            try{recognizer.stopListening();}
-            catch(RuntimeException e){finishWithError("Voice typing stopped.");}
-        }
+        if(!active||awaitingFinal||recognizer==null)return;
+        awaitingFinal=true;
+        handler.removeCallbacks(timeout);
+        handler.postDelayed(timeout,12000L); // Never leave a stuck microphone open.
+        callback.onVoiceState(true,"Converting speech to text…");
+        try{recognizer.stopListening();}
+        catch(RuntimeException e){finishWithError("Voice typing stopped.");}
     }
     void cancel(){
         handler.removeCallbacks(timeout);
         SpeechRecognizer old=recognizer;
         recognizer=null;
         active=false;
+        awaitingFinal=false;
         if(old!=null){
             try{old.cancel();}catch(RuntimeException ignored){}
             old.destroy();
@@ -85,12 +90,13 @@ final class VoiceDictation implements RecognitionListener {
         cancel();
         callback.onVoiceState(false,message);
     }
-    @Override public void onReadyForSpeech(Bundle b){callback.onVoiceState(true,"Listening…");}
-    @Override public void onBeginningOfSpeech(){callback.onVoiceState(true,"Listening…");}
+    @Override public void onReadyForSpeech(Bundle b){if(active)callback.onVoiceState(true,"Listening…");}
+    @Override public void onBeginningOfSpeech(){if(active)callback.onVoiceState(true,"Listening…");}
     @Override public void onRmsChanged(float rms){}
     @Override public void onBufferReceived(byte[] buffer){}
-    @Override public void onEndOfSpeech(){callback.onVoiceState(true,"Converting speech to text…");}
+    @Override public void onEndOfSpeech(){if(active)callback.onVoiceState(true,"Converting speech to text…");}
     @Override public void onError(int error){
+        if(!active||recognizer==null)return; // No callbacks from a cancelled session.
         String message;
         switch(error){
             case SpeechRecognizer.ERROR_NO_MATCH:
@@ -113,6 +119,7 @@ final class VoiceDictation implements RecognitionListener {
         finishWithError(message);
     }
     @Override public void onResults(Bundle results){
+        if(!active||recognizer==null)return; // Stale text must NEVER reach another editor.
         ArrayList<String> phrases=results==null?null:
             results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         String transcript="";
