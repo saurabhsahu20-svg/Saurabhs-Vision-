@@ -80,6 +80,23 @@ sleep 3
 adb shell settings get secure default_input_method | grep -F "$IME"
 echo "PASS: microphone button handled on Android without losing the selected keyboard."
 
+# The same rightmost ABC key must be a SEARCH action in search fields,
+# NOT another '?123' toggle or a hard-coded newline.
+adb shell input tap 245 413
+sleep 3
+adb shell input tap 1022 1695
+sleep 2
+adb shell uiautomator dump /sdcard/sboard-search-action.xml >/dev/null 2>&1
+adb pull /sdcard/sboard-search-action.xml /tmp/sboard-search-action.xml >/dev/null
+if ! grep -q 'Search actions: 1' /tmp/sboard-search-action.xml; then
+  echo "FAIL: S Board right action did not trigger native IME_ACTION_SEARCH."
+  grep -o 'Search actions: [0-9]*' /tmp/sboard-search-action.xml || true
+  exit 1
+fi
+echo "PASS: right action key sends native Android Search in search fields."
+adb shell input tap 245 267
+sleep 1
+
 # Switch to a small landscape window and verify the keyboard can still open.
 # Force a wide logical display directly. Emulator user_rotation=1 can
 # unexpectedly rotate that simulated display back into portrait mode.
