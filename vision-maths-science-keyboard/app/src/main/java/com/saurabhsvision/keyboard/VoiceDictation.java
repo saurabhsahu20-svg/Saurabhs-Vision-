@@ -37,11 +37,11 @@ final class VoiceDictation implements RecognitionListener {
 
     boolean start(String languageTag){
         if(active)return false;
-        if(!SpeechRecognizer.isRecognitionAvailable(context)){
-            callback.onVoiceState(false,"Install or enable an Android speech recognition service.");
-            return false;
-        }
         try{
+            if(!SpeechRecognizer.isRecognitionAvailable(context)){
+                callback.onVoiceState(false,"Install or enable an Android speech recognition service.");
+                return false;
+            }
             recognizer=SpeechRecognizer.createSpeechRecognizer(context);
             recognizer.setRecognitionListener(this);
             Intent intent=new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -82,7 +82,7 @@ final class VoiceDictation implements RecognitionListener {
         awaitingFinal=false;
         if(old!=null){
             try{old.cancel();}catch(RuntimeException ignored){}
-            old.destroy();
+            try{old.destroy();}catch(RuntimeException ignored){}
         }
         callback.onVoiceState(false,"");
     }
