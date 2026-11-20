@@ -32,6 +32,24 @@ adb shell ime set "$IME"
 adb shell am start -W -n "$APP/.KeyboardVisibilityTestActivity"
 sleep 12
 
+# Cold Android 15 emulators can show a SYSTEM launcher "Quickstep isn't
+# responding" ANR while the OS initializes, covering a healthy IME. That
+# dialog is not an S Board crash. Dismiss Wait and refocus the actual editor
+# before measuring keyboard touch accuracy.
+recover_system_anr() {
+  adb shell uiautomator dump /sdcard/sboard-system-state.xml >/dev/null 2>&1 || true
+  if adb shell cat /sdcard/sboard-system-state.xml 2>/dev/null | grep -q "Quickstep isn.t responding"; then
+    echo "Recovering Android launcher startup ANR (not S Board)."
+    # Android ANR dialog's Wait button, portrait 1080x1920 emulator.
+    adb shell input tap 500 1080
+    sleep 5
+    adb shell am start -W -n "$APP/.KeyboardVisibilityTestActivity" || true
+  fi
+  adb shell input tap 250 265
+  sleep 2
+}
+recover_system_anr
+
 # Take a screenshot of the actual Android IME in portrait.
 adb exec-out screencap -p > /tmp/sboard-portrait.png
 test -s /tmp/sboard-portrait.png
@@ -45,6 +63,16 @@ adb shell input tap 590 1610
 sleep 2
 adb shell uiautomator dump /sdcard/sboard-tap-result.xml >/dev/null 2>&1 || true
 adb pull /sdcard/sboard-tap-result.xml /tmp/sboard-tap-result.xml >/dev/null
+if grep -q "Quickstep isn.t responding" /tmp/sboard-tap-result.xml; then
+  echo "Android system launcher dialog interrupted typing. Recovering and retrying."
+  recover_system_anr
+  adb shell input tap 230 1335
+  adb shell input tap 420 1475
+  adb shell input tap 590 1610
+  sleep 2
+  adb shell uiautomator dump /sdcard/sboard-tap-result.xml >/dev/null 2>&1 || true
+  adb pull /sdcard/sboard-tap-result.xml /tmp/sboard-tap-result.xml >/dev/null
+fi
 if grep -Eq 'Characters entered: [1-9][0-9]*' /tmp/sboard-tap-result.xml; then
   echo "PASS: keyboard screen taps produced real Android editor characters."
 else
