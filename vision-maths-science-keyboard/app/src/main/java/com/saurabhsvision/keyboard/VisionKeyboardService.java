@@ -75,6 +75,8 @@ public final class VisionKeyboardService extends InputMethodService {
     private VoiceDictation voiceDictation;
     private TextView voiceMicButton;
     private String voiceStatus="";
+    // Invalidate speech callbacks as soon as an editor changes or the IME closes.
+    private long voiceSessionToken=0L;
 
     @Override public void onCreate(){
         super.onCreate();
@@ -175,6 +177,7 @@ public final class VisionKeyboardService extends InputMethodService {
             // Reference screenshot has a single tools row above the keys.
             // Local predictions remain available as an optional setting.
             if(settings().getBoolean("show_suggestions",true))addSuggestions();
+            else addVoiceOnlyRow();
             if(selectedLanguage!=IndicLanguages.ENGLISH)addLanguageStatus();
 
             addRow("Q W E R T Y U I O P");
@@ -384,6 +387,32 @@ public final class VisionKeyboardService extends InputMethodService {
         keysContent.addView(strip,new LinearLayout.LayoutParams(-1,dp(42)));
         updateSuggestions();
     }
+    /** The microphone remains accessible when word suggestions are disabled. */
+    private void addVoiceOnlyRow(){
+        LinearLayout row=new LinearLayout(this);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        TextView openTools=new TextView(this);
+        openTools.setText("▦");openTools.setTextSize(24);
+        openTools.setGravity(Gravity.CENTER);
+        openTools.setTextColor(light()?0xff303542:Color.WHITE);
+        openTools.setContentDescription("Show S Board keyboard tools");
+        row.addView(openTools,new LinearLayout.LayoutParams(dp(44),dp(40)));
+        openTools.setOnClickListener(v->{feedback(v);toolbarExpanded=true;rebuild();});
+        TextView hint=new TextView(this);
+        hint.setText("🎙 Tap microphone to dictate");
+        hint.setGravity(Gravity.CENTER);
+        hint.setTextSize(13);
+        hint.setTextColor(light()?0xff303542:Color.WHITE);
+        row.addView(hint,new LinearLayout.LayoutParams(0,dp(40),1f));
+        TextView mic=new TextView(this);
+        mic.setText("🎙");mic.setTextSize(23);
+        mic.setGravity(Gravity.CENTER);
+        row.addView(mic,new LinearLayout.LayoutParams(dp(48),dp(40)));
+        voiceMicButton=mic;
+        mic.setOnClickListener(v->{feedback(v);toggleVoiceDictation();});
+        refreshVoiceMic();
+        keysContent.addView(row,new LinearLayout.LayoutParams(-1,dp(42)));
+    }
     /** Start one speech recognition session on explicit tap, with runtime consent. */
     private void toggleVoiceDictation(){
         if(sensitiveField){
@@ -411,20 +440,26 @@ public final class VisionKeyboardService extends InputMethodService {
                 Toast.LENGTH_SHORT).show();
             return;
         }
-        if(voiceDictation!=null)voiceDictation.cancel();
+        if(voiceDictation!=null)cancelVoiceDictation();
+        final long expectedVoiceSession=++voiceSessionToken;
         voiceDictation=new VoiceDictation(this,new VoiceDictation.Callback(){
             @Override public void onVoiceState(boolean active,String status){
+                if(expectedVoiceSession!=voiceSessionToken)return;
                 voiceStatus=active?status:"";
                 refreshVoiceMic();
                 if(!active && status!=null && !status.isEmpty()){
                     Toast.makeText(VisionKeyboardService.this,status,Toast.LENGTH_SHORT).show();
                 }
             }
-            @Override public void onVoiceText(String text){insertVoiceText(text);}
+            @Override public void onVoiceText(String text){
+                if(expectedVoiceSession!=voiceSessionToken)return;
+                insertVoiceText(text);
+            }
         });
         voiceDictation.start(VoiceLanguageTags.forLanguage(selectedLanguage));
     }
     private void cancelVoiceDictation(){
+        voiceSessionToken++;
         if(voiceDictation!=null){
             VoiceDictation old=voiceDictation;
             voiceDictation=null;
@@ -438,7 +473,8 @@ public final class VisionKeyboardService extends InputMethodService {
             boolean live=voiceDictation!=null&&voiceDictation.isActive();
             voiceMicButton.setText(live?"■":"🎙");
             voiceMicButton.setContentDescription(live?
-                "Stop dictating and convert speech to text":"Voice typing: tap to speak");
+                (voiceStatus.isEmpty()?"Stop dictating and convert speech to text":voiceStatus):
+                "Voice typing: tap to speak");
             voiceMicButton.setTextColor(live?0xffe34b57:
                 (light()?0xff303542:Color.WHITE));
         }
@@ -505,6 +541,7 @@ public final class VisionKeyboardService extends InputMethodService {
         }finally{updatingSuggestions=false;}
     }
     private void applySuggestion(String suggestion){
+        if(voiceDictation!=null&&voiceDictation.isActive())cancelVoiceDictation();
         InputConnection conn=getCurrentInputConnection();
         if(conn==null||sensitiveField||suggestion==null||suggestion.isEmpty())return;
         if(phoneticEnabled()){
@@ -913,6 +950,7 @@ public final class VisionKeyboardService extends InputMethodService {
         if(haptics)v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
     }
     private void deleteOne(){
+        if(voiceDictation!=null&&voiceDictation.isActive())cancelVoiceDictation();
         InputConnection conn=getCurrentInputConnection();
         if(conn==null)return;
         if(phoneticEnabled() && romanComposing.length()>0){
@@ -927,11 +965,14 @@ public final class VisionKeyboardService extends InputMethodService {
             updateSuggestions();
             return;
         }
-        if(android.os.Build.VERSION.SDK_INT>=24)conn.deleteSurroundingTextInCodePoints(1,0);
-        else conn.deleteSurroundingText(1,0);
+        boolean deleted=false;
+        if(android.os.Build.VERSION.SDK_INT>=24)
+            deleted=conn.deleteSurroundingTextInCodePoints(1,0);
+        if(!deleted)conn.deleteSurroundingText(1,0);
         requestSuggestions();
     }
     private void press(String code){
+        if(voiceDictation!=null&&voiceDictation.isActive())cancelVoiceDictation();
         if(code.equals("⇧")){
             long now=SystemClock.uptimeMillis();
             if(now-lastShift<350){caps=!caps;shifted=caps;}
