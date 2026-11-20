@@ -69,7 +69,23 @@ jobs:
           assert 'settingsActivity' in method
           assert 'android.permission.INTERNET' not in manifest
           assert 'READ_CLIPBOARD' not in manifest
-          assert 'RECORD_AUDIO' not in manifest
+          assert 'android.permission.RECORD_AUDIO' in manifest
+          assert 'android.speech.RecognitionService' in manifest
+          assert 'VoicePermissionActivity' in manifest
+          voice=(root/'java/com/saurabhsvision/keyboard/VoiceDictation.java').read_text()
+          tags=(root/'java/com/saurabhsvision/keyboard/VoiceLanguageTags.java').read_text()
+          permission=(root/'java/com/saurabhsvision/keyboard/VoicePermissionActivity.java').read_text()
+          assert 'SpeechRecognizer.createSpeechRecognizer' in voice
+          assert 'onResults(Bundle results)' in voice and 'onError(int error)' in voice
+          assert 'RecognizerIntent.EXTRA_LANGUAGE' in voice
+          assert 'VoiceLanguageTags.forLanguage(selectedLanguage)' in ime
+          assert 'conn.commitText(prefix+text.trim()+" ",1)' in ime
+          assert 'Manifest.permission.RECORD_AUDIO' in permission
+          assert 'requestPermissions' in permission and 'checkSelfPermission' in ime
+          assert 'if(sensitiveField)' in ime and 'cancelVoiceDictation()' in ime
+          assert 'Voice typing is disabled in password fields' in ime
+          assert 'Voice typing' in activity and 'microphone' in activity.lower()
+          assert 'en-IN' in tags and 'hi-IN' in tags
           assert 'ACTION_INPUT_METHOD_SETTINGS' in activity
           assert 'showInputMethodPicker' in activity
           assert 'S BOARD' in activity and 'Maths • Science' in activity
@@ -161,7 +177,7 @@ jobs:
           import hashlib
           logo_digest=hashlib.sha256((root/'res/drawable-nodpi/s_board_logo.webp').read_bytes()).hexdigest()
           assert logo_digest=='66ce747a7ce6089d587f15f12ca2e6384011f02e5ce7740a94e5ae20ce883e59', 'Wrong (old) S Board icon'
-          assert 'versionCode 21' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
+          assert 'versionCode 22' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
           assert (root/'java/com/saurabhsvision/keyboard/SBoardKeyButton.java').is_file()
           assert 'Toggle Smart Suggestions' in activity
           assert 'setMeasuredDimension(width,Math.min(cap' in panel
@@ -252,6 +268,17 @@ jobs:
           javac -encoding UTF-8 -d "$out" "$src/WordSuggestions.java" "$base/WordSuggestionsSmokeTest.java"
           java -ea -cp "$out" WordSuggestionsSmokeTest
 
+      - name: Test language tags for microphone dictation
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="vision-maths-science-keyboard"
+          src="$base/app/src/main/java/com/saurabhsvision/keyboard"
+          out="$RUNNER_TEMP/s-board-voice-tags"
+          mkdir -p "$out"
+          javac -encoding UTF-8 -d "$out" "$src/IndicLanguages.java" "$src/VoiceLanguageTags.java" "$base/VoiceLanguageTagsSmokeTest.java"
+          java -ea -cp "$out" VoiceLanguageTagsSmokeTest
+
       - name: Benchmark offline suggestion and Hindi typing accuracy
         shell: bash
         run: |
@@ -283,13 +310,19 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.11_RED_CRYSTAL_INPLACE_UPDATE.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.12_VOICE_TYPING.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
+
+      - name: Include Android apksigner utility in CI artifact for privately signed updates
+        shell: bash
+        run: |
+          cp "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" keyboard-deliverables/apksigner.jar
+          test -s keyboard-deliverables/apksigner.jar
 
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_11_RED_CRYSTAL_INPLACE_UPDATE_APK
+          name: S_Board_v1_9_12_VOICE_TYPING_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -299,14 +332,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.11"
-          file="keyboard-deliverables/S_Board_v1.9.11_RED_CRYSTAL_INPLACE_UPDATE.apk"
+          tag="s-board-v1.9.12"
+          file="keyboard-deliverables/S_Board_v1.9.12_VOICE_TYPING.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.9.11 • Faster Touch, Same Red Crystal Logo" \
-              --notes "Version 1.9.11 retains the red crystal S icon, all keyboard modes, word suggestions, symbols, Maths, Science, Emoji and Hindi/Hinglish. Touch processing minimizes unnecessary sound and vibration overhead; keyboard vibration is optional in settings and disabled by default. GitHub CI tests native IME typing, Android emulator portrait and landscape, and package signature. This GitHub test APK is debug signed; it will not upgrade an APK signed by the private stable key. Use the separately distributed stable-signed 1.9.11 APK to upgrade S Board 1.9.10 stable in place; the original 1.9.8 certificate is different and cannot update in place." \
+              --title "S Board 1.9.12 • Microphone Voice-to-Text" \
+              --notes "S Board 1.9.12: real tap-to-dictate microphone in suggestion strip, one-time Android microphone consent, Android SpeechRecognizer integration, English/Hindi voice language selection and 24 locale mappings (subject to engine support), final speech-to-text insertion into active message field, manual stop, private-field exclusion and automatic microphone cleanup on keyboard close. Speech providers may use online processing and need an available recognition service. Retains red crystal S icon, all existing themes, symbols, keyboard speed improvements, Maths, Science and Emoji. GitHub APK is DEBUG-signed and cannot replace Stable-signed v1.9.11 without uninstall; for in-place upgrades use a separately signed APK with the SAME stable signing certificate. Not guaranteed accuracy on any device: actual microphone recognition requires a speech-capable phone and consent." \
               --latest=false
           fi
 
@@ -332,7 +365,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_1_9_10_Android_Emulator_Touch_Audit
+          name: S_Board_1_9_12_Android_Emulator_Voice_UI_Audit
           path: |
             /tmp/sboard-portrait.png
             /tmp/sboard-landscape.png
