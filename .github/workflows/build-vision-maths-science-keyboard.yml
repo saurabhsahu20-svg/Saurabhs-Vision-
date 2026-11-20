@@ -182,11 +182,17 @@ jobs:
           assert 'suggestionHandler.postDelayed(suggestionRefresh,16L)' in ime
           assert 'b.setStateListAnimator(null)' in ime
           assert 'if(inside)view.performClick();' in ime
+          assert ime.count('addKey(row,"?123","123",1.05f,height,true);')==1, "Only left ?123 button should remain"
+          assert 'addKey(row,submitKeyLabel(),"ENTER",1.05f,height,true);' in ime
+          assert 'EditorInfo.IME_ACTION_SEARCH' in ime and 'return isSearchEditor()?"⌕":"↵";' in ime
+          assert 'identity.setOnClickListener(v->' in ime and 'toolbarExpanded=false;' in ime
+          assert 'toolbarExpanded=!toolbarExpanded;' in ime
+          assert 'Search actions: 0' in Path('vision-maths-science-keyboard/app/src/debug/java/com/saurabhsvision/keyboard/KeyboardVisibilityTestActivity.java').read_text()
           assert 'if(!b.isLongClickable())' in ime
           import hashlib
           logo_digest=hashlib.sha256((root/'res/drawable-nodpi/s_board_logo.webp').read_bytes()).hexdigest()
           assert logo_digest=='66ce747a7ce6089d587f15f12ca2e6384011f02e5ce7740a94e5ae20ce883e59', 'Wrong (old) S Board icon'
-          assert 'versionCode 23' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
+          assert 'versionCode 24' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
           assert (root/'java/com/saurabhsvision/keyboard/SBoardKeyButton.java').is_file()
           assert 'Toggle Smart Suggestions' in activity
           assert 'setMeasuredDimension(width,Math.min(cap' in panel
@@ -319,7 +325,7 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.13_TOUCH_VOICE_FIX.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.14_ENTER_SEARCH_TOOLBAR_FIX.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Include Android apksigner utility in CI artifact for privately signed updates
@@ -331,7 +337,7 @@ jobs:
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_13_TOUCH_VOICE_FIX_APK
+          name: S_Board_v1_9_14_ENTER_SEARCH_TOOLBAR_FIX_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -341,14 +347,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.13"
-          file="keyboard-deliverables/S_Board_v1.9.13_TOUCH_VOICE_FIX.apk"
+          tag="s-board-v1.9.14"
+          file="keyboard-deliverables/S_Board_v1.9.14_ENTER_SEARCH_TOOLBAR_FIX.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.9.13 • Touch & Voice Reliability" \
-              --notes "S Board 1.9.13 is a tested maintenance update of v1.9.12. Preserves red crystal S branding, all keyboard themes, numbers, underscore and other symbols, maths/science/emoji/languages and fast offline suggestions. Fixes stale voice-recognition callbacks that could append text to another editor after a cancelled session, makes manual microphone stop idempotent, closes sessions before manual typing, caps recognition finishing time, handles missing recognition providers safely, and preserves microphone shortcut when predictions are disabled. Adds a compatible backspace fallback for editors without code-point deletion support. CI covers Hindi/Hinglish suggestions, rapid physical emulator screen taps, keyboard portrait/landscape, voice service handling and signature checks. Voice recognition needs device mic permission and an installed speech provider; accuracy varies. The public GitHub APK is DEBUG-signed; to upgrade v1.9.12 Stable without uninstall use separately distributed v1.9.13 signed with the matching private Stable key." \
+              --title "S Board 1.9.14 • Enter/Search & Collapsible Tools" \
+              --notes "S Board 1.9.14 fixes duplicate ?123 controls: the left ?123 switches to numbers, and the right context-aware action sends Enter in ordinary editors and a native Search action in search fields. Tap the top grid again, or S Board title/logo, to hide the expanded tools row. Language/theme selection also closes it automatically. Preserves original red crystal icon, voice dictation, offline suggestions, emojis, symbols, maths/science, 24 languages and touch performance updates. CI validates editor action, toolbar source contracts, portrait/landscape keyboard and rapid typing. GitHub release APK is debug signed; for direct installation over v1.9.13 Stable use the separately stable-signed update with the same certificate. Voice accuracy depends on the installed speech provider." \
               --latest=false
           fi
 
@@ -374,7 +380,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_1_9_13_Android_Emulator_Touch_Voice_Audit
+          name: S_Board_1_9_14_Android_Emulator_Enter_Search_Audit
           path: |
             /tmp/sboard-portrait.png
             /tmp/sboard-landscape.png
