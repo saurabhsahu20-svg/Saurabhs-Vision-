@@ -928,6 +928,36 @@ public final class VisionKeyboardService extends InputMethodService {
             // and can leave a fast-tapped key scaled when touches overlap.
             // Keep the same native key style and click semantics.
             b.setOnClickListener(v->{feedback(v);press(output);});
+            if(!b.isLongClickable()){
+                // An IME should commit on finger-up immediately, not via a
+                // deferred View click which may be lost during rapid taps.
+                // Long-press number keys keep Android's native timing instead.
+                b.setOnTouchListener((view,event)->{
+                    switch(event.getActionMasked()){
+                        case MotionEvent.ACTION_DOWN:
+                            view.setPressed(true);
+                            return true;
+                        case MotionEvent.ACTION_MOVE:
+                            view.setPressed(event.getX()>=-dp(10) &&
+                                event.getX()<view.getWidth()+dp(10) &&
+                                event.getY()>=-dp(10) &&
+                                event.getY()<view.getHeight()+dp(10));
+                            return true;
+                        case MotionEvent.ACTION_UP:
+                            boolean inside=event.getX()>=-dp(10) &&
+                                event.getX()<view.getWidth()+dp(10) &&
+                                event.getY()>=-dp(10) &&
+                                event.getY()<view.getHeight()+dp(10);
+                            view.setPressed(false);
+                            if(inside)view.performClick();
+                            return true;
+                        case MotionEvent.ACTION_CANCEL:
+                            view.setPressed(false);
+                            return true;
+                        default:return true;
+                    }
+                });
+            }
         }
     }
     private void startRepeat(){
