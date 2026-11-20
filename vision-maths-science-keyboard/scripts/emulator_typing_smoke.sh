@@ -57,6 +57,29 @@ fi
 adb shell settings get secure default_input_method | grep -F "$IME"
 echo "PASS: S Board is the selected input method."
 
+# Rapid native screen taps must not lose letters while suggestions refresh.
+# Use the same real key position tested above; do not fake text through adb.
+start_count="$(grep -o 'Characters entered: [0-9]*' /tmp/sboard-tap-result.xml | head -1 | grep -o '[0-9]*' | tail -1)"
+for _ in $(seq 1 14); do
+  adb shell input tap 230 1335 >/dev/null
+done
+sleep 2
+adb shell uiautomator dump /sdcard/sboard-fast-tap-result.xml >/dev/null 2>&1
+adb pull /sdcard/sboard-fast-tap-result.xml /tmp/sboard-fast-tap-result.xml >/dev/null
+end_count="$(grep -o 'Characters entered: [0-9]*' /tmp/sboard-fast-tap-result.xml | head -1 | grep -o '[0-9]*' | tail -1)"
+echo "Fast tap count: baseline=$start_count, after=$end_count"
+test "$((end_count-start_count))" -eq 14
+echo "PASS: all 14 rapid screen taps appeared in the editor."
+
+# Exercise microphone button with Android-granted permission.
+# An emulator without an installed speech provider may report it unavailable;
+# it must never crash or secretly start recording without user interaction.
+adb shell pm grant "$APP" android.permission.RECORD_AUDIO
+adb shell input tap 997 940 || true
+sleep 3
+adb shell settings get secure default_input_method | grep -F "$IME"
+echo "PASS: microphone button handled on Android without losing the selected keyboard."
+
 # Switch to a small landscape window and verify the keyboard can still open.
 # Force a wide logical display directly. Emulator user_rotation=1 can
 # unexpectedly rotate that simulated display back into portrait mode.
