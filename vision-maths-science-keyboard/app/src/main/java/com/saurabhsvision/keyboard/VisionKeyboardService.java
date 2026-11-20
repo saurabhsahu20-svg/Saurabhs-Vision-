@@ -800,7 +800,7 @@ public final class VisionKeyboardService extends InputMethodService {
         addKey(row,"▶","EMOJI_NEXT",.55f,height,true);
         addKey(row,"space","SPACE",2.4f,height,true);
         addKey(row,"⌫","⌫",.85f,height,true);
-        addKey(row,"↵","ENTER",.75f,height,true);
+        addKey(row,submitKeyLabel(),"ENTER",.75f,height,true);
         keysContent.addView(row,new LinearLayout.LayoutParams(-1,height+dp(2)));
     }
     /** Editor-specific submit key. Search fields use search; chats use Enter/Send. */
@@ -824,15 +824,27 @@ public final class VisionKeyboardService extends InputMethodService {
             addKey(row,"◀","←",.70f,height,true);
             addKey(row,"▶","CURSOR_RIGHT",.70f,height,true);
             addKey(row,submitKeyLabel(),"ENTER",1.05f,height,true);
+        }else if(mode==NUMBER||mode==SYMBOLS){
+            // Familiar two-page symbol layout:
+            // ABC always returns to letters. The separate adjacent key
+            // switches between basic numbers and the extended symbols page.
+            addKey(row,"ABC","ABC",1.12f,height,true);
+            addKey(row,mode==NUMBER?"=<":"?123",
+                mode==NUMBER?"SYM_MORE":"SYM_BACK",.84f,height,true);
+            addKey(row,"☺","EMOJI",.78f,height,true);
+            addKey(row,"Space","SPACE",4.35f,height,true);
+            addKey(row,",",",",.60f,height,false);
+            addKey(row,".",".",.60f,height,false);
+            addKey(row,submitKeyLabel(),"ENTER",1.16f,height,true);
         }else{
-            addKey(row,mode==NUMBER?"=<":mode==SYMBOLS?"?123":"ABC",
-                mode==NUMBER?"SYM_MORE":mode==SYMBOLS?"SYM_BACK":"ABC",1.02f,height,true);
+            // Maths and Science keep their original quick language toggle.
+            addKey(row,"ABC","ABC",1.02f,height,true);
             addKey(row,"☺","EMOJI",.82f,height,true);
             addKey(row,"A↔अ","LANG_TOGGLE",.85f,height,true);
             addKey(row,"Space","SPACE",4.35f,height,true);
             addKey(row,",",",",.60f,height,false);
             addKey(row,".",".",.60f,height,false);
-            addKey(row,"↵","ENTER",1.16f,height,true);
+            addKey(row,submitKeyLabel(),"ENTER",1.16f,height,true);
         }
         keysContent.addView(row,new LinearLayout.LayoutParams(-1,height+dp(3)));
     }
