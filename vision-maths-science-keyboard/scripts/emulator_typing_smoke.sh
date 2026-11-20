@@ -125,6 +125,36 @@ echo "PASS: right action key sends native Android Search in search fields."
 adb shell input tap 245 267
 sleep 1
 
+# Test the familiar ?123 → ABC return flow with REAL on-screen taps.
+# Read the synthetic debug text field only; no user typing is collected.
+adb shell uiautomator dump /sdcard/sboard-before-abc.xml >/dev/null 2>&1
+adb pull /sdcard/sboard-before-abc.xml /tmp/sboard-before-abc.xml >/dev/null
+adb shell input tap 68 1695
+sleep 2
+adb exec-out screencap -p > /tmp/sboard-numbers.png
+test -s /tmp/sboard-numbers.png
+adb shell input tap 68 1695
+sleep 2
+adb shell input tap 230 1335
+sleep 1
+adb shell uiautomator dump /sdcard/sboard-after-abc.xml >/dev/null 2>&1
+adb pull /sdcard/sboard-after-abc.xml /tmp/sboard-after-abc.xml >/dev/null
+python3 - <<'PY'
+import re, xml.etree.ElementTree as ET
+def field_text(path):
+    root=ET.parse(path).getroot()
+    fields=[n.get('text','') for n in root.iter()
+            if n.get('content-desc')=='IME_TYPING_TEST_FIELD']
+    assert fields, f'Test field unavailable in {path}'
+    return fields[0]
+before=field_text('/tmp/sboard-before-abc.xml')
+after=field_text('/tmp/sboard-after-abc.xml')
+print(f'ABC-return synthetic editor character count: {len(before)} -> {len(after)}')
+assert len(after)==len(before)+1, 'ABC tap did not restore one-letter typing'
+assert after[-1].isalpha(), 'ABC return typed a nonalphabet symbol instead of a letter'
+print('PASS: ?123 page returns to ABC through lower-left key, then types letters.')
+PY
+
 # Switch to a small landscape window and verify the keyboard can still open.
 # Force a wide logical display directly. Emulator user_rotation=1 can
 # unexpectedly rotate that simulated display back into portrait mode.
