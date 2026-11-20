@@ -183,6 +183,17 @@ jobs:
           assert 'b.setStateListAnimator(null)' in ime
           assert 'if(inside)view.performClick();' in ime
           assert ime.count('addKey(row,"?123","123",1.05f,height,true);')==1, "Only left ?123 button should remain"
+          # Familiar Gboard-style ABC access on both number and extended symbol pages.
+          assert 'else if(mode==NUMBER||mode==SYMBOLS){' in ime
+          assert 'addKey(row,"ABC","ABC",1.12f,height,true);' in ime
+          assert 'mode==NUMBER?"=<":"?123"' in ime
+          assert 'mode==NUMBER?"SYM_MORE":"SYM_BACK"' in ime
+          assert 'addKey(row,submitKeyLabel(),"ENTER",1.16f,height,true);' in ime
+          assert 'if(code.equals("SYM_MORE")){mode=SYMBOLS;' in ime
+          assert 'if(code.equals("SYM_BACK")){mode=NUMBER;' in ime
+          assert 'if(code.equals("ABC")){finishRomanWord();mode=ABC;' in ime
+          assert 'addRow("_ ~ ` | • § © ® ™ ✓");' in ime
+          assert 'addKey(row,submitKeyLabel(),"ENTER",.75f,height,true);' in ime
           assert 'addKey(row,submitKeyLabel(),"ENTER",1.05f,height,true);' in ime
           assert 'EditorInfo.IME_ACTION_SEARCH' in ime and 'return isSearchEditor()?"⌕":"↵";' in ime
           assert 'identity.setOnClickListener(v->' in ime and 'toolbarExpanded=false;' in ime
@@ -192,7 +203,7 @@ jobs:
           import hashlib
           logo_digest=hashlib.sha256((root/'res/drawable-nodpi/s_board_logo.webp').read_bytes()).hexdigest()
           assert logo_digest=='66ce747a7ce6089d587f15f12ca2e6384011f02e5ce7740a94e5ae20ce883e59', 'Wrong (old) S Board icon'
-          assert 'versionCode 24' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
+          assert 'versionCode 25' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
           assert (root/'java/com/saurabhsvision/keyboard/SBoardKeyButton.java').is_file()
           assert 'Toggle Smart Suggestions' in activity
           assert 'setMeasuredDimension(width,Math.min(cap' in panel
@@ -325,7 +336,7 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.14_ENTER_SEARCH_TOOLBAR_FIX.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.15_ABC_SYMBOLS_STABLE.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Include Android apksigner utility in CI artifact for privately signed updates
@@ -337,7 +348,7 @@ jobs:
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_14_ENTER_SEARCH_TOOLBAR_FIX_APK
+          name: S_Board_v1_9_15_ABC_SYMBOLS_UPDATE_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -347,14 +358,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.14"
-          file="keyboard-deliverables/S_Board_v1.9.14_ENTER_SEARCH_TOOLBAR_FIX.apk"
+          tag="s-board-v1.9.15"
+          file="keyboard-deliverables/S_Board_v1.9.15_ABC_SYMBOLS_STABLE.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.9.14 • Enter/Search & Collapsible Tools" \
-              --notes "S Board 1.9.14 fixes duplicate ?123 controls: the left ?123 switches to numbers, and the right context-aware action sends Enter in ordinary editors and a native Search action in search fields. Tap the top grid again, or S Board title/logo, to hide the expanded tools row. Language/theme selection also closes it automatically. Preserves original red crystal icon, voice dictation, offline suggestions, emojis, symbols, maths/science, 24 languages and touch performance updates. CI validates editor action, toolbar source contracts, portrait/landscape keyboard and rapid typing. GitHub release APK is debug signed; for direct installation over v1.9.13 Stable use the separately stable-signed update with the same certificate. Voice accuracy depends on the installed speech provider." \
+              --title "S Board 1.9.15 • ABC from Numbers & Symbols" \
+              --notes "S Board 1.9.15 restores the familiar ABC button on the lower-left of both 123 and extended symbol keyboards, so switching back to letters needs only one tap. The =< button next to ABC opens the full extra symbols page; ?123 there returns to the number page. The Enter/Search key is now adaptive in all keyboard modes, including Emoji. Original red crystal icon, design/themes, voice typing, offline corrections, Hindi/Hinglish, scientific/maths and 14/14 rapid touch improvements are retained. CI tests key layout contracts, symbols, language modes, keyboard signing, actual touch input and portrait/landscape. GitHub release is debug signed. For updating S Board Stable in place use the separately stable-signed APK carrying the same signing certificate as 1.9.14 Stable; do not uninstall the old Stable app when the signatures match." \
               --latest=false
           fi
 
@@ -380,7 +391,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_1_9_14_Android_Emulator_Enter_Search_Audit
+          name: S_Board_1_9_15_Android_Emulator_ABC_Symbols_Audit
           path: |
             /tmp/sboard-portrait.png
             /tmp/sboard-landscape.png
