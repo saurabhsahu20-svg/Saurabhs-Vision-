@@ -181,6 +181,8 @@ jobs:
           assert 'getInt(KEY_THEME,4)' in ime
           assert 'suggestionHandler.postDelayed(suggestionRefresh,16L)' in ime
           assert 'b.setStateListAnimator(null)' in ime
+          assert 'if(inside)view.performClick();' in ime
+          assert 'if(!b.isLongClickable())' in ime
           import hashlib
           logo_digest=hashlib.sha256((root/'res/drawable-nodpi/s_board_logo.webp').read_bytes()).hexdigest()
           assert logo_digest=='66ce747a7ce6089d587f15f12ca2e6384011f02e5ce7740a94e5ae20ce883e59', 'Wrong (old) S Board icon'
