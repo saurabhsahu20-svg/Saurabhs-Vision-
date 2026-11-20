@@ -6,6 +6,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
+import android.view.inputmethod.EditorInfo;
+import android.text.InputType;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -44,6 +46,30 @@ public final class KeyboardVisibilityTestActivity extends Activity {
                 typingStatus.setText("Characters entered: "+a.length());
             }
             @Override public void afterTextChanged(Editable a){}
+        });
+        // Native Android search-action probe (debug only).
+        TextView searchStatus=new TextView(this);
+        searchStatus.setText("Search actions: 0");
+        searchStatus.setTextSize(16);
+        searchStatus.setTextColor(0xff13245b);
+        searchStatus.setContentDescription("IME_SEARCH_ACTION_COUNT");
+        root.addView(searchStatus,new LinearLayout.LayoutParams(-1,52));
+        EditText search=new EditText(this);
+        search.setHint("SEARCH_FIELD");
+        search.setContentDescription("IME_SEARCH_TEST_FIELD");
+        search.setSingleLine(true);
+        search.setInputType(InputType.TYPE_CLASS_TEXT);
+        search.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+        search.setTextSize(18);
+        search.setBackgroundColor(0xffeff6ff);
+        root.addView(search,new LinearLayout.LayoutParams(-1,90));
+        final int[] searchActions={0};
+        search.setOnEditorActionListener((v,actionId,event)->{
+            if(actionId==EditorInfo.IME_ACTION_SEARCH){
+                searchStatus.setText("Search actions: "+(++searchActions[0]));
+                return true;
+            }
+            return false;
         });
         setContentView(root);
         test.requestFocus();
