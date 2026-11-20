@@ -37,17 +37,34 @@ sleep 12
 # dialog is not an S Board crash. Dismiss Wait and refocus the actual editor
 # before measuring keyboard touch accuracy.
 recover_system_anr() {
-  adb shell uiautomator dump /sdcard/sboard-system-state.xml >/dev/null 2>&1 || true
-  if adb shell cat /sdcard/sboard-system-state.xml 2>/dev/null | grep -q "Quickstep isn.t responding"; then
-    echo "Recovering Android launcher startup ANR (not S Board)."
-    # Android ANR dialog's Wait button, portrait 1080x1920 emulator.
-    adb shell input tap 500 1080
+  # Only the Android launcher is touched here. Do not force-stop the IME,
+  # because Android may silently replace the selected S Board keyboard.
+  for retry in 1 2 3 4 5; do
+    adb shell uiautomator dump /sdcard/sboard-system-state.xml >/dev/null 2>&1 || true
+    if ! adb shell cat /sdcard/sboard-system-state.xml 2>/dev/null |
+      grep -q "Quickstep isn.t responding"; then
+      adb shell input tap 250 265
+      sleep 2
+      return 0
+    fi
+    echo "Android emulator Quickstep launcher ANR, recovery ${retry}/5"
+    # Close the *launcher* whose ANR is covering the S Board test UI.
+    adb shell input tap 335 950 || true
+    adb shell am force-stop com.android.launcher3 >/dev/null 2>&1 || true
+    adb shell am force-stop com.google.android.apps.nexuslauncher >/dev/null 2>&1 || true
     sleep 5
     adb shell am start -W -n "$APP/.KeyboardVisibilityTestActivity" || true
+    adb shell input tap 250 265 || true
+    sleep 3
+  done
+  adb shell uiautomator dump /sdcard/sboard-system-state.xml >/dev/null 2>&1 || true
+  if adb shell cat /sdcard/sboard-system-state.xml 2>/dev/null |
+    grep -q "Quickstep isn.t responding"; then
+    echo "FAIL: Android system Quickstep ANR persists (unrelated to S Board)."
+    return 1
   fi
-  adb shell input tap 250 265
-  sleep 2
 }
+
 recover_system_anr
 
 # Take a screenshot of the actual Android IME in portrait.
