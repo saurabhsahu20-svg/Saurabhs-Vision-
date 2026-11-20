@@ -202,6 +202,10 @@ public final class MainActivity extends Activity {
         });
         refreshSuggestions.run();
 
+        add(root,text("🎙 Voice Typing — Speak Instead of Typing",21,NAVY,true),23);
+        add(root,text("Tap 🎙 on the S Board suggestion strip, grant microphone access once, then tap 🎙 again to speak. Your spoken words appear in WhatsApp, SMS, Notes or the active message field. Tap ■ to finish a sentence. English/Hinglish use en-IN, Hindi uses hi-IN; other available languages depend on the installed Android speech engine.",14,0xff496284,false),7);
+        add(root,text("Privacy: Audio is sent to your installed Android speech-recognition provider, which may use online processing. S Board itself does not save audio or dictation history. Microphone only activates when you tap it; voice typing is disabled in password fields.",12,0xff526b86,false),8);
+
         add(root,text("⚡ Fast Touch & Typing",20,NAVY,true),22);
         add(root,text("Extra key sound and vibration are off by default for immediate, low-overhead touch feedback. Enable vibration only if preferred.",13,0xff496284,false),6);
         TextView feedbackStatus=text("",14,0xff1746ad,true);
@@ -289,7 +293,7 @@ public final class MainActivity extends Activity {
         add(features,text("• 🌐 22 Indian languages + English and Hinglish Roman typing\n• Hindi phonetic: namaste → नमस्ते, mera → मेरा\n• Picture-style neon QWERTY layout and glowing wide Spacebar\n• Optional offline suggestions; OFF matches the reference image\n• Compact keyboard height: no more full-screen empty background\n• ABC QWERTY, Shift/Caps, Numbers, Maths and Science\n• 😊 Emoji keyboard with 923 options across 11 categories\n• Faces, love, feelings, gestures, people, animals and more\n• Previous/next emoji pages and responsive key touch effects\n• Backspace repeat, cursor arrows, Space and Enter",14,0xff3d5a7b,false),11);
 
         add(root,text("🔒 Your Typing Stays Private",20,NAVY,true),25);
-        add(root,text("इस keyboard को Internet permission नहीं दी गई है। यह आपकी typing history, passwords या clipboard को save या किसी server पर upload नहीं करता। आपके typed characters सिर्फ खुले हुए text field तक भेजे जाते हैं। Android नए keyboard को enable करते समय सामान्य सुरक्षा चेतावनी दिखाता है।",14,0xff445d7f,false),9);
+        add(root,text("S Board आपकी typing history, passwords या clipboard को save या upload नहीं करता। Voice Typing के लिए microphone permission केवल आपकी अनुमति से माँगी जाती है। बोले गए शब्द Android के speech recognition provider द्वारा process हो सकते हैं और उसके लिए Internet का उपयोग हो सकता है। S Board audio recordings नहीं रखता।",14,0xff445d7f,false),9);
 
         Button instagram=button("📷 Follow @saurabhs_vision on Instagram",0xffddd9fc,NAVY);
         add(root,instagram,21);
