@@ -202,13 +202,13 @@ jobs:
           test -s "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
           mkdir -p dist
-          cp "$APK" dist/S_Browser_v1.8.0_General_News_Professional_Beta.apk
+          cp "$APK" dist/S_Browser_v1.8.1_Maps_Download_Beta.apk
 
       - name: Upload installable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S-Browser-1.8.0-APK
-          path: dist/S_Browser_v1.8.0_General_News_Professional_Beta.apk
+          name: S-Browser-1.8.1-Maps-APK
+          path: dist/S_Browser_v1.8.1_Maps_Download_Beta.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -220,13 +220,13 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          TAG="s-browser-v1.8.0-beta"
-          FILE="dist/S_Browser_v1.8.0_General_News_Professional_Beta.apk"
+          TAG="s-browser-v1.8.1-maps-beta"
+          FILE="dist/S_Browser_v1.8.1_Maps_Download_Beta.apk"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$FILE" --clobber
           else
             gh release create "$TAG" "$FILE" \
-              --title "S Browser 1.8 Beta — Reliable News & Professional Design" \
-              --notes "S Browser 1.8 repairs General and Sports news timeout dead ends with a two-stage attributed news feed: the privacy-friendly GitHub Pages bulletin, refreshed periodically by scheduled GitHub Actions from established Hindi/English publishers and PIB where possible; fallback to live Google News RSS, and visible Retry/Open Latest News/official PIB-News On AIR links on total outage. All cards have publisher, actual feed publication date, original news link and Cross-check action. No generated or fake news. A scheduled bulletin is clearly marked as last synced, NOT instant live breaking coverage. Premium news desk layout, clean gradient header, polished buttons, and dedicated one-tap General and Sports cards on the main homepage. CG Jobs, City News, Saurabh Vision learning shortcut, offline dictionary, Daily Assembly, smooth tabs and original S Browser icon are preserved. Android beta: real-device tests and external feeds cannot be guaranteed; publishers are not independently fact-checked." \
+              --title "S Browser 1.8.1 Beta — Student Map Downloads" \
+              --notes "S Browser v1.8.1 adds a Maps Download tile to the Student Dashboard with official downloadable PDFs of Chhattisgarh, India political and outline maps, and world maps. All other S Browser 1.8 features remain unchanged. Previous version: General and Sports news timeout dead ends with a two-stage attributed news feed: the privacy-friendly GitHub Pages bulletin, refreshed periodically by scheduled GitHub Actions from established Hindi/English publishers and PIB where possible; fallback to live Google News RSS, and visible Retry/Open Latest News/official PIB-News On AIR links on total outage. All cards have publisher, actual feed publication date, original news link and Cross-check action. No generated or fake news. A scheduled bulletin is clearly marked as last synced, NOT instant live breaking coverage. Premium news desk layout, clean gradient header, polished buttons, and dedicated one-tap General and Sports cards on the main homepage. CG Jobs, City News, Saurabh Vision learning shortcut, offline dictionary, Daily Assembly, smooth tabs and original S Browser icon are preserved. Android beta: real-device tests and external feeds cannot be guaranteed; publishers are not independently fact-checked." \
               --prerelease
           fi

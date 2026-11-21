@@ -792,7 +792,9 @@ public final class MainActivity extends Activity {
             homeFeature("⭐","Bookmarks",0xfffaf5ff,0xffe4d6ff,0xffc7adfa,
                 this::showBookmarks),
             homeFeature("⬇","Downloads",0xfffff4fa,0xffffdbef,0xffeeacd2,
-                this::openDownloads)
+                this::openDownloads),
+            homeFeature("🗺","Maps Download",0xffeefaff,0xffc8eeff,0xff86cbef,
+                this::showMapDownloads)
         };
         for(int i=0;i<cards.length;i++){
             LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(106),dp(104));
@@ -1138,6 +1140,38 @@ public final class MainActivity extends Activity {
         for(int i=0;i<items.size();i++)options[i]=items.get(i).title;
         new AlertDialog.Builder(this).setTitle(title).setItems(options,
             (d,i)->openAddress(items.get(i).url)).setNegativeButton("Close",null).show();
+    }
+    // Student map downloads: official PDF sources, using the existing DownloadManager.
+    // The rest of S Browser, including all study and browsing features, is unchanged.
+    private void showMapDownloads(){
+        final String[] titles={
+            "Chhattisgarh Map • Hindi (2026)",
+            "Chhattisgarh Map • English (2026)",
+            "India Political Map • Hindi (2026)",
+            "India Political Map • English (2026)",
+            "India Outline Map • State Boundaries",
+            "World Map • Survey of India",
+            "World Political Map • UN (2026)",
+            "More State Maps • Official Source"
+        };
+        final String[] mapUrls={
+            "https://surveyofindia.gov.in/UserFiles/files/CHHATTTISGARH_Hindi-2026.pdf",
+            "https://surveyofindia.gov.in/UserFiles/files/CHHATTTISGARH_ENGLISH_2026.pdf",
+            "https://surveyofindia.gov.in/UserFiles/files/Polmap-Hindi_10th_edition.pdf",
+            "https://surveyofindia.gov.in/UserFiles/files/POL_MAP_4M_ENGLISH_13thEdn2026%281%29.pdf",
+            "https://surveyofindia.gov.in/UserFiles/files/1_16-state%20boundary-1-o%282%29.pdf",
+            "https://surveyofindia.gov.in/UserFiles/files/world-map-40m.pdf",
+            "https://www.un.org/geospatial/sites/default/files/files/documents/2025/Mar/world_map_4651_r4_jul26.pdf",
+            "https://surveyofindia.gov.in/pages/state-maps"
+        };
+        new AlertDialog.Builder(this)
+            .setTitle("🗺 Maps • Free PDF Downloads")
+            .setItems(titles,(dialog,which)->{
+                if(which==titles.length-1)openAddress(mapUrls[which]);
+                else downloadFile(mapUrls[which],"application/pdf",null);
+            })
+            .setNegativeButton("Close",null)
+            .show();
     }
     private void showJobsHub(){startActivity(new Intent(this,JobsHubActivity.class));}
     private void showCityNews(){startActivity(new Intent(this,CityNewsActivity.class));}
