@@ -1144,32 +1144,66 @@ public final class MainActivity extends Activity {
     // Student map downloads: official PDF sources, using the existing DownloadManager.
     // The rest of S Browser, including all study and browsing features, is unchanged.
     private void showMapDownloads(){
+        // Keep printable worksheets separate from official answers. District boundaries
+        // on practice sites should always be checked against current government PDFs.
         final String[] titles={
-            "Chhattisgarh Map • Hindi (2026)",
-            "Chhattisgarh Map • English (2026)",
-            "India Political Map • Hindi (2026)",
-            "India Political Map • English (2026)",
-            "India Outline Map • State Boundaries",
-            "World Map • Survey of India",
-            "World Political Map • UN (2026)",
-            "More State Maps • Official Source"
+            "📝 CG • Blank 33 Districts (Fill in / PDF)",
+            "📝 CG • Numbered District Quiz + Answer Key",
+            "✅ CG • Official District Reference (English 2026)",
+            "✅ CG • Official District Reference (Hindi 2026)",
+            "🔍 CG • Zoomable District GIS (NIC)",
+            "📝 India • Blank State Borders (Official PDF)",
+            "📝 India • Blank Country Outline (Official PDF)",
+            "📝 India • Editable / Numbered Practice Map",
+            "✅ India • Political Map (English 2026 PDF)",
+            "✅ India • Political Map (Hindi 2026 PDF)",
+            "📝 World • Blank Country Borders (PDF)",
+            "📝 World • Printable / Numbered Worksheet",
+            "✅ World • Political Map (UN 2026 PDF)",
+            "✅ World • Survey of India World Map (PDF)",
+            "📚 More Official State Maps (Survey of India)"
         };
-        final String[] mapUrls={
-            "https://surveyofindia.gov.in/UserFiles/files/CHHATTTISGARH_Hindi-2026.pdf",
+        final String[] urls={
+            "https://blankmapof.com/chhattisgarh",
+            "https://blankmapof.com/chhattisgarh",
             "https://surveyofindia.gov.in/UserFiles/files/CHHATTTISGARH_ENGLISH_2026.pdf",
+            "https://surveyofindia.gov.in/UserFiles/files/CHHATTTISGARH_Hindi-2026.pdf",
+            "https://stategisportal.nic.in/stategisportal/Home/State/22",
+            "https://surveyofindia.gov.in/UserFiles/files/1_16-state%20boundary.pdf",
+            "https://surveyofindia.gov.in/files/18m_india.pdf",
+            "https://blankmapof.com/india",
+            "https://surveyofindia.gov.in/UserFiles/files/POLMAP_ENGLISH-2026.pdf",
             "https://surveyofindia.gov.in/UserFiles/files/Polmap-Hindi_10th_edition.pdf",
-            "https://surveyofindia.gov.in/UserFiles/files/POL_MAP_4M_ENGLISH_13thEdn2026%281%29.pdf",
-            "https://surveyofindia.gov.in/UserFiles/files/1_16-state%20boundary-1-o%282%29.pdf",
-            "https://surveyofindia.gov.in/UserFiles/files/world-map-40m.pdf",
+            "https://www.prb.org/app/uploads/2015/08/blankWORLDmap-1.pdf",
+            "https://blankmapof.com/world",
             "https://www.un.org/geospatial/sites/default/files/files/documents/2025/Mar/world_map_4651_r4_jul26.pdf",
+            "https://surveyofindia.gov.in/UserFiles/files/world-map-40m.pdf",
             "https://surveyofindia.gov.in/pages/state-maps"
         };
         new AlertDialog.Builder(this)
-            .setTitle("🗺 Maps • Free PDF Downloads")
+            .setTitle("🗺 Maps • Blank Worksheets & Answer Maps")
             .setItems(titles,(dialog,which)->{
-                if(which==titles.length-1)openAddress(mapUrls[which]);
-                else downloadFile(mapUrls[which],"application/pdf",null);
+                // Interactive practice-map pages offer A4/A3-ready vector PDF output.
+                if(which==0||which==1||which==7||which==11){
+                    toast(which==1||which==7?
+                        "Choose Numbered, then PDF and Download":
+                        "Choose Borders, then PDF and Download");
+                    openAddress(urls[which]);
+                }else if(which==4||which==14){
+                    openAddress(urls[which]);
+                }else{
+                    downloadFile(urls[which],"application/pdf",null);
+                }
             })
+            .setNeutralButton("Print tip",(dialog,which)->
+                new AlertDialog.Builder(this)
+                    .setTitle("Accurate map practice")
+                    .setMessage("Download Blank (Borders) PDF and fill the names yourself. " +
+                        "For 33 Chhattisgarh districts, print on A3 or zoom the PDF. " +
+                        "Use the Survey of India 2026 maps as your official reference. " +
+                        "Third-party practice worksheets are not government publications; " +
+                        "international borders may differ between sources.")
+                    .setPositiveButton("OK",null).show())
             .setNegativeButton("Close",null)
             .show();
     }
