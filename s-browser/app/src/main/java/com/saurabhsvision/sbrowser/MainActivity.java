@@ -823,6 +823,43 @@ public final class MainActivity extends Activity {
                 openAddress("https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/"));
         add(learning,open,12);
         add(layout,learning,6);
+        // Verified official GitHub release downloads for the owner's apps.
+        // Where a public release APK is not yet available, use the Actions build page.
+        homeSection(layout,"⬇","My Apps • APK Downloads");
+        add(layout,text("Direct APK links from our GitHub releases. " +
+            "These are developer/test builds, not Play Store-verified apps.",
+            12,HOME_MUTED,false),2);
+        String[] appNames={
+            "S Browser 1.8 Beta","S Board 1.9.15","S Caller 1.9.6",
+            "MsgU 1.1.1 Beta","Saune Vibe 1.1.1","S CALC Pro 1.7",
+            "SV Caller Pro 3.3","S Vision Launcher 1.2",
+            "Crystal Volume Booster • Builds"
+        };
+        String[] appLinks={
+            "https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases/download/s-browser-v1.8.0-beta/S_Browser_v1.8.0_General_News_Professional_Beta.apk",
+            "https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases/download/s-board-v1.9.15/S_Board_v1.9.15_ABC_SYMBOLS_STABLE.apk",
+            "https://github.com/saurabhsahu20-svg/aura-dialer-/releases/download/v1.9.6-clean-recents-preview/S-Caller-v1.9.6-Clean-Recents-Preview.apk",
+            "https://github.com/saurabhsahu20-svg/AasPass-app/releases/download/msgu-ai-studio-v1.1.1-login-fix-beta/MsgU-v1.1.1-Login-Fix-Debug.apk",
+            "https://github.com/saurabhsahu20-svg/Saurabh-s-vision/releases/download/v1.1.1/Saune_Vibe_Fresh_Install_v1.1.1.apk",
+            "https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases/download/s-calc-pro-v1.7.0/S_CALC_Pro_v1.7.0_BIG_CLEAR_ICON.apk",
+            "https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases/download/sv-caller-pro-v3.3.0/SV_CALLER_PRO_v3.3.0_CLEAN_FAST_UI.apk",
+            "https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases/download/s-vision-launcher-v1.2.0/S_VISION_LAUNCHER_v1.2.0_RED_S_VISION_LOGO.apk",
+            "https://github.com/saurabhsahu20-svg/volume-booster-/actions"
+        };
+        for(int i=0;i<appNames.length;i+=2){
+            LinearLayout downloadRow=row();
+            for(int j=i;j<Math.min(i+2,appNames.length);j++){
+                final String apkLink=appLinks[j];
+                TextView downloadAction=homeButton("⬇ "+appNames[j],
+                    0xffedf7ff,HOME_BORDER,HOME_BLUE,()->openAddress(apkLink));
+                downloadAction.setMaxLines(2);
+                LinearLayout.LayoutParams dl=new LinearLayout.LayoutParams(0,dp(64),1);
+                if(j>i)dl.leftMargin=dp(8);
+                downloadRow.addView(downloadAction,dl);
+            }
+            add(layout,downloadRow,8);
+        }
+
         LinearLayout utility=row();
         TextView news=homeButton("▤ Latest News",0xffffffff,HOME_BORDER,HOME_BLUE,
             ()->openAssemblySection(4));
