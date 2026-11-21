@@ -1,21 +1,21 @@
 {
   "feeds": {
     "breaking_cg_en": {
-      "fetched_ms": 1795227910811,
+      "fetched_ms": 1795259818436,
       "stories": [
+        {
+          "published_ms": 1795237661000,
+          "publisher": "The Hindu",
+          "publisher_url": "https://www.thehindu.com",
+          "title": "Delhi HC declines plea over alleged forced religious conversions of Adivasis in Chhattisgarh, cites lack of territorial jurisdiction - The Hindu",
+          "url": "https://news.google.com/rss/articles/CBMiqwJBVV95cUxPVUl0WGF2dUllYWRwMVZ4NU1rN2MxckR5TC1Na3RUQjFSU3VlNjZGSld1TTdZWGh5M2NPbHRRaldzVkxDVDh0YWZlRVY5cXdqRWVudy1taWRGZEh4cVhldFJHSW95WkVCOHdUOFR3eU5oRnVsMWI2TUliaS1Ob3kzcGRJclc4Z0dtQTNUNkdqbWdyMDBlZ3VuSzUxUTBrWlNmWEZtaWVDMHJ0Z1FFWXAtNUV1WXQtRmdSdEdKQmlKNDR2VnUyM3NvTjlyZVdoMVNfbWpfQzk3ZDBydm9KUGNsaHFfbTJ6aFZDQ2FzbTdPbENKVFpleFdEZS1xZ19QSjVBdTZ6STRNZkNFWEJDVU9KdnhfRVpGOHlqRXpDVnUtd2tGSkc4MjJVVzRHMNIBsgJBVV95cUxNYVh6M1hjSGZoMHEtTnNJUm5tOTl4NEM3SjB2bjFacDZ1cjJzMm5qZUxkSjZub3puc2tYaWZfUFJvYm1xMFJOcldVdTlLdmlEMU5xYVVwaU91OUlvRktCN09ZNTZ0VTJVYjRBSWZaVDVPQnhudE9qdWxVYXctbTlyeDNtSkE5QmRINGxvQXBvVTVVMEpDTFBUV2twb0dMeVRWRmgxNG96ZFIyRmdLdFkzSThXZ1VCcmlCOFhDSGZMT0RqOEhfVTZDZFF0WjJ3OVRpSVRGdW1GNTBqU2w2M1BkWlNvQWJNakZvQ2JYZW8xSzhLYkxqNjhncmxsVWlHZEc5VllZV1JEajJ6akhRUXZ5TnBLeGw2UGo1WmZEeF94OTQzWXZkYldlWVRDTnRtWkNrVVE?oc=5"
+        },
         {
           "published_ms": 1795226040000,
           "publisher": "The Times of India",
           "publisher_url": "https://timesofindia.indiatimes.com",
           "title": "Cyclone Akvan hits Odisha coast, rain threat looms over Chhattisgarh crops - The Times of India",
-          "url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxPaGhXenJUQ0xoMmdqeWxxQzZSaW1zMTFnOUFRMDZpcXNXbVRkdlFJQWUzWmlVdXdMWC1nUTFGSTlvd3g0UWFNT2xHNVRxVUFSVUI4eXRsejNMeGVzWjdHQmxPRUU2ODdLRnAzSjlmQmo2a0ZPSXdlVjlPOXlLc2R4aUJCd1BUdzE4RHRGYWV6cUtfVUpiUzlOd1BmNDBZSDBfNkQ4ZnJINUtVQlVkT2M1clZSeFRIQkxEUFhLb3M5ZUJ3cV9UdlJ2dGx4OXpGdHR0MkQwZXFlZlJaclpJX1lNdNIB5gFBVV95cUxONE9FZWxjcElOaENBS0F3emI5Z0FCcUdRY3BRMlZvQzRqQ2dJUXczbzdaMEdaSFlIb05ybThHU0NvNnlybm5Yc3Atb3pFLWYwWnhUYkdVcWR3X2pKN3FId3A0RnhoOWpYdHdDdXpIN1NKYlpoMDNNd1U4YkVMcm9NRkNMWk1UczZ5STFHUmVsSFc4VVJxbzVfUEFua2l0bVlIcVUyQjFyYmJxWXp3S1hxemJQbVNaci1OcUF1TzlCU0dxbUZjRllSbGdmRmhyV1QzR0Nfbks4bkhCRGYwcEk1OFh0LS1BUQ?oc=5"
-        },
-        {
-          "published_ms": 1795224619000,
-          "publisher": "Livemint",
-          "publisher_url": "https://www.livemint.com",
-          "title": "Cyclone Avkan: Check if schools are open or closed on Saturday in Odisha, TN, West Bengal, Andhra, and Chhattisgarh - Livemint",
-          "url": "https://news.google.com/rss/articles/CBMi-gFBVV95cUxOaDdWb3FTNGJuQ1VEZXA1bnJ6MTJ5QWVOOGxNcEhxLVF0bVBRMDNiOWhibV9YMlNyWjJpODMyT0FNWmhGMndHek5mdjZEMHVSNnotRFNrZWp2ZzJ5ZDdqbkhraXVjcExKSE1iaU9UaGZFaGotS2V6LWdhQmUxdWltYnJNUmEyS19WT01HQkVBTjE5SzhHQ2VwRlBKLXFnWmE4M1FJemtTVUlEdzdaa1hEeGRmZjBkNnZCZHhINGp6TjJRNUJhcHhWNjdlRVZVZ1Z2ZDg2ekwzRFBRcnkySUpzUi03b1JfUlJfcktja1J1MTd5WDZ5YUNoaS130gH_AUFVX3lxTE9oelgwdzJRLWNaSW9md0dLNHo3ZXFLLVVnV1gzNk01TmZmN01hRlNyV1hNc2k0RndaWFNlbEUtTmNtMmdSQ1M4bkUtaFYwRnBjbGZGYklXcnQxOF9kdTNfbXN1X0xxcGdJUTYwZWdRaFRYZXVDNGdjeUIwYnFpR01DS01aY3VqN0N4cTBOT1ZBTEFlU0NpQ012TmQ2NG1YdkxyTlNMZ1BLMUlaYlZlUmFKZXp2eFNLRW5GVDJFN08xYXJ3cVFfbElwYWxMWVlaeXFpYXliclU3Ym9jLWsyZWpYbWlKZWxkYk9GZXNJLUdKcjd6OGlsa3BFSVdoUkZLYw?oc=5"
+          "url": "https://news.google.com/rss/articles/CBMi5gFBVV95cUxONE9FZWxjcElOaENBS0F3emI5Z0FCcUdRY3BRMlZvQzRqQ2dJUXczbzdaMEdaSFlIb05ybThHU0NvNnlybm5Yc3Atb3pFLWYwWnhUYkdVcWR3X2pKN3FId3A0RnhoOWpYdHdDdXpIN1NKYlpoMDNNd1U4YkVMcm9NRkNMWk1UczZ5STFHUmVsSFc4VVJxbzVfUEFua2l0bVlIcVUyQjFyYmJxWXp3S1hxemJQbVNaci1OcUF1TzlCU0dxbUZjRllSbGdmRmhyV1QzR0Nfbks4bkhCRGYwcEk1OFh0LS1BUdIB5gFBVV95cUxONE9FZWxjcElOaENBS0F3emI5Z0FCcUdRY3BRMlZvQzRqQ2dJUXczbzdaMEdaSFlIb05ybThHU0NvNnlybm5Yc3Atb3pFLWYwWnhUYkdVcWR3X2pKN3FId3A0RnhoOWpYdHdDdXpIN1NKYlpoMDNNd1U4YkVMcm9NRkNMWk1UczZ5STFHUmVsSFc4VVJxbzVfUEFua2l0bVlIcVUyQjFyYmJxWXp3S1hxemJQbVNaci1OcUF1TzlCU0dxbUZjRllSbGdmRmhyV1QzR0Nfbks4bkhCRGYwcEk1OFh0LS1BUQ?oc=5"
         },
         {
           "published_ms": 1795223714000,
@@ -32,32 +32,11 @@
           "url": "https://news.google.com/rss/articles/CBMi6wFBVV95cUxOWU5TckFNaGhyZzhPSzlocTg2Vmh5M0dJY1BoWlg2LXlfTnk2YjR1X2Vsb2dDTXF3VFo3MU1VZGNuSkoxTVdseUlNck54T1lpMHlobXI2X2EtLVgwRTdRS2hrOHZnQ3Q1WHdJZ1VfU2VmWWN4QjBnZUFCVWhzX2RKQUVtakZxQ2dfVXBrblJ5YkpLX3FBYXJoX3Q0N0p2TVNYNVhWS0VqR2Ftby10MFBGMmduMEtLcUNwdTRaSlRmN1lzblRROHhEY1lyNmlWcnZRd1F5ejdUNGZxeV8xT3BqZ1AzSFNQT1ZWS2RF0gHwAUFVX3lxTE5uUFZVSDl4bHhHYUdFV0lieUptOEtnSTJnSE02akJTcTBCMzMzb3FDdmtYY2Q3MVc0c3pnNDNieEJ3aXFiUTdkYnN1RUxRZUJTUENMTWU4OWZycVgtZkNXQmNWOE5TNDVaWHY4eXY2R3JmZ1RYTmp0bGstZXBuMVpCdElZck9rdHFpalhfbm5ibFNEUndmeUEzdmlSMUhqemJCS0lqYU1jYnhwTkRpU3RvQ29OeTVRNHdKQlBfRHNpSlYwd0g2d0tQZjF3aS1nMlRCMlhKWWhDUWNadnNleWJWa1NrdGJsNTdsZW9Hdm9IRg?oc=5"
         },
         {
-          "published_ms": 1795168706000,
-          "publisher": "Hindustan Times",
-          "publisher_url": "https://www.hindustantimes.com",
-          "title": "Chhattisgarh landslide collapses NMDC mining waste dump, disrupts Lava village road | India News - Hindustan Times",
-          "url": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxQVWR1dk5COFN1bTRfRU51LW9kUjd5ZlBDbllIeFRrZllFOFptRUZxa2FzQzhNVGRoN3pyZHJReU9KSzNUUFlRQ3V3SFAwNWVjZExiLU1nUWtNR3MzUEFUc2ktSkx2ald5NTdCeS1BQ3pyaUhNdHRqY1ptNC1maGxtdXcwRWxHeGtMWTZxQkJKcF8zSXE0T3FXeGFyaE9WMDFMb3pjSFdjRHdsUGdQcFVmTnpWRG1pd2tGWTNMdjg5ZmI0cWRoQ2d6SjBJZmJxWG5JVDgzNjk2X3RUZ2syekHSAeMBQVVfeXFMUFRWT1FycDVwRW52WHFvVTVMZ1pFUmcxUzJVWHdoOERLcElrYXd4SmV6NDVVQ2J4eGtpTUFpampKeDkwUE5vOWV3TnhOMUNFWHVHSUZNcEhXLVZ2N3pwaTZyenk4ZmZSWGhreWJEdC1jNmZIZGh5TW1pSTgtaGllR0xJTExaSldOOGlSRW5Xb3IySUJISVNvU1NnVUFWeG9vRFBoREt0dnk1WGJoY0dlelRpakdIelJxd0xKQWxIT0ZDTWpNYl9IU0FNeTBucXYtT0liZjM3VFVDQjFpZXNZX0hVTEk?oc=5"
-        },
-        {
-          "published_ms": 1795154193000,
-          "publisher": "Hindustan Times",
-          "publisher_url": "https://www.hindustantimes.com",
-          "title": "102 hectares of forest land cleared of encroachment in Mahanadi source area in Chhattisgarh | India News - Hindustan Times",
-          "url": "https://news.google.com/rss/articles/CBMi6gFBVV95cUxOUXlFLVRaLVRtcndJX05PeE5ZSS0ybkY2SEVBckRDS1kxYXBCaFFQQk5FZHJmaVUyX2d0MEJneHVRbXc2NngtMEJBSWJpdkpKWGp0UXNXb0VTMjFvRkdpbGRNTXdMY2tTOUlWRHhwOFZ3YW5MZmZIUUNtWWl6TlRtZzV4RFd2QjdmdXJHOGVzTk0wOXozeFg4M1ljLU9mckVqMGl5RE9oMmJDS0NrZTlxUlVnQjFlLTBNMmJBY0xQMUk1S3dkc1FSdlk5V2ZkdE9XUUNCRjJVWUVWOE5zZTVaalZ3TnVnMUpIQnfSAe8BQVVfeXFMTklkaVlkNTVZZEdVUTA3SFVpcnE4V1lnQWVRUDRJSmszT01BQzFXOERQaURnV3dEWXYzYzVIa0xiZW5GaTFXdEQ1QU5rNzlNWlpxaHctNnROWGMyQUg4MTczM2xpMjNmak1PYzQyVE5zam9xWkt0ZEJYdjlSMWNLMXpveEpqRUVHZTdPX1Rvb3J3cWF4RklYQVRlUW5yQ1dlMzFpeG9FR1lBN2FYcWZzeTNnT29kX21jTUhKbW5xRG1mUjg5UEZjNklSWlRoSTJ4T1g2cERLUGFZYzk1eWwwWkNCRy1kMDlfU01jWkpEWWc?oc=5"
-        },
-        {
           "published_ms": 1795119840000,
           "publisher": "The Times of India",
           "publisher_url": "https://timesofindia.indiatimes.com",
           "title": "Chhattisgarh man detained in Jammu over Pakistan link - The Times of India",
           "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPVUhwUkt1Y3Rvc3MxNWpSSVRYSkhhWlJJZ3JvQ1hUbVE5N0pOeGN5WmY2MGhQZFJibWkxR0lQaDA1aTRMZVZZRHBkajN2TktLVzNnUUJYaFduemlkUmlscDBPZ1BUYzVBbDlWd3JGWEUwZ1pHbUtGVm5FdnBZZVZpU25rUGRfTnM5YnhneENQT05ja1RCYzdfM1BacEpQeldNSGhpU01mTjNZbnFrcGlRMXBqRlo4bnlQYXNHb2hB0gHDAUFVX3lxTFBFcjQtZG9tYjRSNlhGN0ZGR1hzNFJKVzBzaDUxaGZQVk1jMmNYejROaUt0MGZObWhBZEdqUjlEbWtoeHhDM01PUzJRQXpmYk1vS2VyeFdHUTBNNXhJMDFQa1pyTWJtZHh0YlJFa2sza09wRHozbnhDZWRmX29MOXd3akE5LXNhcjNMeUtMZ2dwQzZSeVlQX3p6Sk14LVZoRFdJZEJrQ0MxNkhWckJrNTlIVmtTXzA2WkwyM0M2dktTVTI2NA?oc=5"
-        },
-        {
-          "published_ms": 1795096260000,
-          "publisher": "The Times of India",
-          "publisher_url": "https://timesofindia.indiatimes.com",
-          "title": "Chhattisgarh coal mines shut, livelihoods suffer, but villagers have no say in what comes next: Study - The Times of India",
-          "url": "https://news.google.com/rss/articles/CBMiggJBVV95cUxNMGpRQTJMVUtLdVlzU0JfZDA5NXVqblRyV3B1eFZ0QjRxR1hzU29jZUp0dXVQOXEzQXJkUmVfcC1FVVRNem1NLXd1TDVmYXpDRGJibGtKaXl2WXdTUU1DSnZiek54c3NxdEhRbS1qX1ZZTHVxUC1ELV8wNnRkRTFmU2ZsbS1mRGNkVWJGVWN5ZVRCWTA3SUQ3TVBLMVRDQU8yYmNxZFA5ekhWXzl0bFZBb1ZqZVVUTjBSa05Od1g4UnpRdU8tTVJsRm5jcXNPMFJ6aUlWT0hpRjVNVnVsTkpib0U0azdBWEREN3lCUTNIckV4c3NGclJKcHptSUVuaDJFX2fSAYcCQVVfeXFMUHRkTzNGTXRXeGZnVFMyVTMtQXRuUXVPLUM5UnQwRVVVOUxxQnZILUItb2pZTFQyMEktTmFiem9jallEU1JSSURKTHdDWHdpWElfeFBRLXU0YmNlWkxjbGl1UUpPUGRhRTE4THM1ZlZFVjRmb0JGOUZLV2ZWaGpoM1FyQUdSRDJrNkM2dnByejNOeDFqeUlTSmlyQ0d5UllvWnVmSmI0dEdSS2NUN3VpRHRadm4xU3hLcG1EbV9ONHFnM2t5WlZITVRGb1d1Yjh1dm5VQ1FFa0lsVTl6UTZnYXl5UUhCR3haWC1zdUVXRlJRWTBJUWpXUUJYdVA4SnFmYU9ybUV2eGM?oc=5"
         },
         {
           "published_ms": 1795095960000,
@@ -67,11 +46,25 @@
           "url": "https://news.google.com/rss/articles/CBMi-gFBVV95cUxQMmlXMkRDb2FJZmQ1ckFJNmdTVXVrUHJMSDRfTTZUOVBHZnBpWmJjTW9rQzItQzBBOWpYLXZzekl1eHZ6dWh6VVBmU0RYdTVZVml6TFIzOHRwNnFlak03Qi04aEZKVmdndW1MY1lzcDNvZTA3a0daRHhWb3NqSG41U0twWkpHbnNoTTIyX19tWTk0bklBWjVrV3pZRTZFSDFIN3dBdjRqSFBvMnBIWVlQcjF2NUJ3RkRYb2lPV0c4ZkU1cEZqS0pwQjlLYzNJYUd3MnF3OFVjTjBqb1dSVDJ2Wm5KNnJ6eUlkY2wtWDA2aXo2NGo1VEFzT0VR0gH_AUFVX3lxTFBmWVJXMnpXVmlIX01yVVVfVkxadzM0bjB0dzRzVGE1V0lOT0VGd0JmZDRyWEhfeVhrUjZwODVrNVp5U1B5V2RkYjZPRGo3VFdPLVdGNXhGdjk2OGp5b3o0SlNTdkZXZm9mb0VVdUNfLWVDUHhBWkVYamQ3bmlKQTRHLVRFMHBkQ2ZUdjNqR0tmcmlmcmlGQXE4WU5IYzNWWWthZjEyajRNMkFDU2dfazJRSDFERjMzYk8tSE1HQVAtS2s0TS13VUZZX2thaFJQZlFjNXhCUW5IblZuWk8xb3R2U01vdV8xMjFpUXlHeWlIMnJsQmprVmNzZDVwdF8xNA?oc=5"
         },
         {
+          "published_ms": 1795093244000,
+          "publisher": "The Indian Express",
+          "publisher_url": "https://indianexpress.com",
+          "title": "Mother’s job and travel no ground to question child care: Chhattisgarh High Court - The Indian Express",
+          "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQTmRFZHdXR0dYZGw5cjJwQ2pMcUczaFotbk1tS2dIejVhQzhMeUZONVlkamxkaDlCeVJEdVIxdE9ROGpWYkgwMUNRN0hBVS1LemRPYnhqdGZqY19aMFJXWEN3enNveEEtNlpucVlCRjZvVTNYZUFYT2ZSSWhHdUxjZkZ2aTJzRWxfWWh4dHFoaWRBYl8tQ1pZSmJWLXZyakJXRE1Kbm5yR0JBQnRmN0xOb2RVSjRMNjZnTlHSAcABQVVfeXFMTVJad3FOWXlOT0owUFlmWjJMNHVpS0VFb2xyY3RuYTd4NDBXYjdlX3JRbWRfaV82aDJONC1VdzVROUxBUm91a1JwaXg2bmZueWJJcXVURjBjcVozMXhCcXRxYnhhY29FZ2lSMjNXTGNaUUJud25XanI3MXN2Zk5qb3VNMU4zSDBCeXE2MzFWRzh4WjdyQ3d5V1h3QWluYlpvNU9lMEw1Tl9UNUhBMkFBb1NUUTZNWTd4clJEV1plOEVh?oc=5"
+        },
+        {
           "published_ms": 1795078993000,
           "publisher": "India Today",
           "publisher_url": "https://bestcolleges.indiatoday.in",
           "title": "CGBSE datesheet 2027 out at cgbse.nic.in: Check Chhattisgarh Board Class 10, 12 exam schedule here - India Today",
           "url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxOSFJOMFdKTWk4VUUxY2RkTTRwR3hpNEhPREFILTJhLTNyM09iRFVJLW1aN0dKZmhpcEFsRFB0bXhNbk5Gb0NDU1RnZDZnbWVWVTlSUlQ3eW12Wl9OMUFMVG96V0lqZE5xM0ktZUVHSU1paEpOLVdBUEY3MnZLVlQ0eVVzalJ3WThhb1Z6bl83TVZIRTF4U2dpOTh5bERZeGlDd0RuSTlfcWVSSlQ3cnBaMEkzWjVDMlh3R3kwaHhNYzB1TjZtR3Rab29FbXdtd0prT3hpS1o4eTlTQVhzSjRKNQ?oc=5"
+        },
+        {
+          "published_ms": 1795072225000,
+          "publisher": "Business Standard",
+          "publisher_url": "https://www.business-standard.com",
+          "title": "CGBSE board exam dates 2027: Chhattisgarh Class 10, 12 datesheet released - Business Standard",
+          "url": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxNRERjWFpaSkZNOTRlcl9Gd3lxOTZtbk5CVS15c3owYVE1ZjdqRXpnMnpYbEJ0RlViT0lsQnpELWlnRUZldldDUGdac2ZwNktVcVpwMTB3b2xqeDN2M3E1YTdRc1lVN1ptamJVZDlDQ0hBZ0luSkRTakdqUWFHcUd6QlV2YU9RNVFEaV9qTFNqOWhLM1VYM044aDNiOFMzbFo4RXBpU0ZHWUk1MFZoczFYTlJ0U2JiNElpVWxJeTlSb1NsR1VqS0tNU1libTQ4VlRIbkJzUnF0b9IB3AFBVV95cUxOeDFZcjRWdnJ4WHBjQnB6UFJUY0d5Um5MYXEzU2ZSdFp1dXRONGNiNGZCRjV6TXN4NFB4RWhYMU44WmZzMkZyWDZ5ZUNwMXdvUWRRVEtZWHFpbk1CQURCMWJPV1U4c2Z5eXFzUW05dklKWnhqeUc1SW9fQTZSeHRLS19yVGxSSFk5VmNfMzRybk53NV81UTR5UFRyYnJndW5vMTllQVFiQ0FQSWc1OUJGLXEyOE1GOEJpTG9WbS1WTTJlV1djT01ScjdZRmxJU0ljc2o0WFpVNW5qZFh4?oc=5"
         },
         {
           "published_ms": 1795061033000,
@@ -81,18 +74,18 @@
           "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPdDc4NmpkYnV2cU8tX3ozbmpFM0J5YkhZLUc0ZVlSUWJiaFJ4UW9qV0I3Zng2em81MnVPbmI3RldJUVNCb04xU0V2RkRBd01WUzREQ0w3WDd3MGVtc2NWU0RlSWl1X3hZc01wcE1oUEN4TGY0cEZ6YjNZNkxyYTJRVG9DdzZzT1FIWnlaQ0hrSUFac3h2cjJqMFFEMlRNSThIc1g5RjVEd1RCZkw2MVNmQks5OUpKaXFBLXhBUS1naXlvdlXSAdoBQVVfeXFMT1N1cEhpTnJPSUVuZkZZZ2MwYkFfZEd4NThKbm5LbnRlbmE3SnE3VFJHX3JDUU1TaEV0ZUd0Z0JndGpLZ0FDckZ0Y25oOWl6M3lhZ1lzaHZUaUYwekZvTGVxWl9DaTBQMWg3OXo1R3pIaGctUHdLcHNVRm1UZWg1Tmp0YXhpTUs5RWl4RF9nV2NJRDJHc09aV1kycVJyUG85VktlVi15MW9SUWhhcVRjLWNrZHdraEpwQnZlVXlBUzgybjhKakVQUFh0SEd2MUw3bkpBWGtkajBNdGc?oc=5"
         },
         {
-          "published_ms": 1795056705000,
-          "publisher": "Hindustan Times",
-          "publisher_url": "https://www.hindustantimes.com",
-          "title": "Elephant linked to 16 deaths tranquilised, fitted with satellite radio in Chhattisgarh | India News - Hindustan Times",
-          "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxOTUxWd1BpcTgteUNaMEVrZlB0YU8wVXVWdGx2QTVnRTdKbTRFbnVUZno5eGhYZ0lmOF8tb09Bbjh1SVNfWHI3dWRwQXo5NWN5OEVsVnc5R0xSU1BCME04bG1DOGg1OFV2NzJNNE5FUHZBUnZ4RVdkTXZLWU9ITUZocUh0WVcwd2lPYmoyUFVqMm9oTTliTEhmNEVDendrb0JweWtwd2FRcXEtdktWTVRoUExkVHVMQlpVaWpiM0d0enNXQ25ucTN5VFBZWW8zbGxueGs3NG9yLW83eXhyN3FySEpR0gHnAUFVX3lxTFBVa2VaT1BuSnFXa2RacHZ3MDNkcmpjNGcxanEtOGZvZWFvTlM4RXlzdHA2V0RRNEZYR2JEbjhzcTNMaTB4UTFYMHJodEJrRE11cDctQlYtUUdLZjZUVFFodkNKeGlNWTJLODRPWDBTTkhyOU1HNGl0SHp4UTNfQUFzUHNjWGktQmNlV29UNTEzRUtMZU90WlU4a2gtVHktLXdEQUNVWlYtTDZsVW5FLV9sRk13S1AtcWYyWGx2eVVUZE1tdHg5UHByc3hkbWtQQmh3Rm16T3djUnhIYzVDRG5EYUFiTEpsMA?oc=5"
-        },
-        {
           "published_ms": 1795050339000,
           "publisher": "The Indian Express",
           "publisher_url": "https://indianexpress.com",
           "title": "Up a hill and into a forest: How to tranquilise a 3,000-kg elephant, the Chhattisgarh way - The Indian Express",
-          "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNcjlpZnNfbGJwd3BYQXN0V045ZlVIbmRzMms0dGY5WXBpcVFwSEJXSmJmcktPeEF4T3RlUUdia2VsZnFnYk12LTI4dmFEeGZOUjhfRVZ5LWhzbmJkVktFSE1EVUJRTHpYNDM5U2pzT0JTcC1PalNTd3QwTXVRaXZxQWk4SnlzUU5SbC04UndnRVFTX3RDeXQxeXZTX1YyUjlLUWfSAaIBQVVfeXFMTXI5aWZzX2xicHdwWEFzdFdOOWZVSG5kczJrNHRmOVlwaXFRcEhCV0piZnJLT3hBeE90ZVFHYmtlbGZxZ2JNdi0yOHZhRHhmTlI4X0VWeS1oc25iZFZLRUhNRFVCUUx6WDQzOVNqc09CU3AtT2pTU3d0ME11UWl2cUFpOEp5c1FOUmwtOFJ3Z0VRU190Q3l0MXl2U19WMlI5S1Fn?oc=5"
+          "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPN3A0XzNnejVvZkRmTkZjY2wyTlZnOVZtc2NkUklrRkZoQV8tZ3RBZ196a1JoZ3ZxR3hNQWZEUkdaYTgzM2FLaDVsSFRUM2dBQjBrTjNFRlNIS2plN1BoZGpCb25kNG1wU2wxREZmUFZDOEdPakd4OGlES0E5WmhBNG4tbklINUdiUlpvVDl5ekU3dUlIdEphWG91a9IBogFBVV95cUxNcjlpZnNfbGJwd3BYQXN0V045ZlVIbmRzMms0dGY5WXBpcVFwSEJXSmJmcktPeEF4T3RlUUdia2VsZnFnYk12LTI4dmFEeGZOUjhfRVZ5LWhzbmJkVktFSE1EVUJRTHpYNDM5U2pzT0JTcC1PalNTd3QwTXVRaXZxQWk4SnlzUU5SbC04UndnRVFTX3RDeXQxeXZTX1YyUjlLUWc?oc=5"
+        },
+        {
+          "published_ms": 1795027980000,
+          "publisher": "The Times of India",
+          "publisher_url": "https://timesofindia.indiatimes.com",
+          "title": "New water rules: 50% recovery mandatory for panchayat assistance in CG - The Times of India",
+          "url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxOa0paTkhfM1NiTG9sM0c3aEpIbnhGMkotUGNWZnhQMnFWNHZjeUZ1bTFlWnp3ZkVlR3VYcFN2bDZDM1lFdXBKcURNdERKLWdHeVhKUnlycHZVTXdLYXdxc3gxbVd0OWIyaGtFMDhodTA3dTBjb25xd1laTjdzUHAyVU50aERObGN3SHhaVkJvaDhRQ2g1Q2xtSF9LRl9wSFhYR2hNUE1Ecnk1YndtSFlnUk1ZZFRycGlBY1pxNERxM2llR19KN3p2TzBjZnJSM2ZwRnZzWGJtQThTYkptQXRN0gHfAUFVX3lxTE5rSlpOSF8zU2JMb2wzRzdoSkhueEYySi1QY1ZmeFAycVY0dmN5RnVtMWVaendmRWVHdVhwU3ZsNkMzWUV1cEpxRE10REotZ0d5WEpSeXJwdlVNd0thd3FzeDFtV3Q5YjJoa0UwOGh1MDd1MGNvbnF3WVpON3NQcDJVTnRoRE5sY3dIeFpWQm9oOFFDaDVDbG1IX0tGX3BIWFhHaE1QTURyeTVid21IWWdSTVlkVHJwaUFjWnE0RHEzaWVHX0o3enZPMGNmclIzZnBGdnNYYm1BOFNiSm1BdE0?oc=5"
         },
         {
           "published_ms": 1795022820000,
@@ -106,7 +99,7 @@
           "publisher": "The Times of India",
           "publisher_url": "https://timesofindia.indiatimes.com",
           "title": "Chhattisgarh cabinet clears new rural water rules, Rs 41cr aid for college in Abujhmarh - The Times of India",
-          "url": "https://news.google.com/rss/articles/CBMi9wFBVV95cUxQbEpBZXZGWnlwdGg3SzdlUDZpWEpRUlc0eFB3THBCZVIzZW5WU2VORDdIM0N1c09DNUxHbGN5NFh4cWxhRmhaVUVKUHVrOHd0VWJYbFFlWXFHQm0zWkJCSUpicG5ydEpiaE5ObjIzUXdmQ281c3ZYa01EMUE5ZVVnZWdHcUl6S1RobG1MYk9Bc1FITGRfNmtMU1VhU2lsbUFpYzhTUHVjcHd2Mkp0MnNRSjgxSTRCbXNkZ05kNndjYnhwT0hTblUwTm56bE15VW5lRDVYd19TcGFObXV4MHpSSVlwcXpvQy1oTXF6V3oxVENOOU1rSVpR0gH3AUFVX3lxTFBsSkFldkZaeXB0aDdLN2VQNmlYSlFSVzR4UHdMcEJlUjNlblZTZU5EN0gzQ3VzT0M1TEdsY3k0WHhxbGFGaFpVRUpQdWs4d3RVYlhsUWVZcUdCbTNaQkJJSmJwbnJ0SmJoTk5uMjNRd2ZDbzVzdlhrTUQxQTllVWdlZ0dxSXpLVGhsbUxiT0FzUUhMZF82a0xTVWFTaWxtQWljOFNQdWNwd3YySnQyc1FKODFJNEJtc2RnTmQ2d2NieHBPSFNuVTBObnpsTXlVbmVENVh3X1NwYU5tdXgwelJJWXBxem9DLWhNcXpXejFUQ045TWtJWlE?oc=5"
+          "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxOMGtFX3Zxa0FXLTZ0U1VqN0g4YjFrdkJEV3M0cGs2aE44VjRoS2NZTEVLbU4zdDItZnQxbjZBcDUydksxc1BibXNXdkFSbzJXWUs4QnRNMWNjbkE4MHJkLUkxN3hlOG0wMV9BRW9vSUVCOWdyNGdfc1Q4c1JGQ0ZGZlFyREctY3duYlVhME1zNUdEd2w3ZnVZS1NONUhwdFUwRktmUWhFVEpQZlpSTGJONVgxRGxHY0J1MUpOUjlvS2s1YkNuejlEczczNjlSWXRnSW1yRWxxYVdpbEVQcHJkRDhzdDR4bDVtbk5qMkZHUU9Od9IB9wFBVV95cUxQbEpBZXZGWnlwdGg3SzdlUDZpWEpRUlc0eFB3THBCZVIzZW5WU2VORDdIM0N1c09DNUxHbGN5NFh4cWxhRmhaVUVKUHVrOHd0VWJYbFFlWXFHQm0zWkJCSUpicG5ydEpiaE5ObjIzUXdmQ281c3ZYa01EMUE5ZVVnZWdHcUl6S1RobG1MYk9Bc1FITGRfNmtMU1VhU2lsbUFpYzhTUHVjcHd2Mkp0MnNRSjgxSTRCbXNkZ05kNndjYnhwT0hTblUwTm56bE15VW5lRDVYd19TcGFObXV4MHpSSVlwcXpvQy1oTXF6V3oxVENOOU1rSVpR?oc=5"
         },
         {
           "published_ms": 1795022280000,
@@ -116,11 +109,18 @@
           "url": "https://news.google.com/rss/articles/CBMi8wFBVV95cUxORG4yZ1VqRUQ4c2Y4WExDY0FEczVnT2V1Q3drb2gzdU5DS0c3WmJIR3JxRlFrNU5ROG84TjRHYTBpWVdIWnB0eVczVzlzYzhNUzJEYzhKZ0pycVFwMWhGM3Z5SzVhVXgxdl9EZFVodkFhVlp3azBBcXNJeVM2REZaZ2NOeFozWEI3YTlPcW1DRC1sRGtxWk1oTUVUWnpPanphTVJyZl96RjVyemdQcnA5V3U3OUhwcmhfM2ljZTVyVWN3dGFyelU2OXh0V3liNEs5cnZ4WnRaem9mYkVVeFh3eWZUYUZhb29lVG03d2VUV1JaU0HSAfgBQVVfeXFMUFdQbG41UGdCVmJoWXktMkk5Y2FGemU5aFBOUjJ5WGk3NmpvRjNjOWxTYlROZlhhZUs5am1GUzRFWFlRWFdNcHZxYWd3NHFRN1F2Zm8tVk13aHQ4RmJPdTYwWmVuOWt6aS11RDR1N2RDakE0a2hXUkdUX3RNMXg4OTZxX2lMMlBIdXVyVXBkTnM1Y25SeUoxS2gyYTM0TWRVVXpaSFRsTk5lcVZQZWxUYmZkYlZudGRfTGlUdFlUVjRzaTJ5Z2doUk1XMm9WV0d2MEd2RlAxX0VhVUNiOEEzbjVQMWt2R3BPbXZjSk1RTy1JV0hvOW5wdGM?oc=5"
         },
         {
+          "published_ms": 1795021560000,
+          "publisher": "The Times of India",
+          "publisher_url": "https://timesofindia.indiatimes.com",
+          "title": "Police unearth major Maoist explosives dump near AP-Chhattisgarh border; 670 live BGL shells seized - The Times of India",
+          "url": "https://news.google.com/rss/articles/CBMihwJBVV95cUxNaG9pbm5GU1N5WS12MTF1d1FyWlZyanVKdEtoR3ZKNFFmenN3Y2xBRXB1Uy1mZUpwTFRtR3NlSS1DVllIMFVBOUhGTWg2cDdPWlcwZ1lVTnBDbDktV1Y1WjR5aDVqRENWNnpwWFNvcDc1MDIteDhrSGNjMUNLTktHdS1VZjNIc2lNVUxsa2xVcm5YbU9mUWdTNGxUOTlNZDJaOUNxQ21ScFd5QVZ5SmN0cFhhOUpqVlNPM3QyWUpJSU00SzBwd2dyQnlMU2VTaTRobkdDeGhVQU1lX0hlQnI0NDRucG9SZURMOEZKcEZHdlFyemtVLWZJdVMzWmxWMU1STHdic3gzVdIBjAJBVV95cUxQdUt4Rll6QXlzd1pTdUUyQjRGeWZxeDBCNnk3R19tR2xzNDdzNWZ5eGFqZFdNQzdtLTVVMUlSNjUtZndSejY4cVNaTHRjTFJpTjEzUHVKdkVxWTVHcDJCam93YjdsOW44TmZEaUJEcU5LbUdETy1UX2RqSjZXOEVyUG4zc1piZTFOVWhDcC1vZ2VUODFDRzhXeEE1aHluMHoyZXdhb18temhTd3BBMzgtSFo2VG9rVnhVSU12RjJMYS1DSmhlejdkNU8tajZWWFRpc2FlSjdnQkNTeUQ2elhHUml4OHhsbXM4S3JjWG1JODVxUEdmT0J1YzZrT0JvOTFKSTNVSmhYcUdkVmpS?oc=5"
+        },
+        {
           "published_ms": 1795017658000,
           "publisher": "The Hindu",
           "publisher_url": "https://www.thehindu.com",
           "title": "Huge Maoist arms dump seized near Andhra-Chhattisgarh border - The Hindu",
-          "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxOS3JmQUJLUm94SmxibUZVREJ3a2JnWmpIRDAxWEYza2JzX2VkWDZFTFNFNE01a29WTGdwMGJpbXVzZmVBNVg2VmRKMVI1ekVjeTRXRUZZTDRNSlpVSURZTktwNjZwSWdhaFF1Z0Q0MHpqMzluOE9GTUR4MzQ4RVN5RVpfcDFpbEw1NkM3TFNpeGtORmRxTXNHOEpvSkh1M3lpbkxySkJzVnl4MnluODNZVlIydlIzLWJSRzU4WVVhNFZyVWlZancyMUpUVmtDNWPSAdYBQVVfeXFMTzZHS0M4SXdUZUhRVUdnTmJOZmZXNzFIbjJXT28xVmNXcml6RHNuRzF1clN2V1ItYXlLa3RuZFJhWUQ5b2ZCRFJTWlZQaVhpQVBzZDViQ1ExYVhlSXRzQUoyRmlfU1lFb0I3Y0hxeUtuTXdyVjRDUThnYndiMTgxSWpJX3J1MFNtVHB0NDYxcmhhUDJGeHlubXhlamJZcmtka3B4ZWZGRXNubk9tR1NZdTVtaG85dWJVdGFQNTRsSUNqMlUzTkZPejZoRTdseEpONXRTWEVkZw?oc=5"
+          "url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxPNkdLQzhJd1RlSFFVR2dOYk5mZlc3MUhuMldPbzFWY1dyaXpEc25HMXVyU3ZXUi1heUtrdG5kUmFZRDlvZkJEUlNaVlBpWGlBUHNkNWJDUTFhWGVJdHNBSjJGaV9TWUVvQjdjSHF5S25Nd3JWNENROGdid2IxODFJaklfcnUwU21UcHQ0NjFyaGFQMkZ4eW5teGVqYllya2RrcHhlZkZFc25uT21HU1l1NW1obzl1YlV0YVA1NGxJQ2oyVTNORk96NmhFN2x4Sk41dFNYRWRn0gHWAUFVX3lxTE82R0tDOEl3VGVIUVVHZ05iTmZmVzcxSG4yV09vMVZjV3JpekRzbkcxdXJTdldSLWF5S2t0bmRSYVlEOW9mQkRSU1pWUGlYaUFQc2Q1YkNRMWFYZUl0c0FKMkZpX1NZRW9CN2NIcXlLbk13clY0Q1E4Z2J3YjE4MUlqSV9ydTBTbVRwdDQ2MXJoYVAyRnh5bm14ZWpiWXJrZGtweGVmRkVzbm5PbUdTWXU1bWhvOXViVXRhUDU0bElDajJVM05GT3o2aEU3bHhKTjV0U1hFZGc?oc=5"
         },
         {
           "published_ms": 1795005175000,
@@ -132,91 +132,84 @@
       ]
     },
     "breaking_cg_hi": {
-      "fetched_ms": 1795227910811,
+      "fetched_ms": 1795259818436,
       "stories": [
         {
-          "published_ms": 1795225128000,
+          "published_ms": 1795259391000,
+          "publisher": "Dainik Bhaskar",
+          "publisher_url": "https://www.bhaskar.com",
+          "title": "रायपुर में सीएम साय 26 नवंबर को लगाएंगे जनदर्शन: सुनेंगे लोगों की समस्या और शिकायत, सुबह 11 से दोपहर 2 बजे ... - Dainik Bhaskar",
+          "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxQSmJGZkNiQjkzMVN1X01ZZDVOWUFOQ0FSUjVad25XemRqanE5MGNsLWV5aEVZdnpQSEpWRjZMSnF6TlhvbUNvRDRMYWduQVJVdC1WTFdxZlF0QVZFeFhUU1lfLVhCbHFyaElPTEtiS2FkOUZZWmJIeDA2eHBudV9uS2ducmg4bG5LdEFhN0tuMmRIeXBiOTRRTHE3bDNaN05TaUJlOW5GZm00aUhkQV9oMFNJS2szcGhoTjY4RGlxcmFkbEV3WEVRMtIBzgFBVV95cUxNeXJpbVI0b0VZSTU3eVhabnQzaTROMW56M0VUNzR3UHNwX1pVVUVrWnJlajNjaWtzdlgtQy1xay1PN0drbGdrNjNkUkdRYnIzOWxLWmxDMG9xdWJ6aV9PdHhCd1N0OW5ZTDVtUXNqb3ZudWVLRXc1cEVyQXRnYk5nbEFXY0ljYUt6WWJoV085MTVCNkx1eXN1TG9pM0hyVG9GNUQ0RWU1cTZ6ZnY0UW1paDlwS0Y2QVhIRWRZRzExRHg2aEFVMDRsclZpVU5rdw?oc=5"
+        },
+        {
+          "published_ms": 1795258975000,
+          "publisher": "Nai Dunia",
+          "publisher_url": "https://www.naidunia.com",
+          "title": "छत्तीसगढ़ से गुजरने वाली बरौनी-चर्लपल्ली स्पेशल ट्रेन अब दरभंगा से चलेगी, देखें नया शेड्यूल - Nai Dunia",
+          "url": "https://news.google.com/rss/articles/CBMi9AFBVV95cUxNSWs4MzRWZDNZMGIwWmdkdHM3cEpTX25JRkktUjktbEtkSDRmZXlaM2ZPTFIxNWgzOWRCVllVVTlCWEYyNkVvdTdnSEJra2g3aW9lWXhTNFdiNkV1aUs4RDlPVFZjZkh1QTFJQmVrNUYtbFR3ZEpIdjFxTExKbWJrU2psdXM0M3MxRWl5LUMzM1RaeG1KZENrZm9NWENBVm54bnEzZXB1dEZyVjJQZUJpd253Vzdjbm1SMTNvcXUwOWp2T2ZDZE1hRVRxX3g2TGE2cTZxdnRrZTRtQzRjTHlyNkdRdjVCWjBFc29kSVdxcXVJYXND?oc=5"
+        },
+        {
+          "published_ms": 1795255169000,
+          "publisher": "Nai Dunia",
+          "publisher_url": "https://www.naidunia.com",
+          "title": "राजनांदगांव में मेडिकल मॉल पर ताला लगाकर भागे ठग, 29.90 लाख हड़पे - Nai Dunia",
+          "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxOaHFlOWdveHhCLXdTaEE1Zkx4aElOdjFSOWk0Mmw1RUNVR2poYnlBVTQ0T0lNSjNBb2FtajlWOEw1dS1XYU5TMUtTQ0o4elZ6Y1ZDR09rVHk0YUdVQUFKdHk5T3BEeF9heHR1MUJURGplNGE2bWlnaHZqcmVvLUhtM0pVZVNhc2dOMU81OTRkdzNhMmltaTdrZHN5QUZYdkFsMjF3cTMyLWFBTEJ6cW54YkxIQ2pzMGJzS2dfWlpUWUg2Y21nNldNZkpZTk1oY0VEaDZvbA?oc=5"
+        },
+        {
+          "published_ms": 1795250779000,
+          "publisher": "Nai Dunia",
+          "publisher_url": "https://www.naidunia.com",
+          "title": "लारेंस गैंग के नाम पर शशांक चोपड़ा से मांगी 15 करोड़ फिरौती - Nai Dunia",
+          "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxNVHAycHNxcjhWazhDaTYyUlExbHRVVTNQem9tR09GVWNfRTE1ZXBOdVBtTVZiWFJlNGRuVkxXMmtTZDFieHRKM2NZcTZONWFvWFhfWHlOTldmeUlHYVhHTFVMSTczT0pWNWlsRGpoQlRIbXdRbjdKSC1DbUwxZUVDdDBrbGItTGhNYndVOTBrQmV5aEVBVWNINi01Z0gyV1lnV0pqU3BMUzJpbVFWU1oyRi1MSFNDVnV0UXAtR285R1FKNFgzYkE?oc=5"
+        },
+        {
+          "published_ms": 1795242380000,
+          "publisher": "Nai Dunia",
+          "publisher_url": "https://www.naidunia.com",
+          "title": "रायपुर रेलवे स्टेशन के फुटपाथ पर रहने वाली दो साल की बच्ची की मौत, दुष्कर्म की आशंका - Nai Dunia",
+          "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxONnA3UGNXTlZWMzNRM0loNlpnbmN0Z0UybVI2VGl1dWdGWVpENjhCYXFwYnBfNVYwbDQ1YzVVdUJRZmMtZjVTV0JtZFBLWHBVaVJlcE5mQlFzRUtQbjI5bVA0aDJqMkdqYVdpNkxxanBxTHNWM1V5WF9laGZWVkJLX21mOU5Cb0hKYkVhS3pBV1RhQ0dIck96U25hRlk5NHRKTGpUZWpnVVFVcTFzYm5fWnV3V1I3SHBFY0ZlT01vbGRTdV9FLTA5eURHMW9tR01pcDlXMQ?oc=5"
+        },
+        {
+          "published_ms": 1795239620000,
+          "publisher": "Dainik Bhaskar",
+          "publisher_url": "https://www.bhaskar.com",
+          "title": "बारिश से धान खरीदी ठप, केंद्रों में भरा पानी: तौल बंद होने से टोकन लेकर लौटे किसान, कटी फसल भीगी, नुकसान बत... - Dainik Bhaskar",
+          "url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxOTDUxekN4UzhZdDhWaDhzSTRnUVpCU3IwMUVrNDdBZXFWRGNpbUhZeFNMZ3FwWEdCbkFHQ29BdXpwWkV0Zk1kQlV1RlE1dFdJYU1pWk96elRNd0VXQlBvXzF3Tm5QR09rbm9IRVp1cERvUk1tbzNqRnhzMjg1aWFvc3ZFc0N0R2VEQ0Z1dC1JSGFjdVZJZWswYS1SdU5qTjQ4MlBuSGwyeU1Pa1RORmU1THJoclcyc2FNZFpCcVF3SVNGTFZyRUxoMDdJMFgzdWhTR3JGUEVR0gHbAUFVX3lxTE1wNFhsdDFfbkYwMkV3b1NFNkxORlRhUmstazlPenl5c3NDY0FoWVI5NUQ3ODVlWmdSRDljSUk3VlJyV0swTmFPNUMwVWUxa08wTFZURDZzTFE3aTQ5MzZsakZWX0JibUxZaGs0ZWhueGRoM0lHZEU2WVdNNDVEY3VRRDVNVHVTNFczWkNhOXB5RDdZWkFCRFgtRnhhNkVJbHZyUVZHT1IyR1U5anNjU1QtS2JucFZKQURNaUZIQ0lveThKVU9JR1JkUDBsZVI2MVVYdWE3QXBTSEticw?oc=5"
+        },
+        {
+          "published_ms": 1795236555000,
+          "publisher": "Nai Dunia",
+          "publisher_url": "https://www.naidunia.com",
+          "title": "छत्तीसगढ़ में 62 करोड़ की मच्छरदानी खरीदी का टेंडर निरस्त, 20 लाख मच्छरदानियों की होनी थी खरीदी - Nai Dunia",
+          "url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxNTGNqekpoZlQyc0RESUp4M1lGRUVVYUNnMUFqblNlX2NtZ0FkcjRRc0hBYmZJWGZiZC1ZWGd5eW5OU0MzYTNsdU5fVXdLZVVjOXRWblFfcXlfa3RkektVX3pZNnFxYXNrcFpkb0tYcmoxa3JDbTFRdElnd0JYcXdySGJRZUhDWXNaZy1fS0J0V2hwc2RNblh3R2tZbWtaYmFqVXIteUJjdHNqcG5fRm5JMk5vbmx4Q0g4WFRDbUdXaUg4ell2NEdmM3lRRnNWUC1fZUtUREJZTzhTT0JEVEhZbQ?oc=5"
+        },
+        {
+          "published_ms": 1795235930000,
           "publisher": "Dainik Bhaskar",
           "publisher_url": "https://www.bhaskar.com",
           "title": "छत्तीसगढ़ के 7 जिलों में भारी बारिश का अलर्ट: तूफान अकवान से बदला मौसम, रायपुर में बूंदाबांदी, अंबिकापुर मे... - Dainik Bhaskar",
           "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxNb3hlNDBxd1NWd0ZPMHRfbDVjWHo5SlpvUzlXVHIzWU9yN0JwTDA4YlRYcFdlZ3lzcWVzVFlwUmtQaTQwaG5HNHdQU2NvcVllYU5IOHc5VmMzdHB3T2lQa2wzbTU3bEczRlppdWRDS1ktRy1PbU1JeGl1Z0hPS0tVakZEOEtYMVdTdzg2UERSeE9DT1FTRW1rZzRCVWx5MmVfNlQzT0RCbGl3b05PYW0zUmRCcXR4ZnYxQkxHZXlnTWw0UmREYVFNX9IBzgFBVV95cUxPSlRGSS1OWlppa1lDVXd1X2ZteF9taC1pcjZ4aHZIZzhuTkgwUFUzRURCMk9GUF9ZR0pUb2xlX2FaaWpIN1YwcHN2OHZHNU5BZFRfSTFMcG96YW1vU25BU1dnSERMYTZ5ZDV0bTJPOUMzeEMxRWhXdThDNkJ4OGxfWjc5WHZBd1hGaW1PVUQ1RHBwdU5PTXNRUl84S0RFWFFXRzk3Zk1MZnF2eEp2Y1NKZGVWaDI3aFo1SmVVN0tNUGdCN3RkTno0eFNPeU5CQQ?oc=5"
         },
         {
-          "published_ms": 1795219200000,
+          "published_ms": 1795231542000,
           "publisher": "Dainik Bhaskar",
           "publisher_url": "https://www.bhaskar.com",
-          "title": "छत्तीसगढ़ स्काउटिंग की सराहना, कार्ययोजना पेश की - Dainik Bhaskar",
-          "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxQdUR6TGhFLVQtazdPS3owMHJac2Z0NmdfMW5RZ3V4YlJPajAzb0xkWjJKaEJqSEMydU1nLUgxbXV2a2Jmbm9pdWE4Y2NPQnFkNEp5SHFlbVlTMkpzbDRzeDZWcjJkVkxRWWtnOXQ0d2x3anNfMkI4aTJ0MEdDMXdHa1c1V0UzblF1Q25mQWRiTXVacnRnYkRPLXFvdWVrZDllMDJPMHRJNFBzRmF4anJySUp3VjhoeXBTbUthRVVVekxsUGVubkpn0gHMAUFVX3lxTFA0aEl3d3V6Z0F5VldCVm9qdDl0Q3ItVFJHWjZtX3p6bDl2ZlhWUTBRdklMbTBUOGhfYlUxRVVmU1RvVTlsdDZMNDFVZnhGM3BUNWxwOGk0QnI3Z3B3bHBodGdxMUpRUi1XVjQtV2VoMXFNQjZhV3ViZUszTGRLeWpjM2xwRC1PVWJWcDdzdkktbHJRbXJ6ZUJPdUtHR3Jma0VlTkRkM3M1R1BBNWRsY3hrVVJIMlNoZ1NUaVVadkd1TXRwU1VpOEN2bHd6RA?oc=5"
+          "title": "चार हाथियों ने दो मकानों की दीवारें तोड़ी: छत्तीसगढ़ से आया दल तीन दिन से डिंडोरी में घूम रहा; घरों में रखा... - Dainik Bhaskar",
+          "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPa0cwSEpFSkRfeFlNUWl0cmJBVVBVTV91YUpfLU82bXZLd3RnREpxS29WRmdaWUpHZkpFdi1OWVk3bHh6OW96ODlpd2h6cHdqX1FQb3AtTTBXRnVPMWkxZGVKdm1BdlQyaVpybk9SREtIUW42NEdUSDdubmE5U1E0clkxeEtSYjdFOXpzeWQ1VmxkRHh1aHJLcFh2RkFnUng3a1JEcnhUOUxDR0xQaVF4QjJWME9BSXRWczFMYmZ1NVHSAcYBQVVfeXFMUFg3NENjeGtZbU5BeFR4NUVxVjJnY0QwcWJuUU9rRDRvdHRHdU5BMlNsYUpjeEYyRGFQQWVFdjkxOUN2NUdSWVdfNjZvQVdMVml5cXRsV3NKbzREN1Z2R3lubTBkQW1nVkZRQ0o3RTNoUkktMjVjTlBkb1JiaWpvbC1ZQnp0d0N4NEJiMUgwY2lyZGFmZmJ0N0Q0NDFRbkMzSTB6UVlpSC1wOGltaGh0bnNBN3V5SGp3cFcyVVdCR0JtSjl5YnFB?oc=5"
         },
         {
-          "published_ms": 1795219200000,
+          "published_ms": 1795229692000,
           "publisher": "Dainik Bhaskar",
           "publisher_url": "https://www.bhaskar.com",
-          "title": "नक्सलवाद की छवि से बाहर निकलकर निवेश और विरासत की पहचान बना रहा छत्तीसगढ़ - Dainik Bhaskar",
-          "url": "https://news.google.com/rss/articles/CBMijAJBVV95cUxPeHgtMXFUWnJaekZfb3labER1Q0xVWVhWaVRzb0hYVUh5NVpXWUdJSm1kYVpKZGFPMlpfTmhfSVZJMFY5S3piZlNtX1Q5ckFuZUp6VXUtak1PaUhZV2VyR1QyXzJtZUtVQnRpMEdsclNYY05UNW1PdGppdExEUWRRYi1SQVRBX00xS2FCa3VPT0wtVmNWcXQwaTNGQ1RVQXVUbjhwdXI1VXdfSkpnNS12ZUhhckc1b05JRHJkSkpEZkdqem1BdDIwY1prQ0o2Z3IzRjQ3dUo2S2JTWXMzek5EWDFxZEdPMU5TVTY2ejZjU3RKUHRITk04V2Y2Q0RmdFRiS3pIYTl2Q192NmNQ0gGSAkFVX3lxTE9pMHFSd2hwV2wtRGZsNno2NnpVbkxZQmRPcGd6WS15UUlJRDY4ajNQQmpJR0pESWFYVE4yOWtGTzQ1djdHcTVjZVo0Y180VlByRFZzMWJSNzFaUHV3YS1la1IwQkZVVkUwRWlRLWxZYUZGb3Yta0VJN24tbVNlSnFtckNmSEg1UXZPQzhBUjJ5Tk95UnBQNy04cUlkajFKa2tGM1NVRWRRbVJKNk41TUJrcy1pQ2xzU282dzFweDZZN0U2ME5HNWk4dDFVSWNOTU81ZmFHMGU4VGV0UXFBeW11V00tWDlrd2FhamR6elFUdm84RmNndktqdlFaQV9uZnB4YURNT2JVOG0xSWVKdHl3UkE?oc=5"
+          "title": "छत्तीसगढ़ में आज भारी बारिश, तेज हवाओं का अलर्ट: पेंड्रा-केशकाल में धुंध से विजिबिलिटी घटी, लाइट जलाकर चल र... - Dainik Bhaskar",
+          "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxPVUxKc1BkR1lGblJyRGZ0bWNWLURCbF9MMDE1NkY4b2ZkZG1RUmRPdmdmV1FTQk13NkF0TWlZLVE2UFd6eE1Mb0x1dGtEOXFTX1EtZllKcVZFbFVya0xoSVZWejlSck5BV19YcDBERjRBSnJYbFVldEFQWnZzeWRoUG5VbzRYR2xUWjlRX2hESGJyaWk2MkZiMERqbTFacTRNaGFVYzhvUFZhbzdwTThsMzJ0TGJaeDBacUZjc1ItU0xnemF5TERPekRhMk45WmtMdXVCMtIB2gFBVV95cUxPQnh4QXQ3TnhQWDNxT09jemlSUUpvNzNSQ0xNdklXS3E4QmxNTzgwaWRDa1lSVVg4WHJkY1NGbHZic2xGMmEtcDFQZmVweTBIQjdMa2htcGQ1TThockhaZGEycl9QTy1hWWdBYlhyVTRKVVJpUnFJb0JFa0pwd19lckhOb0YtS1V0b0dCZFhJYmpITjBBMEN0ZExoa2dwRzQ5azBuTnF5Y0lkanFLSWdYTDhVTjhHbTZocDBEVVN0YlhIbWJwVVdWdTZpRFdjRHhmQXdiZHBZUkJfUQ?oc=5"
         },
         {
-          "published_ms": 1795219200000,
-          "publisher": "Dainik Bhaskar",
-          "publisher_url": "https://www.bhaskar.com",
-          "title": "पीएम स्वनिधि सम्मान में छत्तीसगढ़ को मिले राष्ट्रीय स्तर पर पांच पुरस्कार - Dainik Bhaskar",
-          "url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxQWGJ0Tm81RFVnaEdkck9CdnBNVF9NU05UT2JtS21oaFE5SDFjTUx3OUctTjRfQ1JhWjV4dU1vVzlVQ0JRUXN6bHY0R3BGLURtTTNzYkJZM2dRRDdmSWd4VFdSR2c0cjAzODlqWHg3dHVIWFdDdzlKM0x1UlVRZWs2ZE1leWhCNTAwSEU4Yk9BVTZWZmI1MkVqamlSWmxqQjNWOUl5NS11QUZ5SlFPMVBjV3JwTlE3ZmVxWFhfWmszOWlXTmVBMDdCOVdUWlU4aXI3V0RSRFlkd185bFJ6aUZYTNIB5gFBVV95cUxNLUlxZmwyZmgycFI4NXA3SVh4ZzlpU3YxRFFTa08taEdoTkdEeVpDQWplSE1yOHZaNVNNR0RwNDdwMS1vVjF5dkFjMkZZaWFsVlpKSWRNOGZ5YW1LNGI1aUs4VXNNeWRqVjhodVNoNGI2WWlJZ0ZnVUpJZTcwbG9GSWtjTmNCQnluT2pVVDZmQl8wNFNQSTVOWnRINk5WMUxDemstTDlBSU94b1hCdzVnc0NROVBlNHFIQjEwTU1oLTBMMFVibFNmMVhkYWpxMm5xbjdLYWpyYlY2akFFZzQtVmpjd0JQQQ?oc=5"
-        },
-        {
-          "published_ms": 1795219200000,
-          "publisher": "Dainik Bhaskar",
-          "publisher_url": "https://www.bhaskar.com",
-          "title": "बेमौसम बारिश: अकवान चक्रवात के कारण छत्तीसगढ़ में जगह-जगह हुई बारिश, सक्ती जिले के बाराद्वार में सबसे ज्यादा पानी गिरा - Dainik Bhaskar",
-          "url": "https://news.google.com/rss/articles/CBMingJBVV95cUxPU085NFNjQ0RxbVY4LXluTXhOQWdvYmd1MGxJbGcxbWpNblprcjdQNnhuYzg5RF9ISE9VNFdPdTR1ZVAzai1BWl9VTEJyUlZLZUVzd2QwRENadEwtZHdpQ3dway1KME9sYUZjczdjMVVMZTg5RExlVnZUaG5yTlBvMUtMWDV5SUFaaUNQb3Y1Rll5U0hNTFlnMHhQXzE1UjBMNFd4VzVNdmNvWGRRT2J1TnBPc2NkSXhsVUFkS2tDdGxBbnppeF90UW5LQnJfYzBjNjRPQlgwVC1GSTA2SnYyU0w2dGhNNHdDUzlwOW9iN1psMnlDelRsLXhmM1NOYm51eXJyanZZb054NVZNRTJnRHJ0bFRkMmxydGFicHFR?oc=5"
-        },
-        {
-          "published_ms": 1795219200000,
-          "publisher": "Dainik Bhaskar",
-          "publisher_url": "https://www.bhaskar.com",
-          "title": "नया प्रस्ताव मंजूर हुआ तो होगी परेशानी: मोतियाबिंद-दांतों के बाद 1 दिसंबर से निजी अस्पतालों में सर्दी-बुखार... - Dainik Bhaskar",
-          "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxNSnJYdVg0czJ6RkxSSEhYUEZZN1UwWnlzNVU5TnhXRllLLUVNcGZZYVp1YkR4aU5iUXpmbnduSmVhX01yWVpVdXU3V1BZODJJTjJjN3JnQWNfdDNaVWlGbFFaRklodVgzLVRnUXpYMEg1LXNNM3M2TVFfUUZBbm4tdXc0djZJMlgyc21IbkU0MlA5aEZkMTlOQkNDQWtLRjhMVi1zNUY0NjluWVFZdlB4VE94ZWJmb0ZEZFNrb1lycFByV0ZpeHfSAcsBQVVfeXFMTm9McmtaQ3dEbTlCbWpXcDU1YWdkVWZ4bE9pZExJWlVkeU4xcW9TQVUtM1NOX3A4WW1OLVN3eDA0d0tsejdRRXMwSzAwbUptWnJLT1k1bnY3bTY0X3Y0SFdfUzg4N1c0R0JaOHRtVUJXQlJyd19qNHJIOVJfUTZwUlpHSlM4Y3ZKLTY2bGZQdGNKQXAtLUlrcHNESF9JN3QxOWJKRlBac3lzZUllMnhZQUpna0JzNGloRDBLT0JycXNySkVvOFg2U1RISHM?oc=5"
-        },
-        {
-          "published_ms": 1795219200000,
-          "publisher": "Dainik Bhaskar",
-          "publisher_url": "https://www.bhaskar.com",
-          "title": "दूसरे राज्यों से धान लाने पर कड़ा पहरा व्यापारियों-मिलर्स को देना होगा हिसाब - Dainik Bhaskar",
-          "url": "https://news.google.com/rss/articles/CBMigwJBVV95cUxObUhoc3Q0MzRhVEZCS1FxZWVjeHd0cU4tRjZ5LU1mMnBiYUxRd055TUhKbkZYcnRjRWlVZzFYV3l6OHk4RVdRdWliclMwVVAxMWE1OWRjb1lBdlVtR0dRaHNlSDdtMnR1YlNFVUZsMkd5Mi1haUtEdXRNQ2cyYVdUd0hEeGZnWWdHd2gzY2FhZ3gxOVdPMWdIbk82aDIyTjdNYlFlYV96VUFPZGVLSXAxaE45eWRmYlpCTUlJby1mTUQzZEtWbFBUQ08zQk5YVnN6ZXNtTFNHQnVKdFk4RVR0X3o5Zk1WRzhYWXN1QU05MGUwbFZtOUljSkUxYi13YWlSbUVN0gGIAkFVX3lxTFBiUFVoM2R0UnFYWU5yaTgzSmE2T0JuQjBFTXJmOGcwd0lOYVhMWERDbmFWZTVXTHpaNmo3MXM4aFhqX29mYVMyc0lOUHZ1MmZtOXI5WEZNMncwQUVpXzI0T2JBMUIwVndjc1FBblBaWmdKcl93MHJIRTFFcHAyZGVhZExfblpwVjdaTDZ0bDN0NkItUzZWU2ZHU2dwS2liM0U3ekdneXJLVUpaY05hdWExRVVNNkZlX3NHSVd4TFRkaDVmV09iNEFnQlJ1dXhURzdsSVFCT3lKYzZndDlPbjYwWVVYUS1vRnFZWUJWMFR4alMzTGM2TGFmb2tUckdHVFl2NlpWTnZDRA?oc=5"
-        },
-        {
-          "published_ms": 1795219200000,
-          "publisher": "Dainik Bhaskar",
-          "publisher_url": "https://www.bhaskar.com",
-          "title": "परला के नए केंद्र में रामसिंह के धान से हुई बोहनी - Dainik Bhaskar",
-          "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxNTVZ6MXFLc0FmYXVLdU1aWld5aGFSNmZCcDIxZ0o2UEJwdWVaTElBUHdzckJnMnZPa1dYWXJBVWFMSkMtSXR0UFdad1ZIN19WRVNJVjRRNU9DQTAxcWNGZzBnNE1CV0NqZFlrOEJvU3dBb3hfcGhGVmRra2VubGpGREZZWnJndFc4VzgwOFdwZlpzTGgwZ0lfQjZhQXVRb0ZJSURabHFCZDJzQmI3YmQ2dmg2SDltWHhhTDRwak5HYzdKMVpUUFHSAcsBQVVfeXFMUDJSV2dDX081cnJPazlJNlNXQ0JGWlZnV0RvTFU2TFVhal9ob1JKcVVWRnZBaWVQTGJMR3NRaHdhc2cyOUNzZUJfcWduOVBrUGF5TGVxQW9TMnYxLUVacFNuYjQzOWRKOWRFYmdoNmpRLUswVWRVbEFOcGViRVZBTkY4LUh3bHAwSUFhX3VORWJQOS1KUHVfbmdOZFZvN0NkaVJUMl9SSGktN1lGZTNJbHhoSXh4ejlHX2hxT2Nxc3o2VVBFUlZzRHREWEk?oc=5"
-        },
-        {
-          "published_ms": 1795219200000,
-          "publisher": "Dainik Bhaskar",
-          "publisher_url": "https://www.bhaskar.com",
-          "title": "आईजी के निर्देश, पीड़ितों से संवेदनशीलता पर दिया जोर - Dainik Bhaskar",
-          "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxOMk02OE42Q3FrT21uY1NZRTNiZjZramNFYVk0bHpGTVhCUEE1RVEwaWdOb082UWlreXVmSWtxTXlYZ0w5Y2l0SXNOckhwOS0zRG5YUWk2VG1BUzdIYTZsR3RFQ2RKUW5PV0V2c1Y2b19qS0xNUkVhVTlDMWEtZTlna3ZyMmVWQXpNeDhQSEdiVTl3WEJHamFvUV8yWFJ5R1EwTWxDVlktdGFHa0xQbGRhSEtTUUtUQlFCQ0xRSHFpLWVoY19NaURjOUNMZUQ3Y03SAdQBQVVfeXFMTXY2dVBISXB4OVRKazB5MnUzYjRlZ1VoNEw0ZXdhbUhEOXF2ZGtFdVVmRGE3d3VIdURJR3JuYTBPNTlpcVVKV1FQemo2d05fTUN0aHZXdG1lRUpUZXFNbkhBeWIxYXNJQXdzUVJ2MEJmM01OTUswQ0s2MWlmeXlQcmZxZWdobUp0Y3VOVC1sSnd5czVHQzBSRGQta0tCdWZIS21fMTY1eW5EV0xadkV2QzRfa1hLM0FpZF9uVkhsZ29FY0VXeTBENjhSTHpQYmF5MUJ2Mmg?oc=5"
-        },
-        {
-          "published_ms": 1795219200000,
-          "publisher": "Dainik Bhaskar",
-          "publisher_url": "https://www.bhaskar.com",
-          "title": "60 गांवों में घर-घर होगी फाइलेरिया की जांच - Dainik Bhaskar",
-          "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxPZHp5MnNuRnZvV1Y3N25xR19kLTU1T0ZtamdLbkVTc3JVeXJGOXljbmhEZlZKU05UVU5aVFJua0RzNFplZWYtd3lfbGdROFJ5cmJ3YlRKeTI1MF9mQ25vYmtXc0dRMkVka09uVnhCVEQ4dlZZbXYzU2FISVQ1X0dDM2ZVdk9WWkRkNzBzMjJ4UWsyRUc1dktROFE4LTdWdUhxZ2JqX2x4WlkzUFNPSWRMS2lyMnZkNjJBZm1DUDhmVDlmVllWZFZZ0gHMAUFVX3lxTFBjSHMxX24yTjZ4MHluUl9ZSU1NbHpSWGdSdGNwQmpJd01iLTFuU3pjRkptek9sUjBUWThEVFZsM2JhTHhJdWp5NnlKeFNiVXd2VlRtQmdtMTNOZkhISkRCRVM0UEtPUDZ1ZkNmRV9NOWl2MkJDel90YmpoZmtSZFFnTEwwWk5mWFRrNzloZW5JVnlIaDlmdGpoaDVQTEFQMHNMbXRvU3VDY2RadE92SElFZlQ3eWhxem5SZnl1WlZGN1dON1dMLUM3UGlGZQ?oc=5"
-        },
-        {
-          "published_ms": 1795219200000,
-          "publisher": "Dainik Bhaskar",
-          "publisher_url": "https://www.bhaskar.com",
-          "title": "खंभे के फेर में बनाई टेढ़ी-मेढ़ी नाली गुणवत्ता-जलनिकासी पर उठे सवाल - Dainik Bhaskar",
-          "url": "https://news.google.com/rss/articles/CBMihwJBVV95cUxNRzI2d1pLOGQzQXhaSy1wVl81Y0pyREprUW83ZjhWOXBfb1BsWjdENUI0VjV3ZDFNb25sa1c1THhWZ05sYy1RM2pyNFJKN0ljM1BGb2VKMlNWWkZ0VTMydU1uZWVKR1FGUHNiV1ctUFpnZ21BbnFLWW43c2ZJLUdfWE5RWlRkbE9GdjNCaVVLdVgxTUplV3hwRTBWd1RSNnRwckZBWjFmVEh5N0pnWGFMNC1nRjhlV2RFVmVxVlNHSml4UzlSdGtWWmlkdnFyN3o3SVRSUDdLUjZNUWhtY1k1WElSbEJRakZsaGtzaFNLa29CTVFERWRPekVqcFcwR2NRQ1ExV05rRdIBjAJBVV95cUxOc0dTeXRUQmpWMzU0YXY1dXhJTWplY19nclZiMlBxcXptNktycmlMS1NDU3BwNGhob2k4OEhKVjNkTnFaZTFTd0hWOUtzWWVHZWg4TGs2YnQ0S3VQLWJ3M2szNEZEVVBRSjF0Z2xRVXlJaW1xOTVPV2hSZmZzRlJYZm1WZjcwZV8wU2xBU2MxSTNjYjB1dnFMSzBQQmN0eTVmN3BlTkdNdHZJMnBfWWd1dG9jcVI5Nmo2ajU5bmRUbm1IcVVUNW9sbS11Wmc3MTdVZ0dLZ1R1dmJLTlUtOFpfXzJrWlpQTV9iRHh0cDk1eGk2Z045dDVOUGZTOTd6V3JheUZxb3NhNmpDWG1Q?oc=5"
-        },
-        {
-          "published_ms": 1795219200000,
-          "publisher": "Dainik Bhaskar",
-          "publisher_url": "https://www.bhaskar.com",
-          "title": "सीजीएमएससी में डॉक्टर को महाप्रबंधक बनाना नियमों का उल्लंघन : दीपक बैज - Dainik Bhaskar",
-          "url": "https://news.google.com/rss/articles/CBMi7gFBVV95cUxQdUsxbXBDN1h1RF9Bc09ZQklkMlEyZWZlTDNZelA5WDhBV2tMYjZhZ3RNdklnVGdfWGFYTXhXZnRJaW1OQ1ZWeTRUZUQ4WUJLSlItcmRja280OFh2dDM5ZVBLTFY5alFlZHVTSlBVSVNxOHdkLXc2S0FRbkZvNTcyLTdnUlYxam5wMWUxZEtXWnU4QWVidVNmeXpVVE1rcGpBbE4xNFUzblZsNkc4TmQzVk9LTlcxX3A5SmRBZFppRzBROUlJN21makJLM2FTUDIzSlk4bDQ3MkdfMGxuTHRhM3E5eUd0MHZMNDNFd3FR0gHzAUFVX3lxTE1ydGtRdzRYSkZ0dGFzNm5zaC1qdHVFa0MtT19EREtfbG9HREp0azBhWlBPZV9rcDN1bWdSOHVaS1FkeXZnbGt1X25XVEJoNlExOGhGRmx0U1BfSTk4NTNuU3VPR3VwYVdQSkxGbDNERUkzZk9vaWRqMUJMTjNqTjduNmQxRjE5SWN1dERFQmJVSmZtdzdMVHFTeWpLbHo5MDRfWW1JS0ZDRThzVUx4by04MUp5TjVEcW5kOGFqYlhialpBNTBYSjAtcVFvNnhRdmlybldmTDNZemZXZkJRMl8zMUhOc0ZxNVBQMU9RY3pGMVJJaw?oc=5"
+          "published_ms": 1795224087000,
+          "publisher": "News18 Hindi",
+          "publisher_url": "https://hindi.news18.com",
+          "title": "MP CG TOP NEWS: भोपाल में इस दिन होगा INDIA ब्लॉक का महाशक्ति-प्रदर्शन - News18 Hindi",
+          "url": "https://news.google.com/rss/articles/CBMioAJBVV95cUxQT0pJdFdpaW1NNVNkUzJ4RXVXaTF4dFdCUDZfaFBGN3VyWV85dE1JY1d0SHV4aFdxY3JIV3BaMDd1QUlWdDhrNUl3STlFYVNsb2wzV1B6QXhjMGhPRGtrd2Q1T0tERHRyVm9xX3NuUEdua3dpUjBhSVlTNmhEdHltcUg5bk9XN3VVX3FtMlZjU1hzdWZvc28teFh2NVFYYnNjVW5DQ0tHbWhZXzZBMFY2TDREeEd5cHJFMXNfZEVpVTlhSVBGbkhBU092WV9MTGtxT0o5bnkyWEVlX3FMWm42b3RfWUZNd0pMd1lZWjRuNVBtenBjYlpRS3k3VGcwaXdWRnFBVjRZWEZmTHhVRFBCVzZ5NE1FUFlLODcxblVLSkbSAaACQVVfeXFMUE9KSXRXaWltTTVTZFMyeEV1V2kxeHRXQlA2X2hQRjd1cllfOXRNSWNXdEh1eGhXcWNySFdwWjA3dUFJVnQ4azVJd0k5RWFTbG9sM1dQekF4YzBoT0Rra3dkNU9LRER0clZvcV9zblBHbmt3aVIwYUlZUzZoRHR5bXFIOW5PVzd1VV9xbTJWY1NYc3Vmb3NvLXhYdjVRWGJzY1VuQ0NLR21oWV82QTBWNkw0RHhHeXByRTFzX2RFaVU5YUlQRm5IQVNPdllfTExrcU9KOW55MlhFZV9xTFpuNm90X1lGTXdKTHdZWVo0bjVQbXpwY2JaUUt5N1RnMGl3VkZxQVY0WVhGZkx4VURQQlc2eTRNRVBZSzg3MW5VS0pG?oc=5"
         },
         {
           "published_ms": 1795206600000,
@@ -226,65 +219,135 @@
           "url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxPdDBUM2p2VUo3V29HZEQ4WkpPZXJtWEZuNGdvdnpTMDhGR0tlMFNFMDFfSUFuTVAxLWhMY05qdldkVlBrOTJlY0c3RzBUU1ZqM2lJZzZJVzhOMFNyV1JmOEt3dElnSWxmSGpCRUVEOVFlbjlfLUVEYUwwdGUya1RqTjJVVVpRa0xCVHBSOURjNzBSaHE1RS1SVk5qT25CaDU2RkpXYzlUdGdiZWJDdTdIQVlpNmRSZ1BCUUJFQWdQenVYM21IcnhJZDM4Mk5xU3ZQMDVYSHFn?oc=5"
         },
         {
-          "published_ms": 1795197960000,
-          "publisher": "Jagran",
-          "publisher_url": "https://www.jagran.com",
-          "title": "छत्तीसगढ़ में आयकर विभाग की बड़ी कार्रवाई, 225 करोड़ की वित्तीय गड़बड़ी उजागर - Jagran",
-          "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQWWVCMU1jc0ZHYm1FaHM0UVFQU2hBcVNPOFJyNHNPdUI3Q0R5Y01UQXhyYjJwMFlzTjBHRi14T1QtUUpIcjJoRUhOT0ZYNndyZjU5cTc1OTNqbmtZZHpWSDlRZkgzZDBLMEMyb1BpMXFDMGJ1al9zZ0lWSWtJMGd3LXQ5ajRGVnllVWZKN1lEcjRlNFhEVktjdkZnSm9EUm5naVo5NUJPOEExeEVSQXkzbzdBLWZjcmRUWHc?oc=5"
-        },
-        {
-          "published_ms": 1795192224000,
-          "publisher": "Dainik Bhaskar",
-          "publisher_url": "https://www.bhaskar.com",
-          "title": "छत्तीसगढ़ में स्पेशल एजुकेटर के 38 पदों पर सीधी भर्ती: 20 नवंबर से आवेदन शुरू, 5 संभागों के संयुक्त संचालक ... - Dainik Bhaskar",
-          "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxNS29UZFVZQzVxQTNaVlRaZEJiV2RZT190NmZRNWNjTkppSWYxTlIxS3JPaXljMF9UVTZia1VJSDItc3lac25GSnRxWWVwTldKUVN5ZWdtSllTdzM2ZXNFNWZGZU94b1h0S3gzdzh2LVJSZDZSaVdsLXVQSkF4bU1kQWZhbEotUGgyYVh2RHBLU0VHcUdIQmVHOXFnMVZQYmtDbXEtdDRuYkhsQXlJYUp0VTdNVTdFNFpuaWV2Nlh0c05sWkHSAcgBQVVfeXFMTnRIb0hTanJkSjNlQ0lnV3RjRXFLMXM2cldQVFp5Ml9wTVAyUk5lUk9qY2w3QzJpVnV4RTMydTJBeVdIWElWSF9vUllnQ2JpU1VDMzRBR3ppUldPczhTSWFuNHN6dExBYnlrVUNwUThjeHk4UG1uT01BZ0otVkFzREM2MEkzUHJIbHZ0MlFCR09pTDB4SU9JVTR6b1gwMVdSOF9sa1ZkMkFiZmdmUTlHUXlIVmwxY3FoZHE2X2Mza3VsWi1RcmRaX3M?oc=5"
-        },
-        {
-          "published_ms": 1795187640000,
-          "publisher": "Jagran",
-          "publisher_url": "https://www.jagran.com",
-          "title": "नक्सलवाद के साये से समृद्धि के उजाले तक, भारत मंडपम में दिखा नए छत्तीसगढ़ का नया चेहरा - Jagran",
-          "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxOeVNZWGZtVlRvTFZQT1VOSFQ0eDdQdVJUWnB1UTBkWlJZTFB6M2VfX0dUbjZFVGs0ZlBkU1dETWx1b2prWkREN21iSUJ3cWVoaDk5SnQ1WGtpbmFvMmUydzc5M1NjUHA5ck8wY0Q1MjNuOXJqU2E3Q3JHcmhHUWRsNnFUWm02UUJIVnQ3ZmNKTlVUS2R5UlJfV0c5dWwwX2pkOW5ZSHhzRURremlCcGZtN0dJV0htcGRmVGJWMDdRMA?oc=5"
-        },
-        {
-          "published_ms": 1795182654000,
-          "publisher": "Dainik Bhaskar",
-          "publisher_url": "https://www.bhaskar.com",
-          "title": "चक्रवात से फसल खराब हुई तो सरकार देगी मुआवजा: सीएम साय बोले- किसानों को चिंता करने की जरूरत नहीं, कलेक्टरों... - Dainik Bhaskar",
-          "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxPOEtHdkE3dmd6TFRDWUxrY2VrSUk3emdmQm81Q0I2NS1PQWxZcXpHOVZNeGNSc3RFWXBmZHJXUnpxVjV3UE1EWDRDQ2JCUng2cmk4ZjFubjIwQ1ZNV3R4Ml91YU94cmdjenRYRDRLLVZWdzItQl8wN0FfUko5UVJtOTlsRENZN2hEa1A4UnNuamVkdWxFRmdmdWRIQ2hRNWdyVEJLZTg0MjhuS04wdWgydTFNb2ZMTG13bGlHSHY3Vm84dHBFMjZzZThTR0JLLU5OdWljTtIB2gFBVV95cUxPdnhnS0ZZNUwxNDRFY2dsd1ZoNXVWdFhwQUhvVEYyRDVYNkRzZ2xGVU9YblgyaDdzXy1uQjFhOUROTTRGU1dQZS00dE9wVmdLekM0OGR1U2toOFdEelo1NXh5eWtPdFdoNXdhalMtWlRHQXhLZE5BZVp4MzhXOEk5WXFZcVA0cVRPd014OUNFNkUzUE02M1pQWTNPTkE2NVpKa2o0dW1raXdUdXo1OEJYeks2S3VCYi01UF9qd3UtRUZseEpqZXJ2QktjUTg0Q0RjcUt0dWN1S0RJUQ?oc=5"
-        },
-        {
           "published_ms": 1795181121000,
           "publisher": "Dainik Bhaskar",
           "publisher_url": "https://www.bhaskar.com",
           "title": "छत्तीसगढ़ दिनभर, 10 बड़ी खबरें: घर में मां-2 बच्चों की लाश, 1500 किलो पनीर जब्त, CM की पत्नी की सुरक्षा घटा... - Dainik Bhaskar",
           "url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxPenRNRmRCbjYzZDFKZlRpZjZtcGx0MXlfMGV6cklxeS1LWUJBd0hSRHJ4RHJNaXJMeFFVbW1qLTFHM0pGZ3R0MGhWSnhncE8xdV8zcUkwMzNneVVkMHp0SzdXSTZxNjUzS3drY1NaN1dZanRrUG5VajVoWEZxYkxCczY1a0VKbkx3aHBOZWxaY3RlSjRUR0FTRmhHQXRXWWVjbGRscEp5MlJCMEw1dU5MSHJ0SDMyaXhtQ3ZHRkVOS1ozZS0tR000OEhjUG1kSzBDQ3U2OWMwWHrSAd4BQVVfeXFMUHREOGRSOTR6UzJzYkxiRGtWRTJDN211NWU1VVpFMThsM0VON0NnVzhmcEFwbjNOWk1NUDZlRGtKdXE1RXVKa2xIbTZydjVLMXFQWXdPNVpKVE1NaWM4eWoyVzRKTk1INjZhY0NqaElacU5SRWhWRWdrc05NclNvcVBsV29WMWpfcmJkR3ZtSDduYlBDVXBwa09aQllHR3FLc2Z0c2lxVHZFdkRzWTFiVzNMSWduSmZJZHh4MHJBYkd2VmpvVlJ4QmNWNU9XZlRLWjlIbkdJUFNZOEdlZVF3?oc=5"
+        },
+        {
+          "published_ms": 1795156767000,
+          "publisher": "Dainik Bhaskar",
+          "publisher_url": "https://www.bhaskar.com",
+          "title": "कांग्रेस में बड़ा फेरबदल: छत्तीसगढ़ के प्रभारी सचिव बदले: छत्तीसगढ़ के कोको पाढ़ी और नरेश ठाकुर बनाए गए AIC... - Dainik Bhaskar",
+          "url": "https://news.google.com/rss/articles/CBMiygFBVV95cUxQVGRfWDZhYXp4SnA5UjAzd3l0SVN5ajJ4eUY2aHk2bkZKWko2ZXZXTFNFZEhaMnRaR1M2cFFNQ2gxV1E2bTVTVVM2RG5xWk04TVh3R281MVhBbUxReHBQMGhOaFNPeUplZG1SY1BfX3ZUeDlnMi0zUmhZZGRxOEdQbDM1ZVBiYVRvOW84RkktUnV0dU1KZFEtUzV6SS14X1U1YzZCaEZLS09YMVJUTzl3dGtXcWxZallEcGZoUE53U2ppR0hka2lzRkpn0gHPAUFVX3lxTE5VWnhQMzdyVE5fNk9BaVR3ajBWY19zOVBWemx0Y1JTbE51NHBvaW9KTWc1SjRtcUR3VXpWUmxlcmg5TUhIZUhHd1JZc3UxVTI2bkdWbWZLeHoydGtRRTRxYUNXUzFxMktTNlExNi1YLU41TlV4NXpKa0VRX2FIMUpxdHo2RUQ2LUdSTjlsVEhyTGEzV0RuYkMtLUtjVDFsR0pWRXhHOHhoS0Qza0pqRmpPQ2xZd1JqVTRCNVJ1WlJlZjdpWUlfNkFDVGx4T0dhOA?oc=5"
+        },
+        {
+          "published_ms": 1795140508000,
+          "publisher": "Dainik Bhaskar",
+          "publisher_url": "https://www.bhaskar.com",
+          "title": "सौरभ चंद्राकर की गिरफ्तारी पर BJP ने भूपेश को घेरा: कहा-बघेल की बढ़ेगी मुश्किलें, पूछताछ में खुलेंगे कई राज... - Dainik Bhaskar",
+          "url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxQeXp3U0EzUGFDNE9xZG5aQVRITllTaExBajZnUEVPV2tiNzVxQUZPTWNiV2xGZXl0TGxrclNRN0FBTWp3T3hiX0c2QmZkMW5uc1NSSEZ1QktuXzhYa01jY1ZleUdfQlZERUZOMUE5elZENFcyMTRLUWV5NkV6cjMxdTV4UWxzZ0g2QnFYYmJtdTZ6dVFTU2wzWS1jSDZORTZscHQ1Ulo0OEpVUzRHQnIxXzBCLWFUNWJheFJSVk1ha3EtanZicFVXREZJV2trb0d6Q2Q1ek1B0gHbAUFVX3lxTE5yT2dFMlNsOWpoVjIxZFlEVW9TWUtPbGNTZE1CNUNnTzJuSEtPNDhRbFk1RzB4ZjhSaXVtRHFDNXkyaTF5Y0g0X0hQWjlwSl9ndzBoMkFyNnRyS1dPME9sNWd5WWh6WVQwbjZMVkhHdHJrZG02SVM1ajFsU0tDVDhOVVpzZGNzYlpxZUVkQmFhRnNXMEQya2FZd3NjNllVU2xFV2JKdlZVVm81ZlhtRlY5UFlERk5PT0p4dWxGZzhudVJSWWd5czN2dnlKT2hKNUV3c0RwVFA4TnQ4bw?oc=5"
+        },
+        {
+          "published_ms": 1795089985000,
+          "publisher": "Dainik Bhaskar",
+          "publisher_url": "https://www.bhaskar.com",
+          "title": "रशिया में फंसे-छत्तीसगढ़ के 2 युवक...आर्मी में जाने का दबाव: दावा-टेलीग्राम पर नौकरी का ऑफर देकर बुलाया, ड्... - Dainik Bhaskar",
+          "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxQZWItTjlrS2xjQnVlaWtHR2lKVnBCUm9yU2V6VElZSlp5RWN6LXZpRjVsWWVVLW1wYXFXLUMtSlpQdDNZX1FvOF9Bbjdic2Z2UnktVllPeUEtbFB1VlpNbTljeVV0aG1OV1ZrcFJibWFKMGJSVkZwUUJuVy1PaXB5X25DYzRsWGo4UVRzWHlqRW1LNVZDaDhwcnNPLUJGUzhiRERRLV92aXZrQS1kTVN2NDFSRnM4OW5FaUtxdUt2dlJ5VHBGckNaWkQwZ9IB0AFBVV95cUxNVW81VGM3d1VFeDdwUGFhUFhKQjZ4UGgwZVEzX0w2M0g2RWpOQUQ1bHRtZWJ2Y3NhRmtLcU9QeThQRWF6cFNkTmQySmxyaHA2VE1YM3k1WlNWVXBUQldncVZpeUstM1M5cEZLb3dTMkxXVVlXSWdCMGdsbzlfQ2Q4ZnpZOUlkN2E0Y0U4c3BLX3hwNmV5X3hBU2FNTndmVWRCRF80OGY1cGQ1LTE5REV0bzZ5U2NnRFdvai00bElEUkJIVUg4azJlQTVrR2pMTy1i?oc=5"
+        },
+        {
+          "published_ms": 1795082716000,
+          "publisher": "Dainik Bhaskar",
+          "publisher_url": "https://www.bhaskar.com",
+          "title": "कुम्हारी में छत्तीसगढ़ का पहला बहुमंजिला बर्ड टॉवर: 80 फीट ऊंची मीनार में 768 घोंसले, 2 हजार पक्षियों के रह... - Dainik Bhaskar",
+          "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNS1ZPTlNzdnVKQWRnRGJybG1XcFRUUnZYTnFLZFFreHJacmpGYks3VzRKZlVwTG1Pcjg3cE53clRYTl95MDM3M3poOUFsNEV4OXBvNnM0TXEwTkdNZVpwblVqem5XWDdEMTNiMXFIbGxuMXk5b3ZZSDNVeFVHNFlOQVZRbkJxUDJxM2ptNjZDT1JHUjBrblluWmJKUnZTZVVIaUxEbTg5U0V5R2pCSExmNHFzRmxiRlFnOUE5MXBhZEF2QmtEdWJZRUgwY2hUYXpEYTdZ0gHYAUFVX3lxTFBHOFpfV1k4SWdsbU1ZWjdxVlZ2azlMSkZoMTYwbVVsMjA3ZXhnelh3RTBENW5KT3N4cmRjeUJfM09QRW9lV2Q3TzdKYjJaSFU5bERORmpqTEpIZXctV21LM1dmem1YbFd3N2FfXzZfWHFoQmlTTk1EMVppblByczVmdW9SMGhVRkFEcVZLOGVFdWRiUHJFRDA0bnpxSTV0b1lvNi0zWnU4M0pxUlYzekhVakNlSndhN3RicXlFcnNldVdLcWJMVmwwTXhzdW5fbi02NElGTnpEeg?oc=5"
+        },
+        {
+          "published_ms": 1795076614000,
+          "publisher": "DD News",
+          "publisher_url": "https://ddnews.gov.in",
+          "title": "रीजनल कनेक्टिविटी को बूस्ट: दिल्ली से सीधे जुड़ेगा छत्तीसगढ़ का बिलासपुर, 3 मई को शुरू होगी उड़ान - DD News",
+          "url": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxOMm1nX2U3V2pDcVAxeWx2WDZUeFd3bnplMnJUNk1GSzF0YzVlakZ3Umh4X2RyNm9nM05LaGtaVEFuRDRLSmE5d2RhcG8xUGI2a0h6VnZKMklKM0FOaE92bG5KTnNhODFHOERkQVh3a2VhS3BZWkJoOGJzeWhiemFJc3pZQ1Uyd1VuNUFJZ2xHNy1UcW5udmRsUDBwVF9pRng4M3RaVV9EWFJTMlNZQ2w0enMzT29jMmRhSV9LV2xUaVM0ZEwzOUNLS0trdERPMlZNdFoxd19iRQ?oc=5"
         }
       ]
     },
     "breaking_india_en": {
-      "fetched_ms": 1795227910811,
+      "fetched_ms": 1795259818436,
       "stories": [
         {
-          "published_ms": 1795226654000,
-          "publisher": "India Today",
-          "publisher_url": "https://www.indiatoday.in",
-          "title": "Look at India: Trump slams US central bank for high interest rates - India Today",
-          "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxPYUdnY2dZNHp0QWRNVmtId1Q2TnRTcFZqS2RWWEg3QnlLVkRzRXVsdFNTTnphN3o1VjZRSFNkWWJiVXdZdTlGUGNPUnQwNmFiREg4VlBOa0ltUmd3TWdTZ2wzUFNTaW9xRGZXRml4WXZxVnc3VV9xQTAzMm1qbEE4OVF2TDY3akVVV2xld01QQXVQdVk5OXJWeHVYczhVNzV1QUtHV3VOTFdfblNteDhNSy1oT2pCeUpzbEVUM0U0ZTR2c0l2V2d2Nk45YWYwbUHSAdQBQVVfeXFMTVlKeFd1clEyMVpzMHozRWNfRFZod0I1SHdPdjEweVE3UFFPMUF2cUJTRm5xMGV5ck1hVUZNUVJpVEVqd2NvOEhmVnFoZl9QWTE3Z010d05xaDFRWkVrdVk4M1NKLW5DRlA3dW5zX3JOME4xdU1FeUt6Z0UxVFRjalZUUDB1UmZ4S1VTeFAzQnNqT3BySEVKWFE0aGNrcjd2ZXllWHh3TElLQmd1Z1NQQU1ZQ2lZLTl0SE9YU3Nudm5JM1VnNW5yblQwTlFsaG1lSEppZE4?oc=5"
-        },
-        {
-          "published_ms": 1795226460000,
+          "published_ms": 1795256880000,
           "publisher": "The Times of India",
           "publisher_url": "https://timesofindia.indiatimes.com",
-          "title": "Gukesh-Sindarov clash puts India-Uzbek chess rivalry in focus - The Times of India",
-          "url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxOeW56TWtNOFZNakF0bFh3TFdfZWZ4MEtjUHhRUmtmVnNNNUFwNVIwN0Zsak8zamt3VGpLbnpCVTNyTWowVlY3WXl4cnFVREdvQ080RUdDNXRTQlJ1bG9fcEpoV0lFZDJ2T1hXS0VvZk81WlktdUdCQ3hycnIza2I3SFA4ZWR2M0lUaDBiOV9uT3B4ZUZQeDZCVVRmM2hWcWVkQ2UxdFYwa253Q3lqVnFqWGpjRWV6Z1ExYk5wcjhJd0trblV6UW9xeE9QMWo2aTJQa0HSAdcBQVVfeXFMTnh3TFh1dGc1SDFYUWFuazZBLUtYQjdBUXVPTHBHanJCakZaN00xX2loZ3V5NUNhNzRudHV6ODNzdFdiczFlTTgwZ1VFMGJaYV95Rjc1aVl6MUNLd3d2bXBZbl8tRkVGeEtGcDBJVm9tanpuWXNINXpnVnlad1UwcTZaV0ZUTnNoUmNuOFlkb3ZTZUxrX19lQUo1TUdhdXVFU2hZRkp1SmRVV2NMb3o2bURQWDhERTBWWG5KZ2pvN09JQURmYVpyUjhZU1ZXSUhraXNOOUVpZ28?oc=5"
+          "title": "England eclipse India’s MCG record as Harry Brook’s fireworks power them to new T20I high vs Australia - The Times of India",
+          "url": "https://news.google.com/rss/articles/CBMijwJBVV95cUxPeHI0bUpyU2wwdXpKRVR2RWN1MmNKdFFrd3VrN2pMOUdTRTB1YVhRNUtmZ0pLVXRXU3pJRTZLLTZOaURtbzJWNFU3enlvWFFOR2NjWWNMT0FiS204RUVMN0VfSFA3ZGxHRjU1aUpPMUMxVWlwZU1jUWtnSWtaNHhCbUtvdlRPclhuMGRYWXNCNWVnWTBrVHlkUTRrcl9WckhmdnduNlN5dktvVnhnUmJGSXRkX1AyZE1xNnNwXy13NWx1Vl9tb2hOLVZ0ZlQycHgwdFVHUGl6N3VMMVpRQU5RUlJVVGtaWWpJdUIxZmMyblNINm5lVnhjUlRRdUNNS05NaTNBc0h3MjFwZHdXTWxV0gGUAkFVX3lxTE5Ub19NQXNadUtVbTIxSVN0QUlhTktIZTRJTUxPSmx0U3NOM1pfOWNETWdPU1BhRlNvNTVYSEJWM29nLWZUa3BPdVJleGF4aldhc29zZ29sWE1lS3c4aVFEenFNcFI2UENVUmZmaE0ycC10MjJqUHotdnZQbGVEWWlLWGRnOHoxdU53RExHY3JjMER2c0ZEcHlWNlB5aUVoRDl3bkhUY1FydEhpYmx6WFBNWlVHVUtjakRhWWgtY3dKYUxiUXVqVFR1cVcta2pGMTVNd0c5SWQzUmxWOVROWXlRY2hPZ2lPTGp2eFB4eDhTZkprbnQtV28zY0U3b1BQaTBJcEdtQTJRUEdVc2ctYU13WmNxSA?oc=5"
         },
         {
-          "published_ms": 1795224660000,
+          "published_ms": 1795247880000,
           "publisher": "The Times of India",
           "publisher_url": "https://timesofindia.indiatimes.com",
-          "title": "Pakistan attending SCO event won't dilute IWT stand: Govt - The Times of India",
-          "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPQWtMVUJtdUt0UmhlWUdzRzBrLUgzcE5qRWRkZ3N5Xy1qZmxJOFU0TENad3V2UWlVZVlOLUtCTGpJYnVkaWQ3aVNqTi1EeGFDTmUyanUyVkpLendFdy1PUXdoYlV2T3J2R3dXQ0NVSFF0cm5VOFRKb2hoWmViM1JrVmxmNkZKYVNkM3ZoSElvS2lBSDhHdTlkdVVqVmV5V3Q2NmVtQUxJVGcyVUNrdEZURUdxR0FkTklSV2tTdWlWa3rSAcYBQVVfeXFMTm5nYm9kbjJEY0gyMDJHeVA3N0FBbE5QT1YyZ2wweTNPS29nVEFVNWNzaVVEdzVHcjVvcDVGX21EaTAzMmdxUVhnbFhVRUVvNUtoLTloY3gweFFZZHdFTWZrX0Jhdk1Cd2pzdk9sRktIaklnaUg0a3NxaHVQa19oWkVERGFwbm1BR1RqLWN6VTBfN25GTWk0UzFscEwxT3d6LTIzZjdTRVhoRV9tbGVmMW5TYXpjVWhuMDZRVXlueGZaRzRpaEh3?oc=5"
+          "title": "CBI Recovers Cash and jewellery from CGST Superintendent home - The Times of India",
+          "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxNaTRKZ2F5VzVzUjlFdjRGWUM0Z1ZtYVh5RV9IU2MxT2V6QUxYRDhDamIyNXhrbTQxbDEtcWJJWVpCalp6ZkhYRmo5c28xdzN1ZDlDMXFqdXFlY29rUUZpYkd1WTFlNHFNR1d5ZVNXazcwTFRwNWpKVkRZZ1pkaWVFak5sLWFXaHNjX1BOVjcyNnRkQUxMQ001akNNaHhxczNzdHI1aWQ5WEE4VVFNY0lDWlV2SnZNNWJaTmZEYTFKUHl5NzBYaWFXU9IBzgFBVV95cUxPdkNYSmc5S2VTYzRuOTBhQ0ZMckplWld5TVUxSjlaZWNxZ2UzQnA1ODVwVUUxZHd2OHVaRk5zTVhMYVdwY0ZIOUkxbkZvMmRGV3VETWlWWTNFeThsS0FSQk1mTGdPcVB1bFhRSHZYbGQtMjV2LWNzYXc3VmQ1QXBwbjhuN1MtUmdGRnN4cUhGX3ZIcjlidlNtazZPRmQ0MDhFQk1BY2ZsbHhpc1hWX1dDNDd5bWkzRHF1WEs5bjJ0RUFxZ2wwTXJoNlUzaTAtQQ?oc=5"
+        },
+        {
+          "published_ms": 1795247474000,
+          "publisher": "NDTV",
+          "publisher_url": "https://www.ndtv.com",
+          "title": "Yogi Adityanath Performs Mother's Last Rites In Haridwar, Many Leaders Attend - NDTV",
+          "url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxOa3VLZ0dJZGpUUFllUXhzeHc2dXJrX09DNWNsdjUzaTFUMVdaUnFhTnhNV3N0T2o5Nm1LaklxMVc1czhycFl3b0w2dFE2ajZ3aXJ6YVFUWWU3UU5DRk0wQWwxbUdPeGVRb2FKN0t3UlF5Y2NyTEhlTldYWk1UWGE3bXY4ZFVkRWthYlh0dmU2TXN2Y2FGeEo4N0Z2NEdCRGxJcFdOVFMtZWhabnBlaHFLQmxTWDJ3Z3FOLUFieVdWYzVPVTVpa2NBUmdWUW42SWtVUV9FVEloLVpDQUsxYVVXNtIB6AFBVV95cUxQZVNBNHNjVVYtdE54b3FKd215Q1JxYXltNk9wcHR5emUzX3lJMFpCeVh5dlM4X1Jxc2c4OVBQNFJBaVY5QzFJLXBJUVktYTBQSFZjRzJLbXFKS1JoMlpqQ1pNd1JGTzZiNm1iUTBPazRmeERPQWZuMlk1RUs2N1p2ZGJqUDFYY1pLeVZ3UGFya2oxX1Q5MUxvcHhJSUxYTXRjM3JSX0pKMThoMVA3TnpPUkRjVlJ2b3FrZ2JVOW1LMmRjczJuamZPS1pfVkZNTFJYLUVWLTNXUGVsbkQxaWVGRWZMZ1lVVWJn?oc=5"
+        },
+        {
+          "published_ms": 1795244920000,
+          "publisher": "Business Standard",
+          "publisher_url": "https://www.business-standard.com",
+          "title": "India has shown it can break limits, unlock possibilities: PM Modi - Business Standard",
+          "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOOERTcE41WXF3YXFZeW1pbFNTbnp5akpDRm5NbDVnU2tsOVhnT2JaY2lhemJhZFFPNmVWc3RDNFFSNmlpa0Q0X0xLOFV0UURWdDlWbjhHOEZYQ2FuSmc1RUpOWG9tM1hlTHBvdk5jMmFQcVJ5NWN5WS1KOEZtNXBoN1VzTzZjdkczUnIzV2xlc01oWjFEQVBWenFQVzZHdncxQ3ZMVzV2WmJDYWxENFlTbU5WeG5lNklmWW1ZQkw0Smg0TVZpZ3lWbA?oc=5"
+        },
+        {
+          "published_ms": 1795244124000,
+          "publisher": "NDTV",
+          "publisher_url": "https://www.ndtv.com",
+          "title": "Latest News, India News, Breaking News, Business, Bollywood, Cricket, Videos & Photos - NDTV",
+          "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxOaHBDY3MwbzVOQkxJREhxRFpPcE5BdUtzMzg4bnRRelFWWlU1X19KeWR5YkFHWURvRXRSNXBIU1Fld1I1SFhrT3pMek5UeTBWcVM1X3NZXy1BY1NVSE9FandLRU1hRlZTWnlTWFoybHoyLUhKQzNra2czajNkMFUxdzB1dDBVMF95REdRQ2w2WWdZUkE?oc=5"
+        },
+        {
+          "published_ms": 1795241825000,
+          "publisher": "The Indian Express",
+          "publisher_url": "https://indianexpress.com",
+          "title": "Gill, Pant take the game away from New Zealand as India build 118-run lead - The Indian Express",
+          "url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxOSTJhSHRYQ1R0MHloLTJVem1FSmVmZFhTdUtSUjdHNXdGNWs5MnFWcW8yVjQyd0NGcldQR3paNUZLZG9kczRaakhWY3RhSERlQjJKZ3lLeXV6TTI3TFFCTUF2MmxjSkM4TFZCN2JBeTBBXy1WN3g1cFlvVk5ZaFM0WjdNaWkwRlk2TUR6U1d1OFFwb0hENGNZeHA4WVdhZEVsRTBoMHB0LU5RbFlBUmJ5S2x0dk43anhsdEc2RFhZaUFPZGN5OTk2NVNaV2pRZ2Y3aGfSAdgBQVVfeXFMUDVoa05UejRwRG96M2huR2ptOVhpSzFTQUJ4MmtNUnpWcEZlR0hQYlRJOTN2aEVyZ1A4YTRJbl9DbGRQd0NydFVFQ1BfUTBCUDZCNF82XzBkdE1aVEJlUU1JdXdhcExPMnN4WmVVTDNHQjhQRVpkMnFqOXNocENmTFZxQm90YWFJRmpWRVNlOTF1bHVtWmZMR1p6dUk2MmFWcFdXdXp6OFFRMEkxa2xyMjVmZ1czaGRKbXZVWHFZVW52dnAyWVBjQWVKNXJWOGpVeFZ2TldNazc5?oc=5"
+        },
+        {
+          "published_ms": 1795240519000,
+          "publisher": "NDTV",
+          "publisher_url": "https://www.ndtv.com",
+          "title": "The Vvaan, Ye Prem Mol Liya To Maatrubhumi : Why Bollywood Is Finally Warming Up To Bihar - NDTV",
+          "url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxNLVdUOEdia0V0MTRNQnJjTTVEZ2ZtZVV6a2dsNFZYNkJYQ1NxSkhBZzhXenkwVjJPYVMyN3o3ZUN2TEs2N05OakhrcUdDa3ZIX095TV9RbTFiQzFaQThZSUtrSW56akRSNHVBX0JreUNLMTNEQW8wcmZ1MUluT1dmZjJfdUpReTNlOFVLb1dqS1FyMVFianc?oc=5"
+        },
+        {
+          "published_ms": 1795238700000,
+          "publisher": "NDTV",
+          "publisher_url": "https://www.ndtv.com",
+          "title": "UP Police Recreates Missing Woman's Face Using AI, Trace Her After 5 Years - NDTV",
+          "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOcVNhOTNBTFdUMll5aHFyUG8zdnZ0NUVKY0ZRdkFBUEt0bkFmbm5qcVlDdVloLUoxeEIyME9USVhLWEpPbkFVZGRzR0xQREpFLWdNSWxKM0g2V0k4TWtWLVVKYzhieDNGNFBQQ3ozLW5FYkZieVI3b1J0VUgySUgxeGhfcWd0ckszRUEtYXF4ODI2aDRFRVVzRm1OOGhVNGhBbGpvZFNXb3RfSzNfUklHdXFGa9IBuwFBVV95cUxNbVpqeGhVQVBJTTZla0VObWhoRzdHN0hfZ2RtRTZzeGFSdEJOZ3RxUTlndFN0aktyR2RRc0pGMFdNNGdLQ3VjeUx6WGhSVnRyMXJ1YjktZWNTNmxySzJyY2RJLWpRMl9UamFqVWtvX0l3Nm9EcHdQU1U5ZEN0eFJnM2NIRDhpMmNZWk5aM3d4ODhyQUpHdGxfSHhhVnVIMlI1emJYb25GTlV6azE5b2hFNExoSWFELTJUa1Q4?oc=5"
+        },
+        {
+          "published_ms": 1795231605000,
+          "publisher": "DD News",
+          "publisher_url": "https://ddnews.gov.in",
+          "title": "KL Rahul becomes first Indian opener to score Test centuries in all SENA countries - DD News",
+          "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQSXBQWUVfa2ZMbjBGVkJoWjg0a1BrNHRGRkI5RVZxYm1wNGpjbVQ3b1d5Y3pGRzBFamJSLXg4NHM3N2NMb3dGeEE4V0F3Qlowd01YQ0R4VTV2LVNXSi1ZVVl0LWhONFQ0a2NYTEZQVlJWTDFUcThQVTZvbEtKclYxdHlRNHQ5SmRWbFB3VzJrT00xemFWdW96cThYcjFCaVZtVF94SHpDWkVYOVFZ?oc=5"
+        },
+        {
+          "published_ms": 1795230541000,
+          "publisher": "The Indian Express",
+          "publisher_url": "https://indianexpress.com",
+          "title": "India News Live Updates, 21 November 2026: Delhi wakes up to ‘poor’ air quality with AQI at 279 - The Indian Express",
+          "url": "https://news.google.com/rss/articles/CBMi2gJBVV95cUxONXZhNEZnRUVZcHlqbERJdVBCdkJfcTQ2VHZLTnQ5bFRjcGNCVlc1bmxZUEU5LVJGUFVfMjVpRkxPVFhGQlVxMmFlVGRBZTQyQjNWdHh3RkJFNGYwZ1F4ai1SdUFSa2VrZEh5OEpkS0p3MXJ4dXVXZk84dXMxTExsaG1QdnFsaUliWjViRDBkV2ptVVExSzRhaUxZdV9yOXZMaGdLWlJfWXhHeXcxekdqTllhaHBQSzV4MDNJQ2dqbENtSVRCd2c1cVNwU1k0M0hQbi0xb0hjRWNqamdDY1AzZ0VhRkVaRExtUHFXa1p3TjhueWV5b1UtY0o4OWszOEhiZzJVaktzRFd1TXA3WHgyd05fdUFRYTFwVXRYNlg5NW4wbWswSVJpNjJRaUt5dzFIWk5NOFRhYlliRHpFVlctWVdSVTNCRkRHbExIUmJkbDVsV2lHbW5VRElB0gHaAkFVX3lxTE41dmE0RmdFRVlweWpsREl1UEJ2Ql9xNDZUdktOdDlsVGNwY0JWVzVubFlQRTktUkZQVV8yNWlGTE9UWEZCVXEyYWVUZEFlNDJCM1Z0eHdGQkU0ZjBnUXhqLVJ1QVJrZWtkSHk4SmRLSncxcnh1dVdmTzh1czFMTGxobVB2cWxpSWJaNWJEMGRXam1VUTFLNGFpTFl1X3I5dkxoZ0taUl9ZeEd5dzF6R2pOWWFocFBLNXgwM0lDZ2psQ21JVEJ3ZzVxU3BTWTQzSFBuLTFvSGNFY2pqZ0NjUDNnRWFGRVpETG1QcVdrWndOOG55ZXlvVS1jSjg5azM4SGJnMlVqS3NEV3VNcDdYeDJ3Tl91QVFhMXBVdFg2WDk1bjBtazBJUmk2MlFpS3l3MUhaTk04VGFiWWJEekVWVy1ZV1JVM0JGREdsTEhSYmRsNWxXaUdtblVESUE?oc=5"
+        },
+        {
+          "published_ms": 1795230180000,
+          "publisher": "The Times of India",
+          "publisher_url": "https://timesofindia.indiatimes.com",
+          "title": "India vs US interest rates: Trump cites 'look at India' example to turn up heat on Fed - The Times of India",
+          "url": "https://news.google.com/rss/articles/CBMiiAJBVV95cUxNSXlJOTd4ekZ3SHR4cjJHVFdXMXQzWEllbFQ0OGdwMU50RUFORnRVNC1OV1RGLXd2UVZOZ0NaNEFrX3dESDVMVHYxd3h4a1FGVmxpTFdER3RlZXlnQXVtZm12cHZ4WXhtVThOMVZoWXJCdVQ5ZEN4YjFBUTlaMHBuLXBjMDZGTURaUDNIWWdSQ0NQX3ZrS0RSeVp2TUF5TU8zUjNocVozNkhteVVlX3JTMjZHTzViSE53UTNWOFZaZThlNjNIWUtGMnhjeEJ5TldtUWNsT2hLVklqQUdtbHJVQWdFazJSTGNFU2Q2Q1lVRzRhOTdQQXRDeXk0T1VaQ1BOaTRpOU82S3nSAY4CQVVfeXFMT3VnanBxQXJJWFNyQXNpVXNyMDVUQ3dnSlhDMGNCdmZzUUdhdVh6V25UWWlNR2I2akpHWUVPcE5wU1FOMTRtMkFfYXhlRHh3dzBXcmtLNUtXUHYtZG5WMVhjLUJBc0c0ZFNEblhNVFpiT0ozQ2pqWWdfS0tWUnhXMFg4SEhZcnlub2h0aWpCQ0ZCQTFsX3VnSVQ3alNoaXVaOWtjb0hWSnNCand4RUN2ejZUbjhSc2gxUTl2dkJ0V0lxM1Y0U3ItRjlDNXlxM1NkUDc1UjRzTUM5SkhTbkpsS1lyWXprbHNpczg2NmhETXg2NGRnMndPUVFPdndFaEZBQjc3ZjR5MDdNUHAzdFR3?oc=5"
+        },
+        {
+          "published_ms": 1795227466000,
+          "publisher": "The Hindu",
+          "publisher_url": "https://www.thehindu.com",
+          "title": "‘Look at India, they have low interest rates’: Trump says U.S. could achieve 14–15% economic growth - The Hindu",
+          "url": "https://news.google.com/rss/articles/CBMi6wFBVV95cUxNdzB4OUVERUVFY081YkVlOGdkenBWeTYxdFYzY2ExVlhXTW1QbmhLNGt6MkNOTEN3Skh2UUFYVmU5YVdLV2pabzJDSURSXzh5c0JJM05ZUkVvWjBsQW5zVEhYUVpnSTNVaDlxOW14YWFuWkE2RzBEN0M3bnJQMHVhVXhtc1dZVG1RNmY0ekRHZXdELTNkQUZHQUxkb1d2NEpvSzRraWg5bXFHbENwM3VmdnZHb3VqbVpETEVsMm93cmZjVXRqYWt5MlpDbXhpdzgwcVBkTk5kTHJxcEh6R0ctLS02UFlMU3ZnZXNr0gHyAUFVX3lxTE82NzVUb0dpd2xrbmRXRTVlLS1ETUs1bVFNV0xMWU5sLXkzMmNQVUxLcmxHUTh1c3ZaUVJkcmlvV29LcVh4b2w1cG9fcDFybmNPcWpjRjhzNmJoTWptMWtDS0h6VHRCalBsc0V2WmpBQXIwUk14c1BfVFVjNWlLVTN0bVJ1elhDR0pXRHl5azV1bHplbjRhMEF1Mno4QjBGb192UldMdWFBU3VzaXl5Y2pXUTh4Qk54SFlFc2dPdkNSZHhRbGNMYmhDSkRmVEZlakdHU3pELVdFNm13N0lSSGZSZDJVRGFpZXJYMVBmNmhJMzBR?oc=5"
         },
         {
           "published_ms": 1795223100000,
@@ -292,20 +355,6 @@
           "publisher_url": "https://timesofindia.indiatimes.com",
           "title": "PM Modi’s remark on jobs & wages a confession: Congress - The Times of India",
           "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQUU9mbVB1NExrTlJ0ZUhfTXBPaV9pOVpQUm9xSmdaeHFtVDdJMlp0TFlueWtrRVJydHFITDBDdTNmc0tYSVdVUFd0MHRfMnFZaTRhQkt0UWx4dWNrVFJ6Z2sxaXRNcVV5MDJyaEU0blllbEtNT0xUUFlvZ3ZwNUxfdllyeXNVNEFiMVBzNUtLM3pRcFVUSzVhdmZUcE1nd0xtOFQ1czhYM2xfR3ZqeDBpQUs5a0t6dHgzOTBn0gHAAUFVX3lxTE0zRF8zUHRjTkdQWmFER1dIMlM2eGRNbHhBRFZHbWxlVldxX19adFl6WFpFOENrN191aXBkVmZXdFhyNFZDdlZzbmVFcHh1YXBIcUt4Ry1sX2V1ZlJja0F6LWVvZEtTT2R2Z2Z3SUNSRlNjdk1IOVRVSllzeGRsSE5EVU9ZVkdBX3d0Uk1CZm5JZGZfdFRYcXZwdnN2M2NxWTcwODZyUGNrYS1sVXh2bUNuX0FBSFpaM01TZnRrOG1GaA?oc=5"
-        },
-        {
-          "published_ms": 1795221780000,
-          "publisher": "Reuters",
-          "publisher_url": "https://www.reuters.com",
-          "title": "India's IndusInd Bank ends ex-CEO Kathpalia's employment, seeks to recover pay - Reuters",
-          "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPZi1LVTUydU8xYWRNR3E3TGNiWWo4UDBoQ3p2TXE2NVJkVWdwNmFfUEdpTHo0dTJXcmt0OEdQeE1Kd0tFbV9SMVhvMl9ZSEltNkJpZmRKRmZULVFRQUFreU5ybmdOS2dKdmlCV1V4djdxeDZEV0tXalV4Y2tfdUtROGlXZHQwSFBiWWNENWhZTTVnNU40dVR4TTlvZndDN0dyZ3lmTmd3M3BVRTNMSEZLRGZNUnFtT2JPMDJnMw?oc=5"
-        },
-        {
-          "published_ms": 1795217297000,
-          "publisher": "BBC",
-          "publisher_url": "https://www.bbc.co.uk",
-          "title": "Nepal PM Balendra Shah to meet India PM Modi on first trip abroad - BBC",
-          "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE9INVNLZ0RiLUN3eENkUmVKZk5WZ2s5bUdodUJwb05kbnRvSjNCcGo5RVJLTVBhcGpJYmRYUGxkeHBzQV9hVWlOb1Y1Mmc2dTY4cjVYQm8xcUZSWVc5WUE?oc=5"
         },
         {
           "published_ms": 1795216740000,
@@ -322,99 +371,71 @@
           "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNeFhEVTg3TjNDYjJtdDEzU2dCT0daQUNDSnRtS0R5Q0s5di1iRVg2Q0oza1JCS1ZNcUNuVnF5c2NwOXZ4SFJYb2s3Z1g1NHdfQUg5OHc5NmRkMmVZV0RFZEtVN0xUa0s0T2hlNDd1blpIX2xISVBsUE1vV2pReEQ1OGRYMFNDUWZvUXNnUWxZSG1yLWY5UGxDYWZaWFNJbm9leWcybWxxaFEwN25qTlJHTkZiM2VSTzUtLUVJcUsydV9KeGthbTNBWUdGNjM4SGc2WnBFdVlBNHpsOEczTWtkWGVn0gHoAUFVX3lxTE05b0Qwb0RnWGZsUGlObFBPVk1iNk5CdWNFTEVTcnhoSnczY1c5bmY0RWt3UWY5TVN6N1d4OXFqUk5LQXdwcG1KYXRraEdnZHljOEIwa2xzVzA4M2prd0xpNlZYMm5DR0VYR0ZmSnNMYkdHVVNOODEyNWxqdlgtNnlDM1V4SVVUY080WThfWmlRODFhSDVUMlZmdFF1Ums3bjVpUVZPNWVzeEM3YUp1Uktnai1rcHV5ZVdweVBsOWNWeFE2R0pMOVZFZk5SRXowcjNUOXZzamh0Tzc3WTBsZXp3TEtScExLXy0?oc=5"
         },
         {
-          "published_ms": 1795212924000,
-          "publisher": "NDTV",
-          "publisher_url": "https://www.ndtv.com",
-          "title": "\"Absolutely No Change\": India Slams Pakistan Over Indus Water - NDTV",
-          "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQelo1WDJRUXdSRzdoV3c0MWZQWXBRMTFLdnlFYUVFOVpZZS1TQXV4cWwtSjRQQk5iSUxucVE3dEdlaDVnQ3pjaVliZm9mUlBMbHZYQWVjZDhjN21BYTFNenZmd1RjQVRQaUs2TVZFZlp6b0ZNaXZ2a2Z3VHJ3YXdTbXdUVnNoRkViNWMzQTVB0gGWAUFVX3lxTE1yZVROZVdDdjBub0ZGUnppMndWOG02dm5Ic01OamtDVG56UDVfdGpWZ3J1NzduQ2M3NlFLR0dsaTRZdExNeXN2UEgwU2JGMWN1TXdhdUZKV1F0TmRVNjJVOEZFMVY5V1VRdkszV0RvdDVITjliVzk2VFpSSnMwWjk2cldDdUtnd3ZSbE01SU1sRGV0c2p5UQ?oc=5"
-        },
-        {
-          "published_ms": 1795206691000,
-          "publisher": "Indiatimes",
-          "publisher_url": "https://chemicals.economictimes.indiatimes.com",
-          "title": "Italy looks to India for critical raw materials; opens new opportunities for speciality chemicals - Indiatimes",
-          "url": "https://news.google.com/rss/articles/CBMiigJBVV95cUxNb2MyczBwd2p1LVdLUGdxTDFKOHE2SE1GZUdGMlJ0bk5lVTZsUkgzM05aX2dDU24wbWE5ZmVxbmhCT3dBUGtlbVRPM1ZmeURhM2ludGdLMElZbXVEQlplT1ZPa3Qyb3phUTc0VTlETkFnRHRFT1BjNXBVX1BWOHltM05YbHE1ZXZOYTVDQklDU0Y4ZlNWaGhHMkE5b3l6eGQ1RS1ONDFRSTFnSHU4eGlGdTJGRjFuSHVQTWQ0NmVmcjRhcjJ6WUhmd3RobTlzUDNYU0NLVGxTSGVjbGFWcVNJT2d2b3F6NU1VVzhONmh1V2xJS3JIVGZxMHhVSnpOcHlONEMtdk5lN2lBUdIBjgJBVV95cUxNYVNIR1VJNnVQdm1BSkhWMHQwZTA0aE8tOUZLTzROWnRhUnVTdFg3bFBEVlNwMWFtSXh5dkFFS3BmU3VWOHN0NlEzdWR3UHlzbHFLSVp0Tm9QbWZ5UFJWSjB2VGdVMWxIaGU1cWRBVlIzaDlXalR5cnBZWlcwNnlMRXVDSUhsWjR0bFpBR0xWN2Fsb29aaFJBZHNnQVFtZWw5N3pLUFRwTXNhRGRudks5ZVBQcmp2VGJYekVUS3BPaHh1b1NOQ25Wak91NUlaa1dPYlVkdHhudHFEV2Y1Zk9rQWJEY0gzUi1yZ1pfSEJEQktpN1dLVUNqMjN4SV9aaXNaaThheTR0VWdQZ2x2ZGc?oc=5"
-        },
-        {
-          "published_ms": 1795203480000,
-          "publisher": "NDTV",
-          "publisher_url": "https://www.ndtv.com",
-          "title": "NDTV Live TV, Live English News Channel, Free Live Streaming Online, Watch Live News - NDTV",
-          "url": "https://news.google.com/rss/articles/CBMiTEFVX3lxTE9wMFg1cl9HcGJBVWJMdFVkc3VWN1VzVkFqTzVtMTg4TjhudHF2V1NnN2NaVVJ5VWl2WU1NWkJLeUdQQUw1TlBYdWJ4R3M?oc=5"
-        },
-        {
-          "published_ms": 1795187703000,
+          "published_ms": 1795215224000,
           "publisher": "News On AIR",
           "publisher_url": "https://newsonair.gov.in",
-          "title": "Mirabai Chanu wins India’s first gold at Commonwealth Games 2026 in weightlifting | Akashvani News - News On AIR",
-          "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxPcU51YnlfRFFuZ1RoWi1uVThXZ0ZBejR6NF9BTzNiaE9hQzkxbGJYSGEzeGFGUjROdDBtVzctd3JHWV94Z1dIMnpSTzVCdndOV3NLMzF4ODZTMnZBSEZPc19aelYtQ3R0UUF6ZW4xRld2d3BDU1hpalNMZjhkUWd0S0h2dlpoMVAyUm5ZbGZJSnhqU3M4ZzZncFh3V0JJbUF5MmZDMWljTjVDdw?oc=5"
+          "title": "PM Modi discusses ways to strengthen India-UK strategic partnership with Prince and Princess of Wales in New Delhi - News On AIR",
+          "url": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxNUGxCZDZKMXBPcF91TDdDS29MZkplbmxVRkpvWUJZbjB4NjhkZnJqXzZ4Z1d1azhyaHZLM0VTY1JyM3hpTjJSLW9Ud3RTQkFDS1Z6dnMtN0h4NGVrYWluZ2Rxd2pJUy1BRmdPWGlEUUxtR0tNOVBHUmJnVk1xSlI3OVFpSUxremlnYU9uNHhTWllUWFczZTBuU1l4YjZxVEZtdjRmcnZpdWJKcEtvR09sN25fcXFaVHhFdDNvU1I0ZUxfOU9WMUhMN3had3RpOGlqN3o1VmliNA?oc=5"
         },
         {
-          "published_ms": 1795175335000,
-          "publisher": "Reuters",
-          "publisher_url": "https://www.reuters.com",
-          "title": "India's forex reserves fall to over three month low of $705 billion - Reuters",
-          "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxOS081RnFoQThmaGUzazJPYlFhbzVtckF5aUZqVThSS2xrX0JvWnAzbVhKVVFqMXZ2T2I1WFlSXzdua3M5b1B3aUwyWXJqSW9HS2FMQTZOM3lrVGdZRloteExRY01HT21fcXZfNnotZjdlZHVGcEpwbmw1c3pIVGMyWFB1MFdaNXhhbFJuTF9XVnItS1JnbzJVdFNvZEhuX3RleDVGbXJha1BZNVk?oc=5"
-        },
-        {
-          "published_ms": 1795173596000,
-          "publisher": "DD News",
-          "publisher_url": "https://ddnews.gov.in",
-          "title": "5 new sites added to India’s UNESCO Tentative List for World Heritage - DD News",
-          "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxOOE5JYTR6MGFGd1NqT2ZJNlQxT3ktamhIcFkwM1V3UWtVN3loRmR6azdWX24tS2ZuZFFFMWVQeWoybXFFQzVtOFJXYW1ucFpiZDNBLThObmxVQWU5bFpPY29aVnZSSkhTQXoyVWc0N0NiU09ZUnN2OVFTbTd6SzU2UDE2SVJBRUNHSWZnV2Rncld4WU1UOFlGYS1B?oc=5"
-        },
-        {
-          "published_ms": 1795173464000,
-          "publisher": "ICC",
-          "publisher_url": "https://www.icc-cricket.com",
-          "title": "New Zealand aim to play long game to break India momentum - ICC",
-          "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPVzRuV0ZqSHZLTDB0LXlJTEtUSV9hZDFjV0J0OURZQnUwM3FBb254eG1ldDJNRmNBaTY1V3pBUTFRd3hTTllDX0E5aE1uaU1iTXNSSVJyZFJialNOOW8xeGU4NWY2NDdxTEs3eDRmWEYzZjhuODhrcGEzamhJYU1jVXBQa3JJbDZjZ1hLTmdVbWlnaUh4VFB0cEJ2d19YSWhqWTBkYWwtYTlyM2o2U1dzNFdORmF5Y01FTGZKdkdmMEtPZHpx?oc=5"
-        },
-        {
-          "published_ms": 1795167603000,
-          "publisher": "DD News",
-          "publisher_url": "https://ddnews.gov.in",
-          "title": "SEMICON India 2026 to bring global semiconductor industry together in New Delhi - DD News",
-          "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNZ3p2Y0Z4cHZoUXdoSlJHemp2cWV3ZGNiNTA0eno0NjlZV1JOcTFrTHQ3bGQzQlZWaUF2RkpPeUJCQ3ZMMVJoVHFwR3lVS2k3UUlNaDV1cEY3Zlo2bDFMa25lbDBHc0lqWkNZQ2xjVFdoaWw4bkdkNXJTLVViaTI2MjlvUFBSRHkwSThUMXZCaW5GV3FBTnRWZkFkazgzd2dZU2l1dHRfZjQ?oc=5"
-        },
-        {
-          "published_ms": 1795165920000,
+          "published_ms": 1795212180000,
           "publisher": "The Times of India",
           "publisher_url": "https://timesofindia.indiatimes.com",
-          "title": "Pakistan analyst claims no Indian official welcomed Musadik Malik in Delhi; fact-checked - The Times of India",
-          "url": "https://news.google.com/rss/articles/CBMi6wFBVV95cUxNNlBhS1pHclNiMDZxR01nNEdMOUViV19GY0VOM3paR19vaDFFZ25uSEJudl9uNk80VTYxbDRDdHVuMWpZbnhRTDBRa3RlVnhXdkRxWnkxSFAzRVZDT2FtWThGWFQ0Z3gzMHpoMlhMTTNDYlp6Y3JrTGZHY2xxVEJBSlBJanhsVzk2aWEtZjRPa2UxQ0Rhc1ZMVzBnMmxVMzg3b25TRzNfT3dOTXFHN3FGNzJRVENGU0tBcmxsUEVoU2xHYXNBcGNGN2lvQms0R0QyMDlmMnBSZ280SGF6bVllcXFSUWZoajJVd0840gHwAUFVX3lxTE0tc2VYb0ZEanBRREdTMzc1ZGxxZzlRbV9McVd3XzE1SllZcjRhNWZkWDBPTWxHRjNNb3l2UzlZUW1IXy1nZDVDbFNORjZibFBwWE1fS0dpb2tSTzVtS2wtYk9KQm9GZjFJU0NtRmhLRWhkc3pYTGhJSDBZX1YtelBrV2JsSGxWckozV3NWbWFFeHZ0MGtfcWpmZWN6Y0NBYTZnSWU5SVJvVUpvdlBnM1h2dDVndGZRZ0RwTzloLXBHWkxwWERmUVFEb085RU9ZRFBXRkYtTjZsazVBaHJNY1Q3MmNjMUUtUjBkN1pPcVZCbg?oc=5"
+          "title": "Consider law to curb marriage between relatives: SC to government - The Times of India",
+          "url": "https://news.google.com/rss/articles/CBMizAFBVV95cUxNaGtYLUliT1hFTGNhTWFaeU9ETWRVVmNhN0UtZGlPM25ncUJRREN5Yk5TR0dhbEJKZE42QXh2bTViRWZLUU03OW5DZHcwSnhHaE0wNW4xNW4ySFZXMS1pbkZrdWVMdE5jUGc2VUFZdlZlNi1kUFBUUGh0ZGotaXlubjNseElRYkFFc1BpOGtadDBHOEZtRUJCV01lMWFWWkdJOEJjQ0VrVGpGTE9RRjNrYkhONVhiR3dLWkE0TjZBdW5vX2VwSHNWYkxpbFbSAdIBQVVfeXFMTV9JVGhTbE5nY0h2VW5LSmh3X3dTNWp2Ylc5UGNNb1djaDdqbnM4N0lUaTZBQy15TXJwZFFWTTgySzBodkhtY3VCQnBITkc3Uk5zZWs0M09BYlhRQmZJSDBUUHZwQS1zT3FJWkNNM05QaHVwdUJBSFdXcDBaME51R3I4SkZjalVFLWtuUHNXX085MFkxMDF3VGgtWXhuY0pIb2tqZTAxQUVkMm82WHUxaXRoQ3FCNlJVNVNzRlotYlM0OFh6Y0lVNEttb2VBU014b05B?oc=5"
         },
         {
-          "published_ms": 1795150920000,
-          "publisher": "Reuters",
-          "publisher_url": "https://www.reuters.com",
-          "title": "Rupee climbs past 93/USD as investors seek shelter in Indian stocks, shorts unwind - Reuters",
-          "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNY2pFbUd4enR6VTI3UkVVSllkdl92SkJ3d2hNVkZkQTBlQW9FMnBEMHBmUkRkdkhUUFB2NHV0UHNaYUlKS05JaDJOaEswOXF5N0hlaEo3anZHRHdnSU43cEltdkJfM3lEM1VfSWZLTUwxa3MxM3VRZmlhMkxYRWJjVXRxMGh3TW9uZEJFMG1mXzR0MDZuVXo3ejRMQ1FjSXFZRHMwWHczSURscU56TUVFcDV1dHFMdWgxQ0tn?oc=5"
+          "published_ms": 1795200244000,
+          "publisher": "NDTV",
+          "publisher_url": "https://www.ndtv.com",
+          "title": "'Look At India': Trump Targets US Central Bank Over High Interest Rates - NDTV",
+          "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPV3ozTkpDcXdBaFJMSTloNEdKWjE5MHpZeWlaUUVtQmRUaXhzRGdsQldTX0ZzbWlzaXhrdHk2dEZrZEpZT3gydnowTDFDZ2hJY3RCandHZW1ZS2wwbWtDUk5QU1dwcWl6RHVZanl0a19DR2F0NW5uSWhGblhYdVBnd2xjRzFYa3E0ckJDbi1jUDNSZDJDSjlGYWlfYU8xajJMNHFEU3ROMU9xOXNjaUHSAbYBQVVfeXFMTjlIZC1lZXppcDJHRC1Ram9kSVZWa1lxcGNodS0zYjcyRTdIYlhsVnhERlJ4X0dLeEoxSXc4V2txQ1JTaEJxbUptQ1FyOVAtMG9qRW9hZTB0SUdaT2hsT0E4WjdSQTJ4dnAyNm1wY1plank3YjVfNS1KSzMyODlOWlJDbzFYSmh2am5pdWUteFctVVdqM3NKZXNSSExHcUtRMlpTQXNIdnExcWt1aDQyOE8wYUxwb0E?oc=5"
         }
       ]
     },
     "breaking_india_hi": {
-      "fetched_ms": 1795227910811,
+      "fetched_ms": 1795259818436,
       "stories": [
         {
-          "published_ms": 1795073591000,
+          "published_ms": 1795200537000,
           "publisher": "DD News",
           "publisher_url": "https://ddnews.gov.in",
-          "title": "अरुणाचल प्रदेश भारत का अभिन्न हिस्सा, पूर्वोत्तर देश के विकास का प्रमुख इंजन: उपराष्ट्रपति सीपी राधाकृष्णन - DD News",
-          "url": "https://news.google.com/rss/articles/CBMi6wFBVV95cUxQMTI4Y00xN2s4U3ozRWlvdjdjcE5fU2VqSzlicFVSVmE5WTI3M2JFOFVwR1dyTzhxaGF1UXUtRURrRU4taWY2SVctdklreVp2eFFDVUM4Y0lLaVdLZXNwd0ctQWJvSDF3aXdPX1lBX28yMDFFVTNucnVPQjFPaFJ4c3ZmbGY1aHhoSmpxS0NBWG9ZdUhYX0FXLXoxWFczVUNnSFhTUzJUUnp5NlRTTmsxVFpmb0I4RUQ3MEdJOVlFYy1wZXhScGQ0SFpkODdIcWpDU1ZqSEFsWF9xQ2ZKNTNxVEFkaktMQlV5S2NN?oc=5"
+          "title": "सेना प्रमुख जनरल सेठ ने 11 आसियान देशों की महिला सैन्य अधिकारियों से की मुलाकात - DD News",
+          "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPc3R0VE9jRHB3Y1drM3dtV0JxMWg5Ti1KUG85ajN1V2hLcDNScXlEOXlaem92YWZ3Y3FZcjNPMVRvUXRRd09CSDlSQ19aQ1VZYzZKUV9NVndOYVBTaWJtR1E1Y0NWendvN2ZBTUI4NWNuSmhSQlMtSWN4RVlOX050T3MwTlVhTDZHNmxCdk5JUk1USUdnY0RTbEFYMjBGbXdmbDNrVVFoRQ?oc=5"
         },
         {
-          "published_ms": 1794975240000,
-          "publisher": "News On AIR",
-          "publisher_url": "https://newsonair.gov.in",
-          "title": "विदेश मंत्री एस. जयशंकर ने प्रमुख क्षेत्रों में भारत-जापान सहयोग मजबूत करने का आह्वान किया - News On AIR",
-          "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxPQV9nSEFtNDBMQWhSZWk4NTFjREVfMHhjMmxSVjJFTWFnb1R1ZUlUWTk0aDVDZVBCYkdFRlM3UjJkU3VEUXg4cTdpSy12RVAtUDNWTGZ6VnBHbGJaaUxDcVBBcF9nSEpoYmlFbGxOM3JJM2lmelpMOUxQR2JCaFl6UlJOX1dsU2xMelRHb3RGdnVCOEtUcURhYVp0eHhOWEtvLUFLanVSVy1Sa2lZTTF0Mkt6OXdxY2RwVmFYZ1g4TFRuR254d2NNMQ?oc=5"
+          "published_ms": 1795169501000,
+          "publisher": "DD News",
+          "publisher_url": "https://ddnews.gov.in",
+          "title": "पीएम मोदी आज इंडिया एआई इम्पैक्ट एक्सपो का करेंगे उद्घाटन - DD News",
+          "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQTnJBM2o0QkVPVk5ReXlwMVBDdTB3aDV4ak9mSWppYVdBU0lUR3JoLW41czhlYUE3UjNtaUU4dEgwR0ZSZnIxcXVkVWtDZ0c0TFdjQ2pzUjNSd3hWbXRqWnBVVEpLV2NFUmpjZW5wNEx5eVBuLWstQTJmcmJoQUZ1UFJiLXBPb3RHT01OUG01TmtsRWQ3Z2Vn?oc=5"
         }
       ]
     },
     "sports_cg_en": {
-      "fetched_ms": 1795227910811,
+      "fetched_ms": 1795259818436,
       "stories": [
+        {
+          "published_ms": 1795258420000,
+          "publisher": "News18",
+          "publisher_url": "https://www.news18.com",
+          "title": "Sweet 17: Vikalp Tiwari And The Waves Of A Prodigy From Chhattisgarh - News18",
+          "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPckJRbG9sVXpvU3VtajRzdHk4YTFuM1pKZzhZSDhIQk9sdFdRLVo1c3NkUFF6aGFlNmZzN29LLTBObFI1SWg1NkxRVDBGQ0t6TTZEU3pIV1pDNERBbWNmTlJ1SUhiX3hmOFlFMHY1bTFZRkMyRkZFdHk4OF9iNWE2ZTdtLXRFYzRnRzBGSnh3dkN1WGZONms2ZEFhQ1A4b1RUdTRJajBua1U1cVRDN2pkVXR3bnB2ZllE0gG-AUFVX3lxTE1LZmUtX21VVjZIRzZOTml5cUI0bmdFY21yU3dqTVNsTXR1VmM1QWVnSEZoN2xzZklGVnB4bk9MRFdseFU2YldYT2pYaTFrYl93bTNteWNVaFdVY09ETGJwaWpBZ2pmODhudkxzSmJySDVCNmxPQlVFQzdXWFVCalh2cThQTDl2SFFTV19UeHAxLWJNT3dMRUNOR3RfdVQ5UjVYeGVJNEIzOVpiejRpTWlRTmczUS14ZzZ3WHZLT1E?oc=5"
+        },
+        {
+          "published_ms": 1795257577000,
+          "publisher": "Hindustan Times",
+          "publisher_url": "https://www.hindustantimes.com",
+          "title": "Doctor who spent 6 years improving healthcare in Chhattisgarh villages earns TIME recognition | Trending - Hindustan Times",
+          "url": "https://news.google.com/rss/articles/CBMi6gFBVV95cUxOVXM0UDNFclJtVmRPRUVwNWh0UDhjZFYyR09WVC1aaHRDQ1pIQjdHSnotMHYtSXFOcXA5aVFTejBIMXNYVEFBSEZ4b3NKWUpLREFZNzFpSzZLZVpaQ2Utb0U3cmVMT1RNTXRpMnQtM3VxbVVpNl8xbE1HWWpQSldwX1VNaE0yNWVRaGpYa21uUXJEaHFXTjY3Z1BTSFNIQjBLUmczODhEUnhNbFZxTERGTWxyMkdzVEtyY1A5SzI0TldybzRnX09nMWxKWk9aYmJ3cjFZUjhMdmF0V0E3SDFrLXBVWDBmb3RQNGfSAe8BQVVfeXFMT29ZZU42bGVvN0J5dzN0a3pfb0JVZndqZ2wyNHB0QjZQZ2FYc3B0SmhzUnRZNHFsT1B4OUlSbExzdEo3ZjFJTGZLQ2NTUzVFNGhVd1pMeWlhWWR5VGZsRkhsR0FBMGk4LUJiWEpqRnJTNzR1bUdSYmNpZ2ZUMG1WTktwM01keHVZT0MtUmFadWdGUlYwSFJORHpwbkZjRlpNbzdDaXQ4cE1NekxuRnc2TU93QlhHaHlSTHVva0MxRnU3WnQ1d2w3RU9jTXdlQ1VFY0J0ZDB3cHRkYVJKV2xkc2RzcFIwV29NYWdqWVZQWHM?oc=5"
+        },
+        {
+          "published_ms": 1795187220000,
+          "publisher": "Olympics",
+          "publisher_url": "https://www.olympics.com",
+          "title": "Senior Women’s T20 Trophy 2026 scores, match results and points table - Olympics",
+          "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNMjdjOW9XdmZuTzI4LUVpbUcxWmh2NzdpZjFNRG1uLXE3UWY1MmpHVmFrZUtlUVNPbkxNalk5WDVUb25xVFFBbFlwWkpCSEJGckZSc0Vjc1JHQ0VCT05PX0pQYmxUTnZabThHWTJiX3N1OVVXM3JjWWpLNERuWlVkT2NUd2lIRU8tUUJ1TG96akdBVjJ2cFVZ?oc=5"
+        },
         {
           "published_ms": 1795168706000,
           "publisher": "Hindustan Times",
@@ -434,14 +455,7 @@
           "publisher": "The Indian Express",
           "publisher_url": "https://indianexpress.com",
           "title": "Mother’s job and travel no ground to question child care: Chhattisgarh High Court - The Indian Express",
-          "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQTmRFZHdXR0dYZGw5cjJwQ2pMcUczaFotbk1tS2dIejVhQzhMeUZONVlkamxkaDlCeVJEdVIxdE9ROGpWYkgwMUNRN0hBVS1LemRPYnhqdGZqY19aMFJXWEN3enNveEEtNlpucVlCRjZvVTNYZUFYT2ZSSWhHdUxjZkZ2aTJzRWxfWWh4dHFoaWRBYl8tQ1pZSmJWLXZyakJXRE1Kbm5yR0JBQnRmN0xOb2RVSjRMNjZnTlHSAcABQVVfeXFMTVJad3FOWXlOT0owUFlmWjJMNHVpS0VFb2xyY3RuYTd4NDBXYjdlX3JRbWRfaV82aDJONC1VdzVROUxBUm91a1JwaXg2bmZueWJJcXVURjBjcVozMXhCcXRxYnhhY29FZ2lSMjNXTGNaUUJud25XanI3MXN2Zk5qb3VNMU4zSDBCeXE2MzFWRzh4WjdyQ3d5V1h3QWluYlpvNU9lMEw1Tl9UNUhBMkFBb1NUUTZNWTd4clJEV1plOEVh?oc=5"
-        },
-        {
-          "published_ms": 1795092810000,
-          "publisher": "DD News",
-          "publisher_url": "https://ddnews.gov.in",
-          "title": "Gyaneshwari Yadav wins silver medal in weightlifting at Commonwealth Games 2026; PM Modi congratulates athlete - DD News",
-          "url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxNMUlLeUFHaHp5bE12T1Bia1N1eDR4WkhnVFJKQVRzY3BhcGx0TVJGczcwVm9ha1U0bzFQZjVqRHdiNnRCSEdrNlhPTndLUG9YaF9sR2gtNGM4TFRSYTZjWVlnbWtfajB0NDRySnlRRjlQZzhTMGF4amNwUFkzMS1JUlcwNUJkYVloUlVkVWhiTkVsdzJ3N2JRMUVMa1VqRFVBVzNpOV9LdkF5NGxyNXdfbW54SFMwdEFOMkE4QThsWjNtWkFGMlRKdExSanNYVUZC?oc=5"
+          "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxNUlp3cU5ZeU5PSjBQWWZaMkw0dWlLRUVvbHJjdG5hN3g0MFdiN2VfclFtZF9pXzZoMk40LVV3NVE5TEFSb3VrUnBpeDZuZm55YklxdVRGMGNxWjMxeEJxdHFieGFjb0VnaVIyM1dMY1pRQm53bldqcjcxc3ZmTmpvdU0xTjNIMEJ5cTYzMVZHOHhaN3JDd3lXWHdBaW5iWm81T2UwTDVOX1Q1SEEyQUFvU1RRNk1ZN3hyUkRXWmU4RWHSAcABQVVfeXFMTVJad3FOWXlOT0owUFlmWjJMNHVpS0VFb2xyY3RuYTd4NDBXYjdlX3JRbWRfaV82aDJONC1VdzVROUxBUm91a1JwaXg2bmZueWJJcXVURjBjcVozMXhCcXRxYnhhY29FZ2lSMjNXTGNaUUJud25XanI3MXN2Zk5qb3VNMU4zSDBCeXE2MzFWRzh4WjdyQ3d5V1h3QWluYlpvNU9lMEw1Tl9UNUhBMkFBb1NUUTZNWTd4clJEV1plOEVh?oc=5"
         },
         {
           "published_ms": 1795072225000,
@@ -455,7 +469,7 @@
           "publisher": "Hindustan Times",
           "publisher_url": "https://www.hindustantimes.com",
           "title": "Elephant linked to 16 deaths tranquilised, fitted with satellite radio in Chhattisgarh | India News - Hindustan Times",
-          "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxOTUxWd1BpcTgteUNaMEVrZlB0YU8wVXVWdGx2QTVnRTdKbTRFbnVUZno5eGhYZ0lmOF8tb09Bbjh1SVNfWHI3dWRwQXo5NWN5OEVsVnc5R0xSU1BCME04bG1DOGg1OFV2NzJNNE5FUHZBUnZ4RVdkTXZLWU9ITUZocUh0WVcwd2lPYmoyUFVqMm9oTTliTEhmNEVDendrb0JweWtwd2FRcXEtdktWTVRoUExkVHVMQlpVaWpiM0d0enNXQ25ucTN5VFBZWW8zbGxueGs3NG9yLW83eXhyN3FySEpR0gHnAUFVX3lxTFBVa2VaT1BuSnFXa2RacHZ3MDNkcmpjNGcxanEtOGZvZWFvTlM4RXlzdHA2V0RRNEZYR2JEbjhzcTNMaTB4UTFYMHJodEJrRE11cDctQlYtUUdLZjZUVFFodkNKeGlNWTJLODRPWDBTTkhyOU1HNGl0SHp4UTNfQUFzUHNjWGktQmNlV29UNTEzRUtMZU90WlU4a2gtVHktLXdEQUNVWlYtTDZsVW5FLV9sRk13S1AtcWYyWGx2eVVUZE1tdHg5UHByc3hkbWtQQmh3Rm16T3djUnhIYzVDRG5EYUFiTEpsMA?oc=5"
+          "url": "https://news.google.com/rss/articles/CBMi5wFBVV95cUxQVWtlWk9QbkpxV2tkWnB2dzAzZHJqYzRnMWpxLThmb2Vhb05TOEV5c3RwNldEUTRGWEdiRG44c3EzTGkweFExWDByaHRCa0RNdXA3LUJWLVFHS2Y2VFRRaHZDSnhpTVkySzg0T1gwU05IcjlNRzRpdEh6eFEzX0FBc1BzY1hpLUJjZVdvVDUxM0VLTGVPdFpVOGtoLVR5LS13REFDVVpWLUw2bFVuRS1fbEZNd0tQLXFmMlhsdnlVVGRNbXR4OVBwcnN4ZG1rUEJod0Ztek93Y1J4SGM1Q0RuRGFBYkxKbDDSAecBQVVfeXFMUFVrZVpPUG5KcVdrZFpwdncwM2RyamM0ZzFqcS04Zm9lYW9OUzhFeXN0cDZXRFE0RlhHYkRuOHNxM0xpMHhRMVgwcmh0QmtETXVwNy1CVi1RR0tmNlRUUWh2Q0p4aU1ZMks4NE9YMFNOSHI5TUc0aXRIenhRM19BQXNQc2NYaS1CY2VXb1Q1MTNFS0xlT3RaVThraC1UeS0td0RBQ1VaVi1MNmxVbkUtX2xGTXdLUC1xZjJYbHZ5VVRkTW10eDlQcHJzeGRta1BCaHdGbXpPd2NSeEhjNUNEbkRhQWJMSmww?oc=5"
         },
         {
           "published_ms": 1795050339000,
@@ -467,20 +481,27 @@
       ]
     },
     "sports_cg_hi": {
-      "fetched_ms": 1795227910811,
+      "fetched_ms": 1795259818436,
       "stories": [
+        {
+          "published_ms": 1795232358000,
+          "publisher": "Nai Dunia",
+          "publisher_url": "https://www.naidunia.com",
+          "title": "बिलासपुर में क्रिकेट सट्टे का बड़ा नेटवर्क पकड़ा, दुबई से चल रहा था गिरोह, 25 करोड़ की संपत्ति होगी कुर्क - Nai Dunia",
+          "url": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxPVlFTYktLa292TU1vdF8yRkFjNFYySDNDeGl2bjR5Q2FmNVBtaFN6RkNUcFdGbGV1WV9EOWlnX0RLeHpqMkwwMnFhZ3lFZFdMMm1uR0VsdVV1emZpdlJJdE9jaDllVmJnVGJYZXo4TVVIQ2pURjlWNFBNQl9iVzExRjdvV0M0bXNSSTRQcDJwdTI0VE50NHpicEg3OWI5Z3Zlb1BENGhPX1c4QWFQQXl3N3Vsa3VrUWVIRkh4RXFJTzE5ZHFGOUdZbFJjVXZISWZQZ24wNWg0dGZPS0J0?oc=5"
+        },
         {
           "published_ms": 1795219200000,
           "publisher": "Dainik Bhaskar",
           "publisher_url": "https://www.bhaskar.com",
-          "title": "खेल मैदान में गाड़ियों की पार्किंग, खिलाड़ी परेशान - Dainik Bhaskar",
-          "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxOQUpDN2cyNDVRbWhGS1ZOOWFmRWxmRDRvalVQOS1WLTNRQUxEOGd0VlZYSEtjV3pyUXdnck03c09Tby03dG9UT2lPRDZVck1RUVl4ZkRueWMtVUYxb3AxQlJOYUgzRWtpY3ctd3pPLVVhOWU0OFN5dkh0WEp6WndSZDVrU1U3cnViU3lwMVhtbVUzTzNuc2c3QVNJQkZjUU5YZXg0ZlhOZ0VkWTJaRlhiMHVXcHBVaGlKVFpSN3hZMncxTnU4NmV6QkNXd9IB0AFBVV95cUxPaFgtMHJETHZpRmNtVnRZZGdjQVZCRWhBSnBGX1VNWFh4TC1HNXBUV2JKMEI2ekd2alh6eXc5RWtaVi1mS1pCNW1JRGJzUktUVkpxV256RTNEQS04cExRSUxqakE3MVBjM2dHUUNzeTNycVR5czV5ejdLUjFfVnFjUHRCV1VpYTR2amozd2NxV2phYkljYWFNTHhnc09vQjZRYWVHV3JIN1YxWkZlS3VyM0VxM2lwcndJaWFST0k2dFFodWNTUGRKd04yY1lKUExV?oc=5"
+          "title": "खेल स्पर्धा: माध्यमिक में बोरी व प्राथमिक में जोरातराई विजेता - Dainik Bhaskar",
+          "url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxNd2ktOU5vS0FWQnhhZ1c5UnE4a1g3N3BiM09wRGxPdlQ1X2NhQlJ4MDc0NGJ4cFhlb3U3RkJDbnRDWnU2Tk9uLWNfRUxCa1NQSzZhRHJ6elpUdkFrSzZoOTlPTDdEcTVPaXIwbHFkNVlJTjJDVjBuTnE2bUp2YzNNSnZ2QUJNdkY2TmR4ZTEzb0dhaTBoVU5LMjJqRFhKbmhVTnphWFBOR05LcDBWWjAyRm5BdVhGN3Rfb1EwLWg5OVBVdDJ5akFHTHFiZU43VjBjR2xGOU1nejVvSTFXdjZZUtIB5gFBVV95cUxOV0x1VXZEQ3p5bEdFWTIyWmhGNThhMGF2MGYtSU1NUU0weWx5cmhfYUxKcXExQjJDT2g0azB2TFJQM212SFEwWHRodVUyZzUwbEwzaGNGTnkxZUJVTjJJeHI5eFdmOUhodWVBdlNzcTEtRS1CWGFjemppWnh4TEFwQjVBSzhBaW5hT3U2UXRMcld4N0tjeE04NTIyTUJaUThNRXlNbHVQZUtMOUVpaVJYOWF2Umh6WWtCXzZ0bW9xWkhVTjhQYWVFSTAwMjE0TTM3TUxveTAxNFZ3SW5sZ1VKdUh4WTU1dw?oc=5"
         },
         {
           "published_ms": 1795192541000,
           "publisher": "Dainik Bhaskar",
           "publisher_url": "https://www.bhaskar.com",
-          "title": "22 नवंबर से जुटेंगे 7 कृषि महाविद्यालयों के 240 खिलाड़ी: जगदलपुर में 17 खेलों में होंगे मुकाबले, तीन दिन तक ... - Dainik Bhaskar",
+          "title": "22 नवंबर से जुटेंगे 7 कृषि महाविद्यालयों के 240 खिलाड़ी: जगदलपुर में 17 खेलों में होंगे मुकाबले, तीन दिन चले... - Dainik Bhaskar",
           "url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxQVDZBWVJNUjgwamJOb2hkcGhRNlB5TUFQeXRYeGt1TXNXcjNvVEJjSlZJXzFwaXBtUDJ5ampEU1UxUWx5SWNXN08xZXRHUWlpOWE3WGRwWlp0TWdERFNfbVBabEtFTmtsOTUtZDluUUsySXh2VDNkYkJiQzJvblgwa1ZZdFMxV214RTllUFRxVTB0QlNwSU4wQ1I0UWRjcVRsY3VCTkducHNaVkk4azM2clFVbEZEQTU4RXpJdkNRNUEzY0E4X2J4UXhUcWhWUDJkLVh1c0JOV3LSAd4BQVVfeXFMTnUzVWpqZThPTm5WVmREYXlHTFZDeFcwTzdwWFhIUmFWM3Z0S1diTG53VFhzXzhjam1iTnVUSmE5MElNeGNMVUZMdjN2LWFuTTJGWTdwLUViV2dURzNkVzcwQXZfRUlMMTdlUW1rcGlaX2ZJN0FENUFOdWlLSXZXMmhQQUNpUzFrejZMX0hJRlhjZjNid2liTkVmSkJUR3hJS05pVDRWd2U5b2w3d1hMcFVzVmM5eGE5SGotSVZHNHQzWnV1WGJXMlQ4bFh2TkswS0Q3N19RRDVkbDVaS3Zn?oc=5"
         },
         {
@@ -493,28 +514,42 @@
       ]
     },
     "sports_india_en": {
-      "fetched_ms": 1795227910811,
+      "fetched_ms": 1795259818436,
       "stories": [
         {
-          "published_ms": 1795195980000,
-          "publisher": "The Times of India",
-          "publisher_url": "https://timesofindia.indiatimes.com",
-          "title": "'It was not easy to score runs': Tilak Varma after India A’s 306-run victory over Nepal - The Times of India",
-          "url": "https://news.google.com/rss/articles/CBMi-AFBVV95cUxNRjA3RHoxZnlPS2tUdzdVcGQ4eVdadzRDcldiVUhmUmtNUW44Y0sza2tiTkZYcWhIUHRvRkk0U0llV1RCQlVwQU1qUEhRS25nejRRaWdBNU1ibHEwSHY3SlZiODJZMFJ4MnN2UWtRZTBGQ1B5OEkzSnFPRHZMc3U2RVFPTmJQbFIzWFBjcWNlVUIxc2w1QWxzODVLM3BBV1R3aDdjazhadG5DRk5QN0pIS01fRkVuQlU2SHBMcWVuSHNRdEh0em9rN3NQMmpCS296QmI5eHdCMHd6cWw5Q2kzVWw0RWVBWGZqRmRLbkhVRkFWMHB6MzZZZNIB_gFBVV95cUxPa01jNFpiUTFfUnBxUUY2RjlVdVNOSjR1NUhvMzQ3aXpZdi1hSVlnbWZrR2J2RDVyN2VzWk9RWG5vNXQ3WWhwYjFON21TTU9PZTV2SVJPNi02WGhFdU5uSFlfMUpxMXFQVFNSdGRXYTY5MkRuWWxIS0MwTXFJc1lTZGhhd2tEamxJTmhhX21PbVllcFhTeTRCWWZlVEtaQ0tnY0ZMOHFySUJuQ3h2RWZnelZTT0NhZDhjclNEeXRFRndmbTdSZ1lGc0kxNWV6anpzNXhpM3Q1V0FZZGpiWjI5ZmM2eXUzNll0QUhzdjc3UzQ2NnhXdy1QVGZoNUJpQQ?oc=5"
+          "published_ms": 1795255231000,
+          "publisher": "Sportstar",
+          "publisher_url": "https://sportstar.thehindu.com",
+          "title": "Indian sports wrap, November 21: Tata Steel World 25K Kolkata set for 11th edition on December 20 - Sportstar",
+          "url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxOM1NueUstRi1LYUstQ3VGU05tNzN1VGRVeU9xcENRNFZlN3JZV1lzZmtEZGcwcGZFSUwzOXNGNWxyUUh6REo5M256Mld6Sk8zYllYdUZxMFFsNVRNTENUcjBRN1JUOE9xQnQyaFptX1FfbTZ6QnpVX0FlYk1pQkZRVGtYZ3hZVzFlVTVXNUR2bVAtekgtVWxsbjFjOWxMeXEzUmZOQ0ZDQXpiS3RuaE9FZzJNNEt2alZNNUFqcGpqTndxenRsUnBJRWJGdnRpdmFmSW9KUHoyN3jSAd8BQVVfeXFMTnh1WDBnNUdyTXlOdVhUbktNZFBPcjBZRFV5MllIcmNkSEJCd1pqT2E2WXk3Y0ZacG9rTmtxSWJYVkRlcTNvU25BZUQzQjg1dkZDQ0tudGNxcERhbGZkQ0NXNTk2YklMdFk3T2tGVHktZERrYThob3dNMmhkQXJJWDI4ZVRMYXVfVVllWUg4T1Aza2hTRDNpRmdta19lSGNpNDZ0TXdpSGpja2w1NnBlRzQxV1oyOU9tazB6WGdUT1RXQUlOaFM1cURsYVF3VE9xTUJBREFIN2tGa1kxNVZBOA?oc=5"
         },
         {
-          "published_ms": 1795189740000,
+          "published_ms": 1795254710000,
           "publisher": "The Times of India",
           "publisher_url": "https://timesofindia.indiatimes.com",
-          "title": "Asia Cup Rising Stars: India A crush Nepal by 306 runs after bowling them out for 26 - The Times of India",
-          "url": "https://news.google.com/rss/articles/CBMijwJBVV95cUxOSm04X0psblROR1RfY0dCREtGblp0QnVJa1hMUThGUm56R010aXZwOV9Gc1pUU014cXRiVF9CQlhiS0pyMGtuTFNwbnoxQl9Bb0xQUG9TUTc4Yy0xZmtIbi1fbVp6M19USFQzRnJjT0QwdDRFMXlfTWhqaU0tS1VoYlFsQkgydnNEZTBqSlhQOVRWTFF1cWVRQkcyTHd5ejc4c3J6ZVlrTEgxMHVFTkVoV0Iwb1FQTG9NMEl0SEg2MkExcV90WkE3UWJVb2hYaDQ1TGlZOS1aYmphN2pNQWIzRkJJU01pMzFZcUtSRTdkLWRRZnZOYTAyZ0xDZ0ZTX3JyTHdHRFB4U3RBbXZOek9z0gGUAkFVX3lxTFA5X2NtTlRFY2V0TEtuMHdSeW5MTlZSRG9JSUF0TGtXdk5nNzZQakRPOGw1LWhkLVphcGVzbjR1bzNqMGZOZjdUMWlnR3BBNDM4XzBSNXZOUVNzck82RmZZb0R0bFNzQk1QZ2U5NEIxaGU5Um1mcS1oLUFncERlRVJQM2tLRFVQR3lTWUxvbFM0S2RDN0hDcnBWXzVsdlZOWFZ2VFlzWWtHUktaTEtDbU9pQUJGVDBpUFJpT1RUSnFUS09OZU1RSE94ZDVEaWwtV2FHRXR1UnM3X0xWUXlWd2Z5Y3NsaHQyNjFHN1M0VlFqRjhVSlh5cENjY0xpZEg1MVAwcDc3MUdIUVY0Xy1yWkZoU3dfdQ?oc=5"
+          "title": "India completely dominate New Zealand with daddy stands - The Times of India",
+          "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxOR2xjb0NpNG9MMjlSTmFxS2NVYzNyeEJqRmpnYUFBeHVmdDFIZS1tczZHNm5xZzNTcThDZXdkdkNqaDZBWUhVQ21HVlV1cGQ1SFgzNnp3Mmt5NmpHWnducHo1dXFoa1ZaZXZuclloUHZ3UVhtZ1VKaEJPUjVqWjA4ay1UYUJGRHJ1al9scFJvdzJQRncwUHMzTUh3N0NKbWpfZDlUYTJSN3M3Ml82N1h2RzB2Q3FISVo4eHBmeXJlT2dmRWxLeF92TlZkOGpTaVZjX3Fv0gHYAUFVX3lxTE5TeFhOUnA5cGlCekQ0amZfOG5fc1Q5MlhzVVM2cjBLMmlob2xmSGQ3RVZCczZna0E5eVNJRXZaSlNUSVd2MDdZTlVoNUw2LVZPMmNEbVhhcTYyWDNBNVRwNU1jVVk4TG0xVkRBNkdFdlR5eVBObUNVYm84MW9YLTloU3pLbEQ3M1I0cEViYU5VNDFRWjFKWlctVmtmVENiVzdhYU9RZk1LNGxkRkliM01BMzd0bGd0Tk1nY3ROTXNNU0VlTGJmSEl5ZFJQS1BqMXd4VnVYQkpLYw?oc=5"
         },
         {
-          "published_ms": 1795186935000,
-          "publisher": "ET Government",
-          "publisher_url": "https://government.economictimes.indiatimes.com",
-          "title": "Karnataka to set up India’s first govt sports technology centre with Amagi in Bengaluru - ET Government",
-          "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxOVnJoSlhJWjZ4TUJ1dC1GeVFBaDZMdDRNYi1zUXhFOEtQRTAxWnI0cnZZU2dwVjhQWFNBb0k0YmlKcDE3VWNjS0RXTi0zQU10WDVsUFVtS3Bpc3hKYzl5LXVxcWlnRF9ZVk50Yjh2MjJtdHlEenB5V0xXMnFmT2dyVURZbG9zdl9KQk54cDV2SFNDOXhZc09XN0RseUM1RENBQTk4Zk9sSTJDZGtjWmZfaEstckcxY0t6SzVqd1MxSEh3WlREUnFqZTc5alZ5Y0JfTG5pSWdJS1FxN3ZtcEtObkl1OTdUcUU5WndQY1Ewc29SUdIB9gFBVV95cUxPbDNkLXYyaU9UZ3U2ekdTVmd3YVBjMnhBLXdYeFhDdWd1dFU0OG5KNDJjbWNyOWg2QWdJUkJvMzdHZ2pFYzFoVzRxLVI0dFJpdXZzdWcxZHI1TUIta1hXc2M1VGx4QXJNU0pxb1VBYWY3eUdCb3g0bUgtcXVxSlQ2U2lUcElmdzVVbGc4b3YteW15eEk3OXpyRGFiRG1FUEh2LUhLVXRKR2FOMEEzajFyRExzcUxZSlUtVUlGQl9HX2g4cW9TOVpCcnNvOE5sTjI0NmF6ak1TclIyRHV4NWdxT2VHLVNDTWNkY2gyZ21BclB6Z3V0RXc?oc=5"
+          "published_ms": 1795252457000,
+          "publisher": "The Times of India",
+          "publisher_url": "https://timesofindia.indiatimes.com",
+          "title": "KL Rahul opens up on his preparation, century and India's plans against New Zealand - The Times of India",
+          "url": "https://news.google.com/rss/articles/CBMi9gFBVV95cUxOSHY2QU1CQVhBT1UwWHBGYWUwVWcyOE1meHpkNXpkUk5SUzZkbXVGRHdYazhkNVJMQnQzZ1ZORlZ2SWtxWC1UQ3RkY1hQcjRSU2JWTUVmSHNjaFdhcUdOUmRNZ2hsd2U5cXBlWlZDT2I4R1Y5WHZsTmRzdjJvbDhBeFBzM292RHFSQjlEOUhsWWNENVh4ZmNidWJLWk81OHRmLW92SU5RMEstWWYyZk5tQ2t6NFFtSlNadGY3SC1TVEI1cHMyTHhSdUI0d0V5V0UtSHlzbUNCOVR4eVJ1cGhkWXBfSmdkQUFLSGNlOWdIMEQwQVNaaXfSAfsBQVVfeXFMT2s5M1lYdVZCb2Z2TFdkUlRVUmdDNzRiUUt2SkJHRlhrUF95UmtGUFhNbU9VZHNSYnVqbklQc2pXd3ZOQS1HOF9ROTVCemRyZ09fLXB5TVhPcEZiRFpUZnN4enpCMzZHQjAyVHlpU2V2TTFCdUpZMlk2SExmNE1wZUxFYi1rMTV1OUZGTHYyOWFZZFRUcG4tc1cwREZQSkl5a2ZHZEJwcXJObERveUVzTEJ0SkhMeGM2NEYwQTZmTFlOUFdsV1NrQjBxZDRmMnNUUTRLWUJoQXBsRlJ6X2FlSFA3OVowQVFfZmtIVkhJbjZvWUo2aElsM0k5bjg?oc=5"
+        },
+        {
+          "published_ms": 1795251941000,
+          "publisher": "The Times of India",
+          "publisher_url": "https://timesofindia.indiatimes.com",
+          "title": "Jacob Oram press conference: On India's batting, New Zealand's bowling struggles and more - The Times of India",
+          "url": "https://news.google.com/rss/articles/CBMi-wFBVV95cUxOYUFYajdIWFBUbENnSHQ3MDZuYUozSHA5V0ZWY2FPMVU3Rlk3RzlKMlJoeXFINk1Sb3N2aUxyY0Y0bDBpNlZTUkZmeTViclpObkM2Z3NoRkF2MkRGNmRqN2huSDJlbmhtVzE3QzhTd3FKWFVJY0dtR3ZDUXR6NXk5UzMybkdUWERyUDdNMkUxc1NsdWxHbjhLZktEZUp5RlV0dUl0S1lCaDFYVHJPalc2SWxwbnpfdWRUREs1dk53N1pORkJMdGVSUDdSYnJMZXNidG92Mzh4alVDZndCUFlBU19nWGVwVW5ncFpUZF96Snk5UGczM1pSaE54b9IBgAJBVV95cUxNYXd1NDd5VFVwd2pDYkI5emhMbmlBcEZYc2lXV1ZQd0hiUzYzSUJCU21nQzJweGd5NGx0WDFmLWVTb3k0ZmpsbXlKN0xlZkV4RWJLVTJDTGx2dXhlUkFpbVFzeUVwOXdyYm91TE14eWZQWmx6X3d3cGhVaDcxYmc4dDFHNVplOUNZbjJyV21KNjh5SUVKckFYNmVxaFRTRldoN3Nrbl8yV09PSE0zVkczMWJ0bTdKdG1uU1ZiazZmd2VPLURJYlRvUWpWTU5HaGl0VHFrcDVPbXhEQnlvQzNDWnpsRTB6bGRJN1l5V1lXeXR6U0o2MnA3UURpcm1PRXBZ?oc=5"
+        },
+        {
+          "published_ms": 1795245341000,
+          "publisher": "Sportstar",
+          "publisher_url": "https://sportstar.thehindu.com",
+          "title": "PlayForward launches Australia–India sports initiative, signs MoU with NSW Rugby League - Sportstar",
+          "url": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxPMEV1d3NoUlBaMGsyQzdOZVFzeVo4MkxlOTY4Y242bTdMVUNSWFc5LV9qd1NEcGxRck9WRS1zbkNqMDBLcWJkaHJxTC11RmpSWWNhb0l6VFNZa1VuS3l1VFNuaGFqeFBIa0t2bVFyVHZTdnRQQmJQTm5RXzZWS2FQXzh6TlQtSHlfZF9KZXRpTlJ2Ul9NbWNFd296WS1ZWnR1TDFRT0tyR0hXZ19fWDVxeHBvSGpsM1ctZ3BOR0NIdzlJM21TZVc1bTVMQ3ZrNFUzSE9LVzU3Q3djcjRC0gHjAUFVX3lxTE5ObmpjREJIUlFMOVJ1a1ZneEtYaHVPNWh2NHF5a2k0a25TbkFVeEV5OEhpVldHb3RWZ0Jtck5md3ZJQnhBdWVhWm43MS1GRE5pb2hXbnQzSUN1TmtoZ1owMExLdFhFdURJeTlGR1RHTmFEX0c5aEhJdkdfR3ZBTDU2WjZVTnJ5eE1YSElHQ05QZWNnelpPZS1JSEtSRFlfTlA2cENIRDJFY3N5ZjJXUnh6OFZGLUk5cDFVa2dFMDZMdWFhcG1jLUdEcE15dlZxaUNIeUNxb2dfUWljMDliUWlmcFhj?oc=5"
         },
         {
           "published_ms": 1795184940000,
@@ -527,7 +562,7 @@
           "published_ms": 1795184620000,
           "publisher": "The Indian Express",
           "publisher_url": "https://indianexpress.com",
-          "title": "‘Blunder’: Srikkanth slams India management for not playing Sooryavanshi enough - The Indian Express",
+          "title": "‘Blunder’: Srikkanth slams Indian management for not playing Sooryavanshi enough - The Indian Express",
           "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxNQ0dJRjVwZER6UGJWM2hYZVZjNlFVX2xwTWxzMVRST2h4dFJOM2NnZDNoT3kyZTdZTm5PTTNoUmU2VkJSZnBxOE1lVnp5UGVzM29uRDhDc2MzeDJOdzliZjQwd3RYTHUzVDg2cHkxQ2w3UThuc2dfN290bFh2ZVdVbmU4emh4emtpOGlVYVZBaUpwUHRsekZSME9sOVNkU0VaYTZqWEk2dTRLQjRReW5IeDJWTHRacTZESnJwdUh0LU_SAccBQVVfeXFMTklBNkFVLWd3aG9DZHRMZUp5Z2pvN3JRTEE2QjhZTlFTLU8xRHZLQzRsdk5WcXo4Ujl1aHJrTWpFeTNOWXh4VF84ZGxrbFdrRWJFUXBNT2djT3JBLTBOWlVkalgybHpSTDFQaXZ0UTZUZnJWb2ZhQ0M5Z095RFZrZjZSMkxHcnJCTXp2ZTk2NkdTM000RVQ4Y1dJSGV6SURCa0liLWhhSEJCX1YyQ3VLM0dJYjlOZFcwcHhfZ1ZmanRUQkpyRkpvUQ?oc=5"
         },
         {
@@ -545,18 +580,18 @@
           "url": "https://news.google.com/rss/articles/CBMiggJBVV95cUxPdXQtQmNGeEhOY3NGVlhJb0tSdHJsZ2trVk5YdTN3ZFg0V2pjX2ZFejEtUTBKTl9uUmdqVXRac0szNEFaYmNRaXl4SUlkeUUzUjkwVXlIeVdfc1ZXSUlLbHZGNW1wcG5seFMxMVBicHlCZTdNdnJUMHgyUHJvR3NRR0pzM3J5TUFxMkJDbXYzc2dldXpBai1XZ3hJWGd0ei15UWNaX3JQTG0zb0RaSHN3dWdnS0dqZGNzcTVpWjMwcC1nSWItUWtNUi10Rk5iVy1IWWs0SDNDYktXeVZQYjRIN2FiMW9DdzNhMXk4X0NRdFI2NXJnVmtRTGMybVFySGhpQVHSAYcCQVVfeXFMTm02VTZnWTd6aFd6eEtwVUpucVp4TXYxb1IwWW5VZE5sZTc2MW1BZnpaM1dJMnlHY2tXY1drRk83TW9DSXBSc1FOS1FnT1dySmlPZVQzZkV5ZlBua09HRWlVNHk3cXJyOTNvNjJ6UW1zTlVFT3h6NFJKbktQMFVNckpJQ1ZWdEg2SV9rRTl1MUtQbVV2T3EyMUpsX2lTcHZrSFZ5WE9pRFMtZTYzenNNS0N0bjdKYW5ZQUc2dllVTHVVYnZEZlVSTXZoblRhTlBmSm5rRkx2cXlTQ29XU2V0QmlfVmxoSGxiOXpVcmVQZ2pqWVlzZnlhSmVPa1J4WnlOcjEzVFZlaTQ?oc=5"
         },
         {
-          "published_ms": 1795177182000,
-          "publisher": "India Today",
-          "publisher_url": "https://bestcolleges.indiatoday.in",
-          "title": "School assembly news headlines today- November 21: Top national, sports and world news curated for you - India Today",
-          "url": "https://news.google.com/rss/articles/CBMi5wFBVV95cUxPWjBTVkh4T0IwUFBGMWpEcVliQm5DWUxNTUFPMkhicnpYRGV3NGljZ2J1MVBOVUpxUHZZb0hxa2hYbjNxV21rY2JFYjVKVHFQek9NRmEyNWd4dWRabkV3THhuaHZxdFpsbThyV1F3bkhhV3JYc3VWY1Rrazh0cjF1RjF5Z1JyWGg1OFVjb3J6THVtY0QzMUNxNm5ZYVlsWXZBVFJzTWVRRWJNLXk0ZWQwMG1jUlZXREZhWFZUYWNCYUEzQW5jWVdtOFEtb1dOMVo4YmZSdWJJRlV6a3dyWlZGSmNFb0lEenM?oc=5"
+          "published_ms": 1795182678000,
+          "publisher": "News On AIR",
+          "publisher_url": "https://newsonair.gov.in",
+          "title": "Men’s Cricket: first T20I of five match series between India-West Indies to be played in Lucknow today - News On AIR",
+          "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxNV1puVUZYVmM0VmtuSnRZa3hDOWNoQ3BMRXBFWGpTWFlCc1lscFBTZ09vSmJUVkVYaUxnUTE0VndOalRBR0NENnUwQ0NtMzYyaDd6bDh4ZTRuS2t5YVFNSDNRWGgzTWI1RDJ4NHJOUGwwc1FzOGdrVXRHSmo4YlRKQUk4UGIxMExIVjREMjRUNHg5dkN4MkdUYW1LS2VFYkdRMHh4dzJvQ2RyOW1DMkpLX050dkg2dlRjaDd3VlF3ZElVZzVB?oc=5"
         },
         {
-          "published_ms": 1795173060000,
-          "publisher": "The Times of India",
-          "publisher_url": "https://timesofindia.indiatimes.com",
-          "title": "Early collapse! Abhishek Sharma, Vaibhav Sooryavanshi flop as Nepal put India A under pressure at Asia Cu - The Times of India",
-          "url": "https://news.google.com/rss/articles/CBMipgJBVV95cUxQdnZkWWFoMTFOSkNRWG5MTElXalc3b3JuWHV5SDNmVDVCTzJVNm1fLU5HSG5ERVZRRWU3VnkzWDRCMXlXWUIxYnlrMUY0em5WSzZINWZ6S3pVMHZoSDV0bllzVnR1TjA5Tlk1NU1pUVNIbzNlZnJjMktXVkZoWjMxeG5VMl9yVnEtd1o4Yk5VSnVfelBKRzZ4LUpzMVZYM0JkVm1lWG5ZM2M5Z18yNFhFd3ZkNmVIeldpX2NYMTJ3VXpCb0I1RGxuX3RpWThKSEZJMkxsLTNzQkNLR1JjS2duYm9xeFNFLVF1bU51TjBuTGRjakdZRGptdkhKRHlzdUZZUk9taE5qUHduZnFwdHZkUFZKLW1xLVVDaDRIYkdydlVwemxJWXfSAasCQVVfeXFMUHJnWXZjUjdncjVKUmdTTTk4NVlUZHJsSnBtOUtseEZWUFZHYldvdGxLZEpsanEtZG84czhKdVhEVVBSRkpHdFMxYzZiQ1RYM1hvdFplZUFfblExYm5YeGMzWG5CbUs2NUR6T2thSkQ3aGgxYTI2OUhVU2ZsNy1zclkteVRjaEdyWWlGbXhjdDJpS3FLUU9XcnV4MG85UVBjOEItODRpRjN0OEtTdFlmVEN5VkdXMWwwclhNaHRmRFIxOHNoWEtTSHVmY1lFdTFWeW9UZ05DMTNJMlE1N3VScURJcWJqQm1kM21yTFMtWHFlYUdSS0lqWkNGNXEtY1pDTkJuSmFSRVFNOHdSNWZBaGk0NV9WcHg1SDFRS0xhakEtTTlwcHdEMzAwSlE?oc=5"
+          "published_ms": 1795172406000,
+          "publisher": "DD News",
+          "publisher_url": "https://ddnews.gov.in",
+          "title": "Preparations underway for return of F1 to India: Sports Minister Mandaviya - DD News",
+          "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOQkM4eFhodWxMbTdnV0VBWl9VOE9iNUtmd1VyYld0WkVWRXZ3MlNac0VFYlYzS3B1QkFqSW0tZ2RKQ2xxWVd3T3B1clRuaEZQTWJSOUZGZ0Y2R2RBLUNweVU4UUNQYkY5dExPeE12ZEp6cW4xNkNLa09EOVRaSVBScUVkZjFobnlsaWU0YWU1V1hEUEFPTHpLdWVIcHdob3BD?oc=5"
         },
         {
           "published_ms": 1795165698000,
@@ -566,20 +601,6 @@
           "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPMnBRczNRd1dnd2ZqNUM1MnJHLXFWd2lzUEdRcF9pendrR0lmeFBJUU15MF9ZTExFT3BlcmxjODRid1NTNlg0alBZQi0yYWNIbGFxQUhfbl9sbV9DdzJLVFZic2NTaFNuaUtoOUlUWktaajUza3k4c09kM29GbGhyUXpmNnJUN1JrVzU2ejJQa19xNjBTcVF6NlI2ZGxRclExU3hkS2U3NFhMMVJhTm5VZHItLWlCdw?oc=5"
         },
         {
-          "published_ms": 1795165123000,
-          "publisher": "The Times of India",
-          "publisher_url": "https://timesofindia.indiatimes.com",
-          "title": "Yashasvi Jaiswal puts India on after bowlers show in Wellington - The Times of India",
-          "url": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNZENSY0ZiNUxlRndCY213aDRpeDVnYzFVNGVmaG5yM1dkT181aWt2bUR0N3YwU3F2bW9OTHhiLXBZcmh2OFozZC03YVdhejlKdFFsSjl1dno5c25vWFctU0RzMDBHaFRxTkhzLWhadjZJblBja1pOME12MzJyWGNlNWlTUGIwODFZMXMzVWZnTUtGd1UwZlNZUjVEeHliSmZiMHNfSVVyQS11dDM3ZFpaUWV0eUpTUm04R0ZuN1JNYkVYT0NTTWdZQ1IyYVIwMjdRSVplMXQzV0E3Y3F3aEHSAeMBQVVfeXFMTW4xTmtLVkpRVWlHdGszWGE0R3hWdlFXZEV3QnR2LXFwM0ttNmxqUjJMZEkyVV9ZR3hMV244M1p2OU9SVElYOU9XOGltT1htMkxTQnliZll4MFR4aWZ3R05vQnRKODNGbVdrRnh5MUtTQThXeGhUMkhpZTlMTWtTUDRDMFZoUVFvMFpuaWd6cmxZdzRkcW1fVzhoR0Q3UzRyT3BTdDdXY3ctbFoxRGx4RnkycnNGOHhrM0cxY01CanZfRHl6d0xZRTlMOGNBaVIxQUU1QlVqd3E4d3VOdFBuaVAwM2s?oc=5"
-        },
-        {
-          "published_ms": 1795155420000,
-          "publisher": "The Times of India",
-          "publisher_url": "https://timesofindia.indiatimes.com",
-          "title": "'Match is evenly poised': Glenn Phillips expects spin to come into play as India build momentum vs New Ze - The Times of India",
-          "url": "https://news.google.com/rss/articles/CBMirgJBVV95cUxOWU1mcWRISjVtanhLMk9SVjVTbThUY0tQdTlZVlJFdlh5M2N4Qmx1OHRCQmJ4UW9sVXlDU2NPZHFHN3M0ZmxDb09kNkpCdnpVSHIwTWtXT29EY3RsOVV5RWd0T3JHTHlQeFlTaU14MW5hYlpYekhoUUlQTUJ2VUVxczU1dGRScnZXcVBldHIxVFdKNkJtblk1NUttdHlldEw0Vi1xM0phWmFlb0FBME4xNjZ6aUdFdmMxbTRFUWpaX2VBbEl2dnRtNmw4UTFLbnRnNFlfUFBLQWxnMTF2YldBY3hyQ2xHdXAtOWthakJxeXhsb0hPc3lENDJRZng5akpDLXpCeUF6bXlJTmNONVp3LVpFSUotd0kyWjV0RjNSNWliV0xfMTdXMHRBNVJHZ9IBswJBVV95cUxQdHdOcVkwSWxDV2FwQ3EyYmFSemhFV01XX2N1RXJQd3Z4cEhrSXZDZUNEeHJNQXRMMTFLWVQxZlRQVWN0SzFxVnhfWWFrSnRkclZmMnIxekM4aTdac2ZEOG9Ib2pDQUZnVzN1MU04UFFmOXd2dDlDMnZrMUhWZllpMkdST2tBX2QtRFZDMGRnVjBaWHlBc1BoeWpadlRWMXJNRE5VTE9SdjRrRnlUSmY0TTNpU3dZUGJBMU42ZHVtNmNwMmdBMl9ldnJ4RGJCYllJYXZ6bVN2NURUYWNodnhkT1ZHU3FsZ094Wm92M2R2Mkl6OHFxWENBUWtQQ2ZnUEpwckxLNXpLVXVhZzNMa2hQdUhOdlAyNTFJdm04VTIxXzMzOU13cEZFTFR4dkxNQml5VXVj?oc=5"
-        },
-        {
           "published_ms": 1795155180000,
           "publisher": "The Times of India",
           "publisher_url": "https://timesofindia.indiatimes.com",
@@ -587,18 +608,18 @@
           "url": "https://news.google.com/rss/articles/CBMioAJBVV95cUxNMHI4ZXlfZmxlUkh0RUc0c1FXR094bkgwQmhNUXQxNWEyelA1VHF3ME1kWEtEUzQ3Y0lBaEQ5bE1VMEV6Y0d4NkhBR3FOUnpsSlFqUnRKUzNsSTJ5bVIwLUJQaFJ0eFZYLXByQVJ3VWxJc2F0MG13NkMwaER2ajk5UERJcjVWMGIyanRYWE0wWHM1TjZmSW56aEVyYk1waU9JOXpNVjNmamtqVm8yR21xbjBzbUF5dTdsMnRlSVMtTDc2V3RxOGdZQnowaGFvcmpYSDhZZ0ozTE5ucTdHUGdOREphVXk4emFySkQ5NF9KSHJMVFNUR2lyVkxfd1RrazNSTVpndC1IOWVYUWQzOWdpQ3RsbWZwNlFHejAxYTROY2LSAaYCQVVfeXFMTk80cTFaQ2hPTWxKOURpY1FvWGZ0QXM1TTRYTngzb3ZzNVZrRm9LVW9LOWpTdzVJb091U3B3RUNQUlFZOFVWazNxZ1VjeEZ4OHgzdG5hMUpQel9iLW9BdXF5ZXRpaWNKckt1dUN1RGlwMzRXLWxRdXpZRDdjOHkzVkE0WGVRbXhsT3UxcXhwX0h3QTVqbDJHU0lsS3FvTXR6dVlGN2xCRWFXWnZvSl9nUk9tMzF4ZmhYME5JR2VDNHI5ZkJhRmxZaEJJWHp0S0RnX3dQRGVzdDR5SlFiMGYxVlFPLTlrVlBSUHVyTEFrZGdsWG9BUjNKcmpXMnRMSzhFR2QtY05FUmNEYkVBWE84dTJPQVQxSU5ic1BEcFE5YmNUQXExd1dR?oc=5"
         },
         {
-          "published_ms": 1795153620000,
-          "publisher": "The Times of India",
-          "publisher_url": "https://timesofindia.indiatimes.com",
-          "title": "One boundary at a time, Yashasvi Jaiswal deflates New Zealand - The Times of India",
-          "url": "https://news.google.com/rss/articles/CBMi7wFBVV95cUxQMEZ6YVo4LVRVemNieDh6UmtjSFlhRHdRRDZ6UlZXZHFKZGxYV1VoeWNSM21BVXVBWnVSMXpsempFVnZteVd0aTk1RlBBSTdPR0lrX1JYdEotQ1RWdlpkZTdnRmkwcDQxMWxpTVNtQmlpV1llMVpuN2pJdGVXM1djNGxHaTZ2RWNzcHRnMnRaWml1TWlQNFh1N2xZYnBWRFhiZDdNaWxnUHY4VzZzV2NhQW9NdUpOTzV3WFZQcjZaNkRYbjlmeWRUQmNiQlY0OEVhOXNyQUlHSC15ak9fQ2JOcW5nMkJmV3hfYmNmd1JOb9IB9AFBVV95cUxQQWFVMC1hR1h6TmhpTFlYUVg3MkF0NVEyX0hvUThDdGMtZlVUSlpvX2pmUE9qdkNqZWNqVmRpUEZ1bjBJaVUwRDNIalpiVXoyckRJYjV6RVVETUc3ak9lNlRtWmJpNkM4WDU3UVhPazkwNS1hd0tEZWM5X3AtTUJQUU4yLXpubFRsWllsYUE3NTRHMFYyQi1hYWhodkRFV2NzQ3FySDFDVmtTYXdvVUI3YjY0MWdwOHVXdllKWW5lWDNvWWZGc2NvUVg3eUJVUE95eUdlYnVka2JYdHZONmJJaE95NEU5QkxZRnZ0TlQ2ZDRfR1JW?oc=5"
-        },
-        {
           "published_ms": 1795152120000,
           "publisher": "The Times of India",
           "publisher_url": "https://timesofindia.indiatimes.com",
           "title": "Yashasvi Jaiswal-KL Rahul script history: Produce India's best opening stand in New Zealand in 36 years, - The Times of India",
           "url": "https://news.google.com/rss/articles/CBMiwAJBVV95cUxNSDB5Y3VSTE9vTWUxUDYwRmFsRnM2elJpY1NhcllhNEQ4YURGa1g5YnllbDV2LUsyVGNfVkF4VDB5RlNOdnhoemY2cU9jcVRJd2tLX2VWZFpnSzdqbXp4c0tiX0dWTENuV2NOLXJrYUhYcmhZX2lzQThGM0UwT3ZYQVh3TXlyM1pMb2ZYbHMyblFKejVrcWM5OXN2aGxWbzhkcjlMejV6UFpIUjNIYjBGVEFTc3dlc0tVaXJRVDhKOGxhSmdjc1N2djhCZ0hieHNMS0NySmJURER1WjdoSmhzb0x4WmJVdmFUYzRzaTZNMVRYdlpTMGZXUWZsbjNrQXFHVTJycUNCbTBtV2R6LV9BcHZuMG1IV3l4Y2xrbkZGSUNiNFdzVEduX01aeE9TRXdqQ25Yd2JERDB3V2s0aEZXUdIBxgJBVV95cUxPcHJmRl9SblNEdV9aS1Ntbnl2TWhCQ2h5Y29VMlFTVGpBbmlQS0NuREJqVEx0WFd6c0htaFZzQWVBXzFPWUlaaFZTcS1xcE9DRGpIeXhkcWdfUXcwN0xVNzhjUjRTV0xiOVRabVVuYTR5YkpZQ0pHMWoxbS1aZ3YzbG4wVHhoNXBTZWFjeVdQVnNCck5JMHZDeWItaEk5WGNoTXViTkEtRVNZUkZtYlV6cnd6MlBKQUNXMkllcldXSmJTNllSRV9YbTNaMXdBa1FHRmVwOFBIakVHLVRMVl90UHZBR3ItMkQ2WVpJNnpxZGV0MngwODdZMHB0YXlWdktEZHh5OXdzQTBxVDRTQmlEb0FDRTJEdnJReEo5dkRPQVB3Q2JKTkhxNi1GaHYyd08yNGRsRFpUZWZNanNsVEJYTERQVnlqUQ?oc=5"
+        },
+        {
+          "published_ms": 1795138440000,
+          "publisher": "The Times of India",
+          "publisher_url": "https://timesofindia.indiatimes.com",
+          "title": "Mohammed Siraj, victim of a communication breakdown? - The Times of India",
+          "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNTENKelFkVkdwdWRuS0VhczBNbUUzdTRmUHNOY1p0TTdDU3oySEU5TmRXeU9rMzVaTVU4S2VJZG5nS1VOY1FsRl94cU9KLWV0SExaejE2dFZzekVIVGpuZFNDbXJnM3MtYVI4ZElCOS1iUmRaRDZoMlRvN1RqY0lyWFpFeC1LLUFCcElGbTN2VUw1cHZpZlN0UlVwM3V2WW9neVYxZnZJV3ZDU2FWUUdTLThTUk5aQXZmNHh6VENTTUw5SjgwRy1TLUgxdmxBRUNSLU80ZS1Dd0hkaGVieGQ2TERn0gHnAUFVX3lxTE9YNFJqbV9MWWtRVzVzY2dQZlZiU1JvX0k4dHZqeW00MlI1VGR5blpvNjUtWWluSHFqY2hNV1c5RTVwQWdIcU5XdHg2aUFuZzVwNE1qQzQ5NDlqQkpFclZ6RVYxMHBxNGEzT1Yta3g1alMwTXhZZGJMYTlMa3NvejVwYTljdTRWd0UzWC1RYjVNckVZaXVzZVMtdkQ5Z2VqV3Z2Y1ozaXpscFZCbkR1WmFuSUEtTjR3SlFzY2ZqQURnV0MwSEM4d3FyNEZjUFVGdVBNWVlycVBOM0VOczN6bTJPNU9qWldNMA?oc=5"
         },
         {
           "published_ms": 1795102825000,
@@ -615,17 +636,24 @@
           "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOM19idlM5VUNwTWF2NXc3WkUtaVU3cTBZd0NPN3FUaWlTYzlyY3VfaTRIRnA1ajNVcmZBaXNXSEFmYVdOZzZXX1ludUUxa3pDSm5qS1I4Um1IbUtPSU16WHpMblg5YWRfQzkxRldRTHN6QlIzU05qUnRyY1RTZUJXeVVXZDdVUmpUNF9udDB3?oc=5"
         },
         {
-          "published_ms": 1794989340000,
-          "publisher": "The Times of India",
-          "publisher_url": "https://timesofindia.indiatimes.com",
-          "title": "India and the tail: The old habit needs to die now - The Times of India",
-          "url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxOVEl5YlU5NEJXUnotai1OWHhtODFiXzl0VlF0dWk5bW5KenVYd0ZBS0UzVVctaXBKUV9BSDIxTHh6bXBYUFhxTkdRLWVKVUdGRnhja3M3MG1GaVFwUXdsU2ZpeTQ0YlpnM1lTSjVUbU9iMjh0NkpTQTI2TEhsY2Z0RVBvYUNlSDdRcGc5dlg4Uy05RnR5OXFYWE9QR0Y1Q01jbU95V2MzNkVHdWVFQndHS1k2VWY3Q1gtVlNXd041RlJhSjdKMkVQZTVEZExWcHlMRXRnQVk1TFcwcy0xOXdWUNIB5gFBVV95cUxPRmY5Y1NRcm1OVzRDNTZzTVF6MWZCRE1fM0VVeUhpSnFUWDBfcDBnZTFTNV81TDNaRFI3RTRDTkFxeVU1VlBhVHNnQjNhN1FxSXpoYUVzbC1jV3QtNG0xRldXNnZyejhZTEliVy1mcVMtWnRiX0tDSnItWlhxRlNWdFZxNDBjcGg1VFZFT29IdTRVZXJES2Ewc0hCRXMtajhIRUU1ZkIxUlFDb082VzFpR2xBNGxjLW9CakFScURTdWt1aDdpOENMR2g5WVdBWG82VXhwT0UwVFdHVlZjS2E0VS15ZklUZw?oc=5"
+          "published_ms": 1795073407000,
+          "publisher": "DD News",
+          "publisher_url": "https://ddnews.gov.in",
+          "title": "Sports Becoming a More Viable Career Path in India: Envoy Periasamy Kumaran - DD News",
+          "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNSV94djRKZHVISngxNTlnUWVrODBIQTRDTWJiMXN4Q2NpQnJubUpkbDJCQUdBcXhHOHc0b3EtZThFRDc5Q0Nnd0tiUE9TV0VyWFBVbEx4YUJHLXRFMzZnenNTa2Z3cDAwVUtPVk9VQ05RYjVFeC04X2V6ZWpQbjJkVjhsd2o2WGpzNUxWN0xuM0JNSVJWdG54eWRRZVN4eC1qeUE?oc=5"
         }
       ]
     },
     "sports_india_hi": {
-      "fetched_ms": 1795227910811,
+      "fetched_ms": 1795259818436,
       "stories": [
+        {
+          "published_ms": 1795248855000,
+          "publisher": "News18 Hindi",
+          "publisher_url": "https://hindi.news18.com",
+          "title": "भारत ने न्यूजीलैंड के खिलाफ गंवाया जीत का मौका, आखिरी मिनटों में कप्तान संजय ने गोल कर बचाई लाज - News18 Hindi",
+          "url": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxNOU5Hemx5RGgxTVdYSkt0clZOeHptVkc2WkhtUm1IbHUzTktRc0x0UnpVT1pIdjdUc2xzdnN1dVN2N25OWnNTdENJRlhFUmxvU0VaXzFXNFNiV2thSzIxZndrbThTU3VTcndFOXZpMUl0cUdsaGVtbkFqUm1waGZta214YjdqR2t0cWtaRUxxVGhUTUM3TV8tT2s2RHNlNTVWVEZGakVtakgzeUhCRk4wQXFHX0FKNGR5WmZwcEhBVVdGNmp3V2JQckNpRUpJZzQ4RGQ4Sl8zOVRod9IB2gFBVV95cUxNOU5Hemx5RGgxTVdYSkt0clZOeHptVkc2WkhtUm1IbHUzTktRc0x0UnpVT1pIdjdUc2xzdnN1dVN2N25OWnNTdENJRlhFUmxvU0VaXzFXNFNiV2thSzIxZndrbThTU3VTcndFOXZpMUl0cUdsaGVtbkFqUm1waGZta214YjdqR2t0cWtaRUxxVGhUTUM3TV8tT2s2RHNlNTVWVEZGakVtakgzeUhCRk4wQXFHX0FKNGR5WmZwcEhBVVdGNmp3V2JQckNpRUpJZzQ4RGQ4Sl8zOVRodw?oc=5"
+        },
         {
           "published_ms": 1795074291000,
           "publisher": "DD News",
@@ -637,5 +665,5 @@
     }
   },
   "schema": 1,
-  "updated_ms": 1795227910811
+  "updated_ms": 1795259818436
 }
