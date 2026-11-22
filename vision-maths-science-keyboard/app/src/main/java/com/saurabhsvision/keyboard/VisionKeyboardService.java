@@ -567,6 +567,146 @@ public final class VisionKeyboardService extends InputMethodService {
         if(mode==CLIPBOARD)closeClipboardPanel();
         else requestSuggestions();
     }
+
+    private TextView clipboardButton(String label,int textSize){
+        TextView b=new TextView(this);
+        b.setText(label);
+        b.setTextSize(textSize);
+        b.setGravity(Gravity.CENTER);
+        b.setSingleLine(true);
+        b.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        b.setPadding(dp(5),0,dp(5),0);
+        b.setTextColor(light()?0xff18365a:Color.WHITE);
+        GradientDrawable bg=new GradientDrawable();
+        bg.setColor(light()?0xffedf2fc:0xff244b66);
+        bg.setCornerRadius(dp(12));
+        bg.setStroke(dp(1),light()?0xffb6cce6:0xff45bfd6);
+        b.setBackground(new RippleDrawable(
+            ColorStateList.valueOf(0x334a86ee),bg,null));
+        return b;
+    }
+    private void clipboardRow(LinearLayout row,TextView child,float weight){
+        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(42),weight);
+        lp.setMargins(dp(2),0,dp(2),0);
+        row.addView(child,lp);
+    }
+    private void addClipboardPanel(){
+        LinearLayout header=new LinearLayout(this);
+        header.setGravity(Gravity.CENTER_VERTICAL);
+        TextView back=clipboardButton("ABC",15);
+        clipboardRow(header,back,.65f);
+        back.setOnClickListener(v->{feedback(v);closeClipboardPanel();});
+        TextView title=new TextView(this);
+        title.setText("📋 Clipboard");
+        title.setTextSize(17);
+        title.setGravity(Gravity.CENTER);
+        title.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+        title.setTextColor(light()?0xff213954:Color.WHITE);
+        header.addView(title,new LinearLayout.LayoutParams(0,dp(42),1.35f));
+        final boolean historyOn=clipboardHistory!=null&&clipboardHistory.enabled();
+        TextView toggle=clipboardButton(historyOn?"24h: ON":"24h: OFF",12);
+        clipboardRow(header,toggle,1f);
+        toggle.setContentDescription(historyOn?
+            "Disable and erase encrypted clipboard history":
+            "Enable encrypted clipboard history for up to 24 hours");
+        toggle.setOnClickListener(v->{
+            if(clipboardHistory==null)return;
+            boolean enable=!clipboardHistory.enabled();
+            clipboardHistory.setEnabled(enable);
+            if(enable){
+                String now=plainClipboardText();
+                if(now!=null)clipboardHistory.add(now);
+                Toast.makeText(this,"History ON. Copies made while S Board is open are saved encrypted for up to 24 hours.",
+                    Toast.LENGTH_LONG).show();
+            }else{
+                Toast.makeText(this,"History OFF. Saved clips deleted.",
+                    Toast.LENGTH_SHORT).show();
+            }
+            rebuild();
+        });
+        keysContent.addView(header,new LinearLayout.LayoutParams(-1,dp(46)));
+
+        TextView details=new TextView(this);
+        details.setText("Paste with formatting depends on app support. History saves plain text only.");
+        details.setTextSize(11);
+        details.setGravity(Gravity.CENTER);
+        details.setMaxLines(2);
+        details.setTextColor(light()?0xff49617b:0xffc1dff1);
+        keysContent.addView(details,new LinearLayout.LayoutParams(-1,dp(32)));
+
+        LinearLayout pastes=new LinearLayout(this);
+        pastes.setGravity(Gravity.CENTER);
+        TextView formatted=clipboardButton("Paste with formatting",12);
+        TextView plain=clipboardButton("Paste plain text",12);
+        clipboardRow(pastes,formatted,1f);
+        clipboardRow(pastes,plain,1f);
+        formatted.setOnClickListener(v->{feedback(v);pasteCurrent(true);});
+        plain.setOnClickListener(v->{feedback(v);pasteCurrent(false);});
+        keysContent.addView(pastes,new LinearLayout.LayoutParams(-1,dp(46)));
+
+        TextView current=new TextView(this);
+        String clip=plainClipboardText();
+        current.setText(clip==null||clip.trim().isEmpty()?
+            "Current clipboard: empty or private":
+            "Current: "+(clip.length()>65?clip.substring(0,65)+"…":clip));
+        current.setTextColor(light()?0xff254463:0xffd0e9fa);
+        current.setTextSize(12);
+        current.setSingleLine(true);
+        current.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        current.setPadding(dp(9),0,dp(9),0);
+        current.setGravity(Gravity.CENTER_VERTICAL);
+        keysContent.addView(current,new LinearLayout.LayoutParams(-1,dp(29)));
+
+        ScrollView scroller=new ScrollView(this);
+        scroller.setFillViewport(true);
+        LinearLayout list=new LinearLayout(this);
+        list.setOrientation(LinearLayout.VERTICAL);
+        java.util.ArrayList<ClipboardHistoryStore.Entry> entries=clipboardHistory==null?
+            new java.util.ArrayList<>():clipboardHistory.entries();
+        if(!historyOn||entries.isEmpty()){
+            TextView empty=new TextView(this);
+            empty.setText(historyOn?
+                "No saved copies yet. Copy text while S Board is open.":
+                "History OFF by default. Enable 24h history above.");
+            empty.setTextSize(12);
+            empty.setGravity(Gravity.CENTER);
+            empty.setTextColor(light()?0xff50647e:0xffbedbea);
+            list.addView(empty,new LinearLayout.LayoutParams(-1,dp(95)));
+        }else{
+            for(ClipboardHistoryStore.Entry entry:entries){
+                final String copied=entry.text;
+                String preview=copied.replace('\n',' ').replace('\r',' ');
+                TextView item=clipboardButton(preview,12);
+                item.setContentDescription("Paste saved clipboard text");
+                LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(40));
+                lp.setMargins(dp(4),dp(2),dp(4),dp(2));
+                list.addView(item,lp);
+                item.setOnClickListener(v->{
+                    InputConnection conn=getCurrentInputConnection();
+                    if(conn!=null&&!sensitiveField){
+                        finishRomanWord();
+                        conn.commitText(copied,1);
+                    }
+                    closeClipboardPanel();
+                });
+            }
+        }
+        scroller.addView(list);
+        keysContent.addView(scroller,new LinearLayout.LayoutParams(-1,dp(117)));
+
+        LinearLayout actions=new LinearLayout(this);
+        actions.setGravity(Gravity.CENTER);
+        TextView clear=clipboardButton("Clear saved history",12);
+        clipboardRow(actions,clear,1f);
+        clear.setOnClickListener(v->{
+            if(clipboardHistory!=null)clipboardHistory.clear();
+            rebuild();
+        });
+        TextView returnButton=clipboardButton("↵ Back to keyboard",12);
+        clipboardRow(actions,returnButton,1f);
+        returnButton.setOnClickListener(v->closeClipboardPanel());
+        keysContent.addView(actions,new LinearLayout.LayoutParams(-1,dp(43)));
+    }
     /** Start one speech recognition session on explicit tap, with runtime consent. */
     private void toggleVoiceDictation(){
         if(sensitiveField){
