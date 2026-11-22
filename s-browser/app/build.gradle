@@ -1,5 +1,17 @@
 plugins { id 'com.android.application' }
 
+// Set all four signing variables to use the SAME owner-controlled signing key
+// across releases. Never commit any keystore or passwords to this repository.
+// Without them, GitHub's auto-generated DEBUG key may vary between builds;
+// Android will then refuse to install the next APK over an existing version.
+def stableKeyFile = System.getenv('GRIFLY_KEYSTORE_FILE')
+def stableKeyPassword = System.getenv('GRIFLY_KEYSTORE_PASSWORD')
+def stableKeyAlias = System.getenv('GRIFLY_KEY_ALIAS')
+def stableAliasPassword = System.getenv('GRIFLY_KEY_PASSWORD')
+def stableSigning = [stableKeyFile, stableKeyPassword, stableKeyAlias, stableAliasPassword]
+    .every { it != null && !it.isEmpty() } &&
+    (stableKeyFile != null && file(stableKeyFile).exists())
+
 android {
     namespace 'com.saurabhsvision.sbrowser'
     compileSdk 35
@@ -7,8 +19,25 @@ android {
         applicationId 'com.saurabhsvision.sbrowser'
         minSdk 26
         targetSdk 34
-        versionCode 21
-        versionName '1.9.2-beta'
+        versionCode 22
+        versionName '1.9.3-beta'
+    }
+    signingConfigs {
+        if (stableSigning) {
+            stableRelease {
+                storeFile file(stableKeyFile)
+                storePassword stableKeyPassword
+                keyAlias stableKeyAlias
+                keyPassword stableAliasPassword
+            }
+        }
+    }
+    buildTypes {
+        debug {
+            // Native Android in-place updates are possible only when the
+            // installed app and the new APK have identical signing identity.
+            if (stableSigning) signingConfig signingConfigs.stableRelease
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
