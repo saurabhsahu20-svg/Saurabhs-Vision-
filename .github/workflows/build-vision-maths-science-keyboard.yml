@@ -261,7 +261,7 @@ jobs:
           assert 'identity.setOnClickListener(v->' in ime and 'toolbarExpanded=false;' in ime
           assert 'toolbarExpanded=!toolbarExpanded;' in ime
           assert 'Search actions: 0' in Path('vision-maths-science-keyboard/app/src/debug/java/com/saurabhsvision/keyboard/KeyboardVisibilityTestActivity.java').read_text()
-          assert 'if(!b.isLongClickable())' in ime
+          assert 'b.setLongClickable(false); // Disable the unrelated OS timeout.' in ime
           import hashlib
           logo_digest=hashlib.sha256((root/'res/drawable-nodpi/s_board_logo.webp').read_bytes()).hexdigest()
           assert logo_digest=='66ce747a7ce6089d587f15f12ca2e6384011f02e5ce7740a94e5ae20ce883e59', 'Wrong (old) S Board icon'
