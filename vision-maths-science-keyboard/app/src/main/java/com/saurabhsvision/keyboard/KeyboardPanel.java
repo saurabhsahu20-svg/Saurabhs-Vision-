@@ -21,6 +21,7 @@ import java.util.WeakHashMap;
  */
 public final class KeyboardPanel extends LinearLayout {
     private KeyboardBackdrop painter;
+    private int artworkTheme=-1;
     private final WeakHashMap<View,Integer> naturalRows=new WeakHashMap<>();
     private final WeakHashMap<View,Integer> naturalKeys=new WeakHashMap<>();
     private int portraitMaxDp=365,landscapeMaxDp=340;
@@ -37,7 +38,10 @@ public final class KeyboardPanel extends LinearLayout {
         setTheme(theme);
     }
     public void setTheme(int theme){
-        painter=new KeyboardBackdrop(getContext(),theme);
+        int normalized=ThemePalette.norm(theme);
+        if(painter!=null&&artworkTheme==normalized)return;
+        artworkTheme=normalized;
+        painter=new KeyboardBackdrop(getContext(),normalized);
         invalidate();
     }
     public void setCompact(boolean compact){
