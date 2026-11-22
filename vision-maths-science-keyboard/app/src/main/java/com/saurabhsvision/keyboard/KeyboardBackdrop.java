@@ -64,6 +64,10 @@ public final class KeyboardBackdrop extends View {
             new int[]{BASE[theme],MID[theme],BASE[theme]},
             new float[]{0f,.56f,1f},Shader.TileMode.CLAMP));
         canvas.drawRect(0,0,w,h,paint);paint.setShader(null);
+        if(theme>=45&&theme<=50){
+            ThemeArtwork.drawOverlay(canvas,theme,w,h);
+            return; // Scenic and abstract artwork, no unrelated scientific glyphs.
+        }
         int hi=HIGHLIGHT[theme];
         if(ThemePalette.isLight(theme)){
             // Minimal white and metallic silver finishes: faint technical grid.
