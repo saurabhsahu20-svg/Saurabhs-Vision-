@@ -79,7 +79,7 @@ jobs:
           assert 'ACTION_OPEN_DOCUMENT' in gallery and 'ACTION_OPEN_DOCUMENT' in gallery
           assert 'takePersistableUriPermission' in photo
           assert 'StickerCatalog.count()' in provider and 'MODE_READ_ONLY' in provider
-          assert 'AES/GCM/NoPadding' in clipboard
+          assert 'AES/GCM/NoPadding' in (root/'java/com/saurabhsvision/keyboard/ClipboardHistoryStore.java').read_text()
           assert 'commitContent(sticker' in ime and 'new InputContentInfo(' in ime
           assert 'ThemeGalleryActivity' in manifest and 'StickerProvider' in manifest
           assert 'android:exported="false"' in manifest and 'grantUriPermissions="true"' in manifest
