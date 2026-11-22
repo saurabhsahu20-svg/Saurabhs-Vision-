@@ -24,8 +24,13 @@ label{display:block;font-weight:800;margin-bottom:8px}select{width:100%;font:inh
 .btn.primary{font-weight:900}.btn.alt{background:#e9efff;color:#143d86}.btn[aria-disabled="true"]{opacity:.6;pointer-events:none}
 .note{background:#fff9e9;border:1px solid #f2dfac;padding:15px 18px;border-radius:11px;line-height:1.7}
 .status{border-left:5px solid #1f6dbd;background:#edf4ff;padding:15px;border-radius:9px;line-height:1.6}
-small{color:#607390}#pdfViewer{width:100%;height:min(80vh,850px);border:1px solid #c9d6ec;border-radius:14px;background:#fff;display:none}
-#pdfViewer.visible{display:block}.download-badge{background:#eef9f1;color:#086a38;font-size:12px;font-weight:800;border-radius:25px;padding:7px 10px}
+small{color:#607390}
+#pdfPreview{display:none;overflow:auto;width:100%;max-height:85vh;padding:13px;border:1px solid #c9d6ec;border-radius:14px;background:#dfe7f5;text-align:center}
+#pdfPreview.visible{display:block}#pdfCanvas{display:block;max-width:none;margin:auto;background:white;box-shadow:0 2px 14px #102d632b}
+#pdfControls{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}
+#pdfControls[hidden]{display:none}#pdfControls button{padding:9px 13px;border-radius:9px;border:1px solid #b5c8e3;background:#f3f6fd;color:#102d63;font:inherit;font-weight:700;cursor:pointer}
+#pdfControls button:disabled{opacity:.45;cursor:not-allowed}
+.download-badge{background:#eef9f1;color:#086a38;font-size:12px;font-weight:800;border-radius:25px;padding:7px 10px}
 nav{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:19px}nav a{color:white;font-weight:700;text-decoration:none}
 footer{background:#071b49;color:#d9e6ff;text-align:center;padding:23px 14px;margin-top:25px}
 button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid #2ca9ff;outline-offset:3px}
@@ -48,8 +53,16 @@ button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid #2ca
 <p id="status" class="status" role="status" aria-live="polite">कक्षा, विषय और सेट चुनकर “PDF देखें” दबाएँ।</p>
 </section>
 <section class="card"><h2>📄 Question Paper + Answers <span id="badge" class="download-badge">PDF</span></h2>
-<iframe id="pdfViewer" title="Complete CGBSE model question paper and teacher solution PDF"></iframe>
-<p id="pdfHint"><small>PDF खुलने के बाद ऊपर से डाउनलोड या प्रिंट कर सकते हैं। मोबाइल पर PDF नए टैब में भी खोला जा सकता है।</small></p>
+<div id="pdfControls" hidden aria-label="PDF preview controls">
+<button id="previousPage" type="button" aria-label="Previous PDF page">◀ पिछला</button>
+<strong id="pageInfo" aria-live="polite">पेज 1</strong>
+<button id="nextPage" type="button" aria-label="Next PDF page">अगला ▶</button>
+<button id="zoomOut" type="button" aria-label="Zoom out">−</button>
+<span id="zoomInfo">100%</span>
+<button id="zoomIn" type="button" aria-label="Zoom in">+</button>
+</div>
+<div id="pdfPreview" role="region" aria-label="PDF question paper preview" tabindex="0"><canvas id="pdfCanvas" aria-label="PDF page"></canvas></div>
+<p id="pdfHint"><small>📖 Preview में PDF ऐप के अंदर दिखेगी; इससे फाइल डाउनलोड नहीं होगी। डाउनलोड करने के लिए ऊपर अलग “PDF Download” बटन दबाएँ।</small></p>
 </section>
 <section class="card note"><strong>शिक्षक उपयोग हेतु महत्वपूर्ण जानकारी:</strong>
 ये SAURABH’S VISION™ के स्वतंत्र अभ्यास मॉडल पेपर हैं, CGBSE द्वारा जारी आधिकारिक प्रश्नपत्र नहीं। गणित के संख्यात्मक हल और वस्तुनिष्ठ उत्तर उपलब्ध हैं। अन्य विषयों के कई वर्णनात्मक उत्तर अभी शिक्षक समीक्षा-ड्राफ्ट हैं; पढ़ाने से पहले जाँचें। 2026–27 के आधिकारिक ब्लूप्रिंट से भी मिलान करें। हर PDF में SAURABH’S VISION™ का हल्का पारदर्शी वॉटरमार्क है।</section>
@@ -61,13 +74,117 @@ const subjects={
 '12':['Physics','Chemistry','Biology','Mathematics','Hindi','English','Sanskrit','History','Geography','Political_Science','Sociology','Psychology','Accountancy','Business_Studies','Economics']};
 const $=id=>document.getElementById(id);
 function fillSubjects(){const grade=$('grade').value;const old=$('subject').value;$('subject').replaceChildren(...subjects[grade].map(name=>{const o=document.createElement('option');o.value=name;o.textContent=name.replaceAll('_',' ');return o;}));if(subjects[grade].includes(old))$('subject').value=old;resetPdf();}
-function resetPdf(){$('pdfViewer').removeAttribute('src');$('pdfViewer').classList.remove('visible');$('download').setAttribute('aria-disabled','true');$('download').setAttribute('href','#');$('status').textContent='कक्षा, विषय और सेट चुनकर “PDF देखें” दबाएँ।';}
+
+let documentTask=null,pdfDocument=null,drawingTask=null,viewEpoch=0,drawEpoch=0,pageNumber=1,zoom=1,pdfJsPromise=null;
+function resetPdf(){
+  viewEpoch++;drawEpoch++;
+  if(drawingTask){drawingTask.cancel();drawingTask=null;}
+  if(documentTask){documentTask.destroy().catch(()=>{});documentTask=null;}
+  else if(pdfDocument){pdfDocument.destroy().catch(()=>{});}
+  pdfDocument=null;pageNumber=1;zoom=1;
+  $('pdfPreview').classList.remove('visible');$('pdfControls').hidden=true;
+  const canvas=$('pdfCanvas');canvas.width=0;canvas.height=0;
+  $('download').setAttribute('aria-disabled','true');$('download').setAttribute('href','#');
+  $('status').textContent='कक्षा, विषय और सेट चुनकर “PDF देखें” दबाएँ।';
+}
+async function ensurePdfJs(){
+  if(window.pdfjsLib)return window.pdfjsLib;
+  if(!pdfJsPromise){
+    pdfJsPromise=new Promise((resolve,reject)=>{
+      const script=document.createElement('script');
+      script.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      script.onload=()=>window.pdfjsLib?resolve(window.pdfjsLib):reject(Error('Viewer could not start'));
+      script.onerror=()=>reject(Error('Viewer library unavailable'));
+      document.head.append(script);
+    }).catch(e=>{pdfJsPromise=null;throw e;});
+  }
+  const lib=await pdfJsPromise;
+  lib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  return lib;
+}
+async function drawPage(epoch){
+  const serial=++drawEpoch,doc=pdfDocument;
+  if(!doc||epoch!==viewEpoch)return;
+  if(drawingTask){
+    const old=drawingTask;old.cancel();
+    try{await old.promise;}catch(e){if(e?.name!=='RenderingCancelledException')console.warn('Previous PDF draw stopped',e);}
+  }
+  if(epoch!==viewEpoch||serial!==drawEpoch||pdfDocument!==doc)return;
+  const page=await doc.getPage(pageNumber);
+  if(epoch!==viewEpoch||serial!==drawEpoch||pdfDocument!==doc)return;
+  const base=page.getViewport({scale:1});
+  const availableWidth=Math.max(260,$('pdfPreview').clientWidth-38);
+  const scale=Math.min(1.5,availableWidth/base.width)*zoom;
+  const viewport=page.getViewport({scale});
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const canvas=$('pdfCanvas');
+  canvas.width=Math.ceil(viewport.width*dpr);canvas.height=Math.ceil(viewport.height*dpr);
+  canvas.style.width=viewport.width+'px';canvas.style.height=viewport.height+'px';
+  const context=canvas.getContext('2d',{alpha:false});
+  if(!context)throw Error('Canvas is unavailable');
+  const task=page.render({canvasContext:context,viewport,transform:[dpr,0,0,dpr,0,0]});
+  drawingTask=task;
+  try{await task.promise;}catch(e){
+    if(e?.name==='RenderingCancelledException')return;
+    throw e;
+  }finally{if(drawingTask===task)drawingTask=null;}
+  if(epoch!==viewEpoch||serial!==drawEpoch)return;
+  $('pageInfo').textContent='पेज '+pageNumber+' / '+doc.numPages;
+  $('zoomInfo').textContent=Math.round(zoom*100)+'%';
+  $('previousPage').disabled=pageNumber<=1;
+  $('nextPage').disabled=pageNumber>=doc.numPages;
+}
+function updatePreview(){
+  if(!pdfDocument)return;
+  drawPage(viewEpoch).catch(()=>{
+    $('status').textContent='⚠️ इस पेज का Preview नहीं दिख पा रहा है। नीचे PDF Download विकल्प उपलब्ध है।';
+  });
+}
+for(const [id,step] of [['previousPage',-1],['nextPage',1]]){
+  $(id).addEventListener('click',()=>{
+    if(!pdfDocument)return;
+    pageNumber=Math.max(1,Math.min(pdfDocument.numPages,pageNumber+step));
+    updatePreview();
+  });
+}
+for(const [id,factor] of [['zoomOut',1/1.2],['zoomIn',1.2]]){
+  $(id).addEventListener('click',()=>{
+    if(!pdfDocument)return;
+    zoom=Math.max(.5,Math.min(3,zoom*factor));updatePreview();
+  });
+}
 for(let n=1;n<=50;n++){const e=document.createElement('option');e.value=String(n).padStart(2,'0');e.textContent='Model Paper Set '+e.value;$('paperSet').append(e);}
 $('grade').addEventListener('change',fillSubjects);$('subject').addEventListener('change',resetPdf);$('paperSet').addEventListener('change',resetPdf);fillSubjects();
 function pdfPath(){return './pdfs/'+$('grade').value+'_'+$('subject').value+'/Set_'+$('paperSet').value+'.pdf';}
 $('view').addEventListener('click',async()=>{
-const path=pdfPath();$('status').textContent='PDF की उपलब्धता जाँच रहे हैं…';$('download').setAttribute('aria-disabled','true');
-try{const response=await fetch(path,{method:'HEAD',cache:'no-cache'});if(!response.ok||!(response.headers.get('content-type')||'').includes('pdf'))throw Error('PDF not published');
-$('pdfViewer').src=path+'#toolbar=1';$('pdfViewer').classList.add('visible');$('download').href=path;$('download').removeAttribute('aria-disabled');$('status').textContent='✅ पूरा प्रश्नपत्र एवं उत्तर गाइड PDF उपलब्ध है — सीधे देखें या डाउनलोड करें।';
-}catch(e){$('pdfViewer').removeAttribute('src');$('pdfViewer').classList.remove('visible');$('status').textContent='⚠️ यह पूरा PDF अभी वेबसाइट सर्वर पर प्रकाशित नहीं हुआ है। इसे सैंपल से नहीं बदला गया है।';}});
+  resetPdf();
+  const epoch=viewEpoch,path=pdfPath();
+  $('status').textContent='PDF की उपलब्धता जाँच रहे हैं…';
+  try{
+    const response=await fetch(path,{method:'HEAD',cache:'no-store'});
+    if(!response.ok||!/(application\/pdf|\.pdf)/i.test((response.headers.get('content-type')||'')+' '+response.url))throw Error('PDF not published');
+    if(epoch!==viewEpoch)return;
+    $('download').href=path;
+    $('download').removeAttribute('aria-disabled');
+    $('status').textContent='PDF मिल गई है। Preview खोल रहे हैं…';
+    const lib=await ensurePdfJs();
+    if(epoch!==viewEpoch)return;
+    const task=lib.getDocument({url:path,withCredentials:false});
+    documentTask=task;
+    const doc=await task.promise;
+    if(epoch!==viewEpoch){await doc.destroy();return;}
+    pdfDocument=doc;
+    $('pdfPreview').classList.add('visible');$('pdfControls').hidden=false;
+    await drawPage(epoch);
+    if(epoch===viewEpoch)$('status').textContent='✅ PDF Preview खुल गई है। डाउनलोड केवल अलग “PDF Download” बटन से होगा।';
+  }catch(e){
+    if(epoch!==viewEpoch)return;
+    $('pdfPreview').classList.remove('visible');$('pdfControls').hidden=true;
+    if($('download').getAttribute('aria-disabled')==='true'){
+      $('status').textContent='⚠️ इस सेट की PDF अभी वेबसाइट पर प्रकाशित नहीं है।';
+    }else{
+      $('status').textContent='⚠️ PDF उपलब्ध है, लेकिन Preview नहीं खुल पाया। ऊपर PDF Download इस्तेमाल कर सकते हैं।';
+    }
+  }
+});
 </script></body></html>
