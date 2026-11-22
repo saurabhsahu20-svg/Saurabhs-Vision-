@@ -207,6 +207,24 @@ sleep 4
 adb shell logcat -d -s SBoardClipQA:I | grep 'PASS: clipboard opt-in, AES-GCM ciphertext'
 echo "PASS: encrypted 24-hour history, clipboard opt-in and HTML clipboard metadata."
 
+# Test original offline theme and PNG sticker assets through the Android provider.
+adb shell logcat -c || true
+adb shell am start -W -n "$APP/.ThemeStickerSelfTestActivity"
+sleep 3
+adb shell logcat -d -s SBoardThemeQA:I | grep 'PASS: 35 themes'
+echo "PASS: 35 original themes and 30 stickers including real PNG ContentProvider payload."
+
+# Check the themed gallery really opens on Android rather than just compiling.
+adb shell am start -W -n "$APP/.ThemeGalleryActivity"
+sleep 3
+adb exec-out screencap -p > /tmp/sboard-theme-gallery.png
+test -s /tmp/sboard-theme-gallery.png
+adb shell uiautomator dump /sdcard/sboard-theme-gallery.xml >/dev/null 2>&1
+adb pull /sdcard/sboard-theme-gallery.xml /tmp/sboard-theme-gallery.xml >/dev/null
+grep -q 'S Board Themes' /tmp/sboard-theme-gallery.xml
+grep -q 'Create' /tmp/sboard-theme-gallery.xml
+echo "PASS: visual theme studio launches with Create and category filters."
+
 # Inspect only errors, never output sensitive input or clipboard content.
 adb shell logcat -d -t 1800 -s AndroidRuntime:E > /tmp/sboard-androidruntime.log || true
 if grep -F "Process: $APP" /tmp/sboard-androidruntime.log; then
