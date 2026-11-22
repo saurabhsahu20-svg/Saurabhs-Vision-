@@ -150,6 +150,43 @@ await check('admission-guide-and-links',async page=>{
   await page.locator('details').first().locator('summary').click();
   assert.ok(await page.locator('details').first().getAttribute('open')!==null,'FAQ expandable');
 });
+
+await check('model-paper-inline-pdf-preview',async page=>{
+  await page.addInitScript(()=>{
+    window.pdfjsLib={
+      GlobalWorkerOptions:{},
+      getDocument:()=>({
+        promise:Promise.resolve({
+          numPages:2,
+          getPage:async()=>({
+            getViewport:({scale})=>({width:600*scale,height:800*scale}),
+            render:()=>({promise:Promise.resolve(),cancel(){}})
+          }),
+          destroy:async()=>{}
+        }),
+        destroy:async()=>{}
+      })
+    };
+  });
+  await page.route('**/cgbse-solutions/pdfs/**',route=>{
+    if(route.request().method()==='HEAD')
+      return route.fulfill({status:200,headers:{'content-type':'application/pdf'}});
+    return route.abort();
+  });
+  await goto(page,'cgbse-solutions/');
+  assert.equal(await page.locator('iframe#pdfViewer').count(),0,'never open a direct PDF iframe');
+  assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true');
+  await page.locator('#view').click();
+  await page.locator('#pdfPreview.visible').waitFor();
+  assert.equal(await page.locator('#download').getAttribute('aria-disabled'),null);
+  assert.equal(await page.locator('#download').getAttribute('download'),'','only Download button saves the PDF');
+  assert.match(await page.locator('#pageInfo').textContent(),/1 \/ 2/);
+  await page.locator('#nextPage').click();
+  await page.waitForFunction(()=>document.getElementById('pageInfo').textContent.includes('2 / 2'));
+  await page.selectOption('#paperSet','02');
+  assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true','changing set invalidates stale download');
+  assert.equal(await page.locator('#pdfPreview.visible').count(),0,'changing set hides old preview');
+});
 await browser.close();
 if(failures)process.exitCode=1;
 else console.log('PASS: all 7 desktop/mobile Chromium browser flows');
