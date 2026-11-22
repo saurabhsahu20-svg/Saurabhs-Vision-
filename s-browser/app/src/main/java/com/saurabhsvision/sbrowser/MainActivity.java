@@ -155,13 +155,25 @@ public final class MainActivity extends Activity {
     // Apply a real per-letter rainbow to Grifly inside the Android app.
     // Android home screen icon labels use launcher-controlled, unstyled text.
     private TextView griflyRainbow(int size){
+        // Slightly stronger but still readable rainbow branding, without altering the icon.
         TextView view=text("Grifly",size,HOME_INK,true);
+        view.setTypeface(Typeface.create("sans-serif-black",Typeface.BOLD));
         SpannableString rainbow=new SpannableString("Grifly");
-        int[] colors={0xffed313d,0xfffd8522,0xffe9b600,0xff19a758,0xff1289e9,0xff8d4be2};
+        int[] colors={0xffd82540,0xffdb6515,0xffab8200,0xff118a51,0xff1769cb,0xff7636c0};
         for(int i=0;i<rainbow.length();i++){
             rainbow.setSpan(new ForegroundColorSpan(colors[i]),i,i+1,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         view.setText(rainbow);
+        GradientDrawable highlight=new GradientDrawable(
+            GradientDrawable.Orientation.LEFT_RIGHT,
+            new int[]{0xffeffaff,0xfffff9fd,0xffedf3ff});
+        highlight.setCornerRadius(dp(size>=40?18:11));
+        highlight.setStroke(dp(1),0xffbad6f4);
+        view.setBackground(highlight);
+        view.setPadding(dp(size>=40?17:9),dp(size>=40?4:2),
+                        dp(size>=40?17:9),dp(size>=40?4:2));
+        view.setElevation(dp(2));
+        view.setShadowLayer(dp(1),0f,dp(0.5f),0x1e102b65);
         view.setContentDescription("Grifly browser");
         return view;
     }
@@ -294,7 +306,7 @@ public final class MainActivity extends Activity {
         logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
         header.addView(logo,new LinearLayout.LayoutParams(dp(48),dp(48)));
         LinearLayout branding=column();
-        TextView name=griflyRainbow(19);
+        TextView name=griflyRainbow(20);
         name.setSingleLine(true);
         branding.addView(name);
         TextView byline=text("A Saurabh Vision Product",11,HOME_MUTED,false);
@@ -631,7 +643,7 @@ public final class MainActivity extends Activity {
             dp(106),dp(106));
         rainbowParams.gravity=Gravity.CENTER_HORIZONTAL;
         layout.addView(rainbowLogo,rainbowParams);
-        TextView brand=griflyRainbow(43);
+        TextView brand=griflyRainbow(46);
         brand.setGravity(Gravity.CENTER);
         brand.setContentDescription("Grifly search home");
         add(layout,brand,0);
