@@ -470,7 +470,8 @@ public final class VisionKeyboardService extends InputMethodService {
         catch(RuntimeException ignored){return null;}
     }
     private static boolean sensitiveClip(ClipDescription d){
-        return d!=null && d.getExtras()!=null &&
+        return d!=null && android.os.Build.VERSION.SDK_INT>=24 &&
+            d.getExtras()!=null &&
             d.getExtras().getBoolean("android.content.extra.IS_SENSITIVE",false);
     }
     private boolean clipboardTextAvailable(){
