@@ -485,6 +485,7 @@ public final class MainActivity extends Activity {
         try{
             // Prefer the 75-mark offline study pack, then fall back to the older mini-pack.
             for(String pkg:new String[]{
+                "com.saurabhsvision.quizclub.v415x",
                 "com.saurabhsvision.quizclub.v414x",
                 "com.saurabhsvision.quizclub.study"
             }){
@@ -500,7 +501,7 @@ public final class MainActivity extends Activity {
         }
         new AlertDialog.Builder(this)
             .setTitle("Model Paper Library")
-            .setMessage("SAURABH'S VISION v4.1.4 Study Test में 10वीं के 6 मूल 75-अंक पेपर, 30 पुराने छोटे अभ्यास सेट और 30 नए 75-अंकीय सेट (हर विषय में 5) उपलब्ध हैं। ऐप इंस्टॉल करें, फिर Model Paper Library खोलें।")
+            .setMessage("SAURABH'S VISION v4.1.5 Study Test में 10वीं के सभी 66 पेपर, नए 75-अंक के 30 चरणबद्ध हल, लेबल वाले आरेख और ऑफलाइन Preview हैं। पहले यह ऐप इंस्टॉल करें और Model Paper Library खोलें।")
             .setPositiveButton("ठीक है",(dialog,which)->dialog.dismiss())
             .show();
     }
