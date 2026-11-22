@@ -215,7 +215,7 @@ adb shell logcat -d -s SBoardThemeQA:I | grep 'PASS: 35 themes'
 echo "PASS: 35 original themes and 30 stickers including real PNG ContentProvider payload."
 
 # Check the themed gallery really opens on Android rather than just compiling.
-adb shell am start -W -n "$APP/.ThemeGalleryActivity"
+adb shell am start -W -n "$APP/.ThemeGalleryTestAlias"
 sleep 3
 adb exec-out screencap -p > /tmp/sboard-theme-gallery.png
 test -s /tmp/sboard-theme-gallery.png
