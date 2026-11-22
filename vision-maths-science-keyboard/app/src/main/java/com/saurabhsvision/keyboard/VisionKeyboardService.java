@@ -2,6 +2,11 @@ package com.saurabhsvision.keyboard;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.ClipboardManager;
+import android.content.ClipData;
+import android.content.ClipDescription;
+import android.text.Html;
+import android.widget.ScrollView;
 import android.content.pm.PackageManager;
 import android.widget.Toast;
 import android.content.res.ColorStateList;
@@ -33,12 +38,12 @@ import android.content.SharedPreferences;
 
 /**
  * Fully native system keyboard / IME. No network, account login, logging,
- * clipboard access, or saved keystroke history.
+ * clipboard access without explicit keyboard visibility, or saved keystroke history.
  */
 public final class VisionKeyboardService extends InputMethodService {
     private static final String PREFS="vision_keyboard_settings";
     private static final String KEY_THEME="theme";
-    private static final int ABC=0,NUMBER=1,MATH=2,SCIENCE=3,EMOJI=4,LANGUAGE=5,SYMBOLS=6;
+    private static final int ABC=0,NUMBER=1,MATH=2,SCIENCE=3,EMOJI=4,LANGUAGE=5,SYMBOLS=6,CLIPBOARD=7;
     private static final int EMOJIS_PER_PAGE=32;
     private int emojiCategory=0,emojiPage=0;
     private static final int[] ACCENTS=ThemePalette.ACCENTS;
@@ -77,12 +82,20 @@ public final class VisionKeyboardService extends InputMethodService {
     private String voiceStatus="";
     // Invalidate speech callbacks as soon as an editor changes or the IME closes.
     private long voiceSessionToken=0L;
+    private ClipboardManager clipboardManager;
+    private ClipboardHistoryStore clipboardHistory;
+    private TextView clipboardShortcut;
+    private boolean clipboardObserverRegistered=false;
+    private boolean keyboardVisible=false;
+    private final ClipboardManager.OnPrimaryClipChangedListener clipboardObserver=()->onClipboardChanged();
 
     @Override public void onCreate(){
         super.onCreate();
         theme=ThemePalette.norm(getSharedPreferences(PREFS,MODE_PRIVATE).getInt(KEY_THEME,4));
         selectedLanguage=IndicLanguages.norm(settings().getInt("language",IndicLanguages.ENGLISH));
         haptics=settings().getBoolean("key_haptics",false);
+        clipboardManager=(ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+        clipboardHistory=new ClipboardHistoryStore(this);
     }
     private int dp(float value){
         return (int)(value*getResources().getDisplayMetrics().density+.5f);
@@ -127,7 +140,13 @@ public final class VisionKeyboardService extends InputMethodService {
         selectedLanguage=IndicLanguages.norm(settings().getInt("language",IndicLanguages.ENGLISH));
         sensitiveField=isPasswordField(info);
         haptics=settings().getBoolean("key_haptics",false);
+        keyboardVisible=true;
+        if(clipboardManager!=null&&!clipboardObserverRegistered){
+            clipboardManager.addPrimaryClipChangedListener(clipboardObserver);
+            clipboardObserverRegistered=true;
+        }
         if(keyboardFrame!=null)rebuild();
+        updateClipboardShortcut();
     }
     @Override public void onUpdateSelection(int oldSelStart,int oldSelEnd,
         int newSelStart,int newSelEnd,int candidatesStart,int candidatesEnd){
@@ -137,6 +156,12 @@ public final class VisionKeyboardService extends InputMethodService {
         if(!updatingSuggestions && mode==ABC)requestSuggestions();
     }
     @Override public void onFinishInputView(boolean finishingInput){
+        keyboardVisible=false;
+        if(clipboardManager!=null&&clipboardObserverRegistered){
+            clipboardManager.removePrimaryClipChangedListener(clipboardObserver);
+            clipboardObserverRegistered=false;
+        }
+        clipboardShortcut=null;
         cancelVoiceDictation();
         suggestionHandler.removeCallbacks(suggestionRefresh);suggestionsQueued=false;
         stopRepeat();
@@ -144,6 +169,12 @@ public final class VisionKeyboardService extends InputMethodService {
         super.onFinishInputView(finishingInput);
     }
     @Override public void onDestroy(){
+        keyboardVisible=false;
+        if(clipboardManager!=null&&clipboardObserverRegistered){
+            clipboardManager.removePrimaryClipChangedListener(clipboardObserver);
+            clipboardObserverRegistered=false;
+        }
+        clipboardShortcut=null;
         cancelVoiceDictation();
         suggestionHandler.removeCallbacksAndMessages(null);
         stopRepeat();
@@ -163,6 +194,7 @@ public final class VisionKeyboardService extends InputMethodService {
         keysContent=keyboardFrame;
         suggestionChips=null;
         voiceMicButton=null;
+        clipboardShortcut=null;
         lastSuggestionKey=null;
         romanPreview=null;
         // The compat IME window sits ABOVE Android's navigation bar.
@@ -170,8 +202,10 @@ public final class VisionKeyboardService extends InputMethodService {
         // fourth Space/Enter row under the bottom of the real viewport.
         keysContent.setPadding(dp(3),dp(4),dp(3),dp(8));
         // Compact suggestions bar by default; the grid exposes all original tabs.
-        if(mode!=ABC || toolbarExpanded)addToolbar();
-        if(mode==LANGUAGE){
+        if((mode!=ABC && mode!=CLIPBOARD) || toolbarExpanded)addToolbar();
+        if(mode==CLIPBOARD){
+            addClipboardPanel();
+        }else if(mode==LANGUAGE){
             addLanguagePicker();
         }else if(mode==ABC){
             // Reference screenshot has a single tools row above the keys.
@@ -277,7 +311,7 @@ public final class VisionKeyboardService extends InputMethodService {
 
         // Screenshot-inspired ordering: no redundant toolbar Space control.
         // The real wide Space key always lives in the bottom row.
-        String[] ids={"ABC","123","∑ Math","⚛ Sci","😊","🌐","🎨","⚙"};
+        String[] ids={"ABC","123","∑ Math","⚛ Sci","😊","🌐","🎨","⚙","📋"};
         View active=null;
         for(int i=0;i<ids.length;i++){
             final int index=i;
@@ -315,7 +349,7 @@ public final class VisionKeyboardService extends InputMethodService {
             if(chosen)active=tab;
             tab.setContentDescription(index==5?"Choose Indian language":
                 index==6?"Change keyboard theme":
-                index==7?"Keyboard settings":"Switch keyboard to "+ids[i]);
+                index==7?"Keyboard settings":index==8?"Open clipboard with paste and history options":"Switch keyboard to "+ids[i]);
             tab.setOnClickListener(v->{
                 feedback(v);
                 if(index<5){
@@ -326,6 +360,8 @@ public final class VisionKeyboardService extends InputMethodService {
                     theme=(theme+1)%ThemePalette.count();
                     toolbarExpanded=false;
                     settings().edit().putInt(KEY_THEME,theme).apply();rebuild();
+                }else if(index==8){
+                    openClipboardPanel();
                 }else{
                     finishRomanWord();
                     Intent intent=new Intent(this,MainActivity.class);
