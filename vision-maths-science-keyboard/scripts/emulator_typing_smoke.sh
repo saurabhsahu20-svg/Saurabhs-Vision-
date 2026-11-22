@@ -226,7 +226,7 @@ grep -q 'Create' /tmp/sboard-theme-gallery.xml
 echo "PASS: visual theme studio launches with Create and category filters."
 
 # Verify the new, accessible Layout & Keys settings activity on Android 15.
-adb shell am start -W -n "$APP/.KeyboardSettingsActivity"
+adb shell am start -W -n "$APP/.KeyboardSettingsTestAlias"
 sleep 3
 adb exec-out screencap -p > /tmp/sboard-sboard-settings.png
 test -s /tmp/sboard-sboard-settings.png
