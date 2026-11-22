@@ -207,7 +207,7 @@ await check('class10-model-library-preview-and-release-safety',async(page)=>{
     return route.abort();
   });
   await goto(page,'model-paper-library/');
-  assert.ok(await page.getByText('Model Paper Library',{exact:true}).count()>0);
+  assert.match(await page.locator('h1').textContent(),/Model Paper Library/);
   assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true');
   assert.equal(await page.locator('#subject option').count(),6);
   assert.equal(await page.locator('#paperSet option').count(),5);
