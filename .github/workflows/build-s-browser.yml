@@ -202,13 +202,13 @@ jobs:
           test -s "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
           mkdir -p dist
-          cp "$APK" dist/S_Browser_v1.8.2_Blank_Practice_Maps_Beta.apk
+          cp "$APK" dist/Grifly_v1.8.3_Rainbow_Brand.apk
 
       - name: Upload installable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S-Browser-1.8.2-Blank-Maps-APK
-          path: dist/S_Browser_v1.8.2_Blank_Practice_Maps_Beta.apk
+          name: Grifly-v1.8.3-APK
+          path: dist/Grifly_v1.8.3_Rainbow_Brand.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -220,13 +220,13 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          TAG="s-browser-v1.8.2-blank-maps-beta"
-          FILE="dist/S_Browser_v1.8.2_Blank_Practice_Maps_Beta.apk"
+          TAG="grifly-v1.8.3-rainbow-beta"
+          FILE="dist/Grifly_v1.8.3_Rainbow_Brand.apk"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$FILE" --clobber
           else
             gh release create "$TAG" "$FILE" \
-              --title "S Browser 1.8.2 Beta — Blank District and Political Maps" \
-              --notes "S Browser v1.8.2 adds clearly identified blank district, India and world worksheets plus official reference PDFs to an existing Maps Download tile to the Student Dashboard with official downloadable PDFs of Chhattisgarh, India political and outline maps, and world maps. All other S Browser 1.8 features remain unchanged. Previous version: General and Sports news timeout dead ends with a two-stage attributed news feed: the privacy-friendly GitHub Pages bulletin, refreshed periodically by scheduled GitHub Actions from established Hindi/English publishers and PIB where possible; fallback to live Google News RSS, and visible Retry/Open Latest News/official PIB-News On AIR links on total outage. All cards have publisher, actual feed publication date, original news link and Cross-check action. No generated or fake news. A scheduled bulletin is clearly marked as last synced, NOT instant live breaking coverage. Premium news desk layout, clean gradient header, polished buttons, and dedicated one-tap General and Sports cards on the main homepage. CG Jobs, City News, Saurabh Vision learning shortcut, offline dictionary, Daily Assembly, smooth tabs and original S Browser icon are preserved. Android beta: real-device tests and external feeds cannot be guaranteed; publishers are not independently fact-checked." \
+              --title "Grifly 1.8.3 Beta — Rainbow Name" \
+              --notes "Grifly v1.8.3 rebrands S Browser with a rainbow-colored name and retains the blank district, India and world worksheets plus official reference PDFs in the Maps Download tile to the Student Dashboard with official downloadable PDFs of Chhattisgarh, India political and outline maps, and world maps. All other S Browser 1.8 features remain unchanged. Previous version: General and Sports news timeout dead ends with a two-stage attributed news feed: the privacy-friendly GitHub Pages bulletin, refreshed periodically by scheduled GitHub Actions from established Hindi/English publishers and PIB where possible; fallback to live Google News RSS, and visible Retry/Open Latest News/official PIB-News On AIR links on total outage. All cards have publisher, actual feed publication date, original news link and Cross-check action. No generated or fake news. A scheduled bulletin is clearly marked as last synced, NOT instant live breaking coverage. Premium news desk layout, clean gradient header, polished buttons, and dedicated one-tap General and Sports cards on the main homepage. CG Jobs, City News, Saurabh Vision learning shortcut, offline dictionary, Daily Assembly, smooth tabs and original S Browser icon are preserved. Android beta: real-device tests and external feeds cannot be guaranteed; publishers are not independently fact-checked." \
               --prerelease
           fi
