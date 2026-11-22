@@ -28,6 +28,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".KeyboardSettingsActivity"
+            android:exported="false"
+            android:label="S Board Settings" />
+        <activity
             android:name=".ThemeGalleryActivity"
             android:exported="false"
             android:label="S Board Themes"
