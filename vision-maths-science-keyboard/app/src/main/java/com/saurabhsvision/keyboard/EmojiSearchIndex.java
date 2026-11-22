@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 /** Small offline English keyword index; uses only bundled Unicode emoji. */
-final class EmojiSearchIndex {
+public final class EmojiSearchIndex {
     private EmojiSearchIndex(){}
     private static final String[] WORDS={
         "smile happy laugh","love heart kiss","sad cry tears","hands wave clap",
@@ -37,7 +37,7 @@ final class EmojiSearchIndex {
         {"yes okay ok","✅ 👍 👌 💯"},
         {"no wrong","❌ 👎 🚫"}
     };
-    static String[] search(String query,int max){
+    public static String[] search(String query,int max){
         int limit=Math.max(1,Math.min(32,max));
         String q=query==null?"":query.trim().toLowerCase(Locale.ROOT);
         LinkedHashSet<String> found=new LinkedHashSet<>();
