@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.widget.Toast;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
@@ -28,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+import android.view.inputmethod.InputContentInfo;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -43,7 +45,7 @@ import android.content.SharedPreferences;
 public final class VisionKeyboardService extends InputMethodService {
     private static final String PREFS="vision_keyboard_settings";
     private static final String KEY_THEME="theme";
-    private static final int ABC=0,NUMBER=1,MATH=2,SCIENCE=3,EMOJI=4,LANGUAGE=5,SYMBOLS=6,CLIPBOARD=7;
+    private static final int ABC=0,NUMBER=1,MATH=2,SCIENCE=3,EMOJI=4,LANGUAGE=5,SYMBOLS=6,CLIPBOARD=7,STICKERS=8;
     private static final int EMOJIS_PER_PAGE=32;
     private int emojiCategory=0,emojiPage=0;
     private static final int[] ACCENTS=ThemePalette.ACCENTS;
@@ -87,6 +89,7 @@ public final class VisionKeyboardService extends InputMethodService {
     private TextView clipboardShortcut;
     private boolean clipboardObserverRegistered=false;
     private boolean keyboardVisible=false;
+    private int stickerPack=0;
     private final ClipboardManager.OnPrimaryClipChangedListener clipboardObserver=()->onClipboardChanged();
 
     @Override public void onCreate(){
@@ -202,8 +205,10 @@ public final class VisionKeyboardService extends InputMethodService {
         // fourth Space/Enter row under the bottom of the real viewport.
         keysContent.setPadding(dp(3),dp(4),dp(3),dp(8));
         // Compact suggestions bar by default; the grid exposes all original tabs.
-        if((mode!=ABC && mode!=CLIPBOARD) || toolbarExpanded)addToolbar();
-        if(mode==CLIPBOARD){
+        if((mode!=ABC && mode!=CLIPBOARD && mode!=STICKERS) || toolbarExpanded)addToolbar();
+        if(mode==STICKERS){
+            addStickerPanel();
+        }else if(mode==CLIPBOARD){
             addClipboardPanel();
         }else if(mode==LANGUAGE){
             addLanguagePicker();
@@ -311,7 +316,7 @@ public final class VisionKeyboardService extends InputMethodService {
 
         // Screenshot-inspired ordering: no redundant toolbar Space control.
         // The real wide Space key always lives in the bottom row.
-        String[] ids={"ABC","123","∑ Math","⚛ Sci","😊","🌐","🎨","⚙","📋"};
+        String[] ids={"ABC","123","∑ Math","⚛ Sci","😊","🌐","🎨","⚙","📋","🧩"};
         View active=null;
         for(int i=0;i<ids.length;i++){
             final int index=i;
@@ -349,7 +354,7 @@ public final class VisionKeyboardService extends InputMethodService {
             if(chosen)active=tab;
             tab.setContentDescription(index==5?"Choose Indian language":
                 index==6?"Change keyboard theme":
-                index==7?"Keyboard settings":index==8?"Open clipboard with paste and history options":"Switch keyboard to "+ids[i]);
+                index==7?"Keyboard settings":index==8?"Open clipboard with paste and history options":index==9?"Original sticker packs":"Switch keyboard to "+ids[i]);
             tab.setOnClickListener(v->{
                 feedback(v);
                 if(index<5){
@@ -357,11 +362,14 @@ public final class VisionKeyboardService extends InputMethodService {
                 }else if(index==5){
                     finishRomanWord();mode=LANGUAGE;rebuild();
                 }else if(index==6){
-                    theme=(theme+1)%ThemePalette.count();
-                    toolbarExpanded=false;
-                    settings().edit().putInt(KEY_THEME,theme).apply();rebuild();
+                    Intent gallery=new Intent(this,ThemeGalleryActivity.class);
+                    gallery.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    try{startActivity(gallery);}catch(RuntimeException ignored){}
                 }else if(index==8){
                     openClipboardPanel();
+                }else if(index==9){
+                    finishRomanWord();
+                    mode=STICKERS;stickerPack=0;toolbarExpanded=false;rebuild();
                 }else{
                     finishRomanWord();
                     Intent intent=new Intent(this,MainActivity.class);
@@ -369,6 +377,14 @@ public final class VisionKeyboardService extends InputMethodService {
                     try{startActivity(intent);}catch(RuntimeException ignored){}
                 }
             });
+            if(index==6){
+                tab.setOnLongClickListener(v->{
+                    theme=(theme+1)%ThemePalette.count();
+                    settings().edit().putInt(KEY_THEME,theme).apply();
+                    feedback(v);rebuild();
+                    return true;
+                });
+            }
         }
         scroller.addView(bar);
         int toolHeight=dp(getResources().getConfiguration().orientation==2?49:51);
@@ -707,6 +723,118 @@ public final class VisionKeyboardService extends InputMethodService {
         clipboardRow(actions,returnButton,1f);
         returnButton.setOnClickListener(v->closeClipboardPanel());
         keysContent.addView(actions,new LinearLayout.LayoutParams(-1,dp(43)));
+    }
+
+    /** Original sticker art stays on-device until the user explicitly taps one. */
+    private void addStickerPanel(){
+        LinearLayout header=new LinearLayout(this);
+        header.setGravity(Gravity.CENTER_VERTICAL);
+        TextView abc=clipboardButton("ABC",15);
+        clipboardRow(header,abc,.70f);
+        abc.setOnClickListener(v->{feedback(v);mode=ABC;rebuild();});
+        TextView title=new TextView(this);
+        title.setText("🧩 "+StickerCatalog.PACKS[stickerPack]);
+        title.setTextSize(16);
+        title.setGravity(Gravity.CENTER);
+        title.setTextColor(light()?0xff173354:Color.WHITE);
+        title.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+        header.addView(title,new LinearLayout.LayoutParams(0,dp(42),2.0f));
+        TextView prev=clipboardButton("‹",22);
+        TextView next=clipboardButton("›",22);
+        clipboardRow(header,prev,.45f);
+        clipboardRow(header,next,.45f);
+        prev.setContentDescription("Previous sticker pack");
+        next.setContentDescription("Next sticker pack");
+        prev.setOnClickListener(v->{stickerPack=Math.floorMod(stickerPack-1,StickerCatalog.packCount());rebuild();});
+        next.setOnClickListener(v->{stickerPack=(stickerPack+1)%StickerCatalog.packCount();rebuild();});
+        keysContent.addView(header,new LinearLayout.LayoutParams(-1,dp(45)));
+
+        HorizontalScrollView chooser=new HorizontalScrollView(this);
+        chooser.setHorizontalScrollBarEnabled(false);
+        LinearLayout packs=new LinearLayout(this);
+        packs.setGravity(Gravity.CENTER_VERTICAL);
+        for(int i=0;i<StickerCatalog.packCount();i++){
+            final int pack=i;
+            TextView tag=clipboardButton(StickerCatalog.PACKS[i],12);
+            tag.setBackgroundColor(pack==stickerPack?
+                (light()?0xffb2cbff:0xff295b8b):
+                (light()?0xffe8eef8:0xff254d63));
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(111),dp(36));
+            lp.setMargins(dp(3),0,dp(3),0);
+            packs.addView(tag,lp);
+            tag.setOnClickListener(v->{stickerPack=pack;rebuild();});
+        }
+        chooser.addView(packs);
+        keysContent.addView(chooser,new LinearLayout.LayoutParams(-1,dp(39)));
+
+        int size=dp(getResources().getConfiguration().orientation==2?57:72);
+        for(int row=0;row<2;row++){
+            LinearLayout line=new LinearLayout(this);
+            line.setGravity(Gravity.CENTER_VERTICAL);
+            for(int col=0;col<3;col++){
+                int index=StickerCatalog.id(stickerPack,row*3+col);
+                LinearLayout tile=new LinearLayout(this);
+                tile.setOrientation(LinearLayout.VERTICAL);
+                tile.setGravity(Gravity.CENTER);
+                tile.setContentDescription("Insert "+StickerCatalog.text(index)+" sticker image");
+                Bitmap bitmap=StickerCatalog.draw(index,184);
+                ImageView imageView=new ImageView(this);
+                imageView.setImageBitmap(bitmap);
+                imageView.setAdjustViewBounds(true);
+                imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                tile.addView(imageView,new LinearLayout.LayoutParams(-1,size));
+                LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,size+dp(4),1f);
+                lp.setMargins(dp(3),0,dp(3),0);
+                line.addView(tile,lp);
+                tile.setOnClickListener(v->{feedback(v);sendSticker(index);});
+            }
+            keysContent.addView(line,new LinearLayout.LayoutParams(-1,size+dp(8)));
+        }
+        TextView hint=new TextView(this);
+        hint.setText("Tap a sticker to send a PNG where supported; other apps get emoji text.");
+        hint.setTextSize(11);hint.setGravity(Gravity.CENTER);
+        hint.setMaxLines(2);
+        hint.setTextColor(light()?0xff334b66:0xffc1e8f6);
+        keysContent.addView(hint,new LinearLayout.LayoutParams(-1,dp(38)));
+    }
+    private void sendSticker(int index){
+        if(sensitiveField){
+            Toast.makeText(this,"Stickers are unavailable in password fields.",
+                Toast.LENGTH_SHORT).show();return;
+        }
+        InputConnection connection=getCurrentInputConnection();
+        if(connection==null)return;
+        finishRomanWord();
+        boolean inserted=false;
+        if(android.os.Build.VERSION.SDK_INT>=25){
+            EditorInfo info=getCurrentInputEditorInfo();
+            String[] types=info==null?null:info.contentMimeTypes;
+            boolean accepts=false;
+            if(types!=null){
+                for(String type:types){
+                    if("image/png".equalsIgnoreCase(type)||"image/*".equalsIgnoreCase(type)){
+                        accepts=true;break;
+                    }
+                }
+            }
+            if(accepts){
+                try{
+                    InputContentInfo sticker=new InputContentInfo(
+                        StickerProvider.uriFor(index),
+                        new ClipDescription("S Board original sticker",
+                            new String[]{"image/png"}),null);
+                    inserted=connection.commitContent(sticker,
+                        InputConnection.INPUT_CONTENT_GRANT_READ_URI_PERMISSION,null);
+                }catch(RuntimeException ignored){inserted=false;}
+            }
+        }
+        if(!inserted){
+            connection.commitText(StickerCatalog.emoji(index)+" "+
+                StickerCatalog.text(index)+" ",1);
+            Toast.makeText(this,
+                "This app accepts sticker text, not keyboard PNG images.",
+                Toast.LENGTH_SHORT).show();
+        }
     }
     /** Start one speech recognition session on explicit tap, with runtime consent. */
     private void toggleVoiceDictation(){
