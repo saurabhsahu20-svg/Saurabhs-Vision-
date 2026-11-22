@@ -483,19 +483,24 @@ public final class MainActivity extends Activity {
     /** Open the privately installed Vision study pack without sending PDFs to the network. */
     private void openInstalledVisionModelPapers(){
         try{
-            Intent launch=getPackageManager().getLaunchIntentForPackage(
-                "com.saurabhsvision.quizclub.study");
-            if(launch!=null){
-                launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(launch);
-                return;
+            // Prefer the 75-mark offline study pack, then fall back to the older mini-pack.
+            for(String pkg:new String[]{
+                "com.saurabhsvision.quizclub.v414x",
+                "com.saurabhsvision.quizclub.study"
+            }){
+                Intent launch=getPackageManager().getLaunchIntentForPackage(pkg);
+                if(launch!=null){
+                    launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(launch);
+                    return;
+                }
             }
         }catch(Exception ignored){
             // A missing or non-launchable study test package is handled below.
         }
         new AlertDialog.Builder(this)
             .setTitle("Model Paper Library")
-            .setMessage("10वीं के 6 मूल मॉडल पेपर और 30 समझाए हुए अभ्यास सेट SAURABH'S VISION v4.1.3 Study Test ऐप में उपलब्ध हैं। पहले वह ऐप इंस्टॉल करें, फिर उसके होम से Model Paper Library खोलें।")
+            .setMessage("SAURABH'S VISION v4.1.4 Study Test में 10वीं के 6 मूल 75-अंक पेपर, 30 पुराने छोटे अभ्यास सेट और 30 नए 75-अंकीय सेट (हर विषय में 5) उपलब्ध हैं। ऐप इंस्टॉल करें, फिर Model Paper Library खोलें।")
             .setPositiveButton("ठीक है",(dialog,which)->dialog.dismiss())
             .show();
     }
