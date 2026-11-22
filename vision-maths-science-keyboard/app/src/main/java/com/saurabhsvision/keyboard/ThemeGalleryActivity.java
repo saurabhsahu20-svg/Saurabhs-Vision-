@@ -38,7 +38,7 @@ public final class ThemeGalleryActivity extends Activity {
     private static final String[] FILTERS={
         "All","Classic","Sports","Festive","Floral","Celestial",
         "Scenic","Minimal","Vivid","Spotlights","Feather",
-        "Carbon","Colorful","Custom"
+        "Carbon","Colorful","Originals","Nickel","Abstract","Landscapes","Custom"
     };
     private static final int DARK=0xff101319,SOFT=0xff20242d,ACCENT=0xff7299ff;
     private SharedPreferences prefs;
@@ -102,6 +102,11 @@ public final class ThemeGalleryActivity extends Activity {
             lp.setMargins(dp(3),0,dp(3),0);
             chips.addView(chip,lp);
             chip.setOnClickListener(v->{filter=category;build();});
+            if(category.equals(filter)){
+                final TextView selectedChip=chip;
+                chipScroll.post(()->chipScroll.scrollTo(
+                    Math.max(0,selectedChip.getLeft()-dp(75)),0));
+            }
         }
         chipScroll.addView(chips);
         screen.addView(chipScroll,new LinearLayout.LayoutParams(-1,dp(56)));
@@ -147,7 +152,12 @@ public final class ThemeGalleryActivity extends Activity {
         if(t<=29)return "Festive";
         if(t<=31)return "Sports";
         if(t<=33)return "Colorful";
-        return "Custom";
+        if(t==34)return "Custom";
+        if(t<=39)return "Originals";
+        if(t<=42)return "Carbon";
+        if(t<=44)return "Nickel";
+        if(t<=46)return "Abstract";
+        return "Landscapes";
     }
     private void showThemes(){
         int cards=0;
@@ -259,6 +269,7 @@ public final class ThemeGalleryActivity extends Activity {
                     ThemePalette.BASE[theme],ThemePalette.MID[theme],
                     Shader.TileMode.CLAMP));
                 canvas.drawRect(0,0,w,h,p);p.setShader(null);
+                ThemeArtwork.drawOverlay(canvas,theme,w,h);
             }
             float left=w*.045f, right=w*.955f;
             paintText(canvas,"the      |        I        |       thanks",
