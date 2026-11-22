@@ -108,21 +108,21 @@ public final class ModelPaperLibraryActivity extends Activity {
         hero.setBackground(shape(BLUE,19));
         TextView heading=text("📚 Model Paper Library",25,Color.WHITE,true);
         pad(hero,heading,0);
-        pad(hero,text("CLASS 10 • SAURABH'S VISION • VISION FLASH 💡",12,0xffd2edff,true),8);
+        pad(hero,text("कक्षा 10वीं • Grifly × SAURABH'S VISION • VISION FLASH 💡",12,0xffd2edff,true),8);
         pad(hero,text("6 विषय • 6 मूल पेपर • 30 नए 75-अंक सेट • 30 छोटे 30-अंक सेट",14,0xfff5faff,false),10);
         pad(body,hero,0);
 
-        TextView notice=text("पहली बार 66 PDF वाली ZIP को Import करें। उसके बाद सभी पेपर Grifly में ऑफलाइन खुलेंगे। ZIP का चयन आप ही करेंगे; Grifly आपकी फाइल सर्वर पर नहीं भेजेगा।",14,0xff405473,false);
+        TextView notice=text("📖 75-अंक के पेपर में प्रश्नों के बाद Step-by-Step Answers और जहाँ जरूरी हो Diagrams हैं। अगर PDF पहले से शामिल हैं तो सीधे Preview दबाएँ। नहीं हैं तो नीचे 66-PDF ZIP एक बार चुनें। कोई फ़ाइल अपने-आप डाउनलोड या ऑनलाइन अपलोड नहीं होगी।",14,0xff405473,false);
         notice.setPadding(px(13),px(14),px(13),px(14));
         notice.setBackground(shape(0xffffffff,15));pad(body,notice,14);
 
-        importButton=button("📥 Import 66 PDF ZIP",0xff1555bc);
+        importButton=button("📥 66 PDF ZIP चुनें",0xff1555bc);
         importButton.setOnClickListener(v->chooseZip());
         pad(body,importButton,13);
 
         summary=text(" ",13,0xff305f94,true);pad(body,summary,10);
         pad(body,text("1. विषय चुनें",15,BLUE,true),17);
-        subject=select(ModelPaperCatalog.TITLES);pad(body,subject,6);
+        subject=select(ModelPaperCatalog.TITLES);subject.setSelection(2);pad(body,subject,6);
         pad(body,text("2. पेपर चुनें",15,BLUE,true),15);
         series=select(ModelPaperCatalog.SERIES);pad(body,series,6);
         pad(body,text("3. सेट चुनें (मूल पेपर में केवल एक)",15,BLUE,true),15);
@@ -159,6 +159,7 @@ public final class ModelPaperLibraryActivity extends Activity {
         TextView foot=text("शिक्षक मार्गदर्शन: नए अभ्यास सेट स्वतंत्र रूप से बनाए गए हैं, आधिकारिक CGBSE प्रश्नपत्र या प्रमाणित उत्तर-कुंजी नहीं। गलत उत्तर दिखने पर शिक्षक से सत्यापन करें।",13,0xff60512b,false);
         foot.setPadding(px(13),px(14),px(13),px(14));
         foot.setBackground(shape(0xfffff3d5,12));pad(body,foot,20);
+        pad(body,text("🎓 कक्षा 12वीं: प्रश्नपत्र मिलने पर अलग सेक्शन जोड़ा जाएगा।",12,0xff64718c,false),12);
 
         android.widget.AdapterView.OnItemSelectedListener changed=new android.widget.AdapterView.OnItemSelectedListener(){
             @Override public void onItemSelected(android.widget.AdapterView<?> parent,View view,int position,long id){
@@ -181,11 +182,12 @@ public final class ModelPaperLibraryActivity extends Activity {
         int count=0;
         for(String path:ModelPaperCatalog.allPdfPaths())
             if(new File(library,path).isFile())count++;
-        summary.setText("ऑफलाइन उपलब्ध: "+count+" / 66 PDF");
+        summary.setText("📚 Offline Library: "+count+" / 66 PDF उपलब्ध");
+        importButton.setText(count==66?"↻ दूसरी ZIP से PDF अपडेट करें":"📥 66 PDF ZIP चुनें");
         if(importing){message("PDF Import चल रहा है…");return;}
-        if(count==0)message("पहले ऊपर Import 66 PDF ZIP दबाकर अपनी ZIP चुनें।");
+        if(count==0)message("इस APK में अभी PDF नहीं हैं। ऊपर 66 PDF ZIP चुनें, फिर यहाँ Preview देखें।");
         else if(!requestedPdf().isFile())message("इस पेपर की PDF नहीं मिली। ZIP दोबारा Import करें।");
-        else message("✅ पेपर तैयार है। Preview दबाएँ, PDF डाउनलोड नहीं होगी।");
+        else message("✅ पेपर तैयार है। Preview पेज दिखाएगा, फाइल Save केवल अलग बटन से होगी।");
         preview.setEnabled(count>0 && requestedPdf().isFile());
         save.setEnabled(count>0 && requestedPdf().isFile());
     }
