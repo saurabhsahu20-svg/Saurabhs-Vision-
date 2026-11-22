@@ -40,6 +40,10 @@ import android.webkit.WebSettings;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.RenderProcessGoneDetail;
+import android.os.Handler;
+import android.os.Looper;
+import android.content.SharedPreferences;
 import android.net.http.SslError;
 import android.widget.EditText;
 import android.widget.AutoCompleteTextView;
@@ -207,6 +211,10 @@ public final class MainActivity extends Activity {
         if(intent!=null&&Intent.ACTION_VIEW.equals(intent.getAction())&&intent.getData()!=null)
             openAddress(intent.getData().toString());
         else showHome();
+        // Non-blocking, max once daily; site/news contents already update over HTTPS.
+        new Handler(Looper.getMainLooper()).postDelayed(()->{
+            if(!isFinishing()&&!isDestroyed())checkGriflyUpdates(false);
+        },4500L);
     }
     @Override protected void onNewIntent(Intent intent){
         super.onNewIntent(intent);setIntent(intent);
@@ -282,6 +290,55 @@ public final class MainActivity extends Activity {
         }catch(ActivityNotFoundException error){
             toast("Voice recognition is unavailable on this device");
         }
+    }
+    private String installedVersion(){
+        try{
+            return getPackageManager().getPackageInfo(getPackageName(),0).versionName;
+        }catch(Exception ignored){return "Unknown version";}
+    }
+    private void checkGriflyUpdates(boolean manual){
+        SharedPreferences prefs=getSharedPreferences("grifly_update_preferences",MODE_PRIVATE);
+        if(!manual){
+            if(!prefs.getBoolean("auto_check",true))return;
+            long last=prefs.getLong("last_checked",0);
+            long now=System.currentTimeMillis();
+            if(last>0 && now-last>=0 && now-last<24L*60*60*1000)return;
+            prefs.edit().putLong("last_checked",now).apply();
+        }else toast("Checking official Grifly releases…");
+        GriflyUpdateChecker.check(getApplicationContext(),(latest,error)->{
+            if(isFinishing()||isDestroyed())return;
+            if(error!=null){
+                if(manual) new AlertDialog.Builder(this).setTitle("Grifly updates")
+                    .setMessage(error+"\\nCheck internet and try again.")
+                    .setPositiveButton("OK",null).show();
+                return;
+            }
+            int[] current=GriflyVersion.fromInstalled(installedVersion());
+            if(current==null){
+                if(manual)toast("Could not read installed version");
+                return;
+            }
+            if(GriflyVersion.compare(latest.version,current)<=0){
+                if(manual)new AlertDialog.Builder(this).setTitle("Grifly is up to date")
+                    .setMessage("Installed version: "+installedVersion()+
+                        "\\nOfficial GitHub release check is current.")
+                    .setPositiveButton("OK",null).show();
+                return;
+            }
+            if(!manual&&latest.tag.equals(prefs.getString("last_prompt_tag","")))return;
+            prefs.edit().putString("last_prompt_tag",latest.tag).apply();
+            new AlertDialog.Builder(this).setTitle("New Grifly update available")
+                .setMessage("Installed: "+installedVersion()+"\\nNew: "+latest.tag+
+                    "\\n\\nGrifly can open the official GitHub download page. Android must ask before installing an APK. In-place updates require the same signing certificate as your installed version.")
+                .setPositiveButton("View official update",(d,w)->openAddress(latest.releasePage))
+                .setNegativeButton("Later",null).show();
+        });
+    }
+    private void toggleAutoUpdates(){
+        SharedPreferences prefs=getSharedPreferences("grifly_update_preferences",MODE_PRIVATE);
+        boolean enabled=!prefs.getBoolean("auto_check",true);
+        prefs.edit().putBoolean("auto_check",enabled).apply();
+        toast(enabled?"Update notifications on":"Update notifications off");
     }
     private void showAccountInfo(){
         new AlertDialog.Builder(this).setTitle("Grifly • Local profile")
@@ -903,13 +960,13 @@ public final class MainActivity extends Activity {
             "These are developer/test builds, not Play Store-verified apps.",
             12,HOME_MUTED,false),2);
         String[] appNames={
-            "Grifly 1.8.3","S Board 1.9.15","S Caller 1.9.6",
+            "Grifly • Updates","S Board 1.9.15","S Caller 1.9.6",
             "MsgU 1.1.1 Beta","Saune Vibe 1.1.1","S CALC Pro 1.7",
             "SV Caller Pro 3.3","S Vision Launcher 1.2",
             "Crystal Volume Booster • Builds"
         };
         String[] appLinks={
-            "https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases/download/s-browser-v1.8.0-beta/S_Browser_v1.8.0_General_News_Professional_Beta.apk",
+            "https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases",
             "https://github.com/saurabhsahu20-svg/Saurabhs-Vision-/releases/download/s-board-v1.9.15/S_Board_v1.9.15_ABC_SYMBOLS_STABLE.apk",
             "https://github.com/saurabhsahu20-svg/aura-dialer-/releases/download/v1.9.6-clean-recents-preview/S-Caller-v1.9.6-Clean-Recents-Preview.apk",
             "https://github.com/saurabhsahu20-svg/AasPass-app/releases/download/msgu-ai-studio-v1.1.1-login-fix-beta/MsgU-v1.1.1-Login-Fix-Debug.apk",
@@ -1061,6 +1118,27 @@ public final class MainActivity extends Activity {
             }
             @Override public void onReceivedSslError(WebView view,SslErrorHandler handler,SslError error){
                 handler.cancel();toast("Unsafe certificate: connection blocked");
+            }
+            @Override public boolean onRenderProcessGone(WebView view,RenderProcessGoneDetail detail){
+                // Android may kill WebView renderers under memory pressure. Recover
+                // just the crashed tab, not the entire browser or user's bookmarks.
+                int index=tabs.indexOf(tab);
+                if(index<0)return true;
+                boolean visible=!home&&index==selected;
+                tabs.remove(index);
+                if(view.getParent() instanceof ViewGroup)
+                    ((ViewGroup)view.getParent()).removeView(view);
+                try{view.destroy();}catch(Exception ignored){}
+                if(tabs.isEmpty()){
+                    selected=-1;showHome();
+                }else{
+                    if(index<selected)selected--;
+                    else if(index==selected)selected=Math.min(selected,tabs.size()-1);
+                    if(visible)attachCurrent();
+                    else refreshTabBadge();
+                }
+                toast("Web page restarted after a renderer error");
+                return true;
             }
             @Override public void onPageStarted(WebView view,String url,android.graphics.Bitmap icon){
                 if(selected>=0&&selected<tabs.size()&&tabs.get(selected)==tab&&!home){
@@ -1469,7 +1547,8 @@ public final class MainActivity extends Activity {
             "⌕  Search engine","▤  Desktop / mobile site","↗  Share page",
             "⊘  Clear browsing data","ⓘ  About Grifly",
             "⚑  CG Jobs, Railway & Exams","▤  Latest CG City News",
-            "→  Forward page","✦  Daily Assembly & Fun"};
+            "→  Forward page","✦  Daily Assembly & Fun",
+            "↻  Check for Grifly updates","☑  Automatic update notices ON/OFF"};
         new AlertDialog.Builder(this).setTitle("Grifly tools").setItems(choices,(d,i)->{
             Tab tab=current();
             switch(i){
@@ -1506,7 +1585,7 @@ public final class MainActivity extends Activity {
                     startActivity(Intent.createChooser(share,"Share page"));break;
                 case 12:clearData();break;
                 case 13:new AlertDialog.Builder(this).setTitle("About Grifly")
-                    .setMessage("Grifly 1.8.3 Beta • SAURABH'S VISION™\n\n"+
+                    .setMessage("Grifly "+installedVersion()+" • SAURABH'S VISION™\\n\\n"+
                     "Android WebView-powered browsing; a curated offline English–Hindi student dictionary, local bookmarks, notes and Study Focus. No ads or analytics.\n\n"+
                     "Study Focus blocks selected top-level websites, not every possible distracting resource. This browser is an early beta and does not yet provide full incognito isolation, automatic spam protection or universal ad blocking.")
                     .setPositiveButton("OK",null).show();break;
@@ -1514,6 +1593,8 @@ public final class MainActivity extends Activity {
                 case 15:showCityNews();break;
                 case 16:forward();break;
                 case 17:showDailyAssembly();break;
+                case 18:checkGriflyUpdates(true);break;
+                case 19:toggleAutoUpdates();break;
             }
         }).show();
     }
