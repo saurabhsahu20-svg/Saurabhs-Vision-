@@ -200,6 +200,13 @@ adb shell settings get secure default_input_method | grep -F "$IME"
 java vision-maths-science-keyboard/scripts/SBoardEmulatorScreenCheck.java /tmp/sboard-landscape.png
 echo "PASS: S Board stays selected, and visible key panel rendered after rotation."
 
+# Debug-only, Android-native secure clipboard regression. No user data is used.
+adb shell logcat -c || true
+adb shell am start -W -n "$APP/.ClipboardHistorySelfTestActivity"
+sleep 4
+adb shell logcat -d -s SBoardClipQA:I | grep 'PASS: clipboard opt-in, AES-GCM ciphertext'
+echo "PASS: encrypted 24-hour history, clipboard opt-in and HTML clipboard metadata."
+
 # Inspect only errors, never output sensitive input or clipboard content.
 adb shell logcat -d -t 1800 -s AndroidRuntime:E > /tmp/sboard-androidruntime.log || true
 if grep -F "Process: $APP" /tmp/sboard-androidruntime.log; then
