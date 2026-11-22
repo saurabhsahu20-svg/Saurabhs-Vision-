@@ -259,14 +259,14 @@ public final class MainActivity extends Activity {
         refreshFeedback.run();
 
         add(root,text("🎨 S Board Theme Studio",21,NAVY,true),29);
-        add(root,text("Explore 35 original offline themes in categories such as Sports, Festive, Floral, Celestial, Minimal, Vivid and Carbon. Apply a theme instantly, preview it, or create a personal keyboard background from a photo you choose.",14,0xff496284,false),7);
+        add(root,text("Explore 51 original offline themes in categories such as Sports, Festive, Floral, Celestial, Minimal, Vivid and Carbon. Apply a theme instantly, preview it, or create a personal keyboard background from a photo you choose.",14,0xff496284,false),7);
         Button gallery=button("Browse Theme Gallery & Create Photo Theme",0xff1b4eaa,Color.WHITE);
         add(root,gallery,10);
         gallery.setOnClickListener(v->startActivity(
             new Intent(this,ThemeGalleryActivity.class)));
 
         add(root,text("🎨 Premium Keyboard Themes",21,NAVY,true),22);
-        add(root,text("11 classic themes below • Browse the Theme Gallery for all 35 originals",13,0xff54708e,false),5);
+        add(root,text("11 classic themes below • Browse the Theme Gallery for all 51 originals",13,0xff54708e,false),5);
         themeStatus=text("",15,0xff16519a,true);
         add(root,themeStatus,10);
         LinearLayout themeColumn=new LinearLayout(this);
@@ -312,10 +312,10 @@ public final class MainActivity extends Activity {
         showTheme();
 
         add(root,text("🎭 Cartoon Friends + Emoji Keyboard",21,NAVY,true),27);
-        add(root,text("Emoji tab → 🎭 Cartoon Friends: playful cartoon-style kids, robots, superheroes, animals and expressions. Faces, Love, Science and other categories still work. These are original combinations of Unicode emoji (not official copyrighted character stickers). Rendering depends on your Android version. Total: "+EmojiCatalog.total()+" entries.",14,0xff496284,false),8);
+        add(root,text("Emoji tab → 🔎 Search emojis (offline) or 🎭 Cartoon Friends: playful cartoon-style kids, robots, superheroes, animals and expressions. Faces, Love, Science and other categories still work. These are original combinations of Unicode emoji (not official copyrighted character stickers). Rendering depends on your Android version. Total: "+EmojiCatalog.total()+" entries.",14,0xff496284,false),8);
         add(root,text("👦🎒  👧📚  🤖⚡  🦸‍♀️  🐼🎩  🧚‍♀️  🐱🦸",23,NAVY,true),7);
         add(root,text("🧩 Original Sticker Packs",21,NAVY,true),26);
-        add(root,text("30 S Board-designed sticker pictures in 5 offline packs: Study Crew, Animal Moods, Science Fun, Good Vibes and Celebration. Open the 🧩 tab in your keyboard toolbar to insert a PNG sticker where the receiving app supports image input. Otherwise, an emoji and caption are inserted as a text fallback.",14,0xff496284,false),7);
+        add(root,text("54 original S Board sticker pictures in 9 offline packs, including Study Crew, Animal Moods, Science Fun, Comic Faces, Nature Notes and Sport Sparks. Open the 🧩 tab in your keyboard toolbar to insert a PNG sticker where the receiving app supports image input. Otherwise, an emoji and caption are inserted as a text fallback.",14,0xff496284,false),7);
 
         add(root,text("🧪 Test Your Keyboard",21,NAVY,true),30);
         add(root,text("नीचे बॉक्स पर टैप करें और Maths/Science keyboard से लिखकर देखें:",14,0xff496284,false),8);
