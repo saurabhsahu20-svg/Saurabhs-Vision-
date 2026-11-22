@@ -427,6 +427,7 @@ public final class VisionKeyboardService extends InputMethodService {
         mic.setTextColor(light()?0xff303542:Color.WHITE);
         mic.setGravity(Gravity.CENTER);
         mic.setContentDescription("Tap to dictate your message using microphone");
+        attachClipboardShortcut(strip);
         strip.addView(mic,new LinearLayout.LayoutParams(dp(44),dp(39)));
         voiceMicButton=mic;
         mic.setOnClickListener(v->{feedback(v);toggleVoiceDictation();});
@@ -454,6 +455,7 @@ public final class VisionKeyboardService extends InputMethodService {
         TextView mic=new TextView(this);
         mic.setText("🎙");mic.setTextSize(23);
         mic.setGravity(Gravity.CENTER);
+        attachClipboardShortcut(row);
         row.addView(mic,new LinearLayout.LayoutParams(dp(48),dp(40)));
         voiceMicButton=mic;
         mic.setOnClickListener(v->{feedback(v);toggleVoiceDictation();});
