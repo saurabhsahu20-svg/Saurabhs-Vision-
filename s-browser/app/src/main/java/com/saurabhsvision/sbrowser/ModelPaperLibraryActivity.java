@@ -171,6 +171,7 @@ public final class ModelPaperLibraryActivity extends Activity {
         series.setOnItemSelectedListener(changed);
         set.setOnItemSelectedListener(changed);
         refreshAvailability();
+        importBundledPapersIfAvailable();
     }
     private File requestedPdf(){
         return new File(library,ModelPaperCatalog.path(subject.getSelectedItemPosition(),
@@ -284,6 +285,66 @@ public final class ModelPaperLibraryActivity extends Activity {
             });
         });
     }
+    /**
+     * Optional preloaded assets for fully offline distributions.
+     * A normal GitHub source build contains no PDFs and uses the ZIP picker instead.
+     * The owner can attach assets/model-paper-library/Class_10/... PDFs during packaging.
+     */
+    private void importBundledPapersIfAvailable(){
+        if(importing || library.isDirectory() &&
+           ModelPaperCatalog.allPdfPaths().stream().allMatch(p->new File(library,p).isFile()))return;
+        String first=ModelPaperCatalog.path(0,0,1);
+        try(InputStream probe=getAssets().open("model-paper-library/"+first)){
+            if(probe.read()!='%')return;
+        }catch(Exception ignored){return;}
+        importing=true;importButton.setEnabled(false);preview.setEnabled(false);save.setEnabled(false);
+        message("इस Grifly Test APK के 66 PDF अंदर से Import हो रहे हैं…");
+        io.execute(()->{
+            String report;
+            File temp=new File(getFilesDir(),"model-papers-bundled-"+System.currentTimeMillis());
+            try{
+                if(!temp.mkdirs())throw new IllegalStateException("Temporary storage unavailable");
+                byte[] buf=new byte[32768];long total=0;
+                for(String path:ModelPaperCatalog.allPdfPaths()){
+                    File target=new File(temp,path);
+                    File parent=target.getParentFile();
+                    if(!parent.isDirectory()&&!parent.mkdirs())
+                        throw new IllegalStateException("Cannot create PDF storage");
+                    long count=0;
+                    try(InputStream src=getAssets().open("model-paper-library/"+path);
+                        OutputStream dest=new FileOutputStream(target)){
+                        int n;while((n=src.read(buf))!=-1){
+                            count+=n;total+=n;
+                            if(count>12_000_000 || total>70_000_000)
+                                throw new IllegalArgumentException("Invalid embedded paper size");
+                            dest.write(buf,0,n);
+                        }
+                    }
+                    try(InputStream check=new FileInputStream(target)){
+                        byte[] sig=new byte[5];
+                        if(check.read(sig)!=5 || sig[0]!='%' || sig[1]!='P' ||
+                            sig[2]!='D' || sig[3]!='F' || sig[4]!='-')
+                            throw new IllegalArgumentException("Bundled asset is not PDF: "+path);
+                    }
+                }
+                File backup=new File(getFilesDir(),"model-papers-previous");
+                deleteDir(backup);
+                if(library.exists()&&!library.renameTo(backup))
+                    throw new IllegalStateException("Could not replace old paper library");
+                if(!temp.renameTo(library)){
+                    if(backup.exists())backup.renameTo(library);
+                    throw new IllegalStateException("Could not activate PDF library");
+                }
+                deleteDir(backup);
+                report="✅ सभी 66 PDF Grifly में पहले से शामिल हैं। Preview करें।";
+            }catch(Exception e){report="⚠ Bundled PDF Import असफल: "+e.getMessage();}
+            finally{deleteDir(temp);}
+            final String message=report;
+            runOnUiThread(()->{importing=false;importButton.setEnabled(true);
+                refreshAvailability();message(message);});
+        });
+    }
+
     private static void deleteDir(File file){
         if(file==null||!file.exists())return;
         if(file.isDirectory()){
