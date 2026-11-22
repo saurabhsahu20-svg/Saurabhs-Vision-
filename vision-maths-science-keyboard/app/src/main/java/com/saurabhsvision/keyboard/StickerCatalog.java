@@ -9,27 +9,37 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.Typeface;
 
-/** 30 original offline PNG stickers, rendered with Canvas and Unicode emoji. */
+/** 54 original offline PNG stickers, rendered with Canvas and Unicode emoji. */
 public final class StickerCatalog {
     private StickerCatalog(){}
     static final String[] PACKS={"Study Crew","Animal Moods","Science Fun",
-        "Good Vibes","Celebration"};
+        "Good Vibes","Celebration","Comic Faces","Festive Fun",
+        "Nature Notes","Sport Sparks"};
     private static final String[][] LABELS={
         {"Great job!","Study time","Super smart","Keep going","Homework hero","A+ effort"},
         {"Happy paws","Purrfect!","Cool cat","Oh wow!","Tiny joy","Let's play"},
         {"Eureka!","Lab day","Space trip","Brain power","Bright idea","Hello Mars"},
         {"You got this","Be kind","Thank you","Good morning","Well done","All smiles"},
-        {"Hooray!","Happy day","Let's dance","Best wishes","Big win","Party time"}
+        {"Hooray!","Happy day","Let's dance","Best wishes","Big win","Party time"},
+        {"No way!","So funny","Oops!","Epic win","Amazing","So cute"},
+        {"Shine bright","Happy lights","Cheers!","Surprise!","Celebrate","Make a wish"},
+        {"Go green","Bloom","Fresh air","Save trees","Rainy day","Sunny vibes"},
+        {"Go team!","Goal!","Champion","Keep playing","Full power","Game on"}
     };
     private static final String[][] EMOJI={
         {"⭐","📚","🧠","🚀","✏️","🏅"},
         {"🐾","🐈","😺","🐼","🐣","🐶"},
         {"💡","🧪","🛸","🔬","⚡","🪐"},
         {"🌈","💖","🙏","☀️","👏","😊"},
-        {"🎉","🎁","💃","🎈","🏆","🥳"}
+        {"🎉","🎁","💃","🎈","🏆","🥳"},
+        {"😲","🤣","🙈","😎","🤩","🥹"},
+        {"✨","🪔","🎇","🎊","🎆","🌠"},
+        {"🌿","🌸","🍃","🌳","🌧️","☀️"},
+        {"🏏","⚽","🏆","🏃","💪","🎮"}
     };
     private static final int[] BASE={
-        0xff3769c9,0xffa84c8d,0xff267d8b,0xff975eb6,0xffde8051
+        0xff3769c9,0xffa84c8d,0xff267d8b,0xff975eb6,0xffde8051,
+        0xff963c78,0xffc38132,0xff288b68,0xff356fc2
     };
     static int packCount(){return PACKS.length;}
     static int count(){return PACKS.length*6;}
