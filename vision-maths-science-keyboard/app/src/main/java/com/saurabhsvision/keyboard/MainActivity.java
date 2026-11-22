@@ -159,6 +159,12 @@ public final class MainActivity extends Activity {
         }
         add(root,text("ℹ️ Roman phonetic input writes sounds in another script; it does NOT translate sentence meaning. Non-Hindi spellings, Urdu and minority scripts are basic approximations.",12,0xff607590,false),9);
 
+        add(root,text("⚙️ S Board Layout & Keys",21,NAVY,true),24);
+        add(root,text("Configure Number row, long-press symbols and accents, cursor arrows, key previews, large key letters, sound, vibration and press duration.",14,0xff496284,false),8);
+        Button controls=button("Open S Board Advanced Settings",0xff153d87,Color.WHITE);
+        add(root,controls,10);
+        controls.setOnClickListener(v->startActivity(new Intent(this,KeyboardSettingsActivity.class)));
+
         add(root,text("📏 Keyboard Height & Spacebar",20,NAVY,true),26);
         add(root,text("Compact height is recommended on phones where the bottom SPACE / ENTER row was hidden. Both options automatically fit their rows inside the available screen height.",14,0xff496284,false),7);
         TextView heightStatus=text("",14,0xff1848a0,true);
