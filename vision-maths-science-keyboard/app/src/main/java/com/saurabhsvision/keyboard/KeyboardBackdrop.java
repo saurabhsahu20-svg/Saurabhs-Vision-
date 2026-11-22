@@ -2,6 +2,8 @@ package com.saurabhsvision.keyboard;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
@@ -17,10 +19,14 @@ public final class KeyboardBackdrop extends View {
     private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF oval=new RectF();
     private int theme;
+    private Bitmap customPhoto;
     private static final int[] BASE=ThemePalette.BASE;
     private static final int[] MID=ThemePalette.MID;
     private static final int[] HIGHLIGHT=ThemePalette.HIGHLIGHT;
-    public KeyboardBackdrop(Context context,int theme){super(context);this.theme=ThemePalette.norm(theme);}
+    public KeyboardBackdrop(Context context,int theme){
+        super(context);this.theme=ThemePalette.norm(theme);
+        if(this.theme==ThemePalette.PHOTO_THEME)customPhoto=PhotoThemeArt.load(context,1000);
+    }
     private void spot(Canvas c,float x,float y,float r,int color,int alpha){
         paint.reset();paint.setAntiAlias(true);paint.setColor(color);paint.setAlpha(alpha);
         c.drawCircle(x,y,r,paint);
@@ -39,6 +45,19 @@ public final class KeyboardBackdrop extends View {
     public void drawArtwork(Canvas canvas,int w,int h){
         if(w<=0||h<=0)return;
         if(theme==4){canvas.drawColor(0xffeeedf3);return;}
+        if(theme==ThemePalette.PHOTO_THEME&&customPhoto!=null){
+            paint.reset();paint.setAntiAlias(true);paint.setFilterBitmap(true);
+            float scale=Math.max((float)w/customPhoto.getWidth(),
+                (float)h/customPhoto.getHeight());
+            int sw=Math.min(customPhoto.getWidth(),(int)(w/scale));
+            int sh=Math.min(customPhoto.getHeight(),(int)(h/scale));
+            int sx=(customPhoto.getWidth()-sw)/2,sy=(customPhoto.getHeight()-sh)/2;
+            canvas.drawBitmap(customPhoto,new Rect(sx,sy,sx+sw,sy+sh),
+                new Rect(0,0,w,h),paint);
+            paint.setShader(null);paint.setColor(0xb0000b1b);
+            canvas.drawRect(0,0,w,h,paint);
+            return;
+        }
 
         paint.reset();paint.setAntiAlias(true);
         paint.setShader(new LinearGradient(0,0,w,h,
@@ -74,7 +93,9 @@ public final class KeyboardBackdrop extends View {
                 i%5==0?hi:Color.WHITE,45+(i%4)*18);
         }
         float sz=Math.min(w,h);
-        label(canvas,theme==0?"π² + E = mc²":theme==1?"∞   ∑   √":theme==2?"H₂O   DNA   ⚛":
+        label(canvas,theme>=11?
+            ThemePalette.SYMBOLS[theme]+"     ✦     "+ThemePalette.SYMBOLS[theme]:
+            theme==0?"π² + E = mc²":theme==1?"∞   ∑   √":theme==2?"H₂O   DNA   ⚛":
             theme==5?"♥   π   ⚛":theme==7?"DNA   ⚛   φ":theme==8?"∫   λ   ∑":
             theme==9?"π   ✦   H₂O":theme==10?"∞   ⚛   √":"α   β   Ω   λ",
             w*.06f,h*.37f,sz*.065f,hi,68);
