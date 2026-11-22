@@ -190,7 +190,7 @@ jobs:
           assert 'refreshSetupStatus()' in activity
           assert 'index==6){' in ime and 'theme=(theme+1)%ThemePalette.count()' in ime
           assert 'index==7?' in ime and 'Keyboard settings' in ime
-          assert 'String[] ids={"ABC","123","∑ Math","⚛ Sci","😊","🌐","🎨","⚙"}' in ime
+          assert 'String[] ids={"ABC","123","∑ Math","⚛ Sci","😊","🌐","🎨","⚙","📋"}' in ime
           assert 'by Saurabh' in ime
           assert 'SBoardKeyButton b=new SBoardKeyButton(this);' in ime
           assert 'setSpaceIndicator("SPACE".equals(output),light(),ACCENTS[theme])' in ime
