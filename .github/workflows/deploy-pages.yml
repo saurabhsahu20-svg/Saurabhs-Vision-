@@ -230,6 +230,63 @@ jobs:
           if [ -d "$RUNNER_TEMP/saurabh-site/vision-app" ]; then
             test -f "$RUNNER_TEMP/saurabh-site/vision-app/index.html"
           fi
+      - name: Publish 66 uploaded Class 10 model-paper PDFs when archive is released
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="vision-class10-66-model-papers"
+          ZIP="SAURABHS_VISION_ALL_66_PAPERS_STEP_SOLUTIONS.zip"
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Class 10 PDFs have not been released yet; the catalog correctly shows unavailable files."
+            exit 0
+          fi
+          mkdir -p "$RUNNER_TEMP/vision-model-archive"
+          if ! gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "$ZIP" --dir "$RUNNER_TEMP/vision-model-archive"; then
+            echo "Model paper archive not attached yet; the PDF buttons remain unavailable."
+            exit 0
+          fi
+          python3 - <<'PY'
+          from pathlib import Path, PurePosixPath
+          from zipfile import ZipFile
+          import os, re
+          zpath=Path(os.environ['RUNNER_TEMP'])/'vision-model-archive'/'SAURABHS_VISION_ALL_66_PAPERS_STEP_SOLUTIONS.zip'
+          target=Path(os.environ['RUNNER_TEMP'])/'saurabh-site'/'model-paper-library'/'pdfs'
+          subjects=('English','Hindi','Mathematics','Sanskrit','Science','Social_Science')
+          expected={
+            f'Class_10/10_{subject}/{name}'
+            for subject in subjects
+            for name in ['Original_2025-26.pdf']+
+              [f'Full75_Set_{n:02}.pdf' for n in range(1,6)]+
+              [f'Set_{n:02}.pdf' for n in range(1,6)]
+          }
+          with ZipFile(zpath) as z:
+            pdfs=[m for m in z.infolist() if m.filename.lower().endswith('.pdf') and not m.is_dir()]
+            names=[m.filename for m in pdfs]
+            if len(pdfs)!=66 or set(names)!=expected or len(set(names))!=66:
+              raise SystemExit(f'Expected the exact 66 Class 10 source/study PDF paths, found {len(pdfs)} files.')
+            total=0
+            for entry in pdfs:
+              parts=PurePosixPath(entry.filename).parts
+              if len(parts)!=3 or any(part in ('.','..') for part in parts) or '\\' in entry.filename:
+                raise SystemExit('Unsafe PDF archive path: '+entry.filename)
+              if entry.file_size>10_000_000:
+                raise SystemExit('Unexpectedly large PDF: '+entry.filename)
+              total+=entry.file_size
+              if total>100_000_000:
+                raise SystemExit('Model paper pack exceeds the approved size.')
+              dest=target.joinpath(*parts)
+              dest.parent.mkdir(parents=True,exist_ok=True)
+              with z.open(entry) as src, dest.open('wb') as out:
+                start=src.read(5)
+                if start!=b'%PDF-':
+                  raise SystemExit('Not a PDF: '+entry.filename)
+                out.write(start)
+                import shutil
+                shutil.copyfileobj(src,out)
+          print('Published all',len(pdfs),'Class 10 model paper PDFs:',total,'bytes.')
+          PY
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload static site
