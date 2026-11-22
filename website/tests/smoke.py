@@ -28,3 +28,13 @@ sitemap=(root/'sitemap.xml').read_text()
 for page in ('study-desk/','admissions-guide/'):
  assert page in sitemap,f'missing sitemap listing: {page}'
 print('PASS: new public resources and parent-led admissions links')
+
+# Model Paper Library catalog must not promise unpublished PDFs.
+model=(root/'model-paper-library/index.html').read_text(encoding='utf-8')
+for token in ('Original_2025-26.pdf','Full75_Set_','Class_10/','pdfCanvas','aria-disabled','Step-by-Step','grade','paperSet'):
+ assert token in model, f'missing model-paper catalog feature: {token}'
+assert 'model-paper-library/' in (root/'app.js').read_text(encoding='utf-8')
+assert 'model-paper-library/' in (root/'index.html').read_text(encoding='utf-8')
+assert 'model-paper-library/' in (root/'sitemap.xml').read_text(encoding='utf-8')
+assert '<iframe' not in model, 'Avoid Android inline PDF auto-download iframe'
+print('PASS: Class 10 model-paper library listing, manual preview and separate download')

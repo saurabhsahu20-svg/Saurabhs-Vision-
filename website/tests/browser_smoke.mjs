@@ -187,6 +187,47 @@ await check('model-paper-inline-pdf-preview',async page=>{
   assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true','changing set invalidates stale download');
   assert.equal(await page.locator('#pdfPreview.visible').count(),0,'changing set hides old preview');
 });
+
+await check('class10-model-library-preview-and-release-safety',async(page)=>{
+  await page.addInitScript(()=>{
+    window.pdfjsLib={GlobalWorkerOptions:{},getDocument:()=>({
+      promise:Promise.resolve({numPages:3,getPage:async()=>({
+        getViewport:({scale})=>({width:600*scale,height:800*scale}),
+        render:()=>({promise:Promise.resolve(),cancel(){}})
+      }),destroy:async()=>{}}),
+      destroy:async()=>{}
+    })};
+  });
+  let published=false;
+  await page.route('**/model-paper-library/pdfs/**',route=>{
+    if(route.request().method()==='HEAD'){
+      return route.fulfill({status:published?200:404,
+        headers:{'content-type':published?'application/pdf':'text/html'}});
+    }
+    return route.abort();
+  });
+  await goto(page,'model-paper-library/');
+  assert.ok(await page.getByText('Model Paper Library',{exact:true}).count()>0);
+  assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true');
+  assert.equal(await page.locator('#subject option').count(),6);
+  assert.equal(await page.locator('#paperSet option').count(),5);
+  await page.locator('#view').click();
+  assert.match(await page.locator('#status').textContent(),/अभी वेबसाइट पर प्रकाशित नहीं/);
+  assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true','unpublished PDF must never be downloadable');
+  published=true;
+  await page.locator('#view').click();
+  await page.waitForFunction(()=>document.getElementById('pdfStage').hidden===false);
+  assert.equal(await page.locator('#download').getAttribute('aria-disabled'),null,'published PDF gets separate download link');
+  assert.match(await page.locator('#download').getAttribute('href'),/Full75_Set_01\.pdf$/);
+  assert.equal(await page.locator('#download').getAttribute('download'),'');
+  await page.locator('#next').click();
+  await page.waitForFunction(()=>document.getElementById('pageInfo').textContent.includes('2 / 3'));
+  await page.selectOption('#series','original');
+  assert.equal(await page.locator('#paperSetBox').isHidden(),true,'original paper does not show set chooser');
+  assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true','change resets stale PDF link');
+  await page.selectOption('#grade','12');
+  assert.equal(await page.locator('#view').isDisabled(),true,'class 12 not yet falsely available');
+});
 await browser.close();
 if(failures)process.exitCode=1;
 else console.log('PASS: all 7 desktop/mobile Chromium browser flows');
