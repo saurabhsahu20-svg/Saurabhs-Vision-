@@ -480,6 +480,25 @@ public final class MainActivity extends Activity {
         if(focusBadge!=null)focusBadge.setTextColor(HOME_INK);
         refreshTabStrip();
     }
+    /** Open the privately installed Vision study pack without sending PDFs to the network. */
+    private void openInstalledVisionModelPapers(){
+        try{
+            Intent launch=getPackageManager().getLaunchIntentForPackage(
+                "com.saurabhsvision.quizclub.study");
+            if(launch!=null){
+                launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(launch);
+                return;
+            }
+        }catch(Exception ignored){
+            // A missing or non-launchable study test package is handled below.
+        }
+        new AlertDialog.Builder(this)
+            .setTitle("Model Paper Library")
+            .setMessage("10वीं के 6 मूल मॉडल पेपर और 30 समझाए हुए अभ्यास सेट SAURABH'S VISION v4.1.3 Study Test ऐप में उपलब्ध हैं। पहले वह ऐप इंस्टॉल करें, फिर उसके होम से Model Paper Library खोलें।")
+            .setPositiveButton("ठीक है",(dialog,which)->dialog.dismiss())
+            .show();
+    }
     private void addQuickTab(String label,boolean active,Runnable action){
         TextView chip=text(label,13,active?0xffffffff:HOME_INK,true);
         chip.setGravity(Gravity.CENTER);
@@ -502,6 +521,7 @@ public final class MainActivity extends Activity {
             this::showStudentDashboard);
         addQuickTab("▤ Study Portal",false,
             ()->openAddress("https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/"));
+        addQuickTab("📚 Model Papers",false,this::openInstalledVisionModelPapers);
         addQuickTab("＋ New Tab",false,()->{
             if(createTab()!=null)showHome();
         });
