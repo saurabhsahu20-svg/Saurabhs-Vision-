@@ -50,6 +50,9 @@ public final class VisionKeyboardService extends InputMethodService {
     private static final int EMOJIS_PER_PAGE=32;
     private int emojiCategory=0,emojiPage=0;
     private final StringBuilder emojiSearchText=new StringBuilder();
+    private TextView emojiSearchLabel;
+    private TextView[] emojiResultKeys;
+    private TextView emojiEmptyHint;
     private static final int[] ACCENTS=ThemePalette.ACCENTS;
     private KeyboardPanel keyboardFrame;
     private LinearLayout keysContent;
@@ -214,6 +217,9 @@ public final class VisionKeyboardService extends InputMethodService {
         clipboardShortcut=null;
         lastSuggestionKey=null;
         romanPreview=null;
+        emojiSearchLabel=null;
+        emojiResultKeys=null;
+        emojiEmptyHint=null;
         // The compat IME window sits ABOVE Android's navigation bar.
         // Avoid adding a second oversized bottom inset: it squeezed the
         // fourth Space/Enter row under the bottom of the real viewport.
@@ -1273,45 +1279,43 @@ public final class VisionKeyboardService extends InputMethodService {
         TextView back=clipboardButton("◀ Emoji",13);
         clipboardRow(bar,back,.85f);
         back.setOnClickListener(v->{emojiSearchText.setLength(0);mode=EMOJI;rebuild();});
-        TextView query=clipboardButton("🔎 "+(emojiSearchText.length()==0?
-            "Search emojis":emojiSearchText.toString()),13);
-        query.setContentDescription("Emoji search: "+emojiSearchText);
+        TextView query=clipboardButton("",13);
+        emojiSearchLabel=query;
         clipboardRow(bar,query,2.1f);
         TextView clear=clipboardButton("Clear",12);
         clipboardRow(bar,clear,.55f);
-        clear.setOnClickListener(v->{emojiSearchText.setLength(0);rebuild();});
+        clear.setOnClickListener(v->{emojiSearchText.setLength(0);updateEmojiSearchResults();});
         keysContent.addView(bar,new LinearLayout.LayoutParams(-1,dp(41)));
 
-        String[] found=EmojiSearchIndex.search(emojiSearchText.toString(),16);
+        // Allocate result cells once. Only texts/visibility change as the
+        // user types, so rapid taps never lose their touch target mid-gesture.
+        emojiResultKeys=new TextView[16];
         int height=dp(getResources().getConfiguration().orientation==2?32:38);
         for(int r=0;r<2;r++){
             LinearLayout row=new LinearLayout(this);
             row.setGravity(Gravity.CENTER);
             for(int c=0;c<8;c++){
-                int i=r*8+c;
-                if(i>=found.length){
-                    row.addView(new View(this),new LinearLayout.LayoutParams(0,height,1f));
-                }else{
-                    final String emoji=found[i];
-                    TextView key=clipboardButton(emoji,19);
-                    key.setContentDescription("Insert "+emoji+" emoji");
-                    row.addView(key,new LinearLayout.LayoutParams(0,height,1f));
-                    key.setOnClickListener(v->{
+                final int index=r*8+c;
+                TextView key=clipboardButton("",19);
+                row.addView(key,new LinearLayout.LayoutParams(0,height,1f));
+                key.setOnClickListener(v->{
+                    Object value=key.getTag();
+                    if(value instanceof String){
                         InputConnection conn=getCurrentInputConnection();
-                        if(conn!=null){finishRomanWord();conn.commitText(emoji,1);}
-                    });
-                }
+                        if(conn!=null){finishRomanWord();conn.commitText((String)value,1);}
+                    }
+                });
+                emojiResultKeys[index]=key;
             }
             keysContent.addView(row,new LinearLayout.LayoutParams(-1,height+dp(1)));
         }
-        if(found.length==0){
-            TextView hint=new TextView(this);
-            hint.setText("No match · try love, cat, happy, science or flower");
-            hint.setTextSize(11);hint.setTextColor(light()?0xff35496b:Color.WHITE);
-            hint.setGravity(Gravity.CENTER);
-            // Reuse a thin strip: don't push the bottom row off short displays.
-            keysContent.addView(hint,new LinearLayout.LayoutParams(-1,dp(15)));
-        }
+        emojiEmptyHint=new TextView(this);
+        emojiEmptyHint.setText("No match · try love, cat, happy, science or flower");
+        emojiEmptyHint.setTextSize(11);
+        emojiEmptyHint.setTextColor(light()?0xff35496b:Color.WHITE);
+        emojiEmptyHint.setGravity(Gravity.CENTER);
+        keysContent.addView(emojiEmptyHint,new LinearLayout.LayoutParams(-1,dp(15)));
+        updateEmojiSearchResults();
         addRow("Q W E R T Y U I O P");
         addRow("A S D F G H J K L");
         addRow("Z X C V B N M ⌫");
@@ -1324,6 +1328,30 @@ public final class VisionKeyboardService extends InputMethodService {
         addKey(footer,"Clear","SEARCH_CLEAR",1.1f,bottom,true);
         addKey(footer,"↵","EMOJI_SEARCH_EXIT",1.1f,bottom,true);
         keysContent.addView(footer,new LinearLayout.LayoutParams(-1,bottom+dp(3)));
+    }
+    private void updateEmojiSearchResults(){
+        if(emojiSearchLabel!=null){
+            emojiSearchLabel.setText("🔎 "+(emojiSearchText.length()==0?
+                "Search emojis":emojiSearchText.toString()));
+            emojiSearchLabel.setContentDescription("Emoji search: "+emojiSearchText);
+        }
+        if(emojiResultKeys==null)return;
+        String[] found=EmojiSearchIndex.search(emojiSearchText.toString(),16);
+        for(int i=0;i<emojiResultKeys.length;i++){
+            TextView key=emojiResultKeys[i];
+            if(i<found.length){
+                key.setText(found[i]);
+                key.setTag(found[i]);
+                key.setVisibility(View.VISIBLE);
+                key.setContentDescription("Insert "+found[i]+" emoji");
+            }else{
+                key.setText("");
+                key.setTag(null);
+                key.setVisibility(View.INVISIBLE);
+            }
+        }
+        if(emojiEmptyHint!=null)
+            emojiEmptyHint.setVisibility(found.length==0?View.VISIBLE:View.INVISIBLE);
     }
     private void addEmojiBottom(){
         LinearLayout row=new LinearLayout(this);
@@ -1628,7 +1656,7 @@ public final class VisionKeyboardService extends InputMethodService {
         if(mode==EMOJI_SEARCH){
             if(emojiSearchText.length()>0){
                 emojiSearchText.deleteCharAt(emojiSearchText.length()-1);
-                rebuild();
+                updateEmojiSearchResults();
             }
             return;
         }
@@ -1661,13 +1689,13 @@ public final class VisionKeyboardService extends InputMethodService {
             if("SPACE".equals(code)){
                 if(emojiSearchText.length()>0&&emojiSearchText.length()<24)
                     emojiSearchText.append(" ");
-                rebuild();return;
+                updateEmojiSearchResults();return;
             }
             if("⌫".equals(code)){deleteOne();return;}
             if(code.length()==1 && Character.isLetter(code.charAt(0)) &&
                emojiSearchText.length()<24){
                 emojiSearchText.append(code.toLowerCase(java.util.Locale.ROOT));
-                rebuild();
+                updateEmojiSearchResults();
             }
             return;
         }
