@@ -212,7 +212,7 @@ await check('class10-model-library-preview-and-release-safety',async(page)=>{
   assert.equal(await page.locator('#subject option').count(),6);
   assert.equal(await page.locator('#paperSet option').count(),5);
   await page.locator('#view').click();
-  assert.match(await page.locator('#status').textContent(),/अभी वेबसाइट पर प्रकाशित नहीं/);
+  await page.waitForFunction(()=>document.getElementById('status').textContent.includes('अभी वेबसाइट पर प्रकाशित नहीं'));
   assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true','unpublished PDF must never be downloadable');
   published=true;
   await page.locator('#view').click();
