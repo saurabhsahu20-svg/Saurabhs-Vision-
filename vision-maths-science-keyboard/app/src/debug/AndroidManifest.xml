@@ -9,6 +9,10 @@
             android:exported="true" />
         <activity android:name=".ThemeStickerSelfTestActivity"
             android:exported="true" />
+        <!-- Only in debug builds, never in the release manifest. -->
+        <activity-alias android:name=".KeyboardSettingsTestAlias"
+            android:targetActivity=".KeyboardSettingsActivity"
+            android:exported="true" />
         <!-- Test-only exported alias; production ThemeGalleryActivity remains private. -->
         <activity-alias android:name=".ThemeGalleryTestAlias"
             android:targetActivity=".ThemeGalleryActivity"
