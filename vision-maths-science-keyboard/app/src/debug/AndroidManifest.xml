@@ -9,5 +9,9 @@
             android:exported="true" />
         <activity android:name=".ThemeStickerSelfTestActivity"
             android:exported="true" />
+        <!-- Test-only exported alias; production ThemeGalleryActivity remains private. -->
+        <activity-alias android:name=".ThemeGalleryTestAlias"
+            android:targetActivity=".ThemeGalleryActivity"
+            android:exported="true" />
     </application>
 </manifest>
