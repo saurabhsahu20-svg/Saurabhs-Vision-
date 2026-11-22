@@ -19,7 +19,7 @@ public final class ThemeStickerSelfTestActivity extends Activity {
         super.onCreate(state);
         try{
             int total=ThemePalette.count();
-            check(total>=35,"Expected gallery theme count");
+            check(total>=51,"Expected gallery theme count");
             check(ThemePalette.NAMES.length==ThemePalette.BASE.length,"Theme BASE length");
             check(total==ThemePalette.MID.length,"Theme MID length");
             check(total==ThemePalette.ACCENTS.length,"Theme ACCENTS length");
@@ -33,8 +33,8 @@ public final class ThemeStickerSelfTestActivity extends Activity {
             check(total==ThemePalette.TEXT.length,"Theme TEXT length");
             check(ThemePalette.PHOTO_THEME==34,"Photo index moved");
             check(ThemePalette.norm(-1)==total-1,"Theme index normalization");
-            check(StickerCatalog.count()==30,"30 original sticker designs");
-            check(StickerCatalog.packCount()==5,"Five original packs");
+            check(StickerCatalog.count()==54,"54 original sticker designs");
+            check(StickerCatalog.packCount()==9,"Nine original packs");
             for(int index=0;index<StickerCatalog.count();index++){
                 Bitmap bmp=StickerCatalog.draw(index,120);
                 check(bmp!=null&&bmp.getWidth()==120,"Sticker bitmap "+index);
@@ -49,7 +49,7 @@ public final class ThemeStickerSelfTestActivity extends Activity {
             }
             check(getSharedPreferences("vision_keyboard_settings",Context.MODE_PRIVATE)
                 .getInt("theme",4)>=0,"Theme preference");
-            Log.i("SBoardThemeQA","PASS: 35 themes, full palette arrays, custom photo index, 30 PNG stickers, provider");
+            Log.i("SBoardThemeQA","PASS: 51 themes, full palette arrays, custom photo index, 54 PNG stickers, provider");
         }catch(Throwable failure){
             Log.e("SBoardThemeQA","FAIL: "+failure.getClass().getSimpleName());
             throw new AssertionError("Original theme/sticker regression failed",failure);
