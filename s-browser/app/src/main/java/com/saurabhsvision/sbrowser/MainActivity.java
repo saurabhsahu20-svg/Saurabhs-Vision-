@@ -20,6 +20,9 @@ import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
@@ -57,7 +60,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * S Browser beta: native Android WebView, no ads or analytics.
+ * Grifly beta: native Android WebView, no ads or analytics.
  * Offline dictionary and local browsing data. No JavaScript bridges.
  */
 public final class MainActivity extends Activity {
@@ -148,6 +151,19 @@ public final class MainActivity extends Activity {
         v.setTypeface(Typeface.create(medium?"sans-serif-medium":"sans-serif",Typeface.NORMAL));
         v.setGravity(Gravity.CENTER_VERTICAL);
         return v;
+    }
+    // Apply a real per-letter rainbow to Grifly inside the Android app.
+    // Android home screen icon labels use launcher-controlled, unstyled text.
+    private TextView griflyRainbow(int size){
+        TextView view=text("Grifly",size,HOME_INK,true);
+        SpannableString rainbow=new SpannableString("Grifly");
+        int[] colors={0xffed313d,0xfffd8522,0xffe9b600,0xff19a758,0xff1289e9,0xff8d4be2};
+        for(int i=0;i<rainbow.length();i++){
+            rainbow.setSpan(new ForegroundColorSpan(colors[i]),i,i+1,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        view.setText(rainbow);
+        view.setContentDescription("Grifly browser");
+        return view;
     }
     private LinearLayout column(){LinearLayout v=new LinearLayout(this);v.setOrientation(1);return v;}
     private LinearLayout row(){LinearLayout v=new LinearLayout(this);v.setOrientation(0);v.setGravity(Gravity.CENTER_VERTICAL);return v;}
@@ -256,7 +272,7 @@ public final class MainActivity extends Activity {
         }
     }
     private void showAccountInfo(){
-        new AlertDialog.Builder(this).setTitle("S Browser • Local profile")
+        new AlertDialog.Builder(this).setTitle("Grifly • Local profile")
             .setMessage("No account required. Bookmarks, notes and history are stored on this device.")
             .setPositiveButton("OK",null).show();
     }
@@ -278,7 +294,7 @@ public final class MainActivity extends Activity {
         logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
         header.addView(logo,new LinearLayout.LayoutParams(dp(48),dp(48)));
         LinearLayout branding=column();
-        TextView name=text("S Browser  ✓",19,HOME_INK,true);
+        TextView name=griflyRainbow(19);
         name.setSingleLine(true);
         branding.addView(name);
         TextView byline=text("A Saurabh Vision Product",11,HOME_MUTED,false);
@@ -578,7 +594,7 @@ public final class MainActivity extends Activity {
         LinearLayout layout=column();
         layout.setPadding(dp(14),dp(12),dp(14),dp(30));
         scroll.addView(layout);
-        // Inspired by a clean search engine landing page, with S Browser identity.
+        // Inspired by a clean search engine landing page, with Grifly identity.
         LinearLayout links=row();
         TextView all=homeButton("ALL",0xffffffff,0,HOME_BLUE,this::showHome);
         TextView images=homeButton("IMAGES",0xffffffff,0,HOME_MUTED,
@@ -610,14 +626,14 @@ public final class MainActivity extends Activity {
         ImageView rainbowLogo=new ImageView(this);
         rainbowLogo.setImageResource(R.drawable.rainbow_s_icon);
         rainbowLogo.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        rainbowLogo.setContentDescription("Rainbow S Browser logo");
+        rainbowLogo.setContentDescription("Rainbow Grifly logo");
         LinearLayout.LayoutParams rainbowParams=new LinearLayout.LayoutParams(
             dp(106),dp(106));
         rainbowParams.gravity=Gravity.CENTER_HORIZONTAL;
         layout.addView(rainbowLogo,rainbowParams);
-        TextView brand=text("Browser",43,0xff061c47,true);
+        TextView brand=griflyRainbow(43);
         brand.setGravity(Gravity.CENTER);
-        brand.setContentDescription("S Browser search home");
+        brand.setContentDescription("Grifly search home");
         add(layout,brand,0);
         TextView byline=text("Explore • Study • Learn • Grow",15,0xff061c47,true);
         byline.setGravity(Gravity.CENTER);
@@ -832,7 +848,7 @@ public final class MainActivity extends Activity {
             "These are developer/test builds, not Play Store-verified apps.",
             12,HOME_MUTED,false),2);
         String[] appNames={
-            "S Browser 1.8 Beta","S Board 1.9.15","S Caller 1.9.6",
+            "Grifly 1.8.3","S Board 1.9.15","S Caller 1.9.6",
             "MsgU 1.1.1 Beta","Saune Vibe 1.1.1","S CALC Pro 1.7",
             "SV Caller Pro 3.3","S Vision Launcher 1.2",
             "Crystal Volume Booster • Builds"
@@ -887,7 +903,7 @@ public final class MainActivity extends Activity {
                 0xffe3f2ff,HOME_BORDER,HOME_BLUE,()->restoreTabs(last));
             add(layout,restore,13);
         }
-        add(layout,text("S Browser  •  SAURABH'S VISION™  •  Student Edition",
+        add(layout,text("Grifly  •  SAURABH'S VISION™  •  Student Edition",
             11,HOME_MUTED,false),22);
         refreshTabBadge();
     }
@@ -981,7 +997,7 @@ public final class MainActivity extends Activity {
                 Uri uri=req.getUrl();
                 String scheme=uri.getScheme();
                 if(!"https".equalsIgnoreCase(scheme)&&!"http".equalsIgnoreCase(scheme)){
-                    toast("Only web pages can open in S Browser");return true;
+                    toast("Only web pages can open in Grifly");return true;
                 }
                 if(focusBlocked(uri)){
                     toast("Site blocked while Study Focus is enabled");return true;
@@ -1142,7 +1158,7 @@ public final class MainActivity extends Activity {
             (d,i)->openAddress(items.get(i).url)).setNegativeButton("Close",null).show();
     }
     // Student map downloads: official PDF sources, using the existing DownloadManager.
-    // The rest of S Browser, including all study and browsing features, is unchanged.
+    // The rest of Grifly, including all study and browsing features, is unchanged.
     private void showMapDownloads(){
         // Keep printable worksheets separate from official answers. District boundaries
         // on practice sites should always be checked against current government PDFs.
@@ -1286,7 +1302,7 @@ public final class MainActivity extends Activity {
         add(body,online,10);
 
         AlertDialog dialog=new AlertDialog.Builder(this)
-            .setTitle("Aa  S Browser Dictionary")
+            .setTitle("Aa  Grifly Dictionary")
             .setView(body).setNegativeButton("Close",null).create();
         online.setOnClickListener(v->{
             String query=search.getText().toString().trim();
@@ -1396,10 +1412,10 @@ public final class MainActivity extends Activity {
             "Aa  Define selected word","☷  Reading mode","✎  Study notes",
             "◉  Study Focus","▣  Bookmarks","◷  History","↓  Downloads",
             "⌕  Search engine","▤  Desktop / mobile site","↗  Share page",
-            "⊘  Clear browsing data","ⓘ  About S Browser",
+            "⊘  Clear browsing data","ⓘ  About Grifly",
             "⚑  CG Jobs, Railway & Exams","▤  Latest CG City News",
             "→  Forward page","✦  Daily Assembly & Fun"};
-        new AlertDialog.Builder(this).setTitle("S Browser tools").setItems(choices,(d,i)->{
+        new AlertDialog.Builder(this).setTitle("Grifly tools").setItems(choices,(d,i)->{
             Tab tab=current();
             switch(i){
                 case 0:
@@ -1434,8 +1450,8 @@ public final class MainActivity extends Activity {
                     share.setType("text/plain");share.putExtra(Intent.EXTRA_TEXT,tab.web.getUrl());
                     startActivity(Intent.createChooser(share,"Share page"));break;
                 case 12:clearData();break;
-                case 13:new AlertDialog.Builder(this).setTitle("About S Browser")
-                    .setMessage("S Browser 1.4 Beta • SAURABH'S VISION™\n\n"+
+                case 13:new AlertDialog.Builder(this).setTitle("About Grifly")
+                    .setMessage("Grifly 1.4 Beta • SAURABH'S VISION™\n\n"+
                     "Android WebView-powered browsing; a curated offline English–Hindi student dictionary, local bookmarks, notes and Study Focus. No ads or analytics.\n\n"+
                     "Study Focus blocks selected top-level websites, not every possible distracting resource. This browser is an early beta and does not yet provide full incognito isolation, automatic spam protection or universal ad blocking.")
                     .setPositiveButton("OK",null).show();break;
