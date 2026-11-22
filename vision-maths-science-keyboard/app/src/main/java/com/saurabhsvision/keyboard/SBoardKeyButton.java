@@ -15,6 +15,8 @@ import android.widget.Button;
  */
 public final class SBoardKeyButton extends Button {
     private boolean isSpaceKey=false;
+    private boolean previewEnabled=false;
+    private String previewLabel="";
     private boolean lightTheme=false;
     private int indicatorColor=0xff2ef4ff;
     private final Paint neon=new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -26,8 +28,28 @@ public final class SBoardKeyButton extends Button {
         indicatorColor=accent;
         invalidate();
     }
+    public void setKeyPopup(boolean enabled,String label){
+        previewEnabled=enabled;
+        previewLabel=label==null?"":label;
+    }
     @Override protected void onDraw(Canvas canvas){
         super.onDraw(canvas);
+        // Cheap in-key pressed preview: never creates floating windows or
+        // animations, so fast typing and Android's IME touch target stay stable.
+        if(previewEnabled&&isPressed()&&!previewLabel.isEmpty()&&
+            getWidth()>16&&getHeight()>16){
+            float d=getResources().getDisplayMetrics().density;
+            float w=getWidth(),h=getHeight();
+            neon.reset();neon.setAntiAlias(true);
+            neon.setColor(lightTheme?0xff356cd6:0xffafeaff);
+            line.set(w*.13f,h*.03f,w*.87f,h*.60f);
+            canvas.drawRoundRect(line,8*d,8*d,neon);
+            neon.setTextAlign(Paint.Align.CENTER);
+            neon.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            neon.setColor(lightTheme?0xffffffff:0xff12314b);
+            neon.setTextSize(Math.min(h*.46f,23*d));
+            canvas.drawText(previewLabel,w*.5f,h*.44f,neon);
+        }
         if(!isSpaceKey || getWidth()<24 || getHeight()<18)return;
         float density=getResources().getDisplayMetrics().density;
         float center=getWidth()*.5f;
