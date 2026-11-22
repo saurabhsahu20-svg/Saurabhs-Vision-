@@ -7,5 +7,7 @@
             android:windowSoftInputMode="stateAlwaysVisible|adjustResize"/>
         <activity android:name=".ClipboardHistorySelfTestActivity"
             android:exported="true" />
+        <activity android:name=".ThemeStickerSelfTestActivity"
+            android:exported="true" />
     </application>
 </manifest>
