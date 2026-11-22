@@ -235,8 +235,24 @@ adb pull /sdcard/sboard-sboard-settings.xml /tmp/sboard-sboard-settings.xml >/de
 grep -q 'S Board settings' /tmp/sboard-sboard-settings.xml
 grep -q 'Number row' /tmp/sboard-sboard-settings.xml
 grep -q 'Long-press symbols' /tmp/sboard-sboard-settings.xml
-grep -q 'Arrow keys' /tmp/sboard-sboard-settings.xml
-echo "PASS: Layout & Keys settings opens with number row, symbol and arrow controls."
+# CI emulator is still in landscape: the short viewport clips lower rows
+# until the settings ScrollView is swiped. Check after real screen scrolling.
+found_arrows=false
+for pass in 1 2 3 4; do
+  adb shell input swipe 580 406 580 146 240
+  sleep 1
+  adb shell uiautomator dump /sdcard/sboard-sboard-settings.xml >/dev/null 2>&1
+  adb pull /sdcard/sboard-sboard-settings.xml /tmp/sboard-sboard-settings.xml >/dev/null
+  if grep -q 'Arrow keys' /tmp/sboard-sboard-settings.xml; then
+    found_arrows=true
+    break
+  fi
+done
+if [ "$found_arrows" != true ]; then
+  echo "FAIL: Arrow keys option not shown after scrolling S Board Settings."
+  exit 1
+fi
+echo "PASS: Layout & Keys settings opens and arrow setting is reachable by scrolling."
 
 # Inspect only errors, never output sensitive input or clipboard content.
 adb shell logcat -d -t 1800 -s AndroidRuntime:E > /tmp/sboard-androidruntime.log || true
