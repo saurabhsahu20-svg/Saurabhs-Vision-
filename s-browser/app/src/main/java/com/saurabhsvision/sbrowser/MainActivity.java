@@ -521,7 +521,8 @@ public final class MainActivity extends Activity {
             this::showStudentDashboard);
         addQuickTab("▤ Study Portal",false,
             ()->openAddress("https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/"));
-        addQuickTab("📚 Model Papers",false,this::openInstalledVisionModelPapers);\n        addQuickTab("＋ New Tab",false,()->{
+        addQuickTab("📚 Model Papers",false,this::openInstalledVisionModelPapers);
+        addQuickTab("＋ New Tab",false,()->{
             if(createTab()!=null)showHome();
         });
         // Open web tabs stay accessible after the four pinned shortcuts.
