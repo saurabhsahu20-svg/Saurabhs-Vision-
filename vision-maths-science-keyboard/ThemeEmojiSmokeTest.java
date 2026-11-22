@@ -11,7 +11,7 @@ public final class ThemeEmojiSmokeTest {
     }
     public static void main(String[] args){
         final int count=ThemePalette.count();
-        check(count==35,"35 original themes available");
+        check(count==51,"51 original themes available");
         check(ThemePalette.PHOTO_THEME==34,"photo theme index stable");
         check("Celestial Violet".equals(ThemePalette.NAMES[11]),"original celestial theme available");
         check("My Photo".equals(ThemePalette.NAMES[34]),"custom photo category available");
