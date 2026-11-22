@@ -206,7 +206,19 @@ public final class MainActivity extends Activity {
         Intent intent=getIntent();
         if(intent!=null&&Intent.ACTION_VIEW.equals(intent.getAction())&&intent.getData()!=null)
             openAddress(intent.getData().toString());
-        else showHome();
+        else {
+            showHome();
+            // New model-paper section is announced once, never on every launch.
+            if(!getPreferences(MODE_PRIVATE).getBoolean("model_papers_v190_shown",false)){
+                getPreferences(MODE_PRIVATE).edit().putBoolean("model_papers_v190_shown",true).apply();
+                new AlertDialog.Builder(this)
+                    .setTitle("📚 नया अपडेट • Model Paper Library")
+                    .setMessage("10वीं के 6 विषयों के 66 पेपर अब Grifly के होम पेज के ऊपर दिखाई देंगे। 30 नए 75-अंक सेट में Step-by-Step Solutions और Diagrams हैं। PDF Preview और Save अलग हैं। पहले से PDF शामिल नहीं हों तो एक बार 66-PDF ZIP Import करें।")
+                    .setPositiveButton("📖 Model Papers खोलें",(dialog,which)->openNativeModelPapers())
+                    .setNegativeButton("होम पेज देखें",(dialog,which)->dialog.dismiss())
+                    .show();
+            }
+        }
     }
     @Override protected void onNewIntent(Intent intent){
         super.onNewIntent(intent);setIntent(intent);
@@ -529,15 +541,15 @@ public final class MainActivity extends Activity {
         if(tabLine==null)return;
         tabLine.removeAllViews();
         addQuickTab("⌂ Home",home&&!dashboardOpen,this::showHome);
+        addQuickTab("📚 कक्षा 10 • 66 PDF",false,this::openNativeModelPapers);
         addQuickTab("◉ Akashvani News",false,
             ()->openAddress("https://www.newsonair.gov.in/"));
         addQuickTab("▤ Study Dashboard",home&&dashboardOpen,
             this::showStudentDashboard);
         addQuickTab("▤ Study Portal",false,
             ()->openAddress("https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/"));
-        addQuickTab("📚 Model Papers",false,()->openAddress(VISION_PAPERS_URL));
-        addQuickTab("⬇ Offline Papers",false,this::openNativeModelPapers);
-        addQuickTab("🎓 Vision Test App",false,this::openInstalledVisionModelPapers);
+        addQuickTab("🌐 Online Papers",false,()->openAddress(VISION_PAPERS_URL));
+        addQuickTab("🎓 Vision App",false,this::openInstalledVisionModelPapers);
         addQuickTab("＋ New Tab",false,()->{
             if(createTab()!=null)showHome();
         });
@@ -664,11 +676,17 @@ public final class MainActivity extends Activity {
         LinearLayout.LayoutParams ul=new LinearLayout.LayoutParams(dp(49),dp(2));
         layout.addView(underline,ul);
 
+        // The Class 10 study library must be visible BEFORE the search-logo hero;
+        // earlier releases hid it far below the fold behind horizontal tiles.
+        homeBanner(layout,"📚","कक्षा 10 • 66 Model Papers",
+            "75 अंक के 30 नए सेट • Step-by-Step हल • Diagram • Offline PDF",
+            0xffdcf7ed,0xffa0e9d4,0xff5dbb9c,this::openNativeModelPapers);
+
         // Top margin scales gently by screen height. Do not push input off
         // small phones or leave the keyboard obscuring important controls.
         int screenDp=(int)(getResources().getDisplayMetrics().heightPixels/
             getResources().getDisplayMetrics().density);
-        int heroGap=Math.max(39,Math.min(99,screenDp/10));
+        int heroGap=Math.max(12,Math.min(34,screenDp/25));
         View gap=new View(this);
         layout.addView(gap,new LinearLayout.LayoutParams(-1,dp(heroGap)));
         ImageView rainbowLogo=new ImageView(this);
@@ -741,6 +759,7 @@ public final class MainActivity extends Activity {
         if(history.isEmpty()){
             addSearchSuggestion(layout,"News and current affairs","latest India news");
             addSearchSuggestion(layout,"Study resources","educational resources");
+            addSearchSuggestion(layout,"Class 10 Model Papers — 66 PDFs",VISION_PAPERS_URL);
             addSearchSuggestion(layout,"Explore Saurabh Vision","https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/");
             addSearchSuggestion(layout,"Student dashboard",null);
         }else{
@@ -813,6 +832,9 @@ public final class MainActivity extends Activity {
         ep.leftMargin=dp(9);heroActions.addView(features,ep);
         add(hero,heroActions,17);
         add(layout,hero,0);
+        homeBanner(layout,"📚","MODEL PAPERS • CLASS 10",
+            "6 Subjects • 66 PDFs • 75 Marks + Worked Answers",
+            0xffd6f6f1,0xff9ee5dc,0xff63c7b7,this::openNativeModelPapers);
 
         // TODAY'S NEWS DESK; no fabricated live alerts.
         // Scrollable collection: never squeeze nine shortcuts into one phone row.
