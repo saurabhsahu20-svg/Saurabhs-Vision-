@@ -121,6 +121,26 @@ jobs:
           assert 'Cartoon Friends' in emojis
           assert 'String[] icons={"😀","🥰","😢","👋","🧑","🐼","🌿","🍕","🎉","💯","🧬","🎭"}' in ime
           assert 'view.animate().scaleX' not in ime
+          # Clipboard: explicit plain paste, editor-native formatting and secure local history.
+          clipboard=(root/'java/com/saurabhsvision/keyboard/ClipboardHistoryStore.java').read_text()
+          debugclip=Path('vision-maths-science-keyboard/app/src/debug/java/com/saurabhsvision/keyboard/ClipboardHistorySelfTestActivity.java').read_text()
+          assert 'AES/GCM/NoPadding' in clipboard and 'AndroidKeyStore' in clipboard
+          assert 'MAX_AGE_MS=24L*60L*60L*1000L' in clipboard
+          assert 'MAX_ITEMS=20' in clipboard and 'getBoolean(ACTIVE,false)' in clipboard
+          assert 'if(!active)prefs.edit().putBoolean(ACTIVE,false).remove(KEY)' in clipboard
+          assert 'clipboardManager.addPrimaryClipChangedListener' in ime
+          assert 'clipboardManager.removePrimaryClipChangedListener' in ime
+          assert 'getPrimaryClipDescription' in ime and 'sensitiveClip' in ime
+          assert 'if(!sensitiveField&&clipboardHistory!=null&&clipboardHistory.enabled())' in ime
+          assert 'ClipDescription' in ime and 'clipboardTextAvailable()' in ime
+          assert 'conn.performContextMenuAction(android.R.id.paste)' in ime
+          assert 'conn.commitText(copied,1)' in ime
+          assert '24h: OFF' in ime and 'Clear saved history' in ime
+          assert 'ClipboardHistoryStore' in activity
+          assert 'SBOARD_TEST_TOKEN' in debugclip
+          assert 'ClipboardHistorySelfTestActivity' in Path('vision-maths-science-keyboard/app/src/debug/AndroidManifest.xml').read_text()
+          assert 'ClipboardHistorySelfTestActivity' not in manifest
+          assert 'android.permission.INTERNET' not in manifest
           assert 'new RippleDrawable(' in ime
           assert 'lastSuggestionKey=null' in ime
           assert 'lookupKey.equals(lastSuggestionKey)' in ime
@@ -203,7 +223,7 @@ jobs:
           import hashlib
           logo_digest=hashlib.sha256((root/'res/drawable-nodpi/s_board_logo.webp').read_bytes()).hexdigest()
           assert logo_digest=='66ce747a7ce6089d587f15f12ca2e6384011f02e5ce7740a94e5ae20ce883e59', 'Wrong (old) S Board icon'
-          assert 'versionCode 25' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
+          assert 'versionCode 26' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
           assert (root/'java/com/saurabhsvision/keyboard/SBoardKeyButton.java').is_file()
           assert 'Toggle Smart Suggestions' in activity
           assert 'setMeasuredDimension(width,Math.min(cap' in panel
@@ -336,7 +356,7 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.15_ABC_SYMBOLS_STABLE.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.16_CLIPBOARD_PRIVACY.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Include Android apksigner utility in CI artifact for privately signed updates
@@ -348,7 +368,7 @@ jobs:
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_15_ABC_SYMBOLS_UPDATE_APK
+          name: S_Board_v1_9_16_CLIPBOARD_UPDATE_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -358,14 +378,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.15"
-          file="keyboard-deliverables/S_Board_v1.9.15_ABC_SYMBOLS_STABLE.apk"
+          tag="s-board-v1.9.16"
+          file="keyboard-deliverables/S_Board_v1.9.16_CLIPBOARD_PRIVACY.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.9.15 • ABC from Numbers & Symbols" \
-              --notes "S Board 1.9.15 restores the familiar ABC button on the lower-left of both 123 and extended symbol keyboards, so switching back to letters needs only one tap. The =< button next to ABC opens the full extra symbols page; ?123 there returns to the number page. The Enter/Search key is now adaptive in all keyboard modes, including Emoji. Original red crystal icon, design/themes, voice typing, offline corrections, Hindi/Hinglish, scientific/maths and 14/14 rapid touch improvements are retained. CI tests key layout contracts, symbols, language modes, keyboard signing, actual touch input and portrait/landscape. GitHub release is debug signed. For updating S Board Stable in place use the separately stable-signed APK carrying the same signing certificate as 1.9.14 Stable; do not uninstall the old Stable app when the signatures match." \
+              --title "S Board 1.9.16 • Clipboard Formatting & 24-Hour History" \
+              --notes "S Board 1.9.16: adds Gboard-inspired clipboard shortcut on the suggestions row after copying text, with long-press options to paste plain text or use the target app native Paste action to preserve formatting where supported. Open the clipboard page through toolbar for those choices. Optional 24-hour text clipboard history is OFF by default, limited to 20 encrypted entries and clips copied while S Board is visible. Uses AndroidKeyStore AES-256-GCM encryption, skips password fields and sensitive-flagged clips, has immediate Clear and Disable options, and no network permission. Does not track clipboard while the keyboard is hidden or guarantee receiving apps will preserve styles. Existing red crystal S icon, Enter/Search, ABC/123, voice typing, maths/science/emoji/languages and responsive typing remain. GitHub APK is debug-signed; separately distributed stable-signed APK must be used to update existing S Board Stable in place." \
               --latest=false
           fi
 
@@ -391,7 +411,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_1_9_15_Android_Emulator_ABC_Symbols_Audit
+          name: S_Board_1_9_16_Android_Emulator_Clipboard_Audit
           path: |
             /tmp/sboard-portrait.png
             /tmp/sboard-landscape.png
