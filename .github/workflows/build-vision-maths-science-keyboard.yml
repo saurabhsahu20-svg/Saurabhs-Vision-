@@ -80,7 +80,7 @@ jobs:
           assert 'KeyboardSettingsActivity' in manifest
           assert 'preference.getBoolean("number_row",false)' in ime
           assert 'preference.getBoolean("arrow_keys",true)' in ime
-          assert 'settings().getInt("long_press_duration",450)' in ime
+          assert 'preference.getInt("long_press_duration",450)' in ime
           assert 'private void showLongPressChoices(' in ime
           assert 'private void addEmojiSearchPanel()' in ime
           assert 'EmojiSearchIndex.search(' in ime
