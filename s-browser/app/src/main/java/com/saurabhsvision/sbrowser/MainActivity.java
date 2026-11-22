@@ -480,6 +480,8 @@ public final class MainActivity extends Activity {
         if(focusBadge!=null)focusBadge.setTextColor(HOME_INK);
         refreshTabStrip();
     }
+    private static final String VISION_PAPERS_URL="https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/model-paper-library/";
+
     /** Open the privately installed Vision study pack without sending PDFs to the network. */
     private void openInstalledVisionModelPapers(){
         try{
@@ -502,7 +504,8 @@ public final class MainActivity extends Activity {
         new AlertDialog.Builder(this)
             .setTitle("Model Paper Library")
             .setMessage("SAURABH'S VISION v4.1.5 Study Test में 10वीं के सभी 66 पेपर, नए 75-अंक के 30 चरणबद्ध हल, लेबल वाले आरेख और ऑफलाइन Preview हैं। पहले यह ऐप इंस्टॉल करें और Model Paper Library खोलें।")
-            .setPositiveButton("ठीक है",(dialog,which)->dialog.dismiss())
+            .setPositiveButton("ऑनलाइन लाइब्रेरी देखें",(dialog,which)->openAddress(VISION_PAPERS_URL))
+            .setNegativeButton("बंद करें",(dialog,which)->dialog.dismiss())
             .show();
     }
     private void addQuickTab(String label,boolean active,Runnable action){
@@ -527,7 +530,8 @@ public final class MainActivity extends Activity {
             this::showStudentDashboard);
         addQuickTab("▤ Study Portal",false,
             ()->openAddress("https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/"));
-        addQuickTab("📚 Model Papers",false,this::openInstalledVisionModelPapers);
+        addQuickTab("📚 Model Papers",false,()->openAddress(VISION_PAPERS_URL));
+        addQuickTab("⬇ Offline Papers",false,this::openInstalledVisionModelPapers);
         addQuickTab("＋ New Tab",false,()->{
             if(createTab()!=null)showHome();
         });
@@ -848,7 +852,11 @@ public final class MainActivity extends Activity {
             homeFeature("⬇","Downloads",0xfffff4fa,0xffffdbef,0xffeeacd2,
                 this::openDownloads),
             homeFeature("🗺","Maps Download",0xffeefaff,0xffc8eeff,0xff86cbef,
-                this::showMapDownloads)
+                this::showMapDownloads),
+            homeFeature("📚","Model Papers",0xfff1f9ff,0xffcfe4ff,0xff98bdeb,
+                ()->openAddress(VISION_PAPERS_URL)),
+            homeFeature("📥","Offline Papers",0xfffffbef,0xffffe4ab,0xffffcc7f,
+                this::openInstalledVisionModelPapers)
         };
         for(int i=0;i<cards.length;i++){
             LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(106),dp(104));
