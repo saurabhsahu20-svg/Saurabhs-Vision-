@@ -81,6 +81,10 @@ public final class VisionKeyboardService extends InputMethodService {
     private boolean backspaceRepeated=false;
     private Runnable backspaceRepeat;
     private boolean haptics=false;
+    // Read user options once when composing the keyboard, not on every key.
+    private boolean keyPopups=false,largeKeyText=true,keySound=false;
+    private boolean topNumberRow=false,showArrowKeys=true;
+    private int longPressMs=450;
     private VoiceDictation voiceDictation;
     private TextView voiceMicButton;
     private String voiceStatus="";
@@ -190,6 +194,14 @@ public final class VisionKeyboardService extends InputMethodService {
     private boolean light(){return ThemePalette.isLight(theme);}
     private void rebuild(){
         if(keyboardFrame==null)return;
+        SharedPreferences preference=settings();
+        keyPopups=preference.getBoolean("key_popups",false);
+        largeKeyText=preference.getBoolean("large_key_text",true);
+        keySound=preference.getBoolean("key_sound",false);
+        topNumberRow=preference.getBoolean("number_row",false);
+        showArrowKeys=preference.getBoolean("arrow_keys",true);
+        longPressMs=Math.max(250,Math.min(700,
+            preference.getInt("long_press_duration",450)));
         suggestionHandler.removeCallbacks(suggestionRefresh);suggestionsQueued=false;
         keyboardFrame.removeAllViews();
         keyboardFrame.setTheme(theme);
@@ -207,7 +219,9 @@ public final class VisionKeyboardService extends InputMethodService {
         // fourth Space/Enter row under the bottom of the real viewport.
         keysContent.setPadding(dp(3),dp(4),dp(3),dp(8));
         // Compact suggestions bar by default; the grid exposes all original tabs.
-        if((mode!=ABC && mode!=CLIPBOARD && mode!=STICKERS && mode!=EMOJI_SEARCH) || toolbarExpanded)addToolbar();
+        if(toolbarExpanded)addToolbar();
+        else if(mode==NUMBER||mode==SYMBOLS||mode==MATH||
+            mode==SCIENCE||mode==EMOJI)addCompactModeBar();
         if(mode==EMOJI_SEARCH){
             addEmojiSearchPanel();
         }else if(mode==STICKERS){
@@ -223,7 +237,7 @@ public final class VisionKeyboardService extends InputMethodService {
             else addVoiceOnlyRow();
             if(selectedLanguage!=IndicLanguages.ENGLISH)addLanguageStatus();
 
-            if(settings().getBoolean("number_row",false))
+            if(topNumberRow)
                 addRow("1 2 3 4 5 6 7 8 9 0");
             addRow("Q W E R T Y U I O P");
             addRow("A S D F G H J K L");
@@ -257,6 +271,45 @@ public final class VisionKeyboardService extends InputMethodService {
             addEmojiBottom();
         }
         keyboardFrame.requestLayout();
+    }
+    /**
+     * The main toolbar is opt-in across all modes. Keep one small control strip
+     * in non-alphabet modes so the full toolbar never steals space from keys.
+     */
+    private void addCompactModeBar(){
+        LinearLayout row=new LinearLayout(this);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        TextView tools=new TextView(this);
+        tools.setText("▦");
+        tools.setTextSize(23);
+        tools.setGravity(Gravity.CENTER);
+        tools.setTextColor(light()?0xff263d60:Color.WHITE);
+        tools.setContentDescription("Open S Board tools");
+        row.addView(tools,new LinearLayout.LayoutParams(dp(45),dp(39)));
+        tools.setOnClickListener(v->{
+            feedback(v);toolbarExpanded=true;rebuild();
+        });
+        TextView current=new TextView(this);
+        String modeName=mode==NUMBER?"Numbers":mode==SYMBOLS?"Symbols":
+            mode==MATH?"Maths":mode==SCIENCE?"Science":"Emoji";
+        current.setText("S Board  ·  "+modeName);
+        current.setTextSize(14);
+        current.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+        current.setGravity(Gravity.CENTER);
+        current.setTextColor(light()?0xff2c4265:Color.WHITE);
+        row.addView(current,new LinearLayout.LayoutParams(0,dp(39),1f));
+        TextView abc=new TextView(this);
+        abc.setText("ABC");
+        abc.setTextSize(15);
+        abc.setGravity(Gravity.CENTER);
+        abc.setTextColor(light()?0xff254fc0:0xff8ceaff);
+        abc.setContentDescription("Return to ABC letters");
+        row.addView(abc,new LinearLayout.LayoutParams(dp(54),dp(39)));
+        abc.setOnClickListener(v->{
+            feedback(v);finishRomanWord();
+            mode=ABC;toolbarExpanded=false;rebuild();
+        });
+        keysContent.addView(row,new LinearLayout.LayoutParams(-1,dp(40)));
     }
     /**
      * Real keyboard toolbar: branded icon and scrollable functionality tabs.
@@ -301,11 +354,9 @@ public final class VisionKeyboardService extends InputMethodService {
         identity.addView(brandWords,new LinearLayout.LayoutParams(0,-2,1f));
         // The S Board brand is also a clearly accessible close/return control.
         identity.setClickable(true);
-        identity.setContentDescription("S Board, close tools and return to typing");
+        identity.setContentDescription("S Board, collapse toolbar without changing keyboard mode");
         identity.setOnClickListener(v->{
             feedback(v);
-            finishRomanWord();
-            mode=ABC;
             toolbarExpanded=false;
             rebuild();
         });
@@ -397,8 +448,10 @@ public final class VisionKeyboardService extends InputMethodService {
         keysContent.addView(scroller,new LinearLayout.LayoutParams(-1,toolHeight));
         if(active!=null && mode!=ABC && mode!=NUMBER && mode!=SYMBOLS){
             final View item=active;
-            scroller.post(()->scroller.smoothScrollTo(
-                Math.max(0,item.getLeft()-dp(narrow?163:210)),0));
+            scroller.post(()->{
+                if(scroller.getParent()!=null)scroller.scrollTo(
+                    Math.max(0,item.getLeft()-dp(narrow?163:210)),0);
+            });
         }
     }
     /**
@@ -1307,7 +1360,7 @@ public final class VisionKeyboardService extends InputMethodService {
             // Keep only the left ?123; use right for Enter/Search instead.
             addKey(row,"?123","123",1.05f,height,true);
             addKey(row,"☺","EMOJI",.90f,height,true);
-            if(settings().getBoolean("arrow_keys",true)){
+            if(showArrowKeys){
                 addKey(row,"Space","SPACE",5.7f,height,true);
                 addKey(row,"◀","←",.70f,height,true);
                 addKey(row,"▶","CURSOR_RIGHT",.70f,height,true);
@@ -1351,7 +1404,7 @@ public final class VisionKeyboardService extends InputMethodService {
     private void addKey(LinearLayout row,String display,String output,float weight,int height,boolean special){
         SBoardKeyButton b=new SBoardKeyButton(this);
         b.setSpaceIndicator("SPACE".equals(output),light(),ACCENTS[theme]);
-        b.setKeyPopup(settings().getBoolean("key_popups",false)&&
+        b.setKeyPopup(keyPopups&&
             mode==ABC && output.length()==1 && Character.isLetter(output.charAt(0)),
             display);
         b.setAllCaps(false);
@@ -1359,7 +1412,7 @@ public final class VisionKeyboardService extends InputMethodService {
         b.setText(display);
         b.setIncludeFontPadding(false);
         int length=display.length();
-        boolean largerLetters=settings().getBoolean("large_key_text",true);
+        boolean largerLetters=largeKeyText;
         b.setTextSize("SPACE".equals(output)?17f:
             (mode==EMOJI? (length>4?18f:23f) :
             length>=5?11.5f:length>=4?13f:length>=3?15f:
@@ -1379,7 +1432,7 @@ public final class VisionKeyboardService extends InputMethodService {
         b.setStateListAnimator(null);
         // Disabling button-level audio/haptics avoids redundant system work
         // during rapid taps. The optional vibration is applied explicitly.
-        b.setSoundEffectsEnabled(settings().getBoolean("key_sound",false));
+        b.setSoundEffectsEnabled(keySound);
         b.setHapticFeedbackEnabled(haptics);
         b.setPadding(0,0,0,0);b.setMinimumHeight(0);b.setMinHeight(0);
         b.setMinimumWidth(0);b.setMinWidth(0);
@@ -1467,8 +1520,7 @@ public final class VisionKeyboardService extends InputMethodService {
                                 }
                             };
                             pending[0]=task;
-                            int ms=Math.max(250,Math.min(700,
-                                settings().getInt("long_press_duration",450)));
+                            int ms=longPressMs;
                             repeatHandler.postDelayed(task,ms);
                         }
                         return true;
