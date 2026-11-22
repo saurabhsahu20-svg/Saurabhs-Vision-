@@ -462,6 +462,111 @@ public final class VisionKeyboardService extends InputMethodService {
         refreshVoiceMic();
         keysContent.addView(row,new LinearLayout.LayoutParams(-1,dp(42)));
     }
+
+    /** Clipboard content is accessed only while S Board is the visible IME. */
+    private ClipDescription safeClipDescription(){
+        if(clipboardManager==null||!keyboardVisible)return null;
+        try{return clipboardManager.getPrimaryClipDescription();}
+        catch(RuntimeException ignored){return null;}
+    }
+    private static boolean sensitiveClip(ClipDescription d){
+        return d!=null && d.getExtras()!=null &&
+            d.getExtras().getBoolean("android.content.extra.IS_SENSITIVE",false);
+    }
+    private boolean clipboardTextAvailable(){
+        if(sensitiveField)return false;
+        ClipDescription d=safeClipDescription();
+        return d!=null&&!sensitiveClip(d)&&
+            (d.hasMimeType("text/plain")||d.hasMimeType("text/html"));
+    }
+    private String plainClipboardText(){
+        if(!clipboardTextAvailable())return null;
+        try{
+            ClipData data=clipboardManager.getPrimaryClip();
+            if(data==null||data.getItemCount()<1)return null;
+            ClipData.Item item=data.getItemAt(0);
+            if(item.getText()!=null)return item.getText().toString();
+            String html=item.getHtmlText();
+            if(html==null)return null;
+            return android.os.Build.VERSION.SDK_INT>=24?
+                Html.fromHtml(html,Html.FROM_HTML_MODE_LEGACY).toString():
+                Html.fromHtml(html).toString();
+        }catch(RuntimeException error){return null;}
+    }
+    private void attachClipboardShortcut(LinearLayout row){
+        TextView b=new TextView(this);
+        b.setText("📋");
+        b.setTextSize(21);
+        b.setGravity(Gravity.CENTER);
+        b.setTextColor(light()?0xff293b60:Color.WHITE);
+        b.setContentDescription("Tap to paste copied text. Long press for clipboard options.");
+        row.addView(b,new LinearLayout.LayoutParams(dp(39),dp(39)));
+        clipboardShortcut=b;
+        b.setOnClickListener(v->{feedback(v);pasteCurrent(true);});
+        b.setOnLongClickListener(v->{feedback(v);openClipboardPanel();return true;});
+        updateClipboardShortcut();
+    }
+    private void updateClipboardShortcut(){
+        if(clipboardShortcut!=null)
+            clipboardShortcut.setVisibility(clipboardTextAvailable()?View.VISIBLE:View.GONE);
+    }
+    private void onClipboardChanged(){
+        if(Looper.myLooper()!=Looper.getMainLooper()){
+            suggestionHandler.post(this::onClipboardChanged);return;
+        }
+        if(!keyboardVisible)return;
+        // Disabled by default. Do not inspect clipboard contents just to show a shortcut.
+        if(!sensitiveField&&clipboardHistory!=null&&clipboardHistory.enabled()){
+            String text=plainClipboardText();
+            if(text!=null&&text.length()<=ClipboardHistoryStore.MAX_TEXT)
+                clipboardHistory.add(text);
+        }
+        updateClipboardShortcut();
+        if(mode==CLIPBOARD)rebuild();
+    }
+    private void openClipboardPanel(){
+        if(sensitiveField){
+            Toast.makeText(this,"Clipboard history is hidden in password fields.",
+                Toast.LENGTH_SHORT).show();return;
+        }
+        cancelVoiceDictation();
+        finishRomanWord();
+        mode=CLIPBOARD;
+        toolbarExpanded=false;
+        rebuild();
+    }
+    private void closeClipboardPanel(){
+        mode=ABC;toolbarExpanded=false;rebuild();
+    }
+    /** Forward styled paste to the receiving editor; that app chooses what to retain. */
+    private void pasteCurrent(boolean preserveFormatting){
+        InputConnection conn=getCurrentInputConnection();
+        if(conn==null)return;
+        if(voiceDictation!=null&&voiceDictation.isActive())cancelVoiceDictation();
+        finishRomanWord();
+        if(preserveFormatting){
+            ClipDescription clip=safeClipDescription();
+            if(clip==null){
+                Toast.makeText(this,"Nothing copied yet.",Toast.LENGTH_SHORT).show();
+                return;
+            }
+            boolean accepted=conn.performContextMenuAction(android.R.id.paste);
+            if(!accepted){
+                Toast.makeText(this,"This app did not accept formatted paste. Try Paste plain.",
+                    Toast.LENGTH_LONG).show();
+                return;
+            }
+        }else{
+            String copied=plainClipboardText();
+            if(copied==null||copied.isEmpty()){
+                Toast.makeText(this,"No copied text available.",Toast.LENGTH_SHORT).show();
+                return;
+            }
+            conn.commitText(copied,1);
+        }
+        if(mode==CLIPBOARD)closeClipboardPanel();
+        else requestSuggestions();
+    }
     /** Start one speech recognition session on explicit tap, with runtime consent. */
     private void toggleVoiceDictation(){
         if(sensitiveField){
