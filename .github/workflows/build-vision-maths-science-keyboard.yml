@@ -78,8 +78,8 @@ jobs:
           assert 'key_popups' in settingsui and 'large_key_text' in settingsui
           assert 'long_press_duration' in settingsui and 'key_sound' in settingsui
           assert 'KeyboardSettingsActivity' in manifest
-          assert 'settings().getBoolean("number_row",false)' in ime
-          assert 'settings().getBoolean("arrow_keys",true)' in ime
+          assert 'preference.getBoolean("number_row",false)' in ime
+          assert 'preference.getBoolean("arrow_keys",true)' in ime
           assert 'settings().getInt("long_press_duration",450)' in ime
           assert 'private void showLongPressChoices(' in ime
           assert 'private void addEmojiSearchPanel()' in ime
@@ -259,13 +259,23 @@ jobs:
           assert 'addKey(row,submitKeyLabel(),"ENTER",1.05f,height,true);' in ime
           assert 'EditorInfo.IME_ACTION_SEARCH' in ime and 'return isSearchEditor()?"⌕":"↵";' in ime
           assert 'identity.setOnClickListener(v->' in ime and 'toolbarExpanded=false;' in ime
+          assert 'if(toolbarExpanded)addToolbar();' in ime
+          assert 'else if(mode==NUMBER||mode==SYMBOLS||mode==MATH||' in ime
+          assert 'private void addCompactModeBar()' in ime
+          assert 'mode=ABC;toolbarExpanded=false;rebuild();' in ime
+          assert 'private void updateEmojiSearchResults()' in ime
+          assert 'emojiSearchText.append(code.toLowerCase(java.util.Locale.ROOT));' in ime
+          assert 'preference.getBoolean("key_popups",false)' in ime
+          assert 'preference.getInt("long_press_duration",450)' in ime
+          assert 'if(painter!=null&&artworkTheme==normalized&&' in panel
+          assert 'Objects.equals(artworkPhotoUri,uri)' in panel
           assert 'toolbarExpanded=!toolbarExpanded;' in ime
           assert 'Search actions: 0' in Path('vision-maths-science-keyboard/app/src/debug/java/com/saurabhsvision/keyboard/KeyboardVisibilityTestActivity.java').read_text()
           assert 'b.setLongClickable(false); // Disable the unrelated OS timeout.' in ime
           import hashlib
           logo_digest=hashlib.sha256((root/'res/drawable-nodpi/s_board_logo.webp').read_bytes()).hexdigest()
           assert logo_digest=='66ce747a7ce6089d587f15f12ca2e6384011f02e5ce7740a94e5ae20ce883e59', 'Wrong (old) S Board icon'
-          assert 'versionCode 28' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
+          assert 'versionCode 29' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
           assert (root/'java/com/saurabhsvision/keyboard/SBoardKeyButton.java').is_file()
           assert 'Toggle Smart Suggestions' in activity
           assert 'setMeasuredDimension(width,Math.min(cap' in panel
@@ -409,7 +419,7 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.18_ALL_IN_ONE_UPDATE.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.19_SMOOTH_TOOLBAR_UPDATE.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Include Android apksigner utility in CI artifact for privately signed updates
@@ -421,7 +431,7 @@ jobs:
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_18_ALL_IN_ONE_APK
+          name: S_Board_v1_9_19_SMOOTH_TOOLBAR_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -431,14 +441,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.18"
-          file="keyboard-deliverables/S_Board_v1.9.18_ALL_IN_ONE_UPDATE.apk"
+          tag="s-board-v1.9.19"
+          file="keyboard-deliverables/S_Board_v1.9.19_SMOOTH_TOOLBAR_UPDATE.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.9.18 • Layout Settings, Emoji Search & 51 Themes" \
-              --notes "S Board 1.9.18 adds an original S Board Layout & Keys settings screen with optional top number row, arrow keys, symbol/accents on adjustable long-press, large key letters, low-overhead key pop-ups, sound and vibration preferences. Adds offline emoji keyword search, 51 original themes including neon Originals, Nickel, Abstract and locally drawn Landscapes, and 54 original PNG stickers across 9 packs. Theme Studio provides category filters and a personal photo background. The private emoji search query is kept only in memory, not sent to other apps or uploaded. Preserves S Board's Red Crystal logo, ABC/123, smart Enter/Search, Hindi/Hinglish, voice typing, encrypted clipboard history, Maths/Science, and quick 14/14 touch behavior. Public GitHub APK is debug-signed. For an in-place update from S Board v1.9.17 Stable use the separately Stable-signed APK with the original private certificate. Some messaging apps cannot accept IME-inserted PNGs; sticker emoji-text fallback remains available. GIF/AI creative services and third-party copyrighted sticker packs are not included." \
+              --title "S Board v1.9.19 • Smooth Typing & Compact Toolbar" \
+              --notes "S Board 1.9.19 is a bug-fix and performance update to the original S Board experience. The full tools row now opens only on demand; a compact, collapsible mode label preserves keyboard space in Numbers, Symbols, Maths, Science and Emoji. Tapping S Board's brand closes expanded tools without unexpectedly changing input modes. Key settings are cached for each layout instead of repeatedly reading storage per button, and photo-theme artwork is reused until its photo changes. Emoji Search updates results in-place without rebuilding the entire keyboard on every typed character, preventing lag and missed inputs. All 51 original visual themes, 54 custom original stickers, local emoji search, Number/ABC, language modes, voice typing, encrypted clipboard, and Red Crystal logo remain. GitHub APK is debug-signed; use the separately stable-signed APK to upgrade the previous S Board stable version directly. Tests are automated emulator checks and do not guarantee identical results on all physical devices." \
               --latest=false
           fi
 
@@ -464,7 +474,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_1_9_18_Android_Layout_Emoji_Theme_Audit
+          name: S_Board_1_9_19_Android_Toolbar_Typing_Audit
           path: |
             /tmp/sboard-portrait.png
             /tmp/sboard-landscape.png
