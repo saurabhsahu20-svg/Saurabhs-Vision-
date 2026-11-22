@@ -68,6 +68,8 @@ jobs:
           assert 'android:resource="@xml/method"' in manifest
           assert 'settingsActivity' in method
           assert 'android.permission.INTERNET' not in manifest
+          gallery=(root/'java/com/saurabhsvision/keyboard/ThemeGalleryActivity.java').read_text()
+          stickers=(root/'java/com/saurabhsvision/keyboard/StickerCatalog.java').read_text()
           settingsui=(root/'java/com/saurabhsvision/keyboard/KeyboardSettingsActivity.java').read_text()
           index=(root/'java/com/saurabhsvision/keyboard/EmojiSearchIndex.java').read_text()
           scenery=(root/'java/com/saurabhsvision/keyboard/ThemeArtwork.java').read_text()
