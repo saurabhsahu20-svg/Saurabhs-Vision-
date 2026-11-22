@@ -68,6 +68,25 @@ jobs:
           assert 'android:resource="@xml/method"' in manifest
           assert 'settingsActivity' in method
           assert 'android.permission.INTERNET' not in manifest
+          theme=(root/'java/com/saurabhsvision/keyboard/ThemePalette.java').read_text()
+          gallery=(root/'java/com/saurabhsvision/keyboard/ThemeGalleryActivity.java').read_text()
+          photo=(root/'java/com/saurabhsvision/keyboard/PhotoThemeArt.java').read_text()
+          stickers=(root/'java/com/saurabhsvision/keyboard/StickerCatalog.java').read_text()
+          provider=(root/'java/com/saurabhsvision/keyboard/StickerProvider.java').read_text()
+          assert 'PHOTO_THEME=34' in theme
+          assert 'Celestial Violet' in theme and 'Winter Sparkle' in theme
+          assert 'S Board Themes' in gallery and 'choosePhoto()' in gallery
+          assert 'ACTION_OPEN_DOCUMENT' in gallery and 'ACTION_OPEN_DOCUMENT' in gallery
+          assert 'takePersistableUriPermission' in photo
+          assert 'StickerCatalog.count()' in provider and 'MODE_READ_ONLY' in provider
+          assert 'AES/GCM/NoPadding' in clipboard
+          assert 'commitContent(sticker' in ime and 'new InputContentInfo(' in ime
+          assert 'ThemeGalleryActivity' in manifest and 'StickerProvider' in manifest
+          assert 'android:exported="false"' in manifest and 'grantUriPermissions="true"' in manifest
+          assert 'ThemeGalleryActivity' in activity
+          assert 'String[] ids={"ABC","123","∑ Math","⚛ Sci","😊","🌐","🎨","⚙","📋","🧩"}' in ime
+          assert 'ThemeStickerSelfTestActivity' in Path('vision-maths-science-keyboard/app/src/debug/AndroidManifest.xml').read_text()
+          assert 'ThemeStickerSelfTestActivity' not in manifest
           assert 'READ_CLIPBOARD' not in manifest
           assert 'android.permission.RECORD_AUDIO' in manifest
           assert 'android.speech.RecognitionService' in manifest
@@ -190,7 +209,7 @@ jobs:
           assert 'refreshSetupStatus()' in activity
           assert 'index==6){' in ime and 'theme=(theme+1)%ThemePalette.count()' in ime
           assert 'index==7?' in ime and 'Keyboard settings' in ime
-          assert 'String[] ids={"ABC","123","∑ Math","⚛ Sci","😊","🌐","🎨","⚙","📋"}' in ime
+          assert 'String[] ids={"ABC","123","∑ Math","⚛ Sci","😊","🌐","🎨","⚙","📋","🧩"}' in ime
           assert 'by Saurabh' in ime
           assert 'SBoardKeyButton b=new SBoardKeyButton(this);' in ime
           assert 'setSpaceIndicator("SPACE".equals(output),light(),ACCENTS[theme])' in ime
@@ -223,7 +242,7 @@ jobs:
           import hashlib
           logo_digest=hashlib.sha256((root/'res/drawable-nodpi/s_board_logo.webp').read_bytes()).hexdigest()
           assert logo_digest=='66ce747a7ce6089d587f15f12ca2e6384011f02e5ce7740a94e5ae20ce883e59', 'Wrong (old) S Board icon'
-          assert 'versionCode 26' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
+          assert 'versionCode 27' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
           assert (root/'java/com/saurabhsvision/keyboard/SBoardKeyButton.java').is_file()
           assert 'Toggle Smart Suggestions' in activity
           assert 'setMeasuredDimension(width,Math.min(cap' in panel
@@ -356,7 +375,7 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.16_CLIPBOARD_PRIVACY.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.17_THEMES_STICKERS_STABLE.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Include Android apksigner utility in CI artifact for privately signed updates
@@ -368,7 +387,7 @@ jobs:
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_16_CLIPBOARD_UPDATE_APK
+          name: S_Board_v1_9_17_THEMES_STICKERS_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -378,14 +397,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.16"
-          file="keyboard-deliverables/S_Board_v1.9.16_CLIPBOARD_PRIVACY.apk"
+          tag="s-board-v1.9.17"
+          file="keyboard-deliverables/S_Board_v1.9.17_THEMES_STICKERS_STABLE.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board 1.9.16 • Clipboard Formatting & 24-Hour History" \
-              --notes "S Board 1.9.16: adds Gboard-inspired clipboard shortcut on the suggestions row after copying text, with long-press options to paste plain text or use the target app native Paste action to preserve formatting where supported. Open the clipboard page through toolbar for those choices. Optional 24-hour text clipboard history is OFF by default, limited to 20 encrypted entries and clips copied while S Board is visible. Uses AndroidKeyStore AES-256-GCM encryption, skips password fields and sensitive-flagged clips, has immediate Clear and Disable options, and no network permission. Does not track clipboard while the keyboard is hidden or guarantee receiving apps will preserve styles. Existing red crystal S icon, Enter/Search, ABC/123, voice typing, maths/science/emoji/languages and responsive typing remain. GitHub APK is debug-signed; separately distributed stable-signed APK must be used to update existing S Board Stable in place." \
+              --title "S Board 1.9.17 • Theme Studio & Original Stickers" \
+              --notes "S Board 1.9.17 adds 35 original free offline keyboard themes across categories Classic, Celestial, Floral, Scenic, Vivid, Minimal, Spotlights, Carbon, Feather, Festive, Sports and Colorful. The new Theme Studio offers visual keyboard previews, Try Now, one-tap Apply and Create a personal photo theme using only Android's user-selected file picker, with a contrast overlay; no download or sign-in is required. Adds a sticker tab with 30 locally drawn original PNG designs across 5 packs, and uses Android IME commitContent for apps accepting image/png with emoji-caption fallback for others. Existing ABC/123, Enter/Search, clipboard, encrypted 24-hour history, voice typing, languages, symbols, Maths/Science, speed improvements and Red Crystal S icon remain. All artwork is original, not copied from SwiftKey. Public GitHub APK is debug-signed. Use the separately stable-signed v1.9.17 APK to update v1.9.16 Stable without uninstall. External app support for PNG image insertion varies." \
               --latest=false
           fi
 
@@ -411,7 +430,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_1_9_16_Android_Emulator_Clipboard_Audit
+          name: S_Board_1_9_17_Android_Themes_Stickers_Audit
           path: |
             /tmp/sboard-portrait.png
             /tmp/sboard-landscape.png
@@ -419,6 +438,8 @@ jobs:
             /tmp/sboard-numbers.png
             /tmp/sboard-before-abc.xml
             /tmp/sboard-after-abc.xml
+            /tmp/sboard-theme-gallery.png
+            /tmp/sboard-theme-gallery.xml
             /tmp/sboard-androidruntime.log
           if-no-files-found: ignore
           retention-days: 30
