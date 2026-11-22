@@ -225,6 +225,19 @@ grep -q 'S Board Themes' /tmp/sboard-theme-gallery.xml
 grep -q 'Create' /tmp/sboard-theme-gallery.xml
 echo "PASS: visual theme studio launches with Create and category filters."
 
+# Verify the new, accessible Layout & Keys settings activity on Android 15.
+adb shell am start -W -n "$APP/.KeyboardSettingsActivity"
+sleep 3
+adb exec-out screencap -p > /tmp/sboard-sboard-settings.png
+test -s /tmp/sboard-sboard-settings.png
+adb shell uiautomator dump /sdcard/sboard-sboard-settings.xml >/dev/null 2>&1
+adb pull /sdcard/sboard-sboard-settings.xml /tmp/sboard-sboard-settings.xml >/dev/null
+grep -q 'S Board settings' /tmp/sboard-sboard-settings.xml
+grep -q 'Number row' /tmp/sboard-sboard-settings.xml
+grep -q 'Long-press symbols' /tmp/sboard-sboard-settings.xml
+grep -q 'Arrow keys' /tmp/sboard-sboard-settings.xml
+echo "PASS: Layout & Keys settings opens with number row, symbol and arrow controls."
+
 # Inspect only errors, never output sensitive input or clipboard content.
 adb shell logcat -d -t 1800 -s AndroidRuntime:E > /tmp/sboard-androidruntime.log || true
 if grep -F "Process: $APP" /tmp/sboard-androidruntime.log; then
