@@ -482,6 +482,11 @@ public final class MainActivity extends Activity {
     }
     private static final String VISION_PAPERS_URL="https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/model-paper-library/";
 
+    /** Native Grifly PDF reader. No external storage permission, cloud or silent downloads. */
+    private void openNativeModelPapers(){
+        startActivity(new Intent(this,ModelPaperLibraryActivity.class));
+    }
+
     /** Open the privately installed Vision study pack without sending PDFs to the network. */
     private void openInstalledVisionModelPapers(){
         try{
@@ -531,7 +536,8 @@ public final class MainActivity extends Activity {
         addQuickTab("▤ Study Portal",false,
             ()->openAddress("https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/"));
         addQuickTab("📚 Model Papers",false,()->openAddress(VISION_PAPERS_URL));
-        addQuickTab("⬇ Offline Papers",false,this::openInstalledVisionModelPapers);
+        addQuickTab("⬇ Offline Papers",false,this::openNativeModelPapers);
+        addQuickTab("🎓 Vision Test App",false,this::openInstalledVisionModelPapers);
         addQuickTab("＋ New Tab",false,()->{
             if(createTab()!=null)showHome();
         });
@@ -856,7 +862,7 @@ public final class MainActivity extends Activity {
             homeFeature("📚","Model Papers",0xfff1f9ff,0xffcfe4ff,0xff98bdeb,
                 ()->openAddress(VISION_PAPERS_URL)),
             homeFeature("📥","Offline Papers",0xfffffbef,0xffffe4ab,0xffffcc7f,
-                this::openInstalledVisionModelPapers)
+                this::openNativeModelPapers)
         };
         for(int i=0;i<cards.length;i++){
             LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(106),dp(104));

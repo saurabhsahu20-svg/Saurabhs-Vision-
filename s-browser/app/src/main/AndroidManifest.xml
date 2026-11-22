@@ -19,6 +19,7 @@
             android:name=".GovtAlertJob"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="true"/>
+        <activity android:name=".ModelPaperLibraryActivity" android:exported="false"/>
         <activity android:name=".DailyAssemblyActivity" android:exported="false"/>
         <activity android:name=".CityNewsActivity" android:exported="false"/>
         <activity
