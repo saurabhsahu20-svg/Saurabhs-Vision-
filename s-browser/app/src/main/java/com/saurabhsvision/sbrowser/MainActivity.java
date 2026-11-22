@@ -813,8 +813,9 @@ public final class MainActivity extends Activity {
         add(hero,heroActions,17);
         add(layout,hero,0);
         homeBanner(layout,"📚","MODEL PAPERS • CLASS 10",
-            "6 Subjects • 66 PDFs • 75 Marks + Worked Answers",
-            0xffd6f6f1,0xff9ee5dc,0xff63c7b7,this::openNativeModelPapers);
+            "Saurabh Vision Website • Subject, Paper, Preview & Solutions",
+            0xffd6f6f1,0xff9ee5dc,0xff63c7b7,
+            ()->openAddress(VISION_PAPERS_URL));
 
         // TODAY'S NEWS DESK; no fabricated live alerts.
         // Scrollable collection: never squeeze nine shortcuts into one phone row.
