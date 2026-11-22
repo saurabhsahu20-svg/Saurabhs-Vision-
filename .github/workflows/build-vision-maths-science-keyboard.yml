@@ -216,7 +216,7 @@ jobs:
           assert 'Hinglish' in activity
           from pathlib import Path
           logo=root/'res/drawable-nodpi/s_board_logo.webp'
-          assert logo.is_file() and logo.stat().st_size>3000
+          assert logo.is_file() and logo.stat().st_size>1800
           raw_logo=logo.read_bytes()
           assert raw_logo[:4]==b'RIFF' and raw_logo[8:12]==b'WEBP'
           
@@ -274,8 +274,8 @@ jobs:
           assert 'b.setLongClickable(false); // Disable the unrelated OS timeout.' in ime
           import hashlib
           logo_digest=hashlib.sha256((root/'res/drawable-nodpi/s_board_logo.webp').read_bytes()).hexdigest()
-          assert logo_digest=='66ce747a7ce6089d587f15f12ca2e6384011f02e5ce7740a94e5ae20ce883e59', 'Wrong (old) S Board icon'
-          assert 'versionCode 29' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
+          assert logo_digest=='f7196693962b5f3e509b271f5451988ec0ebaf1f0d95b7e11cec62bce2a7fc9a', 'Wrong (old) S Board icon'
+          assert 'versionCode 30' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
           assert (root/'java/com/saurabhsvision/keyboard/SBoardKeyButton.java').is_file()
           assert 'Toggle Smart Suggestions' in activity
           assert 'setMeasuredDimension(width,Math.min(cap' in panel
@@ -419,7 +419,7 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.19_SMOOTH_TOOLBAR_UPDATE.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.20_RAINBOW_ICON.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Include Android apksigner utility in CI artifact for privately signed updates
@@ -431,7 +431,7 @@ jobs:
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_19_SMOOTH_TOOLBAR_APK
+          name: S_Board_v1_9_20_RAINBOW_ICON_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -441,14 +441,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.19"
-          file="keyboard-deliverables/S_Board_v1.9.19_SMOOTH_TOOLBAR_UPDATE.apk"
+          tag="s-board-v1.9.20-rainbow-icon"
+          file="keyboard-deliverables/S_Board_v1.9.20_RAINBOW_ICON.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board v1.9.19 • Smooth Typing & Compact Toolbar" \
-              --notes "S Board 1.9.19 is a bug-fix and performance update to the original S Board experience. The full tools row now opens only on demand; a compact, collapsible mode label preserves keyboard space in Numbers, Symbols, Maths, Science and Emoji. Tapping S Board's brand closes expanded tools without unexpectedly changing input modes. Key settings are cached for each layout instead of repeatedly reading storage per button, and photo-theme artwork is reused until its photo changes. Emoji Search updates results in-place without rebuilding the entire keyboard on every typed character, preventing lag and missed inputs. All 51 original visual themes, 54 custom original stickers, local emoji search, Number/ABC, language modes, voice typing, encrypted clipboard, and Red Crystal logo remain. GitHub APK is debug-signed; use the separately stable-signed APK to upgrade the previous S Board stable version directly. Tests are automated emulator checks and do not guarantee identical results on all physical devices." \
+              --title "S Board v1.9.20 • Rainbow S Icon" \
+              --notes "Original user-provided Rainbow S Board icon integrated into launcher, S Board keyboard toolbar and app splash branding. Maintains all typing tools, voice typing, clipboard, 51 themes, 54 stickers, settings and native IME features from v1.9.19. Android source icon is optimized as compact WebP for repository builds. This GitHub Actions APK is DEBUG-SIGNED and cannot update a privately stable-signed installation in place. If you installed a Stable-signed S Board, use the separately distributed matching-certificate Stable APK, not this GitHub debug APK. No user keystore or signing secrets are included in this public repository." \
               --latest=false
           fi
 
@@ -474,7 +474,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_1_9_19_Android_Toolbar_Typing_Audit
+          name: S_Board_1_9_20_Android_Rainbow_Icon_Audit
           path: |
             /tmp/sboard-portrait.png
             /tmp/sboard-landscape.png
