@@ -33,6 +33,7 @@ import android.view.inputmethod.InputContentInfo;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.content.Intent;
@@ -219,6 +220,8 @@ public final class VisionKeyboardService extends InputMethodService {
             else addVoiceOnlyRow();
             if(selectedLanguage!=IndicLanguages.ENGLISH)addLanguageStatus();
 
+            if(settings().getBoolean("number_row",false))
+                addRow("1 2 3 4 5 6 7 8 9 0");
             addRow("Q W E R T Y U I O P");
             addRow("A S D F G H J K L");
             // Exactly three letter rows followed by a separate fourth action row.
@@ -1232,9 +1235,13 @@ public final class VisionKeyboardService extends InputMethodService {
             // Keep only the left ?123; use right for Enter/Search instead.
             addKey(row,"?123","123",1.05f,height,true);
             addKey(row,"☺","EMOJI",.90f,height,true);
-            addKey(row,"Space","SPACE",5.7f,height,true);
-            addKey(row,"◀","←",.70f,height,true);
-            addKey(row,"▶","CURSOR_RIGHT",.70f,height,true);
+            if(settings().getBoolean("arrow_keys",true)){
+                addKey(row,"Space","SPACE",5.7f,height,true);
+                addKey(row,"◀","←",.70f,height,true);
+                addKey(row,"▶","CURSOR_RIGHT",.70f,height,true);
+            }else{
+                addKey(row,"Space","SPACE",7.1f,height,true);
+            }
             addKey(row,submitKeyLabel(),"ENTER",1.05f,height,true);
         }else if(mode==NUMBER||mode==SYMBOLS){
             // Familiar two-page symbol layout:
@@ -1271,14 +1278,19 @@ public final class VisionKeyboardService extends InputMethodService {
     private void addKey(LinearLayout row,String display,String output,float weight,int height,boolean special){
         SBoardKeyButton b=new SBoardKeyButton(this);
         b.setSpaceIndicator("SPACE".equals(output),light(),ACCENTS[theme]);
+        b.setKeyPopup(settings().getBoolean("key_popups",false)&&
+            mode==ABC && output.length()==1 && Character.isLetter(output.charAt(0)),
+            display);
         b.setAllCaps(false);
         b.setGravity(Gravity.CENTER);
         b.setText(display);
         b.setIncludeFontPadding(false);
         int length=display.length();
+        boolean largerLetters=settings().getBoolean("large_key_text",true);
         b.setTextSize("SPACE".equals(output)?17f:
             (mode==EMOJI? (length>4?18f:23f) :
-            length>=5?11.5f:length>=4?13f:length>=3?15f:22f));
+            length>=5?11.5f:length>=4?13f:length>=3?15f:
+                (largerLetters?22f:18f)));
         b.setTypeface(Typeface.create("sans-serif-medium",
             special||isAction(output)?Typeface.BOLD:Typeface.NORMAL));
         final boolean enter="ENTER".equals(output);
@@ -1294,7 +1306,7 @@ public final class VisionKeyboardService extends InputMethodService {
         b.setStateListAnimator(null);
         // Disabling button-level audio/haptics avoids redundant system work
         // during rapid taps. The optional vibration is applied explicitly.
-        b.setSoundEffectsEnabled(false);
+        b.setSoundEffectsEnabled(settings().getBoolean("key_sound",false));
         b.setHapticFeedbackEnabled(haptics);
         b.setPadding(0,0,0,0);b.setMinimumHeight(0);b.setMinHeight(0);
         b.setMinimumWidth(0);b.setMinWidth(0);
@@ -1340,17 +1352,9 @@ public final class VisionKeyboardService extends InputMethodService {
         b.setContentDescription("⌫".equals(output)?"Delete last character":
             ("SPACE".equals(output)?"Spacebar - insert space":
                 ("ENTER".equals(output)?(isSearchEditor()?"Search":"Enter or send"):output)));
-        if(mode==ABC && "123".equals(output)){
-            b.setOnLongClickListener(v->{feedback(v);finishRomanWord();mode=LANGUAGE;rebuild();return true;});
-        }
-        if(mode==ABC && output.length()==1){
-            int index="qwertyuiop".indexOf(output.toLowerCase(java.util.Locale.ROOT));
-            if(index>=0){
-                final String num=index==9?"0":String.valueOf(index+1);
-                b.setOnLongClickListener(v->{feedback(v);press(num);return true;});
-                b.setLongClickable(true);
-            }
-        }
+        // Long-press alternatives are handled on touch-down with the
+        // user-selected timer; they never rely on Android's fixed timeout.
+        final String[] alternatives=longPressAlternatives(output);
         if("⌫".equals(output)){
             b.setOnTouchListener((view,event)->{
                 switch(event.getActionMasked()){
@@ -1367,41 +1371,110 @@ public final class VisionKeyboardService extends InputMethodService {
                 }
             });
         }else{
-            // RippleDrawable already provides pressed feedback. Creating
-            // ViewPropertyAnimator objects for every keystroke costs UI work
-            // and can leave a fast-tapped key scaled when touches overlap.
-            // Keep the same native key style and click semantics.
+            // Key commits on ACTION_UP, with optional truly adjustable
+            // long-press alternatives. No per-tap object allocations.
             b.setOnClickListener(v->{feedback(v);press(output);});
-            if(!b.isLongClickable()){
-                // An IME should commit on finger-up immediately, not via a
-                // deferred View click which may be lost during rapid taps.
-                // Long-press number keys keep Android's native timing instead.
-                b.setOnTouchListener((view,event)->{
-                    switch(event.getActionMasked()){
-                        case MotionEvent.ACTION_DOWN:
-                            view.setPressed(true);
-                            return true;
-                        case MotionEvent.ACTION_MOVE:
-                            view.setPressed(event.getX()>=-dp(10) &&
-                                event.getX()<view.getWidth()+dp(10) &&
-                                event.getY()>=-dp(10) &&
-                                event.getY()<view.getHeight()+dp(10));
-                            return true;
-                        case MotionEvent.ACTION_UP:
-                            boolean inside=event.getX()>=-dp(10) &&
-                                event.getX()<view.getWidth()+dp(10) &&
-                                event.getY()>=-dp(10) &&
-                                event.getY()<view.getHeight()+dp(10);
-                            view.setPressed(false);
-                            if(inside)view.performClick();
-                            return true;
-                        case MotionEvent.ACTION_CANCEL:
-                            view.setPressed(false);
-                            return true;
-                        default:return true;
-                    }
-                });
+            final Runnable[] pending={null};
+            final boolean[] held={false};
+            b.setLongClickable(false); // Disable the unrelated OS timeout.
+            b.setOnTouchListener((view,event)->{
+                switch(event.getActionMasked()){
+                    case MotionEvent.ACTION_DOWN:
+                        held[0]=false;
+                        view.setPressed(true);
+                        if(alternatives!=null){
+                            Runnable task=()->{
+                                held[0]=true;
+                                view.setPressed(false);
+                                if("#LANG".equals(alternatives[0])){
+                                    feedback(view);finishRomanWord();
+                                    mode=LANGUAGE;rebuild();
+                                }else{
+                                    showLongPressChoices(view,alternatives);
+                                }
+                            };
+                            pending[0]=task;
+                            int ms=Math.max(250,Math.min(700,
+                                settings().getInt("long_press_duration",450)));
+                            repeatHandler.postDelayed(task,ms);
+                        }
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        boolean inBounds=event.getX()>=-dp(10) &&
+                            event.getX()<view.getWidth()+dp(10) &&
+                            event.getY()>=-dp(10) &&
+                            event.getY()<view.getHeight()+dp(10);
+                        view.setPressed(inBounds);
+                        if(!inBounds&&pending[0]!=null){
+                            repeatHandler.removeCallbacks(pending[0]);pending[0]=null;
+                        }
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        if(pending[0]!=null){
+                            repeatHandler.removeCallbacks(pending[0]);pending[0]=null;
+                        }
+                        boolean inside=event.getX()>=-dp(10) &&
+                            event.getX()<view.getWidth()+dp(10) &&
+                            event.getY()>=-dp(10) &&
+                            event.getY()<view.getHeight()+dp(10);
+                        view.setPressed(false);
+                        if(inside&&!held[0])view.performClick();
+                        return true;
+                    case MotionEvent.ACTION_CANCEL:
+                        if(pending[0]!=null){
+                            repeatHandler.removeCallbacks(pending[0]);pending[0]=null;
+                        }
+                        view.setPressed(false);return true;
+                    default:return true;
+                }
+            });
+        }
+    }
+    /** Long-press symbols and accented characters; never stored or uploaded. */
+    private String[] longPressAlternatives(String output){
+        if(mode!=ABC)return null;
+        if("123".equals(output))return new String[]{"#LANG"};
+        if(output.length()!=1)return null;
+        String letter=output.toLowerCase(java.util.Locale.ROOT);
+        boolean accents=settings().getBoolean("accented_characters",true);
+        if(accents){
+            switch(letter){
+                case "a":return new String[]{"á","à","â","ä","ã","å","ā"};
+                case "e":return new String[]{"é","è","ê","ë","ē"};
+                case "i":return new String[]{"í","ì","î","ï","ī"};
+                case "o":return new String[]{"ó","ò","ô","ö","õ","ō"};
+                case "u":return new String[]{"ú","ù","û","ü","ū"};
+                case "n":return new String[]{"ñ","ń"};
+                case "c":return new String[]{"ç","ć"};
             }
+        }
+        if(settings().getBoolean("long_press_symbols",false)){
+            String[] keys={"q","w","e","r","t","y","u","i","o","p",
+                "s","d","f","g","h","j","k","l","z","x","v","b","m"};
+            String[] choices={"1","2","3","4","5","6","7","8","9","0",
+                "@","#","₹","%","&","*","(",")","!","?","/","=",":"};
+            for(int i=0;i<keys.length;i++)
+                if(keys[i].equals(letter))return new String[]{choices[i]};
+        }else{
+            int index="qwertyuiop".indexOf(letter);
+            if(index>=0)return new String[]{index==9?"0":String.valueOf(index+1)};
+        }
+        return null;
+    }
+    private void showLongPressChoices(View key,String[] items){
+        if(items==null||items.length==0)return;
+        // One alternative can be inserted without creating a floating menu.
+        if(items.length==1){feedback(key);press(items[0]);return;}
+        try{
+            PopupMenu menu=new PopupMenu(this,key);
+            for(String value:items)menu.getMenu().add(value);
+            menu.setOnMenuItemClickListener(item->{
+                feedback(key);press(item.getTitle().toString());return true;
+            });
+            menu.show();
+        }catch(RuntimeException ex){
+            // Some IME windows disallow anchored submenus. Still make the key work.
+            feedback(key);press(items[0]);
         }
     }
     private void startRepeat(){
