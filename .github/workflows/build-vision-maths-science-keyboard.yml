@@ -243,7 +243,7 @@ jobs:
           assert 'getInt(KEY_THEME,4)' in ime
           assert 'suggestionHandler.postDelayed(suggestionRefresh,16L)' in ime
           assert 'b.setStateListAnimator(null)' in ime
-          assert 'if(inside)view.performClick();' in ime
+          assert 'if(inside&&!held[0])view.performClick();' in ime
           assert ime.count('addKey(row,"?123","123",1.05f,height,true);')==1, "Only left ?123 button should remain"
           # Familiar Gboard-style ABC access on both number and extended symbol pages.
           assert 'else if(mode==NUMBER||mode==SYMBOLS){' in ime
