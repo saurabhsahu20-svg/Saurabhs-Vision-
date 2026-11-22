@@ -206,6 +206,34 @@ public final class MainActivity extends Activity {
         add(root,text("Tap 🎙 on the S Board suggestion strip, grant microphone access once, then tap 🎙 again to speak. Your spoken words appear in WhatsApp, SMS, Notes or the active message field. Tap ■ to finish a sentence. English/Hinglish use en-IN, Hindi uses hi-IN; other available languages depend on the installed Android speech engine.",14,0xff496284,false),7);
         add(root,text("Privacy: Audio is sent to your installed Android speech-recognition provider, which may use online processing. S Board itself does not save audio or dictation history. Microphone only activates when you tap it; voice typing is disabled in password fields.",12,0xff526b86,false),8);
 
+        add(root,text("📋 Clipboard — Plain / Formatted Paste",21,NAVY,true),23);
+        add(root,text("Copy text in any app, then tap the 📋 shortcut on S Board to paste. Long-press 📋 or open it from the S Board tools menu to choose Paste plain text or Paste with formatting. Rich formatting only stays when the receiving app supports Android's Paste action.",14,0xff496284,false),7);
+        add(root,text("Optional 24-hour clipboard history: OFF by default. When enabled, text copied while S Board is open is stored encrypted on this phone for at most 24 hours (up to 20 entries); it is not uploaded. Password fields and sensitive-flagged clips are excluded. History retains plain text, not rich styling.",12,0xff526b86,false),8);
+        ClipboardHistoryStore history=new ClipboardHistoryStore(this);
+        TextView historyStatus=text("",14,0xff1746ad,true);
+        add(root,historyStatus,7);
+        Runnable refreshHistory=()->historyStatus.setText(
+            history.enabled()?"Clipboard history: ON (24h, encrypted)":
+                "Clipboard history: OFF (private by default)");
+        Button toggleHistory=button("Toggle Clipboard History",0xffe1f5ff,NAVY);
+        add(root,toggleHistory,7);
+        toggleHistory.setOnClickListener(v->{
+            boolean enabled=!history.enabled();
+            history.setEnabled(enabled);
+            refreshHistory.run();
+            showMessage(enabled?
+                "History ON. Only clips copied while the keyboard is active can be saved.":
+                "History OFF. Saved clips erased.");
+        });
+        Button clearHistory=button("Clear Saved Clipboard History",0xfffce7eb,NAVY);
+        add(root,clearHistory,7);
+        clearHistory.setOnClickListener(v->{
+            history.clear();
+            refreshHistory.run();
+            showMessage("Clipboard history cleared.");
+        });
+        refreshHistory.run();
+
         add(root,text("⚡ Fast Touch & Typing",20,NAVY,true),22);
         add(root,text("Extra key sound and vibration are off by default for immediate, low-overhead touch feedback. Enable vibration only if preferred.",13,0xff496284,false),6);
         TextView feedbackStatus=text("",14,0xff1746ad,true);
@@ -293,7 +321,7 @@ public final class MainActivity extends Activity {
         add(features,text("• 🌐 22 Indian languages + English and Hinglish Roman typing\n• Hindi phonetic: namaste → नमस्ते, mera → मेरा\n• Picture-style neon QWERTY layout and glowing wide Spacebar\n• Optional offline suggestions; OFF matches the reference image\n• Compact keyboard height: no more full-screen empty background\n• ABC QWERTY, Shift/Caps, Numbers, Maths and Science\n• 😊 Emoji keyboard with 923 options across 11 categories\n• Faces, love, feelings, gestures, people, animals and more\n• Previous/next emoji pages and responsive key touch effects\n• Backspace repeat, cursor arrows, Space and Enter",14,0xff3d5a7b,false),11);
 
         add(root,text("🔒 Your Typing Stays Private",20,NAVY,true),25);
-        add(root,text("S Board आपकी typing history, passwords या clipboard को save या upload नहीं करता। Voice Typing के लिए microphone permission केवल आपकी अनुमति से माँगी जाती है। बोले गए शब्द Android के speech recognition provider द्वारा process हो सकते हैं और उसके लिए Internet का उपयोग हो सकता है। S Board audio recordings नहीं रखता।",14,0xff445d7f,false),9);
+        add(root,text("S Board आपकी typing history या passwords save नहीं करता। Clipboard History default में OFF है। आपकी अनुमति से ON करने पर केवल keyboard खुले रहने के दौरान कॉपी किया गया text Android Keystore से encrypted होकर अधिकतम 24 घंटे तक इस फ़ोन पर रह सकता है; Clear या OFF से मिट जाएगा। Sensitive-flagged clips को history में नहीं रखा जाता। कोई clipboard text सर्वर पर upload नहीं होता। Voice Typing का speech provider इंटरनेट इस्तेमाल कर सकता है, लेकिन S Board audio recording save नहीं करता।",14,0xff445d7f,false),9);
 
         Button instagram=button("📷 Follow @saurabhs_vision on Instagram",0xffddd9fc,NAVY);
         add(root,instagram,21);
