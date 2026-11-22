@@ -56,6 +56,23 @@ jobs:
           java -ea -cp "$dir" DailyNewsSourcesTest
           python3 s-browser/tools/test_news_digest.py
           javac -encoding UTF-8 -d "$dir" \
+            s-browser/app/src/main/java/com/saurabhsvision/sbrowser/GriflyVersion.java \
+            s-browser/tests/GriflyVersionTest.java
+          java -ea -cp "$dir" GriflyVersionTest
+          python3 - <<'PY'
+          from pathlib import Path
+          src=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/MainActivity.java').read_text(encoding='utf-8')
+          checker=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/GriflyUpdateChecker.java').read_text(encoding='utf-8')
+          assert 'onRenderProcessGone' in src, 'No renderer recovery handler'
+          assert 'checkGriflyUpdates(false)' in src and 'checkGriflyUpdates(true)' in src, 'Update check UI missing'
+          assert 'last_checked' in src and 'auto_check' in src, 'Update check preferences missing'
+          assert 'api.github.com/repos/saurabhsahu20-svg/Saurabhs-Vision-/releases' in checker
+          assert 'ASSET_PREFIX+tag+"/"+name' in checker, 'Update URL not authenticated against GitHub'
+          assert 'View official update' in src and 'In-place updates require the same signing certificate' in src
+          assert 'Grifly 1.8.3 Beta' not in src, 'Outdated About version hardcoded'
+          print('PASS: update check, signed-APK guidance, renderer crash recovery and version info')
+          PY
+          javac -encoding UTF-8 -d "$dir" \
             s-browser/app/src/main/java/com/saurabhsvision/sbrowser/ModelPaperCatalog.java \
             s-browser/tests/ModelPaperCatalogTest.java
           java -ea -cp "$dir" ModelPaperCatalogTest
@@ -164,9 +181,28 @@ jobs:
           test -x "$SDKMANAGER"
           "$SDKMANAGER" --install 'platforms;android-35' 'build-tools;35.0.0'
 
+      - name: Restore persistent Android signing key when configured
+        shell: bash
+        env:
+          GRIFLY_SIGNING_KEYSTORE_BASE64: ${{ secrets.GRIFLY_SIGNING_KEYSTORE_BASE64 }}
+        run: |
+          set -euo pipefail
+          if [ -n "$GRIFLY_SIGNING_KEYSTORE_BASE64" ]; then
+            printf '%s' "$GRIFLY_SIGNING_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/grifly-stable-signing.jks"
+            chmod 600 "$RUNNER_TEMP/grifly-stable-signing.jks"
+            echo "Owner's persistent signing key is available (never printed)."
+          else
+            echo "::warning::No persistent signing key configured. Debug-signed APKs may require uninstalling older builds. Configure four GitHub Secrets before relying on in-place updates."
+          fi
+
       - name: Compile S Browser debug APK
         working-directory: s-browser
         shell: bash
+        env:
+          GRIFLY_KEYSTORE_FILE: ${{ runner.temp }}/grifly-stable-signing.jks
+          GRIFLY_KEYSTORE_PASSWORD: ${{ secrets.GRIFLY_SIGNING_STORE_PASSWORD }}
+          GRIFLY_KEY_ALIAS: ${{ secrets.GRIFLY_SIGNING_KEY_ALIAS }}
+          GRIFLY_KEY_PASSWORD: ${{ secrets.GRIFLY_SIGNING_KEY_PASSWORD }}
         run: |
           set -o pipefail
           mkdir -p ../dist
@@ -231,13 +267,13 @@ jobs:
           test -s "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
           mkdir -p dist
-          cp "$APK" dist/Grifly_v1.9.2_Vision_Site_Study_Dashboard.apk
+          cp "$APK" dist/Grifly_v1.9.3_Smooth_Update_Checker_Beta.apk
 
       - name: Upload installable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Grifly-v1.9.2-APK
-          path: dist/Grifly_v1.9.2_Vision_Site_Study_Dashboard.apk
+          name: Grifly-v1.9.3-APK
+          path: dist/Grifly_v1.9.3_Smooth_Update_Checker_Beta.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -249,13 +285,13 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          TAG="grifly-v1.9.2-vision-site-study-dashboard-beta"
-          FILE="dist/Grifly_v1.9.2_Vision_Site_Study_Dashboard.apk"
+          TAG="grifly-v1.9.3-stability-update-checker-beta"
+          FILE="dist/Grifly_v1.9.3_Smooth_Update_Checker_Beta.apk"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$FILE" --clobber
           else
             gh release create "$TAG" "$FILE" \
-              --title "Grifly 1.9.2 Beta — Vision Site Model Papers" \
-              --notes "Grifly v1.9.2 links the organized Model Paper Library on the owner's Saurabh Vision website directly from the Study Dashboard. Grifly v1.9.1 removes the Model Papers banner, forced first-launch popup and prominent quick tab from the search Home, restoring the clean original interface. Model Paper Library stays accessible in Student Dashboard, Study Tools and the online papers tab. All 66 offline papers and reader features remain available after ZIP import. Grifly v1.9.0 brought Model Papers front-and-center on the FIRST screen and Student Dashboard, fixes hidden tabs and adds a one-time new-feature discovery dialog. Its offline reader clearly shows 0/66 or 66/66 PDFs and instructions. No new permissions. Grifly v1.8.9 adds a native offline PDF Model Paper Library: choose and import the owner-provided 66-PDF ZIP once via Android Documents picker, then preview 75-mark worked solutions and diagrams, navigate pages, and save a selected PDF to the user-chosen location. No new permissions, background uploads or silent downloads. Grifly v1.8.8 adds a distinct online Class 10 Model Paper Library shortcut on its quick tab bar and homepage Study Tools, while preserving a separate offline Study Test APK launch button. The catalog correctly flags PDFs as unavailable until the owner publishes all 66 original/new sets as a verified GitHub release asset. Grifly v1.8.7 prefers the locally installed Vision v4.1.5 offline 75-mark paper pack with 30 stepped solutions and diagrams. Earlier v4.1.4/v4.1.3 packs stay available as fallbacks. Grifly v1.8.6 first opens the installed 75-mark v4.1.4 Vision Study Test app and falls back to the earlier 4.1.3 Study Test, preserving all browser features. Grifly v1.8.5 adds a Model Papers shortcut to the installed Saurabh Vision Study Test app; it does not upload student data. Grifly v1.8.4 enhances the rainbow Grifly wordmark with a subtly highlighted badge while retaining all browser functionality. Grifly v1.8.3 rebrands S Browser with a rainbow-colored name and retains the blank district, India and world worksheets plus official reference PDFs in the Maps Download tile to the Student Dashboard with official downloadable PDFs of Chhattisgarh, India political and outline maps, and world maps. All other S Browser 1.8 features remain unchanged. Previous version: General and Sports news timeout dead ends with a two-stage attributed news feed: the privacy-friendly GitHub Pages bulletin, refreshed periodically by scheduled GitHub Actions from established Hindi/English publishers and PIB where possible; fallback to live Google News RSS, and visible Retry/Open Latest News/official PIB-News On AIR links on total outage. All cards have publisher, actual feed publication date, original news link and Cross-check action. No generated or fake news. A scheduled bulletin is clearly marked as last synced, NOT instant live breaking coverage. Premium news desk layout, clean gradient header, polished buttons, and dedicated one-tap General and Sports cards on the main homepage. CG Jobs, City News, Saurabh Vision learning shortcut, offline dictionary, Daily Assembly, smooth tabs and original S Browser icon are preserved. Android beta: real-device tests and external feeds cannot be guaranteed; publishers are not independently fact-checked." \
+              --title "Grifly 1.9.3 Beta — Stability and Safe Updates" \
+              --notes "Grifly v1.9.3 adds an optional daily GitHub update checker, manual Check Updates and auto-notification toggle under Tools, renderer crash recovery, accurate About version and updated GitHub release shortcut. Website pages load fresh automatically; native updates always require Android approval and a consistent signing key. Build supports signing via protected GitHub Secrets; without a configured persistent key the debug APK does not guarantee in-place upgrade. Grifly v1.9.2 links the organized Model Paper Library on the owner's Saurabh Vision website directly from the Study Dashboard. Grifly v1.9.1 removes the Model Papers banner, forced first-launch popup and prominent quick tab from the search Home, restoring the clean original interface. Model Paper Library stays accessible in Student Dashboard, Study Tools and the online papers tab. All 66 offline papers and reader features remain available after ZIP import. Grifly v1.9.0 brought Model Papers front-and-center on the FIRST screen and Student Dashboard, fixes hidden tabs and adds a one-time new-feature discovery dialog. Its offline reader clearly shows 0/66 or 66/66 PDFs and instructions. No new permissions. Grifly v1.8.9 adds a native offline PDF Model Paper Library: choose and import the owner-provided 66-PDF ZIP once via Android Documents picker, then preview 75-mark worked solutions and diagrams, navigate pages, and save a selected PDF to the user-chosen location. No new permissions, background uploads or silent downloads. Grifly v1.8.8 adds a distinct online Class 10 Model Paper Library shortcut on its quick tab bar and homepage Study Tools, while preserving a separate offline Study Test APK launch button. The catalog correctly flags PDFs as unavailable until the owner publishes all 66 original/new sets as a verified GitHub release asset. Grifly v1.8.7 prefers the locally installed Vision v4.1.5 offline 75-mark paper pack with 30 stepped solutions and diagrams. Earlier v4.1.4/v4.1.3 packs stay available as fallbacks. Grifly v1.8.6 first opens the installed 75-mark v4.1.4 Vision Study Test app and falls back to the earlier 4.1.3 Study Test, preserving all browser features. Grifly v1.8.5 adds a Model Papers shortcut to the installed Saurabh Vision Study Test app; it does not upload student data. Grifly v1.8.4 enhances the rainbow Grifly wordmark with a subtly highlighted badge while retaining all browser functionality. Grifly v1.8.3 rebrands S Browser with a rainbow-colored name and retains the blank district, India and world worksheets plus official reference PDFs in the Maps Download tile to the Student Dashboard with official downloadable PDFs of Chhattisgarh, India political and outline maps, and world maps. All other S Browser 1.8 features remain unchanged. Previous version: General and Sports news timeout dead ends with a two-stage attributed news feed: the privacy-friendly GitHub Pages bulletin, refreshed periodically by scheduled GitHub Actions from established Hindi/English publishers and PIB where possible; fallback to live Google News RSS, and visible Retry/Open Latest News/official PIB-News On AIR links on total outage. All cards have publisher, actual feed publication date, original news link and Cross-check action. No generated or fake news. A scheduled bulletin is clearly marked as last synced, NOT instant live breaking coverage. Premium news desk layout, clean gradient header, polished buttons, and dedicated one-tap General and Sports cards on the main homepage. CG Jobs, City News, Saurabh Vision learning shortcut, offline dictionary, Daily Assembly, smooth tabs and original S Browser icon are preserved. Android beta: real-device tests and external feeds cannot be guaranteed; publishers are not independently fact-checked." \
               --prerelease
           fi
