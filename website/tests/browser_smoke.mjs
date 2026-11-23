@@ -403,6 +403,10 @@ await check('twelve-vision-ka-saar-guided-sets-mobile-filter-and-explanations', 
   await page.selectOption('#grade','12');
   await page.selectOption('#subject','BST');
   assert.equal(await page.locator('#guides .card').count(),2,'two Class 12 Business Studies sets');
+  await page.selectOption('#set','B');
+  assert.equal(await page.locator('#guides .card').count(),1,'Set B filter should select one PDF');
+  assert.match(await page.locator('#guides .card a[download]').getAttribute('href'),
+    /Class_12_BST_Set_B_Online_Guide\.pdf$/,'The correct direct PDF must be linked');
 });
 await browser.close();
 if(failures)process.exitCode=1;

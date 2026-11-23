@@ -465,6 +465,11 @@ jobs:
             node website/tests/build_vision_ka_saar_pdf.mjs
           test -s "$PUBLISH_DIR/vision-ka-saar/Vision_Ka_Saar_Class10_Maths_75_Marks_Solved.pdf"
           test -s "$PUBLISH_DIR/vision-ka-saar/Vision_Ka_Saar_Class10_Science_75_Marks_Solved.pdf"
+          # These compact PDFs are generated from the 12 public, independently
+          # authored worked-guide pages. Never publish uploaded school documents.
+          test -s "$PUBLISH_DIR/vision-ka-saar/school-solution-guides/pdfs/Vision_Ka_Saar_Class_9_SST_Set_A_Online_Guide.pdf"
+          test -s "$PUBLISH_DIR/vision-ka-saar/school-solution-guides/pdfs/Vision_Ka_Saar_Class_12_ECO_Set_B_Online_Guide.pdf"
+          test "$(find "$PUBLISH_DIR/vision-ka-saar/school-solution-guides/pdfs" -type f -name '*_Online_Guide.pdf' | wc -l)" -eq 12
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload static site
