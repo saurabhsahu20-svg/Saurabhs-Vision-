@@ -281,71 +281,104 @@ public final class ModelPaperLibraryActivity extends Activity {
     private void importZip(Uri uri){
         if(importing)return;
         importing=true;importButton.setEnabled(false);preview.setEnabled(false);save.setEnabled(false);
-        message("PDF फाइलों की जाँच कर रहे हैं। आपके पुराने पेपर सुरक्षित रखेंगे…");
+        message("PDF जाँच जारी है। पुराने पेपर नहीं हटेंगे…");
         closePdf();
         io.execute(()->{
+            File stage=new File(getFilesDir(),"model-papers-verify-"+System.currentTimeMillis());
             String result;
-            File temp=new File(getFilesDir(),"model-paper-import-"+System.currentTimeMillis());
-            try {
-                if(!temp.mkdirs())throw new IllegalStateException("Temporary folder unavailable");
+            try{
+                if(!stage.mkdirs())throw new IllegalStateException("Temporary folder unavailable");
                 Set<String> found=new HashSet<>();
-                long total=0;
+                byte[] buffer=new byte[32768];
+                long[] total={0};
                 try(InputStream input=getContentResolver().openInputStream(uri)){
                     if(input==null)throw new IllegalStateException("ZIP access denied");
                     try(ZipInputStream zip=new ZipInputStream(input)){
                         ZipEntry entry;
-                        byte[] b=new byte[32768];
                         while((entry=zip.getNextEntry())!=null){
-                            String path=entry.getName();
-                            if(path.startsWith("/")||path.indexOf('\\')>=0||path.contains(".."))
-                                throw new IllegalArgumentException("Unsafe ZIP entry");
-                            if(!entry.isDirectory() && path.toLowerCase(java.util.Locale.ROOT).endsWith(".pdf")){
+                            String name=entry.getName();
+                            if(name.startsWith("/")||name.indexOf('\\')>=0||
+                                name.contains(".."))throw new IllegalArgumentException("Unsafe archive path");
+                            if(!entry.isDirectory()&&name.toLowerCase(java.util.Locale.ROOT).endsWith(".pdf")){
+                                String path=name;
+                                if(name.equals("Vision_Ka_Saar_Maths_Set_A.pdf"))
+                                    path="Class_10/10_Mathematics/Vision_Ka_Saar.pdf";
+                                else if(name.equals("Vision_Ka_Saar_Science_Set_B.pdf"))
+                                    path="Class_10/10_Science/Vision_Ka_Saar.pdf";
                                 if(!ModelPaperCatalog.expectedPdf(path)||!found.add(path))
-                                    throw new IllegalArgumentException("Wrong or duplicate PDF: "+path);
-                                File dest=new File(temp,path),parent=dest.getParentFile();
+                                    throw new IllegalArgumentException("Unknown or repeated PDF: "+name);
+                                File output=new File(stage,path),parent=output.getParentFile();
                                 if(!parent.isDirectory()&&!parent.mkdirs())
-                                    throw new IllegalStateException("Cannot make PDF folder");
-                                long count=0;
-                                try(FileOutputStream out=new FileOutputStream(dest)){
+                                    throw new IllegalStateException("Could not create PDF folder");
+                                long size=0;
+                                try(OutputStream out=new FileOutputStream(output)){
                                     int n;
-                                    while((n=zip.read(b))!=-1){
-                                        count+=n;total+=n;
-                                        if(count>12_000_000||total>70_000_000)
-                                            throw new IllegalArgumentException("PDF pack too large");
-                                        out.write(b,0,n);
+                                    while((n=zip.read(buffer))!=-1){
+                                        size+=n;total[0]+=n;
+                                        if(size>12_000_000||total[0]>160_000_000)
+                                            throw new IllegalArgumentException("PDF archive exceeds safety limit");
+                                        out.write(buffer,0,n);
                                     }
                                 }
-                                try(FileInputStream pdf=new FileInputStream(dest)){
-                                    byte[] sig=new byte[5];
-                                    if(pdf.read(sig)!=5||sig[0]!='%'||sig[1]!='P'||sig[2]!='D'||sig[3]!='F'||sig[4]!='-')
-                                        throw new IllegalArgumentException("Invalid PDF: "+path);
-                                }
+                                if(!hasPdfHeader(output))
+                                    throw new IllegalArgumentException("Invalid PDF header: "+name);
                             }
                             zip.closeEntry();
                         }
                     }
                 }
-                if(!found.equals(ModelPaperCatalog.allPdfPaths()))
-                    throw new IllegalArgumentException("पूरे 66 PDF नहीं मिले: "+found.size()+" / 66");
-                File backup=new File(getFilesDir(),"model-paper-old-backup");
+                if(!ModelPaperCatalog.validImport(found))
+                    throw new IllegalArgumentException(
+                        "Expected exactly 66, 72, 2 or 140 known PDFs; found "+found.size());
+
+                // Preserve previously imported papers when the user imports
+                // Class 12 after Class 10 (or vice versa). Never erase them.
+                for(String path:ModelPaperCatalog.allPdfPaths()){
+                    if(found.contains(path))continue;
+                    File oldFile=new File(library,path);
+                    if(!oldFile.isFile())continue;
+                    File copy=new File(stage,path);
+                    File parent=copy.getParentFile();
+                    if(!parent.isDirectory()&&!parent.mkdirs())
+                        throw new IllegalStateException("Cannot preserve existing PDFs");
+                    try(InputStream in=new FileInputStream(oldFile);
+                        OutputStream out=new FileOutputStream(copy)){
+                        int n;while((n=in.read(buffer))!=-1){
+                            total[0]+=n;
+                            if(total[0]>190_000_000)
+                                throw new IllegalArgumentException("PDF library exceeds size limit");
+                            out.write(buffer,0,n);
+                        }
+                    }
+                }
+                File backup=new File(getFilesDir(),"model-paper-preserved-backup");
                 deleteDir(backup);
                 if(library.exists()&&!library.renameTo(backup))
-                    throw new IllegalStateException("Old library is in use");
-                if(!temp.renameTo(library)){
+                    throw new IllegalStateException("Could not prepare previous PDF library");
+                if(!stage.renameTo(library)){
                     if(backup.exists())backup.renameTo(library);
-                    throw new IllegalStateException("Could not activate imported PDFs");
+                    throw new IllegalStateException("Cannot activate new PDF library");
                 }
                 deleteDir(backup);
-                result="✅ सभी 66 PDF Grifly में ऑफलाइन Import हो गई हैं।";
-            }catch(Exception e){
-                result="⚠ Import नहीं हुआ: "+e.getMessage();
-            }finally{deleteDir(temp);}
+                result="✅ "+found.size()+" नए PDF Import हुए; पुराने उपलब्ध पेपर सुरक्षित हैं।";
+            }catch(Exception error){
+                result="⚠ Import असफल: "+error.getMessage()+"। पुराने PDF नहीं बदले गए।";
+            }finally{
+                deleteDir(stage);
+            }
             final String report=result;
             runOnUiThread(()->{
                 importing=false;importButton.setEnabled(true);
                 refreshAvailability();message(report);
             });
         });
+    }
+    private static boolean hasPdfHeader(File file){
+        try(InputStream in=new FileInputStream(file)){
+            byte[] b=new byte[5];
+            return in.read(b)==5&&b[0]=='%'&&b[1]=='P'&&b[2]=='D'&&
+                b[3]=='F'&&b[4]=='-';
+        }catch(Exception e){return false;}
     }
     /**
      * Optional preloaded assets for fully offline distributions.
@@ -354,7 +387,7 @@ public final class ModelPaperLibraryActivity extends Activity {
      */
     private void importBundledPapersIfAvailable(){
         if(importing || library.isDirectory() &&
-           ModelPaperCatalog.allPdfPaths().stream().allMatch(p->new File(library,p).isFile()))return;
+           ModelPaperCatalog.class10Paths().stream().allMatch(p->new File(library,p).isFile()))return;
         String first=ModelPaperCatalog.path(0,0,1);
         try(InputStream probe=getAssets().open("model-paper-library/"+first)){
             if(probe.read()!='%')return;
@@ -367,7 +400,7 @@ public final class ModelPaperLibraryActivity extends Activity {
             try{
                 if(!temp.mkdirs())throw new IllegalStateException("Temporary storage unavailable");
                 byte[] buf=new byte[32768];long total=0;
-                for(String path:ModelPaperCatalog.allPdfPaths()){
+                for(String path:ModelPaperCatalog.class10Paths()){
                     File target=new File(temp,path);
                     File parent=target.getParentFile();
                     if(!parent.isDirectory()&&!parent.mkdirs())
@@ -387,6 +420,20 @@ public final class ModelPaperLibraryActivity extends Activity {
                         if(check.read(sig)!=5 || sig[0]!='%' || sig[1]!='P' ||
                             sig[2]!='D' || sig[3]!='F' || sig[4]!='-')
                             throw new IllegalArgumentException("Bundled asset is not PDF: "+path);
+                    }
+                }
+                // Old fully bundled Grifly test APKs carry 66 Class 10 PDFs.
+                // Preserve any newer Class 12 or Vision Ka Saar imports as well.
+                for(String path:ModelPaperCatalog.allPdfPaths()){
+                    if(ModelPaperCatalog.class10Paths().contains(path))continue;
+                    File existing=new File(library,path);
+                    if(!existing.isFile())continue;
+                    File copy=new File(temp,path),parent=copy.getParentFile();
+                    if(!parent.isDirectory()&&!parent.mkdirs())
+                        throw new IllegalStateException("Cannot preserve other papers");
+                    try(InputStream input=new FileInputStream(existing);
+                        OutputStream output=new FileOutputStream(copy)){
+                        int n;while((n=input.read(buf))!=-1)output.write(buf,0,n);
                     }
                 }
                 File backup=new File(getFilesDir(),"model-papers-previous");
