@@ -287,7 +287,7 @@ jobs:
                 shutil.copyfileobj(src,out)
           print('Published all',len(pdfs),'Class 10 model paper PDFs:',total,'bytes.')
           PY
-      - name: Publish 25 Class 12 guided practice PDF sets
+      - name: Publish 30 Class 12 guided practice PDF sets
         shell: bash
         run: |
           set -euo pipefail
@@ -295,9 +295,9 @@ jobs:
           from pathlib import Path, PurePosixPath
           from zipfile import ZipFile
           import os, shutil
-          zpath=Path('website/model-paper-library/packs/Class12_25_Practice_Sets_Step_By_Step.zip')
+          zpath=Path('website/model-paper-library/packs/Class12_30_Practice_Sets_Step_By_Step.zip')
           output=Path(os.environ['RUNNER_TEMP'])/'saurabh-site'/'model-paper-library'/'pdfs'
-          subjects=('Physics','Chemistry','Biology','Mathematics','English')
+          subjects=('Physics','Chemistry','Biology','Mathematics','English','Hindi')
           expected={
             f'Class_12/12_{subject}/Practice_Set_{n:02d}.pdf'
             for subject in subjects
@@ -312,8 +312,8 @@ jobs:
           total=0
           with ZipFile(zpath) as archive:
             names=[i.filename for i in archive.infolist() if not i.is_dir() and i.filename.lower().endswith('.pdf')]
-            if set(names)!=expected or len(names)!=25:
-              raise SystemExit(f'Class 12 archive must contain 25 unique exact PDFs, found {len(names)}')
+            if set(names)!=expected or len(names)!=30:
+              raise SystemExit(f'Class 12 archive must contain 30 unique exact PDFs, found {len(names)}')
             for item in archive.infolist():
               if item.is_dir() or not item.filename.lower().endswith('.pdf'):continue
               if PurePosixPath(item.filename).is_absolute() or '..' in PurePosixPath(item.filename).parts or '\\' in item.filename:
