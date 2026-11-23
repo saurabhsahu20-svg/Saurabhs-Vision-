@@ -317,6 +317,51 @@ await check('vision-ka-saar-class10-maths-science-stepwise-75-marks',async page=
   const width=await page.evaluate(()=>({document:document.documentElement.scrollWidth,viewport:innerWidth}));
   assert.ok(width.document<=width.viewport+5,'no sideways mobile scrolling: '+JSON.stringify(width));
 });
+await check('vision-ka-saar-integrated-68-pdf-library',async page=>{
+  await page.addInitScript(()=>{
+    window.pdfjsLib={GlobalWorkerOptions:{},getDocument:()=>({
+      promise:Promise.resolve({
+        numPages:21,
+        getPage:async()=>({
+          getViewport:({scale})=>({width:600*scale,height:800*scale}),
+          render:()=>({promise:Promise.resolve(),cancel(){}})
+        }),
+        destroy:async()=>{}
+      }),
+      destroy:async()=>{}
+    })};
+  });
+  await page.route('**/vision-ka-saar/*.pdf',route=>{
+    if(route.request().method()==='HEAD')return route.fulfill({
+      status:200,headers:{'content-type':'application/pdf'}
+    });
+    return route.abort();
+  });
+  await goto(page,'model-paper-library/?grade=10&subject=Mathematics&type=saar&set=01');
+  assert.match(await page.locator('.stat').first().textContent(),/68/,'App and site Class 10 counts match');
+  assert.equal(await page.locator('#grade').inputValue(),'10');
+  assert.equal(await page.locator('#subject').inputValue(),'Mathematics');
+  assert.equal(await page.locator('#series').inputValue(),'saar');
+  assert.equal(await page.locator('#paperSetBox').isHidden(),true);
+  assert.match(await page.locator('#selectionInfo').textContent(),/VISION KA SAAR/);
+  assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true');
+  await page.locator('#view').click();
+  await page.waitForFunction(()=>document.getElementById('pdfStage').hidden===false);
+  assert.match(await page.locator('#download').getAttribute('href'),/Vision_Ka_Saar_Class10_Maths_75_Marks_Solved\.pdf$/);
+  await page.selectOption('#subject','Science');
+  assert.equal(await page.locator('#series').inputValue(),'saar');
+  assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true');
+  await page.locator('#view').click();
+  await page.waitForFunction(()=>document.getElementById('pdfStage').hidden===false);
+  assert.match(await page.locator('#download').getAttribute('href'),/Vision_Ka_Saar_Class10_Science_75_Marks_Solved\.pdf$/);
+  await page.selectOption('#subject','English');
+  assert.equal(await page.locator('#series option[value="saar"]').count(),0);
+  assert.equal(await page.locator('#series').inputValue(),'full75');
+  assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true');
+  await page.selectOption('#grade','12');
+  assert.equal(await page.locator('#series option[value="saar"]').count(),0);
+  assert.equal(await page.locator('#subject option').count(),12);
+});
 await browser.close();
 if(failures)process.exitCode=1;
 else console.log('PASS: all 7 desktop/mobile Chromium browser flows (including Class 12)');
