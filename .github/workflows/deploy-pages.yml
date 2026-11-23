@@ -369,6 +369,104 @@ jobs:
                 raise SystemExit('Generated ZIP failed integrity checks: '+filename)
           print('Published 6 source PDFs, 30 guided practice PDFs and three validated ZIP packs')
           PY
+      - name: Generate 30 more Class 12 full-mark practice PDFs
+        shell: bash
+        env:
+          VISION_CLASS12_ROOT: ${{ runner.temp }}/vision-class12-additional
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check --quiet weasyprint PyMuPDF matplotlib basemap
+          python3 - <<'PY'
+          from importlib.util import spec_from_file_location, module_from_spec
+          from pathlib import Path, PurePosixPath
+          from zipfile import ZipFile, ZIP_DEFLATED
+          from shutil import copy2
+          import os, hashlib
+          source=Path('website/model-paper-library/generator/build_class12_additional6.py')
+          module_spec=spec_from_file_location('vision_class12_generator',source)
+          maker=module_from_spec(module_spec)
+          module_spec.loader.exec_module(maker)
+          root=Path(os.environ['RUNNER_TEMP'])/'saurabh-site'/'model-paper-library'
+          pdfdir=root/'pdfs'; packs=root/'packs'
+          pdfdir.mkdir(parents=True,exist_ok=True);packs.mkdir(parents=True,exist_ok=True)
+          required={
+            f'Class_12/12_{subject}/Practice_Set_{n:02d}.pdf'
+            for subject in maker.SUBJECTS
+            for n in range(1,6)
+          }
+          generated=[]
+          for subject,settings in maker.SUBJECTS.items():
+            for set_no in range(1,6):
+              result=maker.render_one(subject,set_no)
+              if result['marks']!=settings['marks'] or result['questions']<20:
+                raise SystemExit('Invalid question totals: '+str(result))
+              relative=f'Class_12/12_{subject}/Practice_Set_{set_no:02d}.pdf'
+              origin=Path(result['path'])
+              if not origin.exists() or origin.read_bytes()[:5]!=b'%PDF-':
+                raise SystemExit('Generated file is not a PDF: '+relative)
+              dest=pdfdir.joinpath(*PurePosixPath(relative).parts)
+              dest.parent.mkdir(parents=True,exist_ok=True);copy2(origin,dest)
+              generated.append(relative)
+          if set(generated)!=required or len(generated)!=30:
+            raise SystemExit('Expected 30 original guided practice PDF paths')
+          pack=packs/'Class12_Additional_30_Guided_Sets.zip'
+          with ZipFile(pack,'w',ZIP_DEFLATED,compresslevel=8) as archive:
+            for name in sorted(required):
+              archive.write(pdfdir.joinpath(*PurePosixPath(name).parts),name)
+          with ZipFile(pack) as archive:
+            if archive.testzip() is not None or set(archive.namelist())!=required:
+              raise SystemExit('Class 12 new practice pack ZIP QA failed')
+          print('PASS: 30 additional Class 12 independent full-mark practice PDFs were generated, with worked solutions and maps.')
+          PY
+      - name: Verify and publish six new Class 12 source papers when exact copies are obtainable
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path, PurePosixPath
+          from zipfile import ZipFile, ZIP_DEFLATED
+          from urllib.request import urlopen,Request
+          import hashlib, os
+          base='https://www.cgboardonline.com/papers/cg-board-class-12-model-paper-'
+          originals={
+            'Accountancy':('accountancy-301-2026.pdf','7c7e8b503922bbe6efe371275f64e9a668ef27a0613e794dba378cfddc16eb26'),
+            'Business_Studies':('business-studies-302-2026.pdf','2a891933de41e93497037f3caf0711ab41b91d365b58cee0fbfe96e50c80725a'),
+            'Economics':('economics-303-2026.pdf','4c7c1e1194b90f43eda873e33e1f79eb249823a5e0280bb0f00a5efd4493fe82'),
+            'History':('history-101-2026.pdf','531963a47719fa1d7be26c65c6ebdb8138ca2932db35ce6b7b4b779e284f0afa'),
+            'Geography':('geography-102-2026.pdf','2f3b8a8f931c9db75978d5d131f675c80d29554c0f1b2a2f800b492601745051'),
+            'Political_Science':('political-science-103-2026.pdf','bc4a327c55b32fe410bb4e7407f3164b9cb35f80d13c2a489d5b608544cc1243'),
+          }
+          directory=Path(os.environ['RUNNER_TEMP'])/'saurabh-site'/'model-paper-library'
+          pdfdir=directory/'pdfs';packs=directory/'packs'
+          published=[]
+          for subject,(tail,expected_hash) in originals.items():
+            try:
+              req=Request(base+tail,headers={'User-Agent':'SaurabhsVision-Educational-Archive/1.0'})
+              with urlopen(req,timeout=15) as response:
+                data=response.read(3_000_000)
+              actual=hashlib.sha256(data).hexdigest()
+              if not data.startswith(b'%PDF-') or actual!=expected_hash:
+                print('Not publishing an unverified source PDF:',subject,'hash prefix',actual[:12])
+                continue
+              relative=f'Class_12/12_{subject}/Original_2025-26.pdf'
+              dest=pdfdir.joinpath(*PurePosixPath(relative).parts)
+              dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(data)
+              published.append(relative)
+            except Exception as error:
+              print('Source unavailable; preserving disabled preview:',subject,type(error).__name__)
+          if len(published)==6:
+            allnames=published+[
+              f'Class_12/12_{subject}/Practice_Set_{n:02d}.pdf'
+              for subject in originals for n in range(1,6)
+            ]
+            output=packs/'Class12_Additional_36_Papers.zip'
+            with ZipFile(output,'w',ZIP_DEFLATED,compresslevel=8) as archive:
+              for name in sorted(allnames):
+                archive.write(pdfdir.joinpath(*PurePosixPath(name).parts),name)
+            print('PASS: all six original PDFs are byte-identical to the provided uploads; 36-paper archive published.')
+          else:
+            print('Original source PDFs published:',len(published),'/6. No incomplete combined ZIP created.')
+          PY
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload static site
