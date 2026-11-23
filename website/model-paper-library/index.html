@@ -59,8 +59,8 @@ footer{background:#071b49;color:#e4eeff;text-align:center;padding:26px 18px;line
 <p class="subtle">Preview दबाने से PDF डाउनलोड नहीं होगी। PDF उपलब्ध होने पर केवल अलग Download बटन से फाइल सेव होगी।</p></section>
 <section class="card" id="class12Pack"><h2>📦 कक्षा 12वीं — विषयवार Model Papers और Solutions</h2>
 <p class="subtle">हर विषय के पाँच स्वतंत्र अभ्यास सेट हैं। पूर्णांक: Physics, Chemistry, Biology तथा Geography = 70; Mathematics, English, Hindi, Accountancy, Business Studies, Economics, History और Political Science = 80।</p>
-<div class="actionrow"><a class="btn secondary" href="./packs/Class12_30_Practice_Sets_Step_By_Step.zip" download>⬇ पहले 6 विषय • 30 अभ्यास PDF</a><a class="btn secondary" href="./packs/Class12_Additional_30_Guided_Sets.zip" download>⬇ नए 6 विषय • 30 अभ्यास PDF</a></div>
-<div class="actionrow"><a class="btn secondary" href="./packs/Class12_6_Original_Model_Papers.zip" download>⬇ पहले 6 मूल पेपर</a><a class="btn secondary" href="./packs/Class12_Additional_36_Papers.zip" download>⬇ नए 6 मूल + 30 अभ्यास (सत्यापन के बाद)</a></div>
+<div class="actionrow"><a class="btn secondary" href="./packs/Class12_30_Practice_Sets_Step_By_Step.zip" download>⬇ पहले 6 विषय • 30 अभ्यास PDF</a><a class="btn secondary" id="class12Additional30" href="./packs/Class12_Additional_30_Guided_Sets.zip" download aria-disabled="true" tabindex="-1">⏳ नए 6 विषय • 30 अभ्यास PDF (प्रकाशन जाँचें)</a></div>
+<div class="actionrow"><a class="btn secondary" href="./packs/Class12_6_Original_Model_Papers.zip" download>⬇ पहले 6 मूल पेपर</a><a class="btn secondary" id="class12Additional36" href="./packs/Class12_Additional_36_Papers.zip" download aria-disabled="true" tabindex="-1">⏳ नए 6 मूल + 30 अभ्यास (अभी जाँच जारी)</a></div>
 <p class="subtle">नया 36-PDF पैक तभी प्रकाशित होगा जब सभी छह मूल स्रोत PDF की पुष्टि हो जाएगी। नए 30 स्वतंत्र अभ्यास सेट का ZIP अलग उपलब्ध रहेगा।</p>
 <div class="notice">नए अभ्यास सेट आधिकारिक CGBSE प्रश्नपत्र या प्रमाणित उत्तर-कुंजी नहीं हैं। प्रश्न हल करके फिर चरणबद्ध उत्तर देखें और शिक्षक से जाँच कराएँ।</div>
 </section><section class="card" id="visionSteps"><h2>💡 VISION FLASH — समाधान समझने का तरीका</h2>
@@ -238,5 +238,25 @@ for(const [id,multiplier] of [['less',1/1.2],['more',1.2]])el(id).addEventListen
 });
 el('grade').addEventListener('change',refreshChoices);
 for(const id of ['subject','series','paperSet'])el(id).addEventListener('change',updateSelection);
+/**
+ * Batch ZIPs become downloadable only when GitHub Pages has actually published them.
+ * Never offer a broken 404 as if the original uploaded PDFs were hosted already.
+ */
+async function enablePublishedPack(id,availableText){
+ const link=el(id);
+ if(!link)return;
+ try{
+  const response=await fetch(link.href,{method:'HEAD',cache:'no-store'});
+  const contentType=(response.headers.get('content-type')||'').toLowerCase();
+  if(!response.ok||!(contentType.includes('zip')||contentType.includes('octet-stream')))return;
+  link.removeAttribute('aria-disabled');
+  link.removeAttribute('tabindex');
+  link.textContent=availableText;
+ }catch(error){
+  // Remain visibly unavailable and keyboard-inaccessible when offline or unpublished.
+ }
+}
 makeOptions();updateSelection();
+enablePublishedPack('class12Additional30','⬇ नए 6 विषय • 30 अभ्यास PDF (ZIP)');
+enablePublishedPack('class12Additional36','⬇ नए 6 मूल + 30 अभ्यास PDF (ZIP)');
 </script></body></html>
