@@ -84,3 +84,24 @@ for token in ('SUBJECTS12','Class_12/12_','Practice_Set_','marks:70','marks:80')
  assert token in model,f'missing online Class 12 selector: {token}'
 assert 'Class 10 & 12 Model Papers' in (root/'app.js').read_text(encoding='utf-8')
 print('PASS: 6 original Class 12 PDFs, 30 worked practice sets, Hindi 010, subject marks and site links')
+
+# Additional CGBSE 2025-26 12th model papers and independently generated sets.
+# The CI build generates the binary PDFs after this source smoke check.
+import ast
+generator=root12/'generator'/'build_class12_additional6.py'
+assert generator.is_file(),'Missing reproducible 30-paper source for added Class 12 subjects'
+tree=ast.parse(generator.read_text(encoding='utf8'))
+subjects={}
+for node in tree.body:
+ if isinstance(node,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='SUBJECTS' for t in node.targets):
+  subjects=ast.literal_eval(node.value)
+expected_subjects={
+ 'Accountancy':80,'Business_Studies':80,'Economics':80,
+ 'History':80,'Geography':70,'Political_Science':80
+}
+assert {name:value['marks'] for name,value in subjects.items()}==expected_subjects
+for name in expected_subjects:
+ assert ("key:'"+name+"'") in model, f'New Class 12 subject absent from website: {name}'
+for token in ('Class12_Additional_30_Guided_Sets.zip','Class12_Additional_36_Papers.zip','<strong>72</strong>'):
+ assert token in model, f'Additional 6-subject PDF catalog missing: {token}'
+print('PASS: 12 Class 12 subjects and generator for 30 new full-mark solved paper sets')

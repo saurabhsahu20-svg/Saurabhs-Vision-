@@ -226,7 +226,7 @@ await check('class10-model-library-preview-and-release-safety',async(page)=>{
   assert.equal(await page.locator('#paperSetBox').isHidden(),true,'original paper does not show set chooser');
   assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true','change resets stale PDF link');
   await page.selectOption('#grade','12');
-  assert.equal(await page.locator('#subject option').count(),6,'six uploaded Class 12 subjects including Hindi');
+  assert.equal(await page.locator('#subject option').count(),12,'twelve Class 12 subjects including six new sources');
   assert.equal(await page.locator('#view').isDisabled(),false,'Class 12 original PDFs are available');
   assert.equal(await page.locator('#series option').count(),2,'Class 12 originals and guided sets only');
   assert.match(await page.locator('#selectionInfo').textContent(),/70 अंक/);
@@ -252,6 +252,27 @@ await check('class10-model-library-preview-and-release-safety',async(page)=>{
   await page.locator('#view').click();
   await page.waitForFunction(()=>document.getElementById('pdfStage').hidden===false);
   assert.ok((await page.locator('#download').getAttribute('href')).endsWith('Class_12/12_Hindi/Original_2025-26.pdf'));
+  for (const [subject,marks,original] of [
+    ['Accountancy',80,'Class_12/12_Accountancy/Original_2025-26.pdf'],
+    ['Business_Studies',80,'Class_12/12_Business_Studies/Original_2025-26.pdf'],
+    ['Economics',80,'Class_12/12_Economics/Original_2025-26.pdf'],
+    ['History',80,'Class_12/12_History/Original_2025-26.pdf'],
+    ['Geography',70,'Class_12/12_Geography/Original_2025-26.pdf'],
+    ['Political_Science',80,'Class_12/12_Political_Science/Original_2025-26.pdf']
+  ]){
+    await page.selectOption('#subject',subject);
+    assert.match(await page.locator('#selectionInfo').textContent(),new RegExp(String(marks)+' अंक'));
+    await page.selectOption('#series','practice');
+    await page.selectOption('#paperSet','05');
+    assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true');
+    await page.locator('#view').click();
+    await page.waitForFunction(()=>document.getElementById('pdfStage').hidden===false);
+    assert.ok((await page.locator('#download').getAttribute('href')).endsWith('Class_12/12_'+subject+'/Practice_Set_05.pdf'));
+    await page.selectOption('#series','original');
+    await page.locator('#view').click();
+    await page.waitForFunction(()=>document.getElementById('pdfStage').hidden===false);
+    assert.ok((await page.locator('#download').getAttribute('href')).endsWith(original));
+  }
   await page.selectOption('#grade','10');
   assert.equal(await page.locator('#subject option').count(),6,'Class 10 remains available');
   assert.equal(await page.locator('#series option').count(),3,'all Class 10 paper series preserved');
