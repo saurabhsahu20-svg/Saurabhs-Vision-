@@ -39,7 +39,7 @@ assert 'model-paper-library/' in (root/'sitemap.xml').read_text(encoding='utf-8'
 assert '<iframe' not in model, 'Avoid Android inline PDF auto-download iframe'
 print('PASS: Class 10 model-paper library listing, manual preview and separate download')
 
-# The five owner-uploaded originals are binary-identical PDFs; Class 12 published
+# The six owner-uploaded originals are binary-identical PDFs; Class 12 published
 # practice PDFs must use their true subject-specific 70- or 80-mark pattern.
 from zipfile import ZipFile
 import json
@@ -55,16 +55,18 @@ expected={f'Class_12/12_{subject}/Practice_Set_{n:02d}.pdf'
           for subject in class12_subjects for n in range(1,6)}
 with ZipFile(pack) as z:
  pdfs={p for p in z.namelist() if p.endswith('.pdf')}
- assert pdfs==expected and len(pdfs)==30,'Class 12 practice pack must have exactly 25 PDF files'
+ assert pdfs==expected and len(pdfs)==30,'Class 12 practice pack must have exactly 30 PDF files'
  assert z.testzip() is None,'Class 12 pack ZIP CRC failed'
  for name in expected:
   with z.open(name) as item:
    assert item.read(5)==b'%PDF-',f'Invalid PDF header: {name}'
- manifest=json.loads(z.read('PAPER_MANIFEST.json'))
- assert len(manifest['papers'])==25 || len(manifest['papers'])==30
- for paper in manifest['papers']:
-  expected_marks=80 if paper['subject'] in ('Mathematics','English','Hindi') else 70
-  assert paper['total_marks']==expected_marks,f'wrong exam marks for {paper}'
+ catalog=json.loads(z.read('PAPER_CATALOG.json'))
+ assert len(catalog['subjects'])==6, 'Expected six Class 12 subjects'
+ assert len(catalog['files'])==36, 'Catalog must describe six originals and 30 guided sets'
+ for subject in catalog['subjects']:
+  expected_marks=80 if subject['name'] in ('Mathematics','English','Hindi') else 70
+  assert subject['marks']==expected_marks, f'Wrong marks for {subject["name"]}'
+  assert subject['practice_sets']==5, f'Expected five sets for {subject["name"]}'
 for token in ('SUBJECTS12','Class_12/12_','Practice_Set_','marks:70','marks:80'):
  assert token in model,f'missing online Class 12 selector: {token}'
 assert 'Class 10 & 12 Model Papers' in (root/'app.js').read_text(encoding='utf-8')
