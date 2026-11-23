@@ -362,6 +362,27 @@ await check('vision-ka-saar-integrated-68-pdf-library',async page=>{
   assert.equal(await page.locator('#series option[value="saar"]').count(),0);
   assert.equal(await page.locator('#subject option').count(),12);
 });
+await check('vision-app-grifly-140-study-library-links',async page=>{
+  await page.setViewportSize({width:390,height:844});
+  await goto(page,'model-paper-library/');
+  const parity=page.locator('#app-browser-parity');
+  assert.equal(await parity.count(),1,'web/app/browser parity guide missing');
+  assert.match(await parity.textContent(),/Class 10|कक्षा 10वीं/);
+  assert.match(await parity.textContent(),/Class 12|कक्षा 12वीं/);
+  assert.match(await parity.textContent(),/140/);
+  assert.equal(await parity.locator('a[href="../vision-ka-saar/"]').count(),1);
+  assert.equal(await parity.locator('a[href*="releases"]').count(),1);
+  assert.equal(await page.locator('#grade option').count(),2);
+  await page.selectOption('#grade','12');
+  assert.equal(await page.locator('#subject option').count(),12);
+  await page.selectOption('#grade','10');
+  assert.equal(await page.locator('#subject option').count(),6);
+  await page.selectOption('#subject','Mathematics');
+  await page.selectOption('#series','saar');
+  assert.equal(await page.locator('#paperSetBox').isHidden(),true);
+  assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true',
+    'Do not offer a PDF without verifying published asset');
+});
 await browser.close();
 if(failures)process.exitCode=1;
 else console.log('PASS: all 7 desktop/mobile Chromium browser flows (including Class 12)');

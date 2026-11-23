@@ -42,7 +42,8 @@ public final class ModelPaperLibraryActivity extends Activity {
     private static final int BLUE=Color.rgb(9,40,95);
     private static final int MINT=Color.rgb(18,137,110);
     private final ExecutorService io=Executors.newSingleThreadExecutor();
-    private Spinner subject,series,set;
+    private Spinner grade,subject,series,set;
+    private boolean changingOptions=false;
     private TextView status,pageInfo,summary;
     private Button preview,save,back,forward,plus,minus,importButton;
     private ImageView paperImage;
@@ -108,24 +109,35 @@ public final class ModelPaperLibraryActivity extends Activity {
         hero.setBackground(shape(BLUE,19));
         TextView heading=text("📚 Model Paper Library",25,Color.WHITE,true);
         pad(hero,heading,0);
-        pad(hero,text("कक्षा 10वीं • Grifly × SAURABH'S VISION • VISION FLASH 💡",12,0xffd2edff,true),8);
-        pad(hero,text("6 विषय • 6 मूल पेपर • 30 नए 75-अंक सेट • 30 छोटे 30-अंक सेट",14,0xfff5faff,false),10);
+        pad(hero,text("कक्षा 10 + 12 • Grifly × SAURABH'S VISION • VISION FLASH 💡",12,0xffd2edff,true),8);
+        pad(hero,text("140 PDF • 10वीं: 68 • 12वीं: 72 • Vision Ka Saar: 2",14,0xfff5faff,false),10);
         pad(body,hero,0);
 
-        TextView notice=text("📖 75-अंक के पेपर में प्रश्नों के बाद Step-by-Step Answers और जहाँ जरूरी हो Diagrams हैं। अगर PDF पहले से शामिल हैं तो सीधे Preview दबाएँ। नहीं हैं तो नीचे 66-PDF ZIP एक बार चुनें। कोई फ़ाइल अपने-आप डाउनलोड या ऑनलाइन अपलोड नहीं होगी।",14,0xff405473,false);
+        TextView notice=text("📖 अब 10वीं और 12वीं के प्रश्नपत्र, Step-by-Step Answers, Diagram और Vision Ka Saar एक ही जगह हैं। ऑफलाइन पढ़ने के लिए 140-PDF ZIP या अलग 66/72/2-PDF ZIP चुनें। आपके पुराने ऑफलाइन पेपर सुरक्षित रहेंगे। PDF बिना अनुमति डाउनलोड नहीं होगी।",14,0xff405473,false);
         notice.setPadding(px(13),px(14),px(13),px(14));
         notice.setBackground(shape(0xffffffff,15));pad(body,notice,14);
 
-        importButton=button("📥 66 PDF ZIP चुनें",0xff1555bc);
+        importButton=button("📥 Offline PDF ZIP चुनें (66 / 72 / 2 / 140)",0xff1555bc);
         importButton.setOnClickListener(v->chooseZip());
         pad(body,importButton,13);
 
         summary=text(" ",13,0xff305f94,true);pad(body,summary,10);
-        pad(body,text("1. विषय चुनें",15,BLUE,true),17);
+        Button online=button("🌐 वेबसाइट के सभी 140 पेपर देखें",0xff1462ac);
+        online.setOnClickListener(v->{
+            Intent browser=new Intent(this,MainActivity.class);
+            browser.setAction(Intent.ACTION_VIEW);
+            browser.setData(Uri.parse("https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/model-paper-library/"));
+            startActivity(browser);
+        });
+        pad(body,online,9);
+        pad(body,text("1. कक्षा चुनें",15,BLUE,true),17);
+        grade=select(new String[]{"Class 10 • 68 PDF","Class 12 • 72 PDF"});
+        pad(body,grade,6);
+        pad(body,text("2. विषय चुनें",15,BLUE,true),15);
         subject=select(ModelPaperCatalog.TITLES);subject.setSelection(2);pad(body,subject,6);
-        pad(body,text("2. पेपर चुनें",15,BLUE,true),15);
+        pad(body,text("3. पेपर चुनें",15,BLUE,true),15);
         series=select(ModelPaperCatalog.SERIES);pad(body,series,6);
-        pad(body,text("3. सेट चुनें (मूल पेपर में केवल एक)",15,BLUE,true),15);
+        pad(body,text("4. सेट चुनें (मूल पेपर या Vision Ka Saar में केवल एक)",15,BLUE,true),15);
         set=select(new String[]{"सेट 01","सेट 02","सेट 03","सेट 04","सेट 05"});
         pad(body,set,6);
 
@@ -159,37 +171,85 @@ public final class ModelPaperLibraryActivity extends Activity {
         TextView foot=text("शिक्षक मार्गदर्शन: नए अभ्यास सेट स्वतंत्र रूप से बनाए गए हैं, आधिकारिक CGBSE प्रश्नपत्र या प्रमाणित उत्तर-कुंजी नहीं। गलत उत्तर दिखने पर शिक्षक से सत्यापन करें।",13,0xff60512b,false);
         foot.setPadding(px(13),px(14),px(13),px(14));
         foot.setBackground(shape(0xfffff3d5,12));pad(body,foot,20);
-        pad(body,text("🎓 कक्षा 12वीं: प्रश्नपत्र मिलने पर अलग सेक्शन जोड़ा जाएगा।",12,0xff64718c,false),12);
+        pad(body,text("💡 12वीं विषयवार 70/80 अंक हैं। नए अभ्यास पेपर आधिकारिक बोर्ड उत्तर-कुंजी नहीं हैं।",12,0xff64718c,false),12);
 
-        android.widget.AdapterView.OnItemSelectedListener changed=new android.widget.AdapterView.OnItemSelectedListener(){
-            @Override public void onItemSelected(android.widget.AdapterView<?> parent,View view,int position,long id){
-                set.setEnabled(series.getSelectedItemPosition()!=1);
+        grade.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener(){
+            @Override public void onItemSelected(android.widget.AdapterView<?> p,View v,int i,long id){
+                updateGradeOptions();
+            }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> p){}
+        });
+        subject.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener(){
+            @Override public void onItemSelected(android.widget.AdapterView<?> p,View v,int i,long id){
+                updateSeriesOptions();
+            }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> p){}
+        });
+        android.widget.AdapterView.OnItemSelectedListener chosen=new android.widget.AdapterView.OnItemSelectedListener(){
+            @Override public void onItemSelected(android.widget.AdapterView<?> p,View v,int i,long id){
+                if(changingOptions)return;
+                set.setEnabled(series.getSelectedItemPosition()!=1&&series.getSelectedItemPosition()!=3);
                 closePdf();refreshAvailability();
             }
             @Override public void onNothingSelected(android.widget.AdapterView<?> p){}
         };
-        subject.setOnItemSelectedListener(changed);
-        series.setOnItemSelectedListener(changed);
-        set.setOnItemSelectedListener(changed);
-        refreshAvailability();
+        series.setOnItemSelectedListener(chosen);
+        set.setOnItemSelectedListener(chosen);
+        updateSeriesOptions();
         importBundledPapersIfAvailable();
     }
+    private int selectedGrade(){return grade.getSelectedItemPosition()==1?12:10;}
+    private void updateGradeOptions(){
+        changingOptions=true;
+        int g=selectedGrade();
+        String[] labels=g==12?ModelPaperCatalog.CLASS12_TITLES:ModelPaperCatalog.TITLES;
+        subject.setAdapter(new ArrayAdapter<>(this,
+            android.R.layout.simple_spinner_dropdown_item,labels));
+        subject.setSelection(g==12?3:2);
+        changingOptions=false;
+        updateSeriesOptions();
+    }
+    private void updateSeriesOptions(){
+        if(changingOptions)return;
+        changingOptions=true;
+        int g=selectedGrade(),i=subject.getSelectedItemPosition();
+        boolean vision=g==10&&(i==2||i==4);
+        String[] options=g==12?ModelPaperCatalog.CLASS12_SERIES:
+            (vision?ModelPaperCatalog.CLASS10_VISION_SERIES:ModelPaperCatalog.SERIES);
+        int old=Math.min(series.getSelectedItemPosition(),options.length-1);
+        series.setAdapter(new ArrayAdapter<>(this,
+            android.R.layout.simple_spinner_dropdown_item,options));
+        series.setSelection(Math.max(0,old));
+        set.setEnabled(old!=1&&old!=3);
+        changingOptions=false;
+        closePdf();refreshAvailability();
+    }
     private File requestedPdf(){
-        return new File(library,ModelPaperCatalog.path(subject.getSelectedItemPosition(),
-            series.getSelectedItemPosition(),set.getSelectedItemPosition()+1));
+        return new File(library,ModelPaperCatalog.path(selectedGrade(),
+            subject.getSelectedItemPosition(),series.getSelectedItemPosition(),
+            set.getSelectedItemPosition()+1));
     }
     private void refreshAvailability(){
-        int count=0;
-        for(String path:ModelPaperCatalog.allPdfPaths())
-            if(new File(library,path).isFile())count++;
-        summary.setText("📚 Offline Library: "+count+" / 66 PDF उपलब्ध");
-        importButton.setText(count==66?"↻ दूसरी ZIP से PDF अपडेट करें":"📥 66 PDF ZIP चुनें");
-        if(importing){message("PDF Import चल रहा है…");return;}
-        if(count==0)message("इस APK में अभी PDF नहीं हैं। ऊपर 66 PDF ZIP चुनें, फिर यहाँ Preview देखें।");
-        else if(!requestedPdf().isFile())message("इस पेपर की PDF नहीं मिली। ZIP दोबारा Import करें।");
-        else message("✅ पेपर तैयार है। Preview पेज दिखाएगा, फाइल Save केवल अलग बटन से होगी।");
-        preview.setEnabled(count>0 && requestedPdf().isFile());
-        save.setEnabled(count>0 && requestedPdf().isFile());
+        int count=0,ten=0,twelve=0,saar=0;
+        for(String path:ModelPaperCatalog.allPdfPaths()){
+            if(new File(library,path).isFile()){
+                count++;
+                if(ModelPaperCatalog.visionKaSaarPaths().contains(path))saar++;
+                else if(ModelPaperCatalog.class10Paths().contains(path))ten++;
+                else twelve++;
+            }
+        }
+        summary.setText("✅ Offline: "+count+"/140 PDF • Class 10 "+(ten+saar)+"/68 • Class 12 "+twelve+"/72");
+        importButton.setText(count==140?"↻ दूसरे ZIP से PDF अपडेट करें":
+            "📥 Offline PDF ZIP चुनें (66 / 72 / 2 / 140)");
+        if(importing){message("PDF Import की जाँच चल रही है…");return;}
+        boolean available=false;
+        try{available=requestedPdf().isFile();}catch(Exception ignored){}
+        if(count==0)message("सभी पेपर वेबसाइट पर देख सकते हैं। ऑफलाइन पढ़ने के लिए 140-PDF ZIP Import करें।");
+        else if(!available)message("यह पेपर ऑफलाइन नहीं मिला। 140-PDF ZIP या इसी कक्षा का ZIP चुनें।");
+        else message("✅ PDF तैयार है। Preview बिना Download खुलेगा; Save अलग बटन से होगा।");
+        preview.setEnabled(available);
+        save.setEnabled(available);
     }
     private void chooseZip(){
         if(importing)return;
@@ -221,71 +281,104 @@ public final class ModelPaperLibraryActivity extends Activity {
     private void importZip(Uri uri){
         if(importing)return;
         importing=true;importButton.setEnabled(false);preview.setEnabled(false);save.setEnabled(false);
-        message("सभी 66 PDF की जाँच और सुरक्षित Import कर रहे हैं…");
+        message("PDF जाँच जारी है। पुराने पेपर नहीं हटेंगे…");
         closePdf();
         io.execute(()->{
+            File stage=new File(getFilesDir(),"model-papers-verify-"+System.currentTimeMillis());
             String result;
-            File temp=new File(getFilesDir(),"model-paper-import-"+System.currentTimeMillis());
-            try {
-                if(!temp.mkdirs())throw new IllegalStateException("Temporary folder unavailable");
+            try{
+                if(!stage.mkdirs())throw new IllegalStateException("Temporary folder unavailable");
                 Set<String> found=new HashSet<>();
-                long total=0;
+                byte[] buffer=new byte[32768];
+                long[] total={0};
                 try(InputStream input=getContentResolver().openInputStream(uri)){
                     if(input==null)throw new IllegalStateException("ZIP access denied");
                     try(ZipInputStream zip=new ZipInputStream(input)){
                         ZipEntry entry;
-                        byte[] b=new byte[32768];
                         while((entry=zip.getNextEntry())!=null){
-                            String path=entry.getName();
-                            if(path.startsWith("/")||path.indexOf('\\')>=0||path.contains(".."))
-                                throw new IllegalArgumentException("Unsafe ZIP entry");
-                            if(!entry.isDirectory() && path.toLowerCase(java.util.Locale.ROOT).endsWith(".pdf")){
+                            String name=entry.getName();
+                            if(name.startsWith("/")||name.indexOf('\\')>=0||
+                                name.contains(".."))throw new IllegalArgumentException("Unsafe archive path");
+                            if(!entry.isDirectory()&&name.toLowerCase(java.util.Locale.ROOT).endsWith(".pdf")){
+                                String path=name;
+                                if(name.equals("Vision_Ka_Saar_Maths_Set_A.pdf"))
+                                    path="Class_10/10_Mathematics/Vision_Ka_Saar.pdf";
+                                else if(name.equals("Vision_Ka_Saar_Science_Set_B.pdf"))
+                                    path="Class_10/10_Science/Vision_Ka_Saar.pdf";
                                 if(!ModelPaperCatalog.expectedPdf(path)||!found.add(path))
-                                    throw new IllegalArgumentException("Wrong or duplicate PDF: "+path);
-                                File dest=new File(temp,path),parent=dest.getParentFile();
+                                    throw new IllegalArgumentException("Unknown or repeated PDF: "+name);
+                                File output=new File(stage,path),parent=output.getParentFile();
                                 if(!parent.isDirectory()&&!parent.mkdirs())
-                                    throw new IllegalStateException("Cannot make PDF folder");
-                                long count=0;
-                                try(FileOutputStream out=new FileOutputStream(dest)){
+                                    throw new IllegalStateException("Could not create PDF folder");
+                                long size=0;
+                                try(OutputStream out=new FileOutputStream(output)){
                                     int n;
-                                    while((n=zip.read(b))!=-1){
-                                        count+=n;total+=n;
-                                        if(count>12_000_000||total>70_000_000)
-                                            throw new IllegalArgumentException("PDF pack too large");
-                                        out.write(b,0,n);
+                                    while((n=zip.read(buffer))!=-1){
+                                        size+=n;total[0]+=n;
+                                        if(size>12_000_000||total[0]>160_000_000)
+                                            throw new IllegalArgumentException("PDF archive exceeds safety limit");
+                                        out.write(buffer,0,n);
                                     }
                                 }
-                                try(FileInputStream pdf=new FileInputStream(dest)){
-                                    byte[] sig=new byte[5];
-                                    if(pdf.read(sig)!=5||sig[0]!='%'||sig[1]!='P'||sig[2]!='D'||sig[3]!='F'||sig[4]!='-')
-                                        throw new IllegalArgumentException("Invalid PDF: "+path);
-                                }
+                                if(!hasPdfHeader(output))
+                                    throw new IllegalArgumentException("Invalid PDF header: "+name);
                             }
                             zip.closeEntry();
                         }
                     }
                 }
-                if(!found.equals(ModelPaperCatalog.allPdfPaths()))
-                    throw new IllegalArgumentException("पूरे 66 PDF नहीं मिले: "+found.size()+" / 66");
-                File backup=new File(getFilesDir(),"model-paper-old-backup");
+                if(!ModelPaperCatalog.validImport(found))
+                    throw new IllegalArgumentException(
+                        "Expected exactly 66, 72, 2 or 140 known PDFs; found "+found.size());
+
+                // Preserve previously imported papers when the user imports
+                // Class 12 after Class 10 (or vice versa). Never erase them.
+                for(String path:ModelPaperCatalog.allPdfPaths()){
+                    if(found.contains(path))continue;
+                    File oldFile=new File(library,path);
+                    if(!oldFile.isFile())continue;
+                    File copy=new File(stage,path);
+                    File parent=copy.getParentFile();
+                    if(!parent.isDirectory()&&!parent.mkdirs())
+                        throw new IllegalStateException("Cannot preserve existing PDFs");
+                    try(InputStream in=new FileInputStream(oldFile);
+                        OutputStream out=new FileOutputStream(copy)){
+                        int n;while((n=in.read(buffer))!=-1){
+                            total[0]+=n;
+                            if(total[0]>190_000_000)
+                                throw new IllegalArgumentException("PDF library exceeds size limit");
+                            out.write(buffer,0,n);
+                        }
+                    }
+                }
+                File backup=new File(getFilesDir(),"model-paper-preserved-backup");
                 deleteDir(backup);
                 if(library.exists()&&!library.renameTo(backup))
-                    throw new IllegalStateException("Old library is in use");
-                if(!temp.renameTo(library)){
+                    throw new IllegalStateException("Could not prepare previous PDF library");
+                if(!stage.renameTo(library)){
                     if(backup.exists())backup.renameTo(library);
-                    throw new IllegalStateException("Could not activate imported PDFs");
+                    throw new IllegalStateException("Cannot activate new PDF library");
                 }
                 deleteDir(backup);
-                result="✅ सभी 66 PDF Grifly में ऑफलाइन Import हो गई हैं।";
-            }catch(Exception e){
-                result="⚠ Import नहीं हुआ: "+e.getMessage();
-            }finally{deleteDir(temp);}
+                result="✅ "+found.size()+" नए PDF Import हुए; पुराने उपलब्ध पेपर सुरक्षित हैं।";
+            }catch(Exception error){
+                result="⚠ Import असफल: "+error.getMessage()+"। पुराने PDF नहीं बदले गए।";
+            }finally{
+                deleteDir(stage);
+            }
             final String report=result;
             runOnUiThread(()->{
                 importing=false;importButton.setEnabled(true);
                 refreshAvailability();message(report);
             });
         });
+    }
+    private static boolean hasPdfHeader(File file){
+        try(InputStream in=new FileInputStream(file)){
+            byte[] b=new byte[5];
+            return in.read(b)==5&&b[0]=='%'&&b[1]=='P'&&b[2]=='D'&&
+                b[3]=='F'&&b[4]=='-';
+        }catch(Exception e){return false;}
     }
     /**
      * Optional preloaded assets for fully offline distributions.
@@ -294,7 +387,7 @@ public final class ModelPaperLibraryActivity extends Activity {
      */
     private void importBundledPapersIfAvailable(){
         if(importing || library.isDirectory() &&
-           ModelPaperCatalog.allPdfPaths().stream().allMatch(p->new File(library,p).isFile()))return;
+           ModelPaperCatalog.class10Paths().stream().allMatch(p->new File(library,p).isFile()))return;
         String first=ModelPaperCatalog.path(0,0,1);
         try(InputStream probe=getAssets().open("model-paper-library/"+first)){
             if(probe.read()!='%')return;
@@ -307,7 +400,7 @@ public final class ModelPaperLibraryActivity extends Activity {
             try{
                 if(!temp.mkdirs())throw new IllegalStateException("Temporary storage unavailable");
                 byte[] buf=new byte[32768];long total=0;
-                for(String path:ModelPaperCatalog.allPdfPaths()){
+                for(String path:ModelPaperCatalog.class10Paths()){
                     File target=new File(temp,path);
                     File parent=target.getParentFile();
                     if(!parent.isDirectory()&&!parent.mkdirs())
@@ -327,6 +420,20 @@ public final class ModelPaperLibraryActivity extends Activity {
                         if(check.read(sig)!=5 || sig[0]!='%' || sig[1]!='P' ||
                             sig[2]!='D' || sig[3]!='F' || sig[4]!='-')
                             throw new IllegalArgumentException("Bundled asset is not PDF: "+path);
+                    }
+                }
+                // Old fully bundled Grifly test APKs carry 66 Class 10 PDFs.
+                // Preserve any newer Class 12 or Vision Ka Saar imports as well.
+                for(String path:ModelPaperCatalog.allPdfPaths()){
+                    if(ModelPaperCatalog.class10Paths().contains(path))continue;
+                    File existing=new File(library,path);
+                    if(!existing.isFile())continue;
+                    File copy=new File(temp,path),parent=copy.getParentFile();
+                    if(!parent.isDirectory()&&!parent.mkdirs())
+                        throw new IllegalStateException("Cannot preserve other papers");
+                    try(InputStream input=new FileInputStream(existing);
+                        OutputStream output=new FileOutputStream(copy)){
+                        int n;while((n=input.read(buf))!=-1)output.write(buf,0,n);
                     }
                 }
                 File backup=new File(getFilesDir(),"model-papers-previous");
@@ -357,7 +464,7 @@ public final class ModelPaperLibraryActivity extends Activity {
     }
     private void openSelectedPdf(){
         File pdf=requestedPdf();
-        if(!pdf.isFile()){message("पहले 66-PDF ZIP Import करें।");return;}
+        if(!pdf.isFile()){message("इस PDF के लिए 140-PDF या विषयवार ZIP Import करें।");return;}
         closePdf();
         try{
             descriptor=ParcelFileDescriptor.open(pdf,ParcelFileDescriptor.MODE_READ_ONLY);
@@ -397,7 +504,7 @@ public final class ModelPaperLibraryActivity extends Activity {
         Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("application/pdf");
-        intent.putExtra(Intent.EXTRA_TITLE,ModelPaperCatalog.friendlyName(
+        intent.putExtra(Intent.EXTRA_TITLE,ModelPaperCatalog.friendlyName(selectedGrade(),
             subject.getSelectedItemPosition(),series.getSelectedItemPosition(),set.getSelectedItemPosition()+1));
         try{startActivityForResult(intent,SAVE_PDF);}
         catch(Exception e){message("इस फोन में PDF Save विकल्प नहीं खुल रहा।");}

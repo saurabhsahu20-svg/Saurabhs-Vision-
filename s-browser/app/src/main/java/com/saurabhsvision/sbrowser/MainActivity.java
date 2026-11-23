@@ -932,7 +932,7 @@ public final class MainActivity extends Activity {
                 ()->openAddress(VISION_KA_SAAR_URL)),
             homeFeature("📱","Vision App 140",0xfff6f2ff,0xffded0ff,0xffc6afff,
                 this::openInstalledVisionModelPapers),
-            homeFeature("📥","Offline ZIP 66",0xfffffbef,0xffffe4ab,0xffffcc7f,
+            homeFeature("📥","Offline 140 PDFs",0xfffffbef,0xffffe4ab,0xffffcc7f,
                 this::openNativeModelPapers)
         };
         for(int i=0;i<cards.length;i++){
