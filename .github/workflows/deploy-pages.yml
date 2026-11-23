@@ -287,54 +287,87 @@ jobs:
                 shutil.copyfileobj(src,out)
           print('Published all',len(pdfs),'Class 10 model paper PDFs:',total,'bytes.')
           PY
-      - name: Publish 25 Class 12 guided practice PDF sets
+      - name: Publish 36 Class 12 original and guided PDFs from two validated ZIPs
         shell: bash
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path, PurePosixPath
-          from zipfile import ZipFile
+          from zipfile import ZipFile, ZIP_DEFLATED
           import os, shutil
-          zpath=Path('website/model-paper-library/packs/Class12_25_Practice_Sets_Step_By_Step.zip')
+          root=Path('website/model-paper-library/packs')
+          part1=root/'Class12_25_Practice_Sets_Step_By_Step.zip'
+          part2=root/'Class12_Hindi_6_Papers.zip'
           output=Path(os.environ['RUNNER_TEMP'])/'saurabh-site'/'model-paper-library'/'pdfs'
-          subjects=('Physics','Chemistry','Biology','Mathematics','English')
-          expected={
+          packs=Path(os.environ['RUNNER_TEMP'])/'saurabh-site'/'model-paper-library'/'packs'
+          subjects=('Physics','Chemistry','Biology','Mathematics','English','Hindi')
+          other_subjects=subjects[:-1]
+          practice={
             f'Class_12/12_{subject}/Practice_Set_{n:02d}.pdf'
-            for subject in subjects
-            for n in range(1,6)
+            for subject in subjects for n in range(1,6)
           }
-          original={
+          originals={
             f'Class_12/12_{subject}/Original_2025-26.pdf'
             for subject in subjects
           }
-          if not zpath.is_file():
-            raise SystemExit('Class 12 guided-practice ZIP is required for this deployment')
+          p25={
+            f'Class_12/12_{subject}/Practice_Set_{n:02d}.pdf'
+            for subject in other_subjects for n in range(1,6)
+          }
+          hindi={
+            f'Class_12/12_Hindi/{name}'
+            for name in ['Original_2025-26.pdf']+
+              [f'Practice_Set_{n:02d}.pdf' for n in range(1,6)]
+          }
+          if not part1.is_file() or not part2.is_file():
+            raise SystemExit('Both 25-existing and Hindi-6 PDF archives are required')
           total=0
-          with ZipFile(zpath) as archive:
-            names=[i.filename for i in archive.infolist() if not i.is_dir() and i.filename.lower().endswith('.pdf')]
-            if set(names)!=expected or len(names)!=25:
-              raise SystemExit(f'Class 12 archive must contain 25 unique exact PDFs, found {len(names)}')
-            for item in archive.infolist():
-              if item.is_dir() or not item.filename.lower().endswith('.pdf'):continue
-              if PurePosixPath(item.filename).is_absolute() or '..' in PurePosixPath(item.filename).parts or '\\' in item.filename:
-                raise SystemExit('Invalid Class 12 ZIP path: '+item.filename)
-              if item.file_size>5_000_000:
-                raise SystemExit('Invalid Class 12 PDF size: '+item.filename)
-              total+=item.file_size
-              if total>50_000_000:
-                raise SystemExit('Class 12 pack exceeds allowed size')
-              dest=output.joinpath(*PurePosixPath(item.filename).parts)
-              dest.parent.mkdir(parents=True,exist_ok=True)
-              with archive.open(item) as src, dest.open('wb') as out:
-                magic=src.read(5)
-                if magic!=b'%PDF-':raise SystemExit('Not a PDF: '+item.filename)
-                out.write(magic)
-                shutil.copyfileobj(src,out)
-          for name in original:
-            p=output.joinpath(*PurePosixPath(name).parts)
-            if not p.is_file() or p.read_bytes()[:5]!=b'%PDF-':
-              raise SystemExit('Missing original Class 12 paper: '+name)
-          print('Published',len(names),'independent Class 12 guided PDFs +',len(original),'original PDFs')
+          for zip_path,expected in ((part1,p25),(part2,hindi)):
+            with ZipFile(zip_path) as archive:
+              if archive.testzip() is not None:
+                raise SystemExit('Class 12 ZIP CRC invalid: '+str(zip_path))
+              pdfs=[i for i in archive.infolist() if i.filename.lower().endswith('.pdf') and not i.is_dir()]
+              names=[i.filename for i in pdfs]
+              if len(names)!=len(expected) or len(set(names))!=len(expected) or set(names)!=expected:
+                raise SystemExit('Class 12 ZIP PDF paths are incomplete or unexpected: '+str(zip_path))
+              for item in archive.infolist():
+                path=PurePosixPath(item.filename)
+                if path.is_absolute() or '..' in path.parts or '\\' in item.filename:
+                  raise SystemExit('Unsafe Class 12 ZIP entry: '+item.filename)
+              for entry in pdfs:
+                if entry.file_size>7_000_000:
+                  raise SystemExit('Oversized Class 12 PDF: '+entry.filename)
+                total+=entry.file_size
+                if total>65_000_000:
+                  raise SystemExit('Class 12 PDF collection exceeds safe size')
+                dest=output.joinpath(*PurePosixPath(entry.filename).parts)
+                dest.parent.mkdir(parents=True,exist_ok=True)
+                with archive.open(entry) as src,dest.open('wb') as out:
+                  if (magic:=src.read(5))!=b'%PDF-':
+                    raise SystemExit('Invalid PDF signature: '+entry.filename)
+                  out.write(magic)
+                  shutil.copyfileobj(src,out)
+          if len(practice)!=30 or len(originals)!=6:
+            raise SystemExit('Incorrect expected paper counts')
+          for name in sorted(originals|practice):
+            target=output.joinpath(*PurePosixPath(name).parts)
+            if not target.is_file() or target.open('rb').read(5)!=b'%PDF-':
+              raise SystemExit('Missing or corrupt public Class 12 PDF: '+name)
+          packs.mkdir(parents=True,exist_ok=True)
+          groups=(
+            ('Class12_30_Practice_Sets_Step_By_Step.zip',practice),
+            ('Class12_6_Original_Model_Papers.zip',originals),
+            ('Class12_All_36_Model_Papers.zip',originals|practice),
+          )
+          for filename,names in groups:
+            output_path=packs/filename
+            with ZipFile(output_path,'w',compression=ZIP_DEFLATED,compresslevel=8) as bundle:
+              for name in sorted(names):
+                bundle.write(output.joinpath(*PurePosixPath(name).parts),name)
+            with ZipFile(output_path) as verified:
+              if verified.testzip() or len(verified.namelist())!=len(names):
+                raise SystemExit('Generated ZIP failed integrity checks: '+filename)
+          print('Published 6 source PDFs, 30 guided practice PDFs and three validated ZIP packs')
           PY
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

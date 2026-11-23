@@ -65,7 +65,22 @@ with ZipFile(pack) as z:
  for paper in manifest['papers']:
   expected_marks=80 if paper['subject'] in ('Mathematics','English') else 70
   assert paper['total_marks']==expected_marks,f'wrong exam marks for {paper}'
+# The new Hindi archive contains the sixth original plus exactly five
+# independent 80-mark Hindi practice PDFs and verified PDF signatures.
+hindi_pack=root12/'packs'/'Class12_Hindi_6_Papers.zip'
+assert hindi_pack.is_file(),'Hindi original and five practice PDFs were not uploaded'
+hindi_names={f'Class_12/12_Hindi/Practice_Set_{n:02d}.pdf' for n in range(1,6)}
+hindi_names.add('Class_12/12_Hindi/Original_2025-26.pdf')
+with ZipFile(hindi_pack) as z:
+ items=[p for p in z.namelist() if p.endswith('.pdf')]
+ assert len(items)==6 and set(items)==hindi_names
+ assert z.testzip() is None
+ for name in hindi_names:
+  with z.open(name) as stream:
+   assert stream.read(5)==b'%PDF-',f'Invalid Hindi PDF: {name}'
+assert "key:'Hindi'" in model and "marks:80" in model
+assert "Class12_30_Practice_Sets_Step_By_Step.zip" in model
 for token in ('SUBJECTS12','Class_12/12_','Practice_Set_','marks:70','marks:80'):
  assert token in model,f'missing online Class 12 selector: {token}'
 assert 'Class 10 & 12 Model Papers' in (root/'app.js').read_text(encoding='utf-8')
-print('PASS: 5 original Class 12 PDFs, 25 worked practice sets, subject-correct marks, PDF integrity and site links')
+print('PASS: 6 original Class 12 PDFs, 30 worked practice sets, Hindi 010, subject marks and site links')
