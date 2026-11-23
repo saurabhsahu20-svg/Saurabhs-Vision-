@@ -114,14 +114,17 @@ function setStatus(message){el('status').textContent=message;}
 function disableDownload(){el('download').href='#';el('download').setAttribute('aria-disabled','true');el('download').tabIndex=-1;}
 async function clearPreview(){
  epoch++;drawNumber++;
+ // Invalidate the previous download *before* asynchronous PDF cleanup.
+ // Otherwise a quick subject/set switch can leave a stale downloadable file
+ // enabled until PdfJs destroy finishes.
+ el('pdfStage').hidden=true;el('readerToolbar').hidden=true;
+ el('pdfCanvas').width=0;el('pdfCanvas').height=0;
+ disableDownload();page=1;zoom=1;
  if(paintTask){try{paintTask.cancel();}catch{}paintTask=null;}
  const oldTask=loadTask;loadTask=null;
  const oldDoc=activeDocument;activeDocument=null;
  if(oldTask){try{await oldTask.destroy();}catch{}}
  else if(oldDoc){try{await oldDoc.destroy();}catch{}}
- el('pdfStage').hidden=true;el('readerToolbar').hidden=true;
- el('pdfCanvas').width=0;el('pdfCanvas').height=0;
- disableDownload();page=1;zoom=1;
 }
 function makeOptions(){
  for(let n=1;n<=5;n++)el('paperSet').append(new Option('सेट '+n,String(n).padStart(2,'0')));
