@@ -226,7 +226,7 @@ await check('class10-model-library-preview-and-release-safety',async(page)=>{
   assert.equal(await page.locator('#paperSetBox').isHidden(),true,'original paper does not show set chooser');
   assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true','change resets stale PDF link');
   await page.selectOption('#grade','12');
-  assert.equal(await page.locator('#subject option').count(),5,'five uploaded Class 12 subjects');
+  assert.equal(await page.locator('#subject option').count(),6,'six uploaded Class 12 subjects including Hindi');
   assert.equal(await page.locator('#view').isDisabled(),false,'Class 12 original PDFs are available');
   assert.equal(await page.locator('#series option').count(),2,'Class 12 originals and guided sets only');
   assert.match(await page.locator('#selectionInfo').textContent(),/70 अंक/);
@@ -241,6 +241,17 @@ await check('class10-model-library-preview-and-release-safety',async(page)=>{
   await page.locator('#view').click();
   await page.waitForFunction(()=>document.getElementById('pdfStage').hidden===false);
   assert.match(await page.locator('#download').getAttribute('href'),/Class_12\/12_Mathematics\/Original_2025-26\.pdf$/);
+  await page.selectOption('#subject','Hindi');
+  assert.match(await page.locator('#selectionInfo').textContent(),/80 अंक/);
+  await page.selectOption('#series','practice');
+  await page.selectOption('#paperSet','05');
+  await page.locator('#view').click();
+  await page.waitForFunction(()=>document.getElementById('pdfStage').hidden===false);
+  assert.ok((await page.locator('#download').getAttribute('href')).endsWith('Class_12/12_Hindi/Practice_Set_05.pdf'));
+  await page.selectOption('#series','original');
+  await page.locator('#view').click();
+  await page.waitForFunction(()=>document.getElementById('pdfStage').hidden===false);
+  assert.ok((await page.locator('#download').getAttribute('href')).endsWith('Class_12/12_Hindi/Original_2025-26.pdf'));
   await page.selectOption('#grade','10');
   assert.equal(await page.locator('#subject option').count(),6,'Class 10 remains available');
   assert.equal(await page.locator('#series option').count(),3,'all Class 10 paper series preserved');
