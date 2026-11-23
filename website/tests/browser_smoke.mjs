@@ -295,6 +295,28 @@ await check('class12-deep-link-restores-grade-subject-set', async page=>{
   assert.equal(new URL(page.url()).searchParams.get('grade'),'10');
   assert.equal(await page.locator('#subject option').count(),6);
 });
+await check('vision-ka-saar-class10-maths-science-stepwise-75-marks',async page=>{
+  await page.setViewportSize({width:390,height:844});
+  await goto(page,'vision-ka-saar/?subject=Mathematics');
+  assert.match(await page.locator('#heading').textContent(),/Mathematics/);
+  assert.equal(await page.locator('.item').count(),33,'math must contain 33 new questions');
+  assert.equal((await page.locator('.marks').allTextContents()).reduce((sum,text)=>sum+parseInt(text,10),0),75,'math paper totals 75 marks');
+  assert.equal(await page.locator('.answerbox').count(),33,'all math answers supplied');
+  assert.equal(await page.locator('details[open]').count(),0,'no solutions revealed automatically');
+  await page.locator('.item details summary').first().click();
+  assert.equal(await page.locator('details[open]').count(),1,'individual worked answer expands');
+  await page.locator('#sci').click();
+  assert.equal(await page.locator('.item').count(),33,'science must contain 33 questions');
+  assert.match(await page.locator('#heading').textContent(),/Science/);
+  assert.equal((await page.locator('.marks').allTextContents()).reduce((sum,text)=>sum+parseInt(text,10),0),75,'science paper totals 75 marks');
+  assert.ok(page.url().includes('subject=Science'),'subject URL stays shareable');
+  await page.locator('#answers').click();
+  assert.equal(await page.locator('details[open]').count(),33,'all science solutions can be opened');
+  assert.ok(await page.locator('.diagram').count()>0,'labelled science/geometry example present');
+  assert.equal(await page.locator('a[download][href$=".pdf"]').count(),2,'separate PDF download actions');
+  const width=await page.evaluate(()=>({document:document.documentElement.scrollWidth,viewport:innerWidth}));
+  assert.ok(width.document<=width.viewport+5,'no sideways mobile scrolling: '+JSON.stringify(width));
+});
 await browser.close();
 if(failures)process.exitCode=1;
 else console.log('PASS: all 7 desktop/mobile Chromium browser flows (including Class 12)');

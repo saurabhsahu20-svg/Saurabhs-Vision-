@@ -105,3 +105,15 @@ for name in expected_subjects:
 for token in ('Class12_Additional_30_Guided_Sets.zip','Class12_Additional_36_Papers.zip','<strong>72</strong>'):
  assert token in model, f'Additional 6-subject PDF catalog missing: {token}'
 print('PASS: 12 Class 12 subjects and generator for 30 new full-mark solved paper sets')
+
+# Vision Ka Saar must stay an independent, fully worked Class 10 study page.
+vks=(root/'vision-ka-saar/index.html').read_text(encoding='utf-8')
+assert '<h1>VISION KA SAAR</h1>' in vks
+for token in ('Mathematics','Science','Step-by-step solution','Vision_Ka_Saar_Class10_Maths_75_Marks_Solved.pdf','Vision_Ka_Saar_Class10_Science_75_Marks_Solved.pdf'):
+ assert token in vks,f'missing Class 10 Vision Ka Saar feature: {token}'
+assert 'navbodh' not in vks.lower() and 'prabodh' not in vks.lower()
+for path in ('model-paper-library/index.html','index.html','sitemap.xml','board-preparation/index.html'):
+ assert 'vision-ka-saar/' in (root/path).read_text(encoding='utf-8'),f'missing Vision Ka Saar navigation: {path}'
+builder=(root/'tests/build_vision_ka_saar_pdf.mjs').read_text(encoding='utf-8')
+assert "marks!==75" in builder and "page.pdf(" in builder
+print('PASS: Vision Ka Saar original Class 10 Maths/Science, PDF builder, navigation and no copied publisher branding')
