@@ -229,6 +229,8 @@ await check('class10-model-library-preview-and-release-safety',async(page)=>{
   assert.equal(await page.locator('#subject option').count(),12,'twelve Class 12 subjects including six new sources');
   assert.equal(await page.locator('#view').isDisabled(),false,'Class 12 original PDFs are available');
   assert.equal(await page.locator('#series option').count(),2,'Class 12 originals and guided sets only');
+  assert.equal(await page.locator('#class12Additional30').getAttribute('aria-disabled'),'true','unpublished 30-paper ZIP must stay unavailable');
+  assert.equal(await page.locator('#class12Additional36').getAttribute('aria-disabled'),'true','unverified six-original ZIP must stay unavailable');
   assert.match(await page.locator('#selectionInfo').textContent(),/70 अंक/);
   await page.locator('#view').click();
   await page.waitForFunction(()=>document.getElementById('pdfStage').hidden===false);
