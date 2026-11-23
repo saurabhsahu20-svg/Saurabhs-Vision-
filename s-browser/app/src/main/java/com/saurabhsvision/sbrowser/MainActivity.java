@@ -538,6 +538,7 @@ public final class MainActivity extends Activity {
         refreshTabStrip();
     }
     private static final String VISION_PAPERS_URL="https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/model-paper-library/";
+    private static final String VISION_KA_SAAR_URL="https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-ka-saar/";
 
     /** Native Grifly PDF reader. No external storage permission, cloud or silent downloads. */
     private void openNativeModelPapers(){
@@ -547,8 +548,10 @@ public final class MainActivity extends Activity {
     /** Open the privately installed Vision study pack without sending PDFs to the network. */
     private void openInstalledVisionModelPapers(){
         try{
-            // Prefer the 75-mark offline study pack, then fall back to the older mini-pack.
+            // Prefer the owner's latest 140-PDF Vision v4.1.7 test app.
             for(String pkg:new String[]{
+                "com.saurabhsvision.quizclub.v417x",
+                "com.saurabhsvision.quizclub.v416x",
                 "com.saurabhsvision.quizclub.v415x",
                 "com.saurabhsvision.quizclub.v414x",
                 "com.saurabhsvision.quizclub.study"
@@ -565,7 +568,7 @@ public final class MainActivity extends Activity {
         }
         new AlertDialog.Builder(this)
             .setTitle("Model Paper Library")
-            .setMessage("SAURABH'S VISION v4.1.5 Study Test में 10वीं के सभी 66 पेपर, नए 75-अंक के 30 चरणबद्ध हल, लेबल वाले आरेख और ऑफलाइन Preview हैं। पहले यह ऐप इंस्टॉल करें और Model Paper Library खोलें।")
+            .setMessage("SAURABH'S VISION v4.1.7 Test में 10वीं के 68 और 12वीं के 72 यानी 140 पेपर, Vision Ka Saar Maths/Science, Step-by-Step Solutions और ऑफलाइन Preview हैं। ऐप इंस्टॉल हो तो यहाँ सीधे खुलेगा; नहीं तो वेबसाइट की लाइब्रेरी देखें।")
             .setPositiveButton("ऑनलाइन लाइब्रेरी देखें",(dialog,which)->openAddress(VISION_PAPERS_URL))
             .setNegativeButton("बंद करें",(dialog,which)->dialog.dismiss())
             .show();
@@ -869,10 +872,14 @@ public final class MainActivity extends Activity {
         ep.leftMargin=dp(9);heroActions.addView(features,ep);
         add(hero,heroActions,17);
         add(layout,hero,0);
-        homeBanner(layout,"📚","MODEL PAPERS • CLASS 10",
-            "Saurabh Vision Website • Subject, Paper, Preview & Solutions",
+        homeBanner(layout,"📚","MODEL PAPERS • CLASS 10 + 12",
+            "Vision Website • 140 PDFs • Subjects • Preview & Solutions",
             0xffd6f6f1,0xff9ee5dc,0xff63c7b7,
             ()->openAddress(VISION_PAPERS_URL));
+        homeBanner(layout,"💡","VISION KA SAAR • MATHS + SCIENCE",
+            "Class 10 • 75 Marks • Step-by-Step Explanations",
+            0xffeafcf1,0xffc5f1da,0xff81cfa8,
+            ()->openAddress(VISION_KA_SAAR_URL));
 
         // TODAY'S NEWS DESK; no fabricated live alerts.
         // Scrollable collection: never squeeze nine shortcuts into one phone row.
@@ -921,7 +928,11 @@ public final class MainActivity extends Activity {
                 this::showMapDownloads),
             homeFeature("📚","Model Papers",0xfff1f9ff,0xffcfe4ff,0xff98bdeb,
                 ()->openAddress(VISION_PAPERS_URL)),
-            homeFeature("📥","Offline Papers",0xfffffbef,0xffffe4ab,0xffffcc7f,
+            homeFeature("💡","Vision Ka Saar",0xffeefcf6,0xffd0f5e2,0xff93d8bc,
+                ()->openAddress(VISION_KA_SAAR_URL)),
+            homeFeature("📱","Vision App 140",0xfff6f2ff,0xffded0ff,0xffc6afff,
+                this::openInstalledVisionModelPapers),
+            homeFeature("📥","Offline ZIP 66",0xfffffbef,0xffffe4ab,0xffffcc7f,
                 this::openNativeModelPapers)
         };
         for(int i=0;i<cards.length;i++){
