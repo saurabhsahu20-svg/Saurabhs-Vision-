@@ -40,16 +40,16 @@ footer{background:#071b49;color:#e4eeff;text-align:center;padding:26px 18px;line
 <p>कक्षा 10वीं और 12वीं के लिए अलग विषयवार मॉडल पेपर। 12वीं में Physics, Chemistry, Biology और Geography के 70-अंक, तथा अन्य आठ विषयों के 80-अंक अभ्यास सेट हैं। प्रश्न हल करें, फिर कारण और चरणबद्ध समाधान समझें।</p>
 </div></header>
 <main class="wrap">
-<section class="stats" aria-label="Library statistics"><div class="stat"><strong>66</strong><span>कक्षा 10वीं PDF</span></div><div class="stat"><strong>72</strong><span>कक्षा 12वीं PDF</span></div><div class="stat"><strong>60</strong><span>12वीं के नए अभ्यास सेट</span></div><div class="stat"><strong>70/80</strong><span>12वीं विषयवार पूर्णांक</span></div></section>
+<section class="stats" aria-label="Library statistics"><div class="stat"><strong>68</strong><span>कक्षा 10वीं PDF</span></div><div class="stat"><strong>72</strong><span>कक्षा 12वीं PDF</span></div><div class="stat"><strong>60</strong><span>12वीं के नए अभ्यास सेट</span></div><div class="stat"><strong>70/80</strong><span>12वीं विषयवार पूर्णांक</span></div></section>
 <section class="card" id="vision-ka-saar">
 <h2>📗 VISION KA SAAR — Class 10 Maths &amp; Science</h2>
-<p class="subtle">नए, स्वतंत्र 75-अंक वाले गणित और विज्ञान अभ्यास पेपर। हर प्रश्न के बाद Step-by-Step हल, आसान उदाहरण, ज़रूरी Diagram, और सीधे PDF Download। पुरानी पुस्तक के फोटो या प्रकाशक की ब्रांडिंग यहाँ कॉपी नहीं की गई है।</p>
-<div class="actionrow"><a class="btn" href="../vision-ka-saar/?subject=Mathematics">📐 Maths — 75 Marks + Solutions</a><a class="btn secondary" href="../vision-ka-saar/?subject=Science">🔬 Science — 75 Marks + Solutions</a></div>
+<p class="subtle">नई स्वतंत्र गणित और विज्ञान 75-अंक की पुस्तकें, Step-by-Step हल और Diagram सहित। ये <strong>140 PDF वाली ऑफलाइन Saurabh’s Vision ऐप</strong> में भी हैं। नीचे 10वीं चुनकर इन्हें अन्य मॉडल पेपरों की तरह Preview और अलग Download कर सकते हैं।</p>
+<div class="actionrow"><a class="btn" href="./?grade=10&amp;subject=Mathematics&amp;type=saar&amp;set=01">📐 Maths — Preview / Download</a><a class="btn secondary" href="./?grade=10&amp;subject=Science&amp;type=saar&amp;set=01">🔬 Science — Preview / Download</a><a class="btn secondary" href="../vision-ka-saar/">📖 Interactive Solved Questions</a></div>
 </section>
 <section class="card"><h2>📖 अपना पेपर चुनें</h2>
 <div class="notice">कक्षा 12वीं के <strong>12 विषय (12 मूल + 60 अभ्यास सेट)</strong> व्यवस्थित हैं। पहले छह विषयों के मूल पेपर और अभ्यास सेट ऑनलाइन उपलब्ध हैं; सभी 12 विषयों का संग्रह जोड़ा गया है। PDF का Preview या Download तभी खुलेगा जब उसकी असली फाइल उपलब्ध होगी। Download तभी सक्रिय होगा जब वास्तविक PDF मौजूद होगी।</div>
 <div class="picker">
-<div class="field"><label for="grade">1. कक्षा</label><select id="grade"><option value="10">कक्षा 10वीं (66 PDF)</option><option value="12">कक्षा 12वीं (12 मूल + 60 नए सेट)</option></select></div>
+<div class="field"><label for="grade">1. कक्षा</label><select id="grade"><option value="10">कक्षा 10वीं (68 PDF)</option><option value="12">कक्षा 12वीं (12 मूल + 60 नए सेट)</option></select></div>
 <div class="field"><label for="subject">2. विषय</label><select id="subject"></select></div>
 <div class="field"><label for="series">3. पेपर का प्रकार</label><select id="series"><option value="full75">नए 75-अंक सेट • Step-by-Step</option><option value="original">अपलोड किया हुआ मूल 2025–26 पेपर</option><option value="mini30">पुराने 30-अंक अभ्यास सेट</option></select></div>
 <div class="field" id="paperSetBox"><label for="paperSet">4. सेट</label><select id="paperSet"></select></div>
@@ -114,14 +114,17 @@ function setStatus(message){el('status').textContent=message;}
 function disableDownload(){el('download').href='#';el('download').setAttribute('aria-disabled','true');el('download').tabIndex=-1;}
 async function clearPreview(){
  epoch++;drawNumber++;
+ // Invalidate the previous download *before* asynchronous PDF cleanup.
+ // Otherwise a quick subject/set switch can leave a stale downloadable file
+ // enabled until PdfJs destroy finishes.
+ el('pdfStage').hidden=true;el('readerToolbar').hidden=true;
+ el('pdfCanvas').width=0;el('pdfCanvas').height=0;
+ disableDownload();page=1;zoom=1;
  if(paintTask){try{paintTask.cancel();}catch{}paintTask=null;}
  const oldTask=loadTask;loadTask=null;
  const oldDoc=activeDocument;activeDocument=null;
  if(oldTask){try{await oldTask.destroy();}catch{}}
  else if(oldDoc){try{await oldDoc.destroy();}catch{}}
- el('pdfStage').hidden=true;el('readerToolbar').hidden=true;
- el('pdfCanvas').width=0;el('pdfCanvas').height=0;
- disableDownload();page=1;zoom=1;
 }
 function makeOptions(){
  for(let n=1;n<=5;n++)el('paperSet').append(new Option('सेट '+n,String(n).padStart(2,'0')));
@@ -141,11 +144,29 @@ function refreshChoices(){
         new Option('अपलोड किया हुआ मूल 2025–26 पेपर','original'),
         new Option('पुराने 30-अंक अभ्यास सेट','mini30'));
  }
+ updateVisionSaarOption();
  updateSelection();
+}
+// Keep the subject menu accurate: Vision Ka Saar exists only for Maths and Science.
+function updateVisionSaarOption(){
+ const series=el('series'),allowed=el('grade').value==='10'&&
+   ['Mathematics','Science'].includes(el('subject').value);
+ const existing=[...series.options].find(option=>option.value==='saar');
+ if(allowed&&!existing)series.add(new Option('🟠 Vision Ka Saar • 75 अंक • हल सहित','saar'));
+ if(!allowed&&existing){
+   if(series.value==='saar')series.value='full75';
+   existing.remove();
+ }
 }
 function pdfPath(){
  const grade=el('grade').value;
  const sub=el('subject').value, typ=el('series').value;
+ if(grade==='10'&&typ==='saar'){
+   const pdf=sub==='Mathematics'?'Vision_Ka_Saar_Class10_Maths_75_Marks_Solved.pdf':
+             sub==='Science'?'Vision_Ka_Saar_Class10_Science_75_Marks_Solved.pdf':null;
+   if(pdf)return '../vision-ka-saar/'+pdf;
+   throw new Error('This subject has no Vision Ka Saar PDF');
+ }
  if(grade==='12'){
     const name=typ==='original'?'Original_2025-26.pdf':'Practice_Set_'+el('paperSet').value+'.pdf';
     return './pdfs/Class_12/12_'+sub+'/'+name;
@@ -156,7 +177,7 @@ function pdfPath(){
 function updateSelection(){
  clearPreview();
  const grade=el('grade').value,typ=el('series').value;
- el('paperSetBox').hidden=typ==='original';
+ el('paperSetBox').hidden=typ==='original'||typ==='saar';
  if(grade==='12'){
     const selected=SUBJECTS12.find(x=>x.key===el('subject').value);
     const marks=selected?selected.marks:'70/80';
@@ -166,8 +187,9 @@ function updateSelection(){
  } else {
     const blocks={original:'2025–26 का अपलोड किया हुआ मूल पेपर • 75 अंक',
                   full75:'नया SAURABH’S VISION अभ्यास पेपर • 75 अंक • Step-by-Step Solutions',
-                  mini30:'छोटा स्वतंत्र अभ्यास सेट • 30 अंक'};
-    el('selectionInfo').textContent=blocks[typ]+(typ==='original'?'':' • पाँच में से सेट '+Number(el('paperSet').value));
+                  mini30:'छोटा स्वतंत्र अभ्यास सेट • 30 अंक',
+                  saar:'🟠 VISION KA SAAR • स्वतंत्र 75-अंक पेपर • Step-by-Step Solutions और Diagram'};
+    el('selectionInfo').textContent=blocks[typ]+(typ==='original'||typ==='saar'?'':' • पाँच में से सेट '+Number(el('paperSet').value));
  }
  setStatus('Preview दबाएँ — पहले PDF की ऑनलाइन उपलब्धता जाँची जाएगी।');
 }
@@ -242,7 +264,8 @@ for(const [id,multiplier] of [['less',1/1.2],['more',1.2]])el(id).addEventListen
  renderPage(epoch).catch(()=>setStatus('Zoom पर यह पेज नहीं खुल पाया।'));
 });
 el('grade').addEventListener('change',refreshChoices);
-for(const id of ['subject','series','paperSet'])el(id).addEventListener('change',updateSelection);
+el('subject').addEventListener('change',()=>{updateVisionSaarOption();updateSelection();});
+for(const id of ['series','paperSet'])el(id).addEventListener('change',updateSelection);
 /**
  * Batch ZIPs become downloadable only when GitHub Pages has actually published them.
  * Never offer a broken 404 as if the original uploaded PDFs were hosted already.
@@ -269,6 +292,7 @@ function restorePaperSelection(){
   el('grade').value=grade;refreshChoices();
   const subject=q.get('subject');
   if([...el('subject').options].some(o=>o.value===subject))el('subject').value=subject;
+  updateVisionSaarOption();
   const kind=q.get('type');
   if([...el('series').options].some(o=>o.value===kind))el('series').value=kind;
   const n=q.get('set');
