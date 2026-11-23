@@ -41,3 +41,11 @@ The generated independent practice sets are not officially released CGBSE papers
 ## Grifly linking
 
 Grifly beta **1.8.8** opens the online catalog in its WebView via the `Model Papers` quick tab and Study Tools tile. It retains the `Offline Papers` shortcut that looks for the installed v4.1.5 study APK (then older versions). Website PDFs and Android APKs are distinct distributions; a GitHub source merge does not automatically update already installed Android apps.
+
+## Class 12 source and guided papers (published with site)
+
+- 5 original CGBSE 2025–26 model PDF sources uploaded into `website/model-paper-library/pdfs/Class_12/12_<Subject>/Original_2025-26.pdf`.
+- 25 independently prepared worked practice papers uploaded as the ZIP `website/model-paper-library/packs/Class12_25_Practice_Sets_Step_By_Step.zip`; GitHub Pages workflow validates 25 exact paths and PDF signatures, extracts to `pdfs/Class_12/12_<Subject>/Practice_Set_01.pdf` … `05.pdf`.
+- Subjects / exact marks: Physics 70, Chemistry 70, Biology 70, Mathematics 80, English 80; all practice sets have separate question/solution sections, and science/math diagrams where relevant.
+- Those 30 Class 12 PDFs are separate from the not-yet-published Class 10 ZIP mentioned above. Class 12 originals and question practices are not to be mislabeled as 75-mark papers.
+- Independently written practice sets are **not** official CGBSE papers or official marking schemes; teacher review of solutions is encouraged.
