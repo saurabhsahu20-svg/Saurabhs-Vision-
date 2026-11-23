@@ -127,3 +127,12 @@ for token in ("value==='saar'","updateVisionSaarOption()","Vision_Ka_Saar_Class1
     assert token in model, 'Vision Ka Saar integrated library selector missing: '+token
 assert 'सभी 12 विषयों का संग्रह' in model, 'Class 12 catalog should remain available'
 print('PASS: 140-paper parity, Vision Ka Saar in subject selector, direct PDF links')
+
+# Website, Vision APK and Grifly 140-paper source catalog parity.
+reader=(root/'model-paper-library/index.html').read_text(encoding='utf-8')
+assert 'id="app-browser-parity"' in reader
+assert 'Offline 140 PDFs' in reader
+assert 'कक्षा 10वीं: 68 PDF' in reader and 'कक्षा 12वीं: 72 PDF' in reader
+assert 'vision-ka-saar/' in reader and 'releases' in reader
+assert 'डाउनलोड' not in reader or 'aria-disabled' in reader
+print('PASS: website Grifly/Vision 140-paper parity guide and safe PDF controls')
