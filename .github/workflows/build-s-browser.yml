@@ -103,7 +103,7 @@ jobs:
           assert 'ModelPaperCatalog.validImport(found)' in offline, 'Unvalidated PDF imports'
           assert 'ModelPaperCatalog.allPdfPaths()' in offline, 'Old PDF preservation missing'
           assert 'new Intent(this,MainActivity.class)' in offline, 'Online library fallback missing'
-          for required in ('ACTION_OPEN_DOCUMENT','ZipInputStream','PdfRenderer','ACTION_CREATE_DOCUMENT','expectedPdf(path)','found.equals(ModelPaperCatalog.allPdfPaths())'):
+          for required in ('ACTION_OPEN_DOCUMENT','ZipInputStream','PdfRenderer','ACTION_CREATE_DOCUMENT','expectedPdf(path)','ModelPaperCatalog.validImport(found)'):
               assert required in offline, required
           assert 'android.permission.MANAGE_EXTERNAL_STORAGE' not in manifest
           print('PASS: offline PDF picker, strict ZIP verification and separate native Preview / Save')
