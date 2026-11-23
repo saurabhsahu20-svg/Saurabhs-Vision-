@@ -287,6 +287,55 @@ jobs:
                 shutil.copyfileobj(src,out)
           print('Published all',len(pdfs),'Class 10 model paper PDFs:',total,'bytes.')
           PY
+      - name: Publish 25 Class 12 guided practice PDF sets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path, PurePosixPath
+          from zipfile import ZipFile
+          import os, shutil
+          zpath=Path('website/model-paper-library/packs/Class12_25_Practice_Sets_Step_By_Step.zip')
+          output=Path(os.environ['RUNNER_TEMP'])/'saurabh-site'/'model-paper-library'/'pdfs'
+          subjects=('Physics','Chemistry','Biology','Mathematics','English')
+          expected={
+            f'Class_12/12_{subject}/Practice_Set_{n:02d}.pdf'
+            for subject in subjects
+            for n in range(1,6)
+          }
+          original={
+            f'Class_12/12_{subject}/Original_2025-26.pdf'
+            for subject in subjects
+          }
+          if not zpath.is_file():
+            raise SystemExit('Class 12 guided-practice ZIP is required for this deployment')
+          total=0
+          with ZipFile(zpath) as archive:
+            names=[i.filename for i in archive.infolist() if not i.is_dir() and i.filename.lower().endswith('.pdf')]
+            if set(names)!=expected or len(names)!=25:
+              raise SystemExit(f'Class 12 archive must contain 25 unique exact PDFs, found {len(names)}')
+            for item in archive.infolist():
+              if item.is_dir() or not item.filename.lower().endswith('.pdf'):continue
+              if PurePosixPath(item.filename).is_absolute() or '..' in PurePosixPath(item.filename).parts or '\\' in item.filename:
+                raise SystemExit('Invalid Class 12 ZIP path: '+item.filename)
+              if item.file_size>5_000_000:
+                raise SystemExit('Invalid Class 12 PDF size: '+item.filename)
+              total+=item.file_size
+              if total>50_000_000:
+                raise SystemExit('Class 12 pack exceeds allowed size')
+              dest=output.joinpath(*PurePosixPath(item.filename).parts)
+              dest.parent.mkdir(parents=True,exist_ok=True)
+              with archive.open(item) as src, dest.open('wb') as out:
+                magic=src.read(5)
+                if magic!=b'%PDF-':raise SystemExit('Not a PDF: '+item.filename)
+                out.write(magic)
+                shutil.copyfileobj(src,out)
+          for name in original:
+            p=output.joinpath(*PurePosixPath(name).parts)
+            if not p.is_file() or p.read_bytes()[:5]!=b'%PDF-':
+              raise SystemExit('Missing original Class 12 paper: '+name)
+          print('Published',len(names),'independent Class 12 guided PDFs +',len(original),'original PDFs')
+          PY
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload static site

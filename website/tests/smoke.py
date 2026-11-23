@@ -38,3 +38,34 @@ assert 'model-paper-library/' in (root/'index.html').read_text(encoding='utf-8')
 assert 'model-paper-library/' in (root/'sitemap.xml').read_text(encoding='utf-8')
 assert '<iframe' not in model, 'Avoid Android inline PDF auto-download iframe'
 print('PASS: Class 10 model-paper library listing, manual preview and separate download')
+
+# The five owner-uploaded originals are binary-identical PDFs; Class 12 published
+# practice PDFs must use their true subject-specific 70- or 80-mark pattern.
+from zipfile import ZipFile
+import json
+class12_subjects=('Physics','Chemistry','Biology','Mathematics','English')
+root12=root/'model-paper-library'
+for subject in class12_subjects:
+ source=root12/'pdfs'/'Class_12'/('12_'+subject)/'Original_2025-26.pdf'
+ assert source.is_file(),f'missing Class 12 original: {subject}'
+ assert source.open('rb').read(5)==b'%PDF-',f'invalid original PDF: {subject}'
+pack=root12/'packs'/'Class12_25_Practice_Sets_Step_By_Step.zip'
+assert pack.is_file(),'missing Class 12 practice pack'
+expected={f'Class_12/12_{subject}/Practice_Set_{n:02d}.pdf'
+          for subject in class12_subjects for n in range(1,6)}
+with ZipFile(pack) as z:
+ pdfs={p for p in z.namelist() if p.endswith('.pdf')}
+ assert pdfs==expected and len(pdfs)==25,'Class 12 practice pack must have exactly 25 PDF files'
+ assert z.testzip() is None,'Class 12 pack ZIP CRC failed'
+ for name in expected:
+  with z.open(name) as item:
+   assert item.read(5)==b'%PDF-',f'Invalid PDF header: {name}'
+ manifest=json.loads(z.read('PAPER_MANIFEST.json'))
+ assert len(manifest['papers'])==25
+ for paper in manifest['papers']:
+  expected_marks=80 if paper['subject'] in ('Mathematics','English') else 70
+  assert paper['total_marks']==expected_marks,f'wrong exam marks for {paper}'
+for token in ('SUBJECTS12','Class_12/12_','Practice_Set_','marks:70','marks:80'):
+ assert token in model,f'missing online Class 12 selector: {token}'
+assert 'Class 10 & 12 Model Papers' in (root/'app.js').read_text(encoding='utf-8')
+print('PASS: 5 original Class 12 PDFs, 25 worked practice sets, subject-correct marks, PDF integrity and site links')
