@@ -369,13 +369,20 @@ jobs:
                 raise SystemExit('Generated ZIP failed integrity checks: '+filename)
           print('Published 6 source PDFs, 30 guided practice PDFs and three validated ZIP packs')
           PY
+      - name: Use a compatible Python for map and PDF generation
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Generate 30 more Class 12 full-mark practice PDFs
         shell: bash
         env:
           VISION_CLASS12_ROOT: ${{ runner.temp }}/vision-class12-additional
         run: |
           set -euo pipefail
-          python3 -m pip install --disable-pip-version-check --quiet weasyprint PyMuPDF matplotlib basemap
+          python -m pip install --upgrade --quiet pip setuptools wheel
+          python -m pip install --disable-pip-version-check --quiet weasyprint PyMuPDF matplotlib basemap
+          python -c "import sys; assert sys.version_info[:2] == (3,12), sys.version"
           python3 - <<'PY'
           from importlib.util import spec_from_file_location, module_from_spec
           from pathlib import Path, PurePosixPath
