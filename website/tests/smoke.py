@@ -117,3 +117,13 @@ for path in ('model-paper-library/index.html','index.html','sitemap.xml','board-
 builder=(root/'tests/build_vision_ka_saar_pdf.mjs').read_text(encoding='utf-8')
 assert "marks!==75" in builder and "page.pdf(" in builder
 print('PASS: Vision Ka Saar original Class 10 Maths/Science, PDF builder, navigation and no copied publisher branding')
+
+# Online and offline Saurabh Vision libraries agree on the published categories.
+model=(root/'model-paper-library/index.html').read_text(encoding='utf-8')
+assert '<strong>68</strong><span>कक्षा 10वीं PDF' in model, 'Class 10 should show 68 PDFs'
+assert '<strong>72</strong><span>कक्षा 12वीं PDF' in model, 'Class 12 should show 72 PDFs'
+for token in ("value==='saar'","updateVisionSaarOption()","Vision_Ka_Saar_Class10_Maths_75_Marks_Solved.pdf",
+              "Vision_Ka_Saar_Class10_Science_75_Marks_Solved.pdf","../vision-ka-saar/","typ==='original'||typ==='saar'"):
+    assert token in model, 'Vision Ka Saar integrated library selector missing: '+token
+assert 'सभी 12 विषयों का संग्रह' in model, 'Class 12 catalog should remain available'
+print('PASS: 140-paper parity, Vision Ka Saar in subject selector, direct PDF links')
