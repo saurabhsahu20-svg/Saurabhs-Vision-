@@ -446,6 +446,25 @@ jobs:
                 raise SystemExit('Invalid site download ZIP: '+archive_name)
           print('PASS: all 36 byte-verified owner Class 12 papers published (6 originals + 30 fully worked practice).')
           PY
+      - name: Build original Vision Ka Saar Maths and Science solved PDFs
+        shell: bash
+        run: |
+          set -euo pipefail
+          PUBLISH_DIR="$RUNNER_TEMP/saurabh-site"
+          test -f "$PUBLISH_DIR/vision-ka-saar/index.html"
+          mkdir -p "$PUBLISH_DIR/vision-ka-saar"
+          python3 -m http.server 8770 --bind 127.0.0.1 --directory "$PUBLISH_DIR" >/tmp/sv-vks-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in {1..25}; do
+            if curl -fsS http://127.0.0.1:8770/vision-ka-saar/ >/dev/null; then break; fi
+            sleep 1
+          done
+          VKS_SITE_URL=http://127.0.0.1:8770 \
+          VKS_OUTPUT_DIR="$PUBLISH_DIR/vision-ka-saar" \
+            node website/tests/build_vision_ka_saar_pdf.mjs
+          test -s "$PUBLISH_DIR/vision-ka-saar/Vision_Ka_Saar_Class10_Maths_75_Marks_Solved.pdf"
+          test -s "$PUBLISH_DIR/vision-ka-saar/Vision_Ka_Saar_Class10_Science_75_Marks_Solved.pdf"
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload static site
