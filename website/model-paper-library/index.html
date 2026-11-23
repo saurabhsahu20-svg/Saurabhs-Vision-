@@ -196,7 +196,6 @@ async function renderPage(whichEpoch){
 }
 el('view').addEventListener('click',async()=>{
  await clearPreview();
- if(el('grade').value!=='10')return;
  const myEpoch=epoch,url=pdfPath();
  setStatus('PDF की ऑनलाइन उपलब्धता जाँच रहे हैं…');
  try{
@@ -216,7 +215,7 @@ el('view').addEventListener('click',async()=>{
   if(myEpoch!==epoch)return;
   el('pdfStage').hidden=true;el('readerToolbar').hidden=true;
   setStatus(el('download').getAttribute('aria-disabled')==='true'?
-   '⚠️ इस PDF की फाइल अभी वेबसाइट पर प्रकाशित नहीं हुई है। यह ऑफलाइन Vision Study Test ऐप में उपलब्ध है।':
+   (el('grade').value==='12' ? '⚠️ कक्षा 12वीं की PDF अभी ऑनलाइन नहीं खुल रही। वेबसाइट का प्रकाशन/नेटवर्क जाँचें।' : '⚠️ इस 10वीं PDF की फाइल वेबसाइट पर प्रकाशित नहीं हुई है। यह ऑफलाइन Vision Study Test ऐप में उपलब्ध है।'):
    '⚠️ PDF ऑनलाइन है, पर Browser Preview नहीं खुला। अलग Download बटन इस्तेमाल करें।');
  }
 });
