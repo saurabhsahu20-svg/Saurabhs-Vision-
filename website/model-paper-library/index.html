@@ -111,11 +111,8 @@ function makeOptions(){
 }
 function refreshChoices(){
  const is12=el('grade').value==='12';
- const previous=el('subject').value;
  const options=(is12?SUBJECTS12:SUBJECTS10);
  el('subject').replaceChildren(...options.map(x=>new Option(x.label,x.key)));
- if(options.some(x=>x.key===previous))el('subject').value=previous;
- const oldType=el('series').value;
  if(is12){
     el('series').replaceChildren(
         new Option('नए विषयवार अभ्यास सेट • पूरे हल', 'practice'),
@@ -126,7 +123,6 @@ function refreshChoices(){
         new Option('अपलोड किया हुआ मूल 2025–26 पेपर','original'),
         new Option('पुराने 30-अंक अभ्यास सेट','mini30'));
  }
- if([...el('series').options].some(o=>o.value===oldType))el('series').value=oldType;
  updateSelection();
 }
 function pdfPath(){
