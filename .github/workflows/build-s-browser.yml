@@ -150,7 +150,7 @@ jobs:
           from pathlib import Path
           source=Path('s-browser/app/src/main/java/com/saurabhsvision/sbrowser/MainActivity.java').read_text(encoding='utf-8')
           assert 'VISION_PAPERS_URL' in source and 'model-paper-library/' in source, 'Online model-paper library link missing'
-          assert 'Offline ZIP 66' in source and 'openInstalledVisionModelPapers' in source, 'Offline model paper and owner app shortcuts missing'
+          assert 'Offline 140 PDFs' in source and 'openInstalledVisionModelPapers' in source, 'Offline model paper and owner app shortcuts missing'
           assert 'Saurabh Vision Learning App' in source, 'Owner learning shortcut missing'
           assert 'https://saurabhsahu20-svg.github.io/Saurabhs-Vision-/vision-app/' in source, 'Owner learning app URL missing'
           legacy=['https://ncert.nic.in/','https://www.khanacademy.org/','https://www.wikipedia.org/','https://scholar.google.com/']
