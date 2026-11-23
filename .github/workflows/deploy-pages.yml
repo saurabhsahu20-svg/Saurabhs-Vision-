@@ -373,7 +373,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-          cache: pip
 
       - name: Generate 30 more Class 12 full-mark practice PDFs
         shell: bash
