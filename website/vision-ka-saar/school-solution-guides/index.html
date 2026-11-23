@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Class 9–12 Solved Paper Guides — Vision Ka Saar</title>
+<meta name="description" content="Class 9–12 Social Science, Business Studies and Economics: 12 independent Set A/B study guides with explained MCQ answers and worked solutions.">
+<meta name="theme-color" content="#0a2f66">
+<style>
+:root{font-family:system-ui,'Noto Sans Devanagari',sans-serif;color:#16304f;color-scheme:light}
+*{box-sizing:border-box}body{margin:0;background:#f0f6fc;line-height:1.56}
+header{background:linear-gradient(125deg,#092c67,#175ca6);padding:26px 18px 35px;color:white}
+.container{max-width:1020px;margin:auto}header a{color:#d6faee}h1{font:750 clamp(27px,5vw,45px)/1.2 Georgia,serif;margin:8px 0}
+h2{font-size:20px;color:#113d74}main{padding:16px 16px 50px}
+p{margin:7px 0 13px}.muted{color:#4d6379}.notice{background:#fff8e5;padding:14px 18px;border-left:4px solid #b97b27;border-radius:10px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}select,button{font:inherit;padding:10px 12px;border:1px solid #bfd0e8;border-radius:10px;background:white;color:#0b3d7a}
+button{cursor:pointer;font-weight:700}button:focus-visible,select:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #42aaca;outline-offset:3px}
+.card{background:white;border:1px solid #dce6f5;padding:18px 20px;border-radius:16px;box-shadow:0 5px 22px #20466c10;margin:16px 0}
+.card h2{margin:0 0 3px}.chip{display:inline-block;background:#def7eb;border-radius:40px;padding:3px 10px;color:#0d644b;font-size:12px;font-weight:750}
+.key{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.key span{background:#e6f0ff;color:#17497e;border-radius:7px;padding:5px 9px;font-size:13px}
+.key span.flag{background:#fff0cf;color:#7d4d13}
+details{margin:9px 0;border:1px solid #d7e3f2;border-radius:12px;overflow:hidden}
+summary{cursor:pointer;font-weight:760;padding:10px 14px;background:#f2f7fe;color:#16457b}
+details ol{margin:10px 12px 13px;padding-left:28px}details li{margin:5px 0}
+footer{margin:26px 0;color:#52637a}a{color:#13599c}
+@media print{header,.filters,.no-print{display:none!important}.card,details{break-inside:avoid;box-shadow:none}details:not([open]){display:none}.notice{border:1px solid #ddd}}
+</style></head><body>
+<header><div class="container"><a href="../../">⌂ Saurabh's Vision</a> · <a href="../">Vision Ka Saar</a> · <a href="../../model-paper-library/">Model Papers</a>
+<h1>VISION KA SAAR</h1><p>Class 9–12 • 12 Set A/B • Step-by-Step Learning Guides</p>
+<p>Social Science · Business Studies · Economics • Independent explanations inspired by uploaded 100-mark assessments</p></div></header>
+<main class="container"><div class="notice"><b>Important:</b> These are supplementary learning guides, not official school answer keys or full solutions to every source question. The uploaded school papers are not reproduced publicly. Numerical questions with missing data and outdated/mistaken choices are flagged instead of guessed. Choose a set, reveal its explained answers and print/save as PDF for revision.</div>
+<div class="filters no-print"><label>Class<br><select id="grade" aria-label="Filter class"><option value="all">All classes</option><option>9</option><option>10</option><option>11</option><option>12</option></select></label>
+<label>Subject<br><select id="subject" aria-label="Filter subject"><option value="all">All subjects</option><option value="SST">Social Science</option><option value="BST">Business Studies</option><option value="ECO">Economics</option></select></label>
+<button type="button" id="print">🖨 Print / Save as PDF</button><button type="button" id="expand">Show all worked answers</button></div>
+<div id="count" class="muted" role="status"></div><div id="guides"></div>
+<footer><strong>VISION FLASH 💡</strong> — Read the question, write your own answer, compare the reasoning, then explain it aloud. The separate Saurabh’s Vision Test APK has the earlier 140 offline model papers; these twelve additional guided sets are new web study content, not yet inside that offline APK.</footer>
+</main>
+<script>
+'use strict';
+const topics={
+climate:['Weather describes short-term conditions like today’s rain and temperature.','Climate describes a place’s usual weather over many years, commonly evaluated across a 30-year reference period.','A daily thunderstorm is weather; a generally dry summer is a climate pattern.'],
+democracy:['Explain that adult citizens choose representatives through meaningful and periodic elections.','Mention equal voting rights, the rule of law, protection of fundamental rights and government accountability.','Contrast this with dictatorship, where citizens cannot freely replace the ruler.'],
+monsoon:['India’s south-west monsoon generally arrives in June and supplies much seasonal rainfall.','Farmers time Kharif sowing according to moisture and weather.','Rainwater harvesting, suitable crop choices and watershed protection can reduce drought risk.'],
+meiji:['The Tokugawa shogun exercised political and military authority while the emperor’s role was largely ceremonial.','The Meiji Restoration beginning in 1868 reorganised the central government and accelerated industrial, education and military reforms.','The Constitution promulgated in Japan in 1889 followed during the Meiji era.'],
+income:['Average income equals total income divided by population.','If group average rises from ₹4,000 to ₹5,000, the average rises by ₹1,000.','Individual incomes might move differently; do not claim that everyone earned ₹1,000 more.'],
+credit:['Institutional credit comes from formal banks and regulated cooperative institutions; traders and informal lenders are generally outside that category.','Compare rates, repayment terms, collateral, fees and borrower protections.','Borrowing responsibly means understanding total repayment cost, not just the monthly instalment.'],
+resources:['Renewable resources replenish naturally if managed sustainably; examples include sunlight and forests.','Non-renewable fuels and minerals form so slowly that reserves can be depleted.','Explain conservation methods such as recycling, responsible harvests and more efficient use.'],
+ww1:['Industrial development increased production, transport and military capabilities.','Imperial rivalry, nationalism, alliances and militarism increased international tension.','The 1914 assassination crisis triggered a wider European war, but industrialisation was not the only cause.'],
+business:['Business regularly produces or exchanges goods/services for economic objectives.','Profit is revenue minus costs and is one possible reward for taking business risks.','Planning, insurance and quality controls reduce but do not eliminate uncertainty.'],
+partnership:['A sole proprietor owns and controls a business individually, often with unlimited liability.','Partners create a business by agreement and share agreed rights, profits and responsibilities.','A partnership deed sets out contributions, profit-sharing, duties and disputes.'],
+ethics:['Explain honesty, fair pricing, safe work and reliable product information.','Responsibility to customers and workers can go beyond minimum legal compliance.','Ethical conduct builds trust and protects long-term reputation.'],
+ecommerce:['E-commerce means transactions through online electronic networks.','Explain online search, ordering, payment, delivery tracking and post-sale support.','Mention consumer benefits and risks such as fraud, privacy and delivery disputes.'],
+rbi:['The RBI is India’s central bank, conducts monetary policy and oversees regulated banks.','Commercial banks accept deposits and lend to customers; RBI performs central-bank functions.','Sound regulation and settlement systems support trust in credit and payments.'],
+management:['Planning sets objectives and selects a course of action.','Organising allocates tasks and authority; staffing recruits and develops people.','Directing guides and motivates workers, and controlling compares results with standards and corrects deviations.'],
+recruitment:['Recruitment attracts suitable applicants and is described as a positive process.','Selection assesses qualifications through fair tests, interviews and verification.','Induction and training follow the decision to hire.'],
+fayol:['Henri Fayol suggested 14 management principles, including division of work, unity of command, equity and discipline.','Explain a practical example of one principle rather than only naming it.','These are adaptable guidelines, not rigid natural laws.'],
+taylor:['Identify the task and scientifically study time and work methods.','Standardise tools, train people and remove needless motions while considering worker safety.','Use cooperation and feedback between managers and workers to improve outcomes.'],
+maslow:['Identify physiological, safety, social, esteem and self-actualisation needs.','In a workplace, fair pay and safety can support more basic needs; recognition and learning support other needs.','Explain that real individuals’ needs overlap and do not always follow a fixed sequence.'],
+tu:['Total utility is the combined satisfaction of consuming several units.','Marginal utility = change in total utility from the extra unit.','If total utility values are 0, 10, 18, 24, 28, 28, marginal utilities are 10, 8, 6, 4, 0; TU is maximum where MU reaches zero.'],
+mean:['Calculate each grouped class midpoint x = (lower+upper)/2.','Multiply each midpoint by its frequency f to obtain fx and sum all fx values.','Divide by Σf; label the final measurement and verify it lies within a plausible range.'],
+median:['Add frequencies and write cumulative frequencies.','Find the class containing N/2 and use Median = L + ((N/2 − cf)/f)×h.','Write all symbols: L is median-class lower boundary, cf preceding cumulative frequency, f class frequency, h class width.'],
+corr:['Pair x and y observations and find their means.','Calculate Σ(x−x̄)(y−ȳ), Σ(x−x̄)² and Σ(y−ȳ)².','Pearson r = Σdxdy/√(Σdx²Σdy²), lies between −1 and +1 and does not prove causation.'],
+index:['Add the base-year price list Σp₀ and current-year list Σp₁.','Use simple aggregative index P₀₁ = (Σp₁ / Σp₀) × 100.','Interpret 100 as the base-year index and do not mix years or units.'],
+national:['Identify factor incomes: compensation of employees, rent, interest and profit.','Add only the factor-income entries; exclude consumption and gross investment from income-method subtotal.','To move between domestic/national or gross/net measures, include NFIA, depreciation and taxes/subsidies where applicable.'],
+expenditure:['GDP by expenditure = C + I + G + (X − M).','Verify the dataset provides consumption, investment, government spending and exports minus imports.','Wages and rent are income-method components; without C, G and (X−M), a complete expenditure-method total cannot be found.'],
+stock:['A stock is measured at a point in time, such as capital on 31 March.','A flow is measured over a period, such as monthly income or yearly investment.','Always label the time period for flows.'],
+demand:['The law of demand usually links higher own price to lower quantity demanded with other conditions held constant.','Draw quantity on x-axis and price on y-axis; a standard demand curve slopes down.','Income, tastes, substitute prices and complementary prices shift demand.']
+};
+const cases=[
+{g:9,s:'SST',set:'A',key:['!region','b','a','b','b','a','b','c','c','b','b','c','b','c','a'],works:[['India’s monsoon and agriculture','monsoon'],['Meaning of democracy','democracy'],['Japan’s Meiji changes','meiji']]},
+{g:9,s:'SST',set:'B',key:['b','b','c','a','c','b','b','d','d','b','c','b','a','c','a'],works:[['Compare climate and weather','climate'],['Why fertile soil matters','resources'],['How democracy is different','democracy']]},
+{g:10,s:'SST',set:'A',key:['a','d','a','a','a','b','b','c','c','a','c','a','c','d','a'],works:[['Bank deposits and formal credit','credit'],['Renewable versus non-renewable resources','resources'],['How industrial rivalries contributed to World War I','ww1']]},
+{g:10,s:'SST',set:'B',key:['c','c','c','c','a','b','d','!unclear','b','b','b','!historical','b','a','d'],works:[['Average income and progress','income'],['Loans, collateral and interest','credit'],['Why topsoil protection matters','resources']]},
+{g:11,s:'BST',set:'A',key:['b','!outdated','c','d','!ambiguous'],works:[['Business risk and profit','business'],['Sole proprietorship and partnership','partnership'],['Business ethics in practice','ethics']]},
+{g:11,s:'BST',set:'B',key:['a','!outdated','!depends on year','c','b'],works:[['How online commerce works','ecommerce'],['RBI and commercial banks','rbi'],['Business social responsibilities','ethics']]},
+{g:11,s:'ECO',set:'A',key:['c','b','b','a','a','b','!unclear','c','a','a'],works:[['Mean from table: Σfx=2,800, N=100, mean=28','mean'],['Grouped median: 30+((12.5−9)/7)×10=35','median'],['2005–2010 price index: (1,060/930)×100≈113.98','index'],['Pearson correlation for supplied data ≈ +0.9074','corr']]},
+{g:11,s:'ECO',set:'B',key:['b','c','c','c','b','!incomplete','d','a','d','b'],works:[['Mean: Σfx=2,530, N=70, mean≈36.14','mean'],['Index: (95/60)×100≈158.33','index'],['Pearson age/weight coefficient ≈ +0.9815','corr'],['The final frequency in one median table is missing','median']]},
+{g:12,s:'BST',set:'A',key:['a','d','d','!no all-of-the-above','b','d','d','d','d','b'],works:[['Management steps and corrective control','management'],['Recruitment versus selection','recruitment'],['Fayol’s principles explained','fayol']]},
+{g:12,s:'BST',set:'B',key:['d','d','d','b','b','c','c','d','b','d'],works:[['Taylor’s work-study methods','taylor'],['Directing and controlling','management'],['Maslow’s motivation theory','maslow']]},
+{g:12,s:'ECO',set:'A',key:['b*','c','c*','a','d','a','b','c','b','a'],works:[['Factor income = 6000+2000+2000+1000 = ₹11,000','national'],['Expenditure-method dataset lacks C, G and exports/imports','expenditure'],['Difference between stocks and flows','stock']]},
+{g:12,s:'ECO',set:'B',key:['!quote attribution','d','a','d','b','b','d','b','d','b'],works:[['Income subtotal 15,000+5,000+25,000+5,000 = ₹50,000','national'],['Marginal utility illustration with graph instructions','tu'],['Law of demand and determinants','demand']]}
+];
+const names={SST:'Social Science',BST:'Business Studies',ECO:'Economics'};
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const grade=document.getElementById('grade'),subject=document.getElementById('subject'),holder=document.getElementById('guides'),count=document.getElementById('count');
+function render(){
+const chosen=cases.filter(d=>(grade.value==='all'||String(d.g)===grade.value)&&(subject.value==='all'||d.s===subject.value));
+holder.replaceChildren();count.textContent=chosen.length+' / 12 guided sets shown';
+for(const c of chosen){
+const card=document.createElement('section');card.className='card';
+const bad=c.key.map((x,i)=>({x,i})).filter(({x})=>x.startsWith('!'));
+const nums=c.key.map((x,i)=>'<span'+(x.startsWith('!')?' class="flag"':'')+'>'+(''+(i+1))+': '+esc(x.replace(/^!/,'Check: '))+'</span>').join('');
+card.innerHTML='<h2>Class '+c.g+' • '+esc(names[c.s])+' • Set '+c.set+'</h2><span class="chip">100-mark source • explained study guide</span><p class="muted">Opening objective answers in source order; expand the guided topics to learn the method.</p><div class="key">'+nums+'</div>'+(bad.length?'<p class="notice">⚠ '+bad.length+' answer choice(s) are outdated, incomplete or ambiguous; do not memorise a guessed letter.</p>':'');
+for(const [title,topic] of c.works){
+const d=document.createElement('details');d.innerHTML='<summary>'+esc(title)+'</summary><ol>'+topics[topic].map(x=>'<li>'+esc(x)+'</li>').join('')+'</ol>';card.appendChild(d);
+}
+holder.appendChild(card);
+}
+}
+grade.addEventListener('change',render);subject.addEventListener('change',render);
+document.getElementById('expand').addEventListener('click',()=>{const list=[...document.querySelectorAll('#guides details')],open=list.some(x=>!x.open);for(const d of list)d.open=open;});
+document.getElementById('print').addEventListener('click',()=>{for(const d of document.querySelectorAll('#guides details'))d.open=true;window.print();});
+const q=new URLSearchParams(location.search);
+if(['9','10','11','12'].includes(q.get('class')))grade.value=q.get('class');
+if(['SST','BST','ECO'].includes(q.get('subject')))subject.value=q.get('subject');
+render();
+</script></body></html>
