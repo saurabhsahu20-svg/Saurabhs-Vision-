@@ -279,6 +279,22 @@ await check('class10-model-library-preview-and-release-safety',async(page)=>{
   assert.equal(await page.locator('#subject option').count(),6,'Class 10 remains available');
   assert.equal(await page.locator('#series option').count(),3,'all Class 10 paper series preserved');
 });
+await check('class12-deep-link-restores-grade-subject-set', async page=>{
+  await goto(page,'model-paper-library/?grade=12&subject=Geography&type=practice&set=04');
+  assert.equal(await page.locator('#grade').inputValue(),'12');
+  assert.equal(await page.locator('#subject').inputValue(),'Geography');
+  assert.equal(await page.locator('#series').inputValue(),'practice');
+  assert.equal(await page.locator('#paperSet').inputValue(),'04');
+  assert.match(await page.locator('#selectionInfo').textContent(),/70 अंक/);
+  assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true',
+    'deep-linked paper must still validate published PDF before download');
+  await page.selectOption('#subject','History');
+  assert.equal(new URL(page.url()).searchParams.get('subject'),'History');
+  assert.match(await page.locator('#selectionInfo').textContent(),/80 अंक/);
+  await page.selectOption('#grade','10');
+  assert.equal(new URL(page.url()).searchParams.get('grade'),'10');
+  assert.equal(await page.locator('#subject option').count(),6);
+});
 await browser.close();
 if(failures)process.exitCode=1;
 else console.log('PASS: all 7 desktop/mobile Chromium browser flows (including Class 12)');
