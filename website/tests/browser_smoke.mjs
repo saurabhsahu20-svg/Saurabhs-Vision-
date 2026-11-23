@@ -300,7 +300,7 @@ await check('vision-ka-saar-class10-maths-science-stepwise-75-marks',async page=
   await goto(page,'vision-ka-saar/?subject=Mathematics');
   assert.match(await page.locator('#heading').textContent(),/Mathematics/);
   assert.equal(await page.locator('.item').count(),33,'math must contain 33 new questions');
-  assert.equal((await page.locator('.marks').allTextContents()).reduce((sum,text)=>sum+Number(text.match(/^\\d+/)?.[0]||0),0),75,'math paper totals 75 marks');
+  assert.equal((await page.locator('.marks').allTextContents()).reduce((sum,text)=>sum+parseInt(text,10),0),75,'math paper totals 75 marks');
   assert.equal(await page.locator('.answerbox').count(),33,'all math answers supplied');
   assert.equal(await page.locator('details[open]').count(),0,'no solutions revealed automatically');
   await page.locator('.item details summary').first().click();
@@ -308,7 +308,7 @@ await check('vision-ka-saar-class10-maths-science-stepwise-75-marks',async page=
   await page.locator('#sci').click();
   assert.equal(await page.locator('.item').count(),33,'science must contain 33 questions');
   assert.match(await page.locator('#heading').textContent(),/Science/);
-  assert.equal((await page.locator('.marks').allTextContents()).reduce((sum,text)=>sum+Number(text.match(/^\\d+/)?.[0]||0),0),75,'science paper totals 75 marks');
+  assert.equal((await page.locator('.marks').allTextContents()).reduce((sum,text)=>sum+parseInt(text,10),0),75,'science paper totals 75 marks');
   assert.ok(page.url().includes('subject=Science'),'subject URL stays shareable');
   await page.locator('#answers').click();
   assert.equal(await page.locator('details[open]').count(),33,'all science solutions can be opened');
