@@ -28,6 +28,7 @@ footer{margin:26px 0;color:#52637a}a{color:#13599c}
 <main class="container"><div class="notice"><b>Important:</b> These are supplementary learning guides, not official school answer keys or full solutions to every source question. The uploaded school papers are not reproduced publicly. Numerical questions with missing data and outdated/mistaken choices are flagged instead of guessed. Choose a set, reveal its explained answers and print/save as PDF for revision.</div>
 <div class="filters no-print"><label>Class<br><select id="grade" aria-label="Filter class"><option value="all">All classes</option><option>9</option><option>10</option><option>11</option><option>12</option></select></label>
 <label>Subject<br><select id="subject" aria-label="Filter subject"><option value="all">All subjects</option><option value="SST">Social Science</option><option value="BST">Business Studies</option><option value="ECO">Economics</option></select></label>
+<label>Set<br><select id="set" aria-label="Filter set"><option value="all">Both</option><option>A</option><option>B</option></select></label>
 <button type="button" id="print">🖨 Print / Save as PDF</button><button type="button" id="expand">Show all worked answers</button></div>
 <div id="count" class="muted" role="status"></div><div id="guides"></div>
 <footer><strong>VISION FLASH 💡</strong> — Read the question, write your own answer, compare the reasoning, then explain it aloud. The separate Saurabh’s Vision Test APK has the earlier 140 offline model papers; these twelve additional guided sets are new web study content, not yet inside that offline APK.</footer>
@@ -79,26 +80,27 @@ const cases=[
 ];
 const names={SST:'Social Science',BST:'Business Studies',ECO:'Economics'};
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const grade=document.getElementById('grade'),subject=document.getElementById('subject'),holder=document.getElementById('guides'),count=document.getElementById('count');
+const grade=document.getElementById('grade'),subject=document.getElementById('subject'),paperSet=document.getElementById('set'),holder=document.getElementById('guides'),count=document.getElementById('count');
 function render(){
-const chosen=cases.filter(d=>(grade.value==='all'||String(d.g)===grade.value)&&(subject.value==='all'||d.s===subject.value));
+const chosen=cases.filter(d=>(grade.value==='all'||String(d.g)===grade.value)&&(subject.value==='all'||d.s===subject.value)&&(paperSet.value==='all'||d.set===paperSet.value));
 holder.replaceChildren();count.textContent=chosen.length+' / 12 guided sets shown';
 for(const c of chosen){
 const card=document.createElement('section');card.className='card';
 const bad=c.key.map((x,i)=>({x,i})).filter(({x})=>x.startsWith('!'));
 const nums=c.key.map((x,i)=>'<span'+(x.startsWith('!')?' class="flag"':'')+'>'+(''+(i+1))+': '+esc(x.replace(/^!/,'Check: '))+'</span>').join('');
-card.innerHTML='<h2>Class '+c.g+' • '+esc(names[c.s])+' • Set '+c.set+'</h2><span class="chip">100-mark source • explained study guide</span><p class="muted">Opening objective answers in source order; expand the guided topics to learn the method.</p><div class="key">'+nums+'</div>'+(bad.length?'<p class="notice">⚠ '+bad.length+' answer choice(s) are outdated, incomplete or ambiguous; do not memorise a guessed letter.</p>':'');
+card.innerHTML='<h2>Class '+c.g+' • '+esc(names[c.s])+' • Set '+c.set+'</h2><span class="chip">100-mark source • explained study guide</span><p class="muted">Opening objective answers in source order; expand the guided topics to learn the method.</p><p class="no-print"><a href="./pdfs/Vision_Ka_Saar_Class_'+c.g+'_'+c.s+'_Set_'+c.set+'_Online_Guide.pdf" download>⬇ Download this guided set as PDF</a></p><div class="key">'+nums+'</div>'+(bad.length?'<p class="notice">⚠ '+bad.length+' answer choice(s) are outdated, incomplete or ambiguous; do not memorise a guessed letter.</p>':'');
 for(const [title,topic] of c.works){
 const d=document.createElement('details');d.innerHTML='<summary>'+esc(title)+'</summary><ol>'+topics[topic].map(x=>'<li>'+esc(x)+'</li>').join('')+'</ol>';card.appendChild(d);
 }
 holder.appendChild(card);
 }
 }
-grade.addEventListener('change',render);subject.addEventListener('change',render);
+grade.addEventListener('change',render);subject.addEventListener('change',render);paperSet.addEventListener('change',render);
 document.getElementById('expand').addEventListener('click',()=>{const list=[...document.querySelectorAll('#guides details')],open=list.some(x=>!x.open);for(const d of list)d.open=open;});
 document.getElementById('print').addEventListener('click',()=>{for(const d of document.querySelectorAll('#guides details'))d.open=true;window.print();});
 const q=new URLSearchParams(location.search);
 if(['9','10','11','12'].includes(q.get('class')))grade.value=q.get('class');
 if(['SST','BST','ECO'].includes(q.get('subject')))subject.value=q.get('subject');
+if(['A','B'].includes(q.get('set')))paperSet.value=q.get('set');
 render();
 </script></body></html>
