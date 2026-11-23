@@ -136,3 +136,17 @@ assert 'कक्षा 10वीं: 68 PDF' in reader and 'कक्षा 12�
 assert 'vision-ka-saar/' in reader and 'releases' in reader
 assert 'डाउनलोड' not in reader or 'aria-disabled' in reader
 print('PASS: website Grifly/Vision 140-paper parity guide and safe PDF controls')
+
+# The new 12 class 9–12 supplementary guides must remain accessible and honest.
+solution_html=(root/'vision-ka-saar/school-solution-guides/index.html').read_text(encoding='utf-8')
+assert 'Class 9–12' in solution_html and 'cases=[' in solution_html
+assert solution_html.count("{g:9,s:'SST'")==2
+assert solution_html.count("{g:10,s:'SST'")==2
+for grade,sub in [(11,'BST'),(11,'ECO'),(12,'BST'),(12,'ECO')]:
+ assert solution_html.count("{g:%d,s:'%s'"%(grade,sub))==2
+assert 'summative assessment' not in solution_html.lower()
+assert 'gudhiyari' not in solution_html.lower()
+assert 'not official school answer keys' in solution_html.lower()
+for page in ('vision-ka-saar/index.html','model-paper-library/index.html','index.html','sitemap.xml'):
+ assert 'school-solution-guides/' in (root/page).read_text(encoding='utf-8'),page
+print('PASS: all 12 independent Class 9-12 stepwise guide sets, transparency, navigation and clean branding')
