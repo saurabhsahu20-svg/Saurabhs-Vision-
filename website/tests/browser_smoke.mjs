@@ -383,6 +383,27 @@ await check('vision-app-grifly-140-study-library-links',async page=>{
   assert.equal(await page.locator('#download').getAttribute('aria-disabled'),'true',
     'Do not offer a PDF without verifying published asset');
 });
+await check('twelve-vision-ka-saar-guided-sets-mobile-filter-and-explanations', async page=>{
+  await page.setViewportSize({width:390,height:844});
+  await goto(page,'vision-ka-saar/school-solution-guides/');
+  assert.match(await page.locator('h1').textContent(),/VISION KA SAAR/);
+  assert.equal(await page.locator('#guides .card').count(),12,'all 12 set cards expected');
+  assert.match(await page.locator('#count').textContent(),/12 \/ 12/);
+  await page.selectOption('#grade','11');
+  await page.selectOption('#subject','ECO');
+  assert.equal(await page.locator('#guides .card').count(),2);
+  assert.match(await page.locator('#guides .card').first().textContent(),/Economics/);
+  assert.equal(await page.locator('#guides details[open]').count(),0,'do not reveal answers by default');
+  await page.locator('#expand').click();
+  assert.ok(await page.locator('#guides details[open]').count()>=6);
+  await page.selectOption('#grade','9');
+  assert.equal(await page.locator('#guides .card').count(),0,'no Class 9 Economics set');
+  await page.selectOption('#subject','SST');
+  assert.equal(await page.locator('#guides .card').count(),2,'two Class 9 Social Science sets');
+  await page.selectOption('#grade','12');
+  await page.selectOption('#subject','BST');
+  assert.equal(await page.locator('#guides .card').count(),2,'two Class 12 Business Studies sets');
+});
 await browser.close();
 if(failures)process.exitCode=1;
-else console.log('PASS: all 7 desktop/mobile Chromium browser flows (including Class 12)');
+else console.log('PASS: all 8 desktop/mobile Chromium browser flows (including Class 9–12 guided sets)');
