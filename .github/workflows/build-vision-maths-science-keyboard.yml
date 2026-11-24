@@ -244,6 +244,14 @@ jobs:
           assert 'suggestionHandler.postDelayed(suggestionRefresh,16L)' in ime
           assert 'b.setStateListAnimator(null)' in ime
           assert 'if(inside&&!held[0])view.performClick();' in ime
+          assert 'private int backspaceGeneration=0;' in ime
+          assert 'if(generation!=backspaceGeneration||!keyboardVisible)return;' in ime
+          assert 'backspaceInside[0]=false;stopRepeat();' in ime
+          assert 'if(allowed&&!backspaceRepeated){feedback(view);deleteOne();}' in ime
+          assert 'UnicodeDeletion.backspaceUnits(before)' in ime
+          assert 'conn.performEditorAction(action))return;' in ime
+          assert 'KeyEvent.KEYCODE_ENTER' in ime
+          assert (root/'java/com/saurabhsvision/keyboard/UnicodeDeletion.java').is_file()
           assert ime.count('addKey(row,"?123","123",1.05f,height,true);')==1, "Only left ?123 button should remain"
           # Familiar Gboard-style ABC access on both number and extended symbol pages.
           assert 'else if(mode==NUMBER||mode==SYMBOLS){' in ime
@@ -275,7 +283,7 @@ jobs:
           import hashlib
           logo_digest=hashlib.sha256((root/'res/drawable-nodpi/s_board_logo.webp').read_bytes()).hexdigest()
           assert logo_digest=='f7196693962b5f3e509b271f5451988ec0ebaf1f0d95b7e11cec62bce2a7fc9a', 'Wrong (old) S Board icon'
-          assert 'versionCode 30' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
+          assert 'versionCode 31' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
           assert (root/'java/com/saurabhsvision/keyboard/SBoardKeyButton.java').is_file()
           assert 'Toggle Smart Suggestions' in activity
           assert 'setMeasuredDimension(width,Math.min(cap' in panel
@@ -317,6 +325,17 @@ jobs:
           assert 'extends View' in bg
           print('Keyboard functional/input/privacy contracts checked.')
           PY
+
+      - name: Unicode-safe backspace regression — Hindi, Latin and emoji
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="vision-maths-science-keyboard"
+          src="$base/app/src/main/java/com/saurabhsvision/keyboard"
+          out="$RUNNER_TEMP/s-board-backspace-test"
+          mkdir -p "$out"
+          javac -encoding UTF-8 -d "$out" "$src/UnicodeDeletion.java" "$base/UnicodeDeletionSmokeTest.java"
+          java -ea -cp "$out" UnicodeDeletionSmokeTest
 
       - name: Test all theme palettes and Cartoon Friends emoji data
         shell: bash
@@ -419,7 +438,7 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.20_RAINBOW_ICON.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.21_TOUCH_RELIABILITY.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Include Android apksigner utility in CI artifact for privately signed updates
@@ -431,7 +450,7 @@ jobs:
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_20_RAINBOW_ICON_APK
+          name: S_Board_v1_9_21_TOUCH_RELIABILITY_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -441,14 +460,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.20-rainbow-icon"
-          file="keyboard-deliverables/S_Board_v1.9.20_RAINBOW_ICON.apk"
+          tag="s-board-v1.9.21-reliability"
+          file="keyboard-deliverables/S_Board_v1.9.21_TOUCH_RELIABILITY.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board v1.9.20 • Rainbow S Icon" \
-              --notes "Original user-provided Rainbow S Board icon integrated into launcher, S Board keyboard toolbar and app splash branding. Maintains all typing tools, voice typing, clipboard, 51 themes, 54 stickers, settings and native IME features from v1.9.19. Android source icon is optimized as compact WebP for repository builds. This GitHub Actions APK is DEBUG-SIGNED and cannot update a privately stable-signed installation in place. If you installed a Stable-signed S Board, use the separately distributed matching-certificate Stable APK, not this GitHub debug APK. No user keystore or signing secrets are included in this public repository." \
+              --title "S Board v1.9.21 • Fast Touch & Reliability" \
+              --notes "A minimal, tested S Board maintenance release. Keeps the exact rainbow S launcher, splash and keyboard artwork; the same package ID; all 51 themes and 54 sticker designs; word suggestions; Voice Typing; clipboard; emoji; Hindi/Hinglish; layouts, Maths and Science. Fixes accidental Backspace after dragging outside the key, ignores additional fingers for Backspace, prevents stale key-repeat callbacks after keyboard close or touch cancel, deletes whole Unicode emoji surrogate pairs when an editor does not support code-point deletion, and uses an Enter key event fallback only if a host editor rejects the IME action. No appearance, permission, or user setting is changed. GitHub APK is DEBUG-signed and cannot update a Stable-signed installation in place. Use the matching-certificate Stable v1.9.21 APK separately distributed for in-place upgrades. No private signing key or secrets are published in GitHub." \
               --latest=false
           fi
 
@@ -474,7 +493,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_1_9_20_Android_Rainbow_Icon_Audit
+          name: S_Board_1_9_21_Android_Touch_Reliability_Audit
           path: |
             /tmp/sboard-portrait.png
             /tmp/sboard-landscape.png
