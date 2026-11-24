@@ -122,6 +122,9 @@ jobs:
           assert 'String[] ids={"ABC","123","∑ Math","⚛ Sci","😊","🌐","🎨","⚙","📋","🧩"}' in ime
           assert 'ThemeStickerSelfTestActivity' in Path('vision-maths-science-keyboard/app/src/debug/AndroidManifest.xml').read_text()
           assert 'ThemeStickerSelfTestActivity' not in manifest
+          debugmanifest=Path('vision-maths-science-keyboard/app/src/debug/AndroidManifest.xml').read_text()
+          assert 'StickerGalleryTestAlias' in debugmanifest
+          assert 'StickerGalleryTestAlias' not in manifest
           assert 'READ_CLIPBOARD' not in manifest
           assert 'android.permission.RECORD_AUDIO' in manifest
           assert 'android.speech.RecognitionService' in manifest
@@ -436,7 +439,7 @@ jobs:
         shell: bash
         run: |
           cd vision-maths-science-keyboard
-          gradle --no-daemon --stacktrace :app:assembleDebug
+          gradle --no-daemon --stacktrace :app:assembleDebug :app:assembleRelease
 
       - name: Validate installable APK, manifest and signature
         shell: bash
@@ -451,6 +454,17 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
           cp "$apk" keyboard-deliverables/S_Board_v1.9.23_VISIBLE_STICKERS.apk
+          # Private Stable signing uses the production variant. Never ship
+          # debug-only exported activity aliases in the Stable APK.
+          production="vision-maths-science-keyboard/app/build/outputs/apk/release/app-release-unsigned.apk"
+          test -s "$production"
+          unzip -t "$production" | tail -1
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$production" | grep "package: name='com.saurabhsvision.keyboard'"
+          if "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$production" AndroidManifest.xml | grep -q "StickerGalleryTestAlias"; then
+            echo "FAIL: debug-test alias leaked into production manifest"
+            exit 1
+          fi
+          cp "$production" keyboard-deliverables/S_Board_v1.9.23_PRODUCTION_UNSIGNED_FOR_STABLE_SIGNING.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Include Android apksigner utility in CI artifact for privately signed updates
