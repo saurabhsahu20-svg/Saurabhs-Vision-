@@ -25,7 +25,7 @@ public final class StickerProvider extends ContentProvider {
             !"s".equals(uri.getPathSegments().get(0)))
             throw new IllegalArgumentException("Invalid sticker URI");
         String part=uri.getLastPathSegment();
-        if(part==null||!part.matches("[0-9]{1,2}"))
+        if(part==null||!part.matches("[0-9]{1,3}"))
             throw new IllegalArgumentException("Invalid sticker ID");
         int id=Integer.parseInt(part);
         if(id<0||id>=StickerCatalog.count())
