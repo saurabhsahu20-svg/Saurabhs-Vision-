@@ -100,7 +100,7 @@ public final class VisionKeyboardService extends InputMethodService {
     private TextView clipboardShortcut;
     private boolean clipboardObserverRegistered=false;
     private boolean keyboardVisible=false;
-    private int stickerPack=0;
+    private int stickerPack=9;
     private final ClipboardManager.OnPrimaryClipChangedListener clipboardObserver=()->onClipboardChanged();
 
     @Override public void onCreate(){
@@ -434,7 +434,7 @@ public final class VisionKeyboardService extends InputMethodService {
                     openClipboardPanel();
                 }else if(index==9){
                     finishRomanWord();
-                    mode=STICKERS;stickerPack=0;toolbarExpanded=false;rebuild();
+                    mode=STICKERS;stickerPack=9;toolbarExpanded=false;rebuild();
                 }else{
                     finishRomanWord();
                     Intent intent=new Intent(this,MainActivity.class);
@@ -800,7 +800,7 @@ public final class VisionKeyboardService extends InputMethodService {
         clipboardRow(header,abc,.70f);
         abc.setOnClickListener(v->{feedback(v);mode=ABC;rebuild();});
         TextView title=new TextView(this);
-        title.setText("🧩 "+StickerCatalog.PACKS[stickerPack]);
+        title.setText("🧩 "+StickerCatalog.PACKS[stickerPack]+"  ·  "+StickerCatalog.itemsInPack(stickerPack));
         title.setTextSize(16);
         title.setGravity(Gravity.CENTER);
         title.setTextColor(light()?0xff173354:Color.WHITE);
@@ -833,32 +833,78 @@ public final class VisionKeyboardService extends InputMethodService {
         }
         chooser.addView(packs);
         keysContent.addView(chooser,new LinearLayout.LayoutParams(-1,dp(39)));
+        // The six original new mood categories are visible by default.
+        // Existing packs retain all their IDs and remain reachable by swipe.
+        chooser.post(()->{
+            if(chooser.getParent()!=null)chooser.scrollTo(
+                dp(Math.max(0,stickerPack-1)*117),0);
+        });
 
-        int size=dp(getResources().getConfiguration().orientation==2?57:72);
-        for(int row=0;row<2;row++){
+        // Three-column scrollable gallery: 12 artworks per new mood pack,
+        // six legacy stickers per original pack. It occupies a fixed IME
+        // viewport so the editor and phone navigation never get covered.
+        ScrollView stickerGallery=new ScrollView(this);
+        stickerGallery.setFillViewport(false);
+        stickerGallery.setVerticalScrollBarEnabled(false);
+        stickerGallery.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
+        LinearLayout galleryGrid=new LinearLayout(this);
+        galleryGrid.setOrientation(LinearLayout.VERTICAL);
+        int cellHeight=dp(getResources().getConfiguration().orientation==2?65:83);
+        int total=StickerCatalog.itemsInPack(stickerPack);
+        for(int row=0;row<(total+2)/3;row++){
             LinearLayout line=new LinearLayout(this);
             line.setGravity(Gravity.CENTER_VERTICAL);
             for(int col=0;col<3;col++){
-                int index=StickerCatalog.id(stickerPack,row*3+col);
+                final int offset=row*3+col;
+                if(offset>=total){
+                    line.addView(new View(this),
+                        new LinearLayout.LayoutParams(0,cellHeight,1f));
+                    continue;
+                }
+                final int index=StickerCatalog.id(stickerPack,offset);
                 LinearLayout tile=new LinearLayout(this);
                 tile.setOrientation(LinearLayout.VERTICAL);
                 tile.setGravity(Gravity.CENTER);
-                tile.setContentDescription("Insert "+StickerCatalog.text(index)+" sticker image");
-                Bitmap bitmap=StickerCatalog.draw(index,184);
-                ImageView imageView=new ImageView(this);
-                imageView.setImageBitmap(bitmap);
-                imageView.setAdjustViewBounds(true);
-                imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                tile.addView(imageView,new LinearLayout.LayoutParams(-1,size));
-                LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,size+dp(4),1f);
-                lp.setMargins(dp(3),0,dp(3),0);
-                line.addView(tile,lp);
+                GradientDrawable tileBg=new GradientDrawable();
+                tileBg.setColor(stickerPack>=9?0xfffbfcff:
+                    (light()?0xffedf2fa:0xff224254));
+                tileBg.setCornerRadius(dp(13));
+                tileBg.setStroke(dp(1),
+                    light()?0xffbfcadb:0xff438497);
+                tile.setBackground(new RippleDrawable(
+                    ColorStateList.valueOf(0x443f88bb),tileBg,null));
+                tile.setContentDescription("Send "+StickerCatalog.text(index)+
+                    " original sticker image");
+                ImageView artwork=new ImageView(this);
+                artwork.setImageBitmap(StickerCatalog.preview(index,176));
+                artwork.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                artwork.setAdjustViewBounds(false);
+                tile.addView(artwork,new LinearLayout.LayoutParams(-1,
+                    cellHeight-dp(18)));
+                TextView caption=new TextView(this);
+                caption.setText(StickerCatalog.text(index));
+                caption.setSingleLine(true);
+                caption.setEllipsize(android.text.TextUtils.TruncateAt.END);
+                caption.setTextSize(10);
+                caption.setTextColor(stickerPack>=9?0xff263447:
+                    (light()?0xff23344c:Color.WHITE));
+                caption.setGravity(Gravity.CENTER);
+                tile.addView(caption,new LinearLayout.LayoutParams(-1,dp(16)));
+                LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(
+                    0,cellHeight-dp(3),1f);
+                params.setMargins(dp(3),dp(2),dp(3),dp(1));
+                line.addView(tile,params);
                 tile.setOnClickListener(v->{feedback(v);sendSticker(index);});
             }
-            keysContent.addView(line,new LinearLayout.LayoutParams(-1,size+dp(8)));
+            galleryGrid.addView(line,
+                new LinearLayout.LayoutParams(-1,cellHeight));
         }
+        stickerGallery.addView(galleryGrid);
+        keysContent.addView(stickerGallery,new LinearLayout.LayoutParams(-1,
+            dp(getResources().getConfiguration().orientation==2?108:171)));
+
         TextView hint=new TextView(this);
-        hint.setText("Tap a sticker to send a PNG where supported; other apps get emoji text.");
+        hint.setText("Swipe for more original stickers · PNG where supported, emoji text elsewhere.");
         hint.setTextSize(11);hint.setGravity(Gravity.CENTER);
         hint.setMaxLines(2);
         hint.setTextColor(light()?0xff334b66:0xffc1e8f6);
