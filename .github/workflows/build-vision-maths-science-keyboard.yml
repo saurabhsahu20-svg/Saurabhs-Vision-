@@ -88,7 +88,7 @@ jobs:
           assert 'ThemeArtwork.drawOverlay' in (root/'java/com/saurabhsvision/keyboard/KeyboardBackdrop.java').read_text()
           assert 'Landscapes' in gallery and 'Originals' in gallery
           assert '51 original' in activity
-          assert '54 original' in activity
+          assert '126 original' in activity
           assert 'packCount()' in stickers and 'Comic Faces' in stickers
           assert 'android.permission.INTERNET' not in manifest
           theme=(root/'java/com/saurabhsvision/keyboard/ThemePalette.java').read_text()
@@ -283,7 +283,7 @@ jobs:
           import hashlib
           logo_digest=hashlib.sha256((root/'res/drawable-nodpi/s_board_logo.webp').read_bytes()).hexdigest()
           assert logo_digest=='f7196693962b5f3e509b271f5451988ec0ebaf1f0d95b7e11cec62bce2a7fc9a', 'Wrong (old) S Board icon'
-          assert 'versionCode 31' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
+          assert 'versionCode 32' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
           assert (root/'java/com/saurabhsvision/keyboard/SBoardKeyButton.java').is_file()
           assert 'Toggle Smart Suggestions' in activity
           assert 'setMeasuredDimension(width,Math.min(cap' in panel
@@ -438,7 +438,7 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.21_TOUCH_RELIABILITY.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.22_MOOD_STICKERS.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Include Android apksigner utility in CI artifact for privately signed updates
@@ -450,7 +450,7 @@ jobs:
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_21_TOUCH_RELIABILITY_APK
+          name: S_Board_v1_9_22_MOOD_STICKERS_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -460,14 +460,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.21-reliability"
-          file="keyboard-deliverables/S_Board_v1.9.21_TOUCH_RELIABILITY.apk"
+          tag="s-board-v1.9.22-mood-stickers"
+          file="keyboard-deliverables/S_Board_v1.9.22_MOOD_STICKERS.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board v1.9.21 • Fast Touch & Reliability" \
-              --notes "A minimal, tested S Board maintenance release. Keeps the exact rainbow S launcher, splash and keyboard artwork; the same package ID; all 51 themes and 54 sticker designs; word suggestions; Voice Typing; clipboard; emoji; Hindi/Hinglish; layouts, Maths and Science. Fixes accidental Backspace after dragging outside the key, ignores additional fingers for Backspace, prevents stale key-repeat callbacks after keyboard close or touch cancel, deletes whole Unicode emoji surrogate pairs when an editor does not support code-point deletion, and uses an Enter key event fallback only if a host editor rejects the IME action. No appearance, permission, or user setting is changed. GitHub APK is DEBUG-signed and cannot update a Stable-signed installation in place. Use the matching-certificate Stable v1.9.21 APK separately distributed for in-place upgrades. No private signing key or secrets are published in GitHub." \
+              --title "S Board v1.9.22 - Original Mood Stickers" \
+              --notes "Adds 72 original transparent PNG stickers across Love, Morning, Laugh, Sadness, Sleep and Other. The nine existing sticker packs and 54 designs remain unchanged. A scrollable three-column gallery and lightweight preview cache keep touch response smooth. All existing keyboard layouts, rainbow S branding, themes, and typing tools remain. Public GitHub APK uses debug signing; Stable APK uses the earlier Stable signing certificate." \
               --latest=false
           fi
 
@@ -493,7 +493,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_1_9_21_Android_Touch_Reliability_Audit
+          name: S_Board_1_9_22_Android_Mood_Stickers_Audit
           path: |
             /tmp/sboard-portrait.png
             /tmp/sboard-landscape.png
