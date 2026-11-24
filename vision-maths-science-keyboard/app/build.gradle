@@ -8,8 +8,8 @@ android {
         applicationId 'com.saurabhsvision.keyboard'
         minSdk 23
         targetSdk 34
-        versionCode 32
-        versionName '1.9.22'
+        versionCode 33
+        versionName '1.9.23'
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
