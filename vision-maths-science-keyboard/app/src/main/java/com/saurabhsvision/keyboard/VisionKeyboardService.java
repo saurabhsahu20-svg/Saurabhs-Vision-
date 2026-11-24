@@ -83,6 +83,8 @@ public final class VisionKeyboardService extends InputMethodService {
     private final Handler repeatHandler=new Handler(Looper.getMainLooper());
     private boolean backspaceRepeated=false;
     private Runnable backspaceRepeat;
+    // Invalidates repeat tasks if a touch ends, is cancelled, or changes editor.
+    private int backspaceGeneration=0;
     private boolean haptics=false;
     // Read user options once when composing the keyboard, not on every key.
     private boolean keyPopups=false,largeKeyText=true,keySound=false;
@@ -1510,16 +1512,39 @@ public final class VisionKeyboardService extends InputMethodService {
         // user-selected timer; they never rely on Android's fixed timeout.
         final String[] alternatives=longPressAlternatives(output);
         if("⌫".equals(output)){
+            // A swipe off the key is a cancellation, not a deletion.
+            // Do not perform an extra delete after long-press repetition.
+            final boolean[] backspaceInside={false};
             b.setOnTouchListener((view,event)->{
                 switch(event.getActionMasked()){
                     case MotionEvent.ACTION_DOWN:
-                        backspaceRepeated=false;view.setPressed(true);startRepeat();
+                        backspaceInside[0]=true;
+                        backspaceRepeated=false;
+                        view.setPressed(true);
+                        startRepeat();
+                        return true;
+                    case MotionEvent.ACTION_POINTER_DOWN:
+                        // Ignore additional fingers rather than doubling the delete.
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        boolean inside=event.getX()>=0&&event.getY()>=0&&
+                            event.getX()<view.getWidth()&&event.getY()<view.getHeight();
+                        if(!inside&&backspaceInside[0]){
+                            backspaceInside[0]=false;stopRepeat();
+                        }
+                        view.setPressed(inside&&backspaceInside[0]);
                         return true;
                     case MotionEvent.ACTION_CANCEL:
-                        stopRepeat();view.setPressed(false);return true;
-                    case MotionEvent.ACTION_UP:
+                        backspaceInside[0]=false;
                         stopRepeat();view.setPressed(false);
-                        if(!backspaceRepeated){feedback(view);deleteOne();}
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        boolean allowed=backspaceInside[0]&&
+                            event.getX()>=0&&event.getY()>=0&&
+                            event.getX()<view.getWidth()&&event.getY()<view.getHeight();
+                        backspaceInside[0]=false;
+                        stopRepeat();view.setPressed(false);
+                        if(allowed&&!backspaceRepeated){feedback(view);deleteOne();}
                         return true;
                     default:return true;
                 }
@@ -1632,17 +1657,20 @@ public final class VisionKeyboardService extends InputMethodService {
     }
     private void startRepeat(){
         stopRepeat();
+        final int generation=backspaceGeneration;
         backspaceRepeat=new Runnable(){
-            boolean first=true;
             @Override public void run(){
-                if(first){first=false;backspaceRepeated=true;}
+                if(generation!=backspaceGeneration||!keyboardVisible)return;
+                backspaceRepeated=true;
                 deleteOne();
-                repeatHandler.postDelayed(this,75L);
+                if(generation==backspaceGeneration&&keyboardVisible)
+                    repeatHandler.postDelayed(this,75L);
             }
         };
         repeatHandler.postDelayed(backspaceRepeat,430L);
     }
     private void stopRepeat(){
+        backspaceGeneration++;
         if(backspaceRepeat!=null)repeatHandler.removeCallbacks(backspaceRepeat);
         backspaceRepeat=null;
     }
@@ -1675,7 +1703,12 @@ public final class VisionKeyboardService extends InputMethodService {
         boolean deleted=false;
         if(android.os.Build.VERSION.SDK_INT>=24)
             deleted=conn.deleteSurroundingTextInCodePoints(1,0);
-        if(!deleted)conn.deleteSurroundingText(1,0);
+        if(!deleted){
+            // Some third-party editors reject code-point deletion. Avoid
+            // splitting emoji surrogate pairs in their UTF-16 fallback.
+            CharSequence before=conn.getTextBeforeCursor(2,0);
+            conn.deleteSurroundingText(UnicodeDeletion.backspaceUnits(before),0);
+        }
         requestSuggestions();
     }
     private void press(String code){
@@ -1743,9 +1776,19 @@ public final class VisionKeyboardService extends InputMethodService {
             EditorInfo info=getCurrentInputEditorInfo();
             int action=info==null?EditorInfo.IME_ACTION_NONE:
                 (info.imeOptions&EditorInfo.IME_MASK_ACTION);
-            if(action!=EditorInfo.IME_ACTION_NONE && action!=EditorInfo.IME_ACTION_UNSPECIFIED)
-                conn.performEditorAction(action);
-            else conn.commitText("\n",1);
+            if(action!=EditorInfo.IME_ACTION_NONE &&
+               action!=EditorInfo.IME_ACTION_UNSPECIFIED &&
+               conn.performEditorAction(action))return;
+            // Apps differ in whether they implement IME actions. Send Enter
+            // once if no action was accepted, keeping search fields usable.
+            boolean pressed=conn.sendKeyEvent(
+                new KeyEvent(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_ENTER));
+            boolean released=conn.sendKeyEvent(
+                new KeyEvent(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_ENTER));
+            if(!pressed&&!released&&
+               (action==EditorInfo.IME_ACTION_NONE||
+                action==EditorInfo.IME_ACTION_UNSPECIFIED))
+                conn.commitText("\n",1);
             return;
         }
         if(phoneticEnabled() && isAsciiLetter(code)){
