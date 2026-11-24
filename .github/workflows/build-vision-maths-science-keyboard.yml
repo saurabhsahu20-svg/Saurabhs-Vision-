@@ -89,6 +89,18 @@ jobs:
           assert 'Landscapes' in gallery and 'Originals' in gallery
           assert '51 original' in activity
           assert '126 original' in activity
+          sticker_gallery=(root/'java/com/saurabhsvision/keyboard/StickerGalleryActivity.java').read_text()
+          assert 'OPEN STICKER GALLERY' in activity
+          assert 'StickerGalleryActivity.class' in activity
+          assert 'StickerGalleryActivity' in manifest and 'android:exported="false"' in manifest
+          assert 'showStickerPacks()' in ime
+          assert 'addStickerShortcut(strip);' in ime
+          assert 'addStickerShortcut(row);' in ime
+          assert 'addKey(row,"🧩","STICKERS"' in ime
+          assert 'code.equals("STICKERS")' in ime
+          assert 'StickerCatalog.preview(index,240)' in sticker_gallery
+          assert 'Share S Board sticker' in sticker_gallery
+          assert 'Intent.FLAG_GRANT_READ_URI_PERMISSION' in sticker_gallery
           assert 'packCount()' in stickers and 'Comic Faces' in stickers
           assert 'android.permission.INTERNET' not in manifest
           theme=(root/'java/com/saurabhsvision/keyboard/ThemePalette.java').read_text()
@@ -283,7 +295,7 @@ jobs:
           import hashlib
           logo_digest=hashlib.sha256((root/'res/drawable-nodpi/s_board_logo.webp').read_bytes()).hexdigest()
           assert logo_digest=='f7196693962b5f3e509b271f5451988ec0ebaf1f0d95b7e11cec62bce2a7fc9a', 'Wrong (old) S Board icon'
-          assert 'versionCode 32' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
+          assert 'versionCode 33' in Path('vision-maths-science-keyboard/app/build.gradle').read_text()
           assert (root/'java/com/saurabhsvision/keyboard/SBoardKeyButton.java').is_file()
           assert 'Toggle Smart Suggestions' in activity
           assert 'setMeasuredDimension(width,Math.min(cap' in panel
@@ -438,7 +450,7 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='com.saurabhsvision.keyboard'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree "$apk" AndroidManifest.xml | grep -q 'android.view.InputMethod'
           mkdir -p keyboard-deliverables
-          cp "$apk" keyboard-deliverables/S_Board_v1.9.22_MOOD_STICKERS.apk
+          cp "$apk" keyboard-deliverables/S_Board_v1.9.23_VISIBLE_STICKERS.apk
           sha256sum keyboard-deliverables/*.apk | tee keyboard-deliverables/SHA256SUMS.txt
 
       - name: Include Android apksigner utility in CI artifact for privately signed updates
@@ -450,7 +462,7 @@ jobs:
       - name: Upload downloadable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_v1_9_22_MOOD_STICKERS_APK
+          name: S_Board_v1_9_23_VISIBLE_STICKERS_APK
           path: keyboard-deliverables/*
           retention-days: 90
 
@@ -460,14 +472,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="s-board-v1.9.22-mood-stickers"
-          file="keyboard-deliverables/S_Board_v1.9.22_MOOD_STICKERS.apk"
+          tag="s-board-v1.9.23-visible-stickers"
+          file="keyboard-deliverables/S_Board_v1.9.23_VISIBLE_STICKERS.apk"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt --clobber
           else
             gh release create "$tag" "$file" keyboard-deliverables/SHA256SUMS.txt \
-              --title "S Board v1.9.22 - Original Mood Stickers" \
-              --notes "Adds 72 original transparent PNG stickers across Love, Morning, Laugh, Sadness, Sleep and Other. The nine existing sticker packs and 54 designs remain unchanged. A scrollable three-column gallery and lightweight preview cache keep touch response smooth. All existing keyboard layouts, rainbow S branding, themes, and typing tools remain. Public GitHub APK uses debug signing; Stable APK uses the earlier Stable signing certificate." \
+              --title "S Board v1.9.23 • Stickers Visible and Shareable" \
+              --notes "Fixes a real usability bug in the 1.9.22 sticker update: the 126 included PNG images were only reachable through the hidden horizontally scrolling advanced toolbar. There is now a visible one-tap 🧩 shortcut next to main word suggestions, in the voice-only row, and on the Emoji page. The S Board Settings screen has a prominent OPEN STICKER GALLERY button. The new gallery visibly previews all 126 original stickers in 15 categories including Love, Morning, Laugh, Sadness, Sleep and Other, with Android image/png sharing from each card via the native Share menu. All 54 existing original sticker IDs, 72 newly added original Moodlings, the rainbow S icon, keyboard layout, themes, ABC/123, voice typing, emoji, clipboard and privacy settings remain unchanged. Tests include actual Android UI visibility and PNG provider checks. The GitHub APK is debug-signed; a separately Stable-signed APK is needed for existing Stable installations." \
               --latest=false
           fi
 
@@ -493,7 +505,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: S_Board_1_9_22_Android_Mood_Stickers_Audit
+          name: S_Board_1_9_23_Android_Visible_Stickers_Audit
           path: |
             /tmp/sboard-portrait.png
             /tmp/sboard-landscape.png
@@ -503,6 +515,8 @@ jobs:
             /tmp/sboard-after-abc.xml
             /tmp/sboard-sboard-settings.png
             /tmp/sboard-sboard-settings.xml
+            /tmp/sboard-sticker-gallery-visible.png
+            /tmp/sboard-sticker-gallery.xml
             /tmp/sboard-theme-gallery.png
             /tmp/sboard-theme-gallery.xml
             /tmp/sboard-androidruntime.log
