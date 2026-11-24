@@ -315,7 +315,7 @@ public final class MainActivity extends Activity {
         add(root,text("Emoji tab → 🔎 Search emojis (offline) or 🎭 Cartoon Friends: playful cartoon-style kids, robots, superheroes, animals and expressions. Faces, Love, Science and other categories still work. These are original combinations of Unicode emoji (not official copyrighted character stickers). Rendering depends on your Android version. Total: "+EmojiCatalog.total()+" entries.",14,0xff496284,false),8);
         add(root,text("👦🎒  👧📚  🤖⚡  🦸‍♀️  🐼🎩  🧚‍♀️  🐱🦸",23,NAVY,true),7);
         add(root,text("🧩 Original Sticker Packs",21,NAVY,true),26);
-        add(root,text("54 original S Board sticker pictures in 9 offline packs, including Study Crew, Animal Moods, Science Fun, Comic Faces, Nature Notes and Sport Sparks. Open the 🧩 tab in your keyboard toolbar to insert a PNG sticker where the receiving app supports image input. Otherwise, an emoji and caption are inserted as a text fallback.",14,0xff496284,false),7);
+        add(root,text("126 original S Board sticker pictures in 15 offline packs. All 54 previous stickers remain unchanged. New transparent illustrated Moodlings include Love, Morning, Laugh, Sadness, Sleep and Other, with 12 original artworks per category. Open the 🧩 tab in your keyboard toolbar to insert a PNG sticker where the receiving app supports image input. Otherwise, an emoji and caption are inserted as a text fallback.",14,0xff496284,false),7);
 
         add(root,text("🧪 Test Your Keyboard",21,NAVY,true),30);
         add(root,text("नीचे बॉक्स पर टैप करें और Maths/Science keyboard से लिखकर देखें:",14,0xff496284,false),8);
