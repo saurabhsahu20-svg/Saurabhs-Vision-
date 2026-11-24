@@ -93,6 +93,13 @@ public final class MainActivity extends Activity {
         hero.addView(animatedLogoBadge,badgeParams);
         LinearLayout.LayoutParams hp=new LinearLayout.LayoutParams(-1,dp(222));root.addView(hero,hp);
 
+        // Main-screen entry point for users who don't know the hidden
+        // advanced toolbar: the new sticker gallery is now one tap away.
+        Button instantStickers=button("🧩 VIEW ALL 126 STICKERS",0xff395de4,Color.WHITE);
+        instantStickers.setContentDescription("Open S Board Sticker Gallery, all 126 images");
+        add(root,instantStickers,12);
+        instantStickers.setOnClickListener(v->startActivity(
+            new Intent(this,StickerGalleryActivity.class)));
         add(root,text("⌨️ Set Up S Board",20,NAVY,true),25);
         add(root,text("एक बार keyboard enable करें, फिर default keyboard चुनें। उसके बाद WhatsApp, Notes और दूसरे text fields में भी इस्तेमाल कर पाएँगे।",14,0xff496284,false),10);
         Button enable=button("① Enable S Board Keyboard",0xff1949ad,Color.WHITE);
