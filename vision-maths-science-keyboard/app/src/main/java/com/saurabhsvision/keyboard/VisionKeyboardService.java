@@ -434,7 +434,7 @@ public final class VisionKeyboardService extends InputMethodService {
                     openClipboardPanel();
                 }else if(index==9){
                     finishRomanWord();
-                    mode=STICKERS;stickerPack=9;toolbarExpanded=false;rebuild();
+                    showStickerPacks();
                 }else{
                     finishRomanWord();
                     Intent intent=new Intent(this,MainActivity.class);
@@ -478,6 +478,9 @@ public final class VisionKeyboardService extends InputMethodService {
         grid.setContentDescription("Show S Board tools, maths, science, languages, emoji, settings");
         strip.addView(grid,new LinearLayout.LayoutParams(dp(42),dp(39)));
         grid.setOnClickListener(v->{feedback(v);toolbarExpanded=!toolbarExpanded;rebuild();});
+        // Discoverability fix: this shortcut is visible without scrolling
+        // through the collapsed tools row (original user-facing bug).
+        addStickerShortcut(strip);
         suggestionChips=new TextView[4];
         for(int i=0;i<suggestionChips.length;i++){
             TextView chip=new TextView(this);
@@ -529,6 +532,7 @@ public final class VisionKeyboardService extends InputMethodService {
         openTools.setContentDescription("Show S Board keyboard tools");
         row.addView(openTools,new LinearLayout.LayoutParams(dp(44),dp(40)));
         openTools.setOnClickListener(v->{feedback(v);toolbarExpanded=!toolbarExpanded;rebuild();});
+        addStickerShortcut(row);
         TextView hint=new TextView(this);
         hint.setText("🎙 Tap microphone to dictate");
         hint.setGravity(Gravity.CENTER);
@@ -546,6 +550,25 @@ public final class VisionKeyboardService extends InputMethodService {
         keysContent.addView(row,new LinearLayout.LayoutParams(-1,dp(42)));
     }
 
+    private void showStickerPacks(){
+        finishRomanWord();
+        mode=STICKERS;
+        stickerPack=9; // Show the new Love category before legacy packs.
+        toolbarExpanded=false;
+        rebuild();
+    }
+    private void addStickerShortcut(LinearLayout row){
+        TextView sticker=new TextView(this);
+        sticker.setText("🧩");
+        sticker.setTextSize(21);
+        sticker.setGravity(Gravity.CENTER);
+        sticker.setContentDescription("Open S Board stickers: Love, Morning, Laugh, Sadness, Sleep, Other");
+        sticker.setBackground(new RippleDrawable(
+            ColorStateList.valueOf(0x445e97ef),
+            new GradientDrawable(),null));
+        row.addView(sticker,new LinearLayout.LayoutParams(dp(38),dp(39)));
+        sticker.setOnClickListener(v->{feedback(v);showStickerPacks();});
+    }
     /** Clipboard content is accessed only while S Board is the visible IME. */
     private ClipDescription safeClipDescription(){
         if(clipboardManager==null||!keyboardVisible)return null;
@@ -1406,6 +1429,7 @@ public final class VisionKeyboardService extends InputMethodService {
         row.setGravity(Gravity.CENTER);
         int height=dp(getResources().getConfiguration().orientation==2?38:47);
         addKey(row,"ABC","ABC",.9f,height,true);
+        addKey(row,"🧩","STICKERS",.95f,height,true);
         addKey(row,"◀","EMOJI_PREV",.55f,height,true);
         int pages=(EmojiCatalog.items(emojiCategory).length+EMOJIS_PER_PAGE-1)/EMOJIS_PER_PAGE;
         TextView count=new TextView(this);
@@ -1792,6 +1816,7 @@ public final class VisionKeyboardService extends InputMethodService {
         if(code.equals("LANG_HINDI")){selectLanguage(IndicLanguages.HINDI);return;}
         if(code.equals("LANG_HINGLISH")){selectLanguage(IndicLanguages.HINGLISH);return;}
         if(code.equals("LANG_ENGLISH")){selectLanguage(IndicLanguages.ENGLISH);return;}
+        if(code.equals("STICKERS")){showStickerPacks();return;}
         if(code.equals("ABC")){finishRomanWord();mode=ABC;shifted=false;toolbarExpanded=false;rebuild();return;}
         if(code.equals("SYM_MORE")){mode=SYMBOLS;rebuild();return;}
         if(code.equals("SYM_BACK")){mode=NUMBER;rebuild();return;}
