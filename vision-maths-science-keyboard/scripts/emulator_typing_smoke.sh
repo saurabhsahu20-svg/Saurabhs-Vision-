@@ -211,8 +211,8 @@ echo "PASS: encrypted 24-hour history, clipboard opt-in and HTML clipboard metad
 adb shell logcat -c || true
 adb shell am start -W -n "$APP/.ThemeStickerSelfTestActivity"
 sleep 3
-adb shell logcat -d -s SBoardThemeQA:I | grep 'PASS: 51 themes'
-echo "PASS: 51 original themes and 54 stickers including real PNG ContentProvider payload."
+adb shell logcat -d -s SBoardThemeQA:I | grep 'PASS: 51 themes, original 54 IDs unchanged, 126 PNG stickers'
+echo "PASS: 51 original themes, all original 54 stickers plus 72 new transparent Moodlings PNGs."
 
 # Check the themed gallery really opens on Android rather than just compiling.
 adb shell am start -W -n "$APP/.ThemeGalleryTestAlias"
