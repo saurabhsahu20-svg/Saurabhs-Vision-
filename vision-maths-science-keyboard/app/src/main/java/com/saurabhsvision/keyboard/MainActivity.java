@@ -317,6 +317,13 @@ public final class MainActivity extends Activity {
         add(root,text("🧩 Original Sticker Packs",21,NAVY,true),26);
         add(root,text("126 original S Board sticker pictures in 15 offline packs. All 54 previous stickers remain unchanged. New transparent illustrated Moodlings include Love, Morning, Laugh, Sadness, Sleep and Other, with 12 original artworks per category. Open the 🧩 tab in your keyboard toolbar to insert a PNG sticker where the receiving app supports image input. Otherwise, an emoji and caption are inserted as a text fallback.",14,0xff496284,false),7);
 
+        Button stickers=button("🧩 OPEN STICKER GALLERY • 126 PICTURES",0xff395de4,Color.WHITE);
+        add(root,stickers,14);
+        stickers.setContentDescription("Open all 15 sticker packs; Love, Morning, Laugh, Sadness, Sleep and Other");
+        stickers.setOnClickListener(v->startActivity(
+            new Intent(this,StickerGalleryActivity.class)));
+        add(root,text("Tap OPEN STICKER GALLERY to see every sticker and share pictures through Android's Share menu. On the keyboard, tap 🧩 next to suggestions or open it from the Emoji panel.",13,0xff496284,false),7);
+
         add(root,text("🧪 Test Your Keyboard",21,NAVY,true),30);
         add(root,text("नीचे बॉक्स पर टैप करें और Maths/Science keyboard से लिखकर देखें:",14,0xff496284,false),8);
         EditText test=new EditText(this);
