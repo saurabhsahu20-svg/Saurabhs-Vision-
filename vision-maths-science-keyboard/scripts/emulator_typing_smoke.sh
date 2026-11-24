@@ -225,6 +225,20 @@ grep -q 'S Board Themes' /tmp/sboard-theme-gallery.xml
 grep -q 'Create' /tmp/sboard-theme-gallery.xml
 echo "PASS: visual theme studio launches with Create and category filters."
 
+# Regression: the sticker content must be reachable from an actual visible
+# Gallery screen, not only exist in a hidden toolbar or ContentProvider.
+adb shell am start -W -n "$APP/.StickerGalleryActivity"
+sleep 3
+adb exec-out screencap -p > /tmp/sboard-sticker-gallery-visible.png
+test -s /tmp/sboard-sticker-gallery-visible.png
+adb shell uiautomator dump /sdcard/sboard-sticker-gallery.xml >/dev/null 2>&1
+adb pull /sdcard/sboard-sticker-gallery.xml /tmp/sboard-sticker-gallery.xml >/dev/null
+grep -q 'S Board Stickers' /tmp/sboard-sticker-gallery.xml
+grep -q 'Love' /tmp/sboard-sticker-gallery.xml
+grep -q 'Share PNG' /tmp/sboard-sticker-gallery.xml
+echo "PASS: visible Sticker Gallery opens, Love stickers and shareable PNG cards are discoverable."
+
+
 # Verify the new, accessible Layout & Keys settings activity on Android 15.
 adb shell am start -W -n "$APP/.KeyboardSettingsTestAlias"
 sleep 3
