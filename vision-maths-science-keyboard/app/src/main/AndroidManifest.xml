@@ -32,6 +32,10 @@
             android:exported="false"
             android:label="S Board Settings" />
         <activity
+            android:name=".StickerGalleryActivity"
+            android:exported="false"
+            android:label="S Board Stickers" />
+        <activity
             android:name=".ThemeGalleryActivity"
             android:exported="false"
             android:label="S Board Themes"
