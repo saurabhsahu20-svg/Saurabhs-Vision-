@@ -227,7 +227,9 @@ echo "PASS: visual theme studio launches with Create and category filters."
 
 # Regression: the sticker content must be reachable from an actual visible
 # Gallery screen, not only exist in a hidden toolbar or ContentProvider.
-adb shell am start -W -n "$APP/.StickerGalleryActivity"
+# Target an exported alias only present in debug AndroidManifest.xml.
+# Production activity remains private (android:exported=false).
+adb shell am start -W -n "$APP/.StickerGalleryTestAlias"
 sleep 3
 adb exec-out screencap -p > /tmp/sboard-sticker-gallery-visible.png
 test -s /tmp/sboard-sticker-gallery-visible.png
