@@ -17,5 +17,9 @@
         <activity-alias android:name=".ThemeGalleryTestAlias"
             android:targetActivity=".ThemeGalleryActivity"
             android:exported="true" />
+        <!-- Test-only alias; production StickerGalleryActivity stays private. -->
+        <activity-alias android:name=".StickerGalleryTestAlias"
+            android:targetActivity=".StickerGalleryActivity"
+            android:exported="true" />
     </application>
 </manifest>
